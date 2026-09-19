@@ -3,17 +3,14 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.2: scaffold.** `docs/plan.md` is approved — build to it, do not re-derive it.
-
-Scaffold Vite + React + TypeScript, add Zustand, Vitest and zod, create the empty folder structure from
-plan.md section 1, confirm `dev` / `build` / `test` all run, fill those three commands into the
-`## Commands` section at the bottom of `CLAUDE.md` (currently a placeholder line), then commit.
-
-No game logic in 1.2. Data files and loaders are 1.3.
+**Step 1.3: content data.** Read `docs/plan.md` section 3 and `docs/content-data.md`, then create every
+file in `src/data/` plus `schema.ts` and `index.ts`, and a content load test proving every species,
+hybrid, trait, ability and resource loads and cross-resolves. Delete `test/smoke.test.ts` once the
+real content test exists.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
-- [ ] 1.2 Scaffold Vite + React + TS + Zustand + Vitest. Build and test commands work. Commands filled in CLAUDE.md. First git commit.
+- [x] 1.2 Scaffold Vite + React + TS + Zustand + Vitest. Build and test commands work. Commands filled in CLAUDE.md. First git commit. *(2026-09-19)*
 - [ ] 1.3 Convert `docs/content-data.md` into JSON in `src/data/` (types, skills, species, hybrids, traits, tuning knobs) plus loaders with type-checked schemas. Test that every species and hybrid loads.
 - [ ] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests.
 - [ ] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests.
@@ -63,6 +60,23 @@ Approved with six amendments, all folded into plan.md:
    parallel simulation, so the shipped code stays exercised. Added to step 1.8. Phase 1 still starts the
    player with one Sproutlet and nothing else. (plan.md 1, 5, 7, 7.1)
 6. Offline slot-ordering question recorded below.
+
+### 2026-09-19, step 1.2 — scaffold
+Scaffolded by hand rather than `npm create vite`, because that command prompts when the target directory
+is not empty. Layout follows plan.md section 1: `tsconfig.json`, `vite.config.ts`, `vitest.config.ts`,
+`index.html`, `src/main.tsx`, `src/App.tsx`, and empty `src/{data,sim,state,ui/*,types}` and `test/`
+folders (each holds a `.gitkeep` so git tracks it).
+
+- Versions are whatever npm resolved today: React 19.3, Vite 8.3, Vitest 5.0, **TypeScript 7.0**, zod 4.6,
+  Zustand 5.0. Note TS 7 is the native compiler; `tsc --noEmit` type-checks the build.
+- `vitest.config.ts` only includes `test/**/*.test.ts`, matching plan.md's `test/` folder.
+- `test/smoke.test.ts` is a one-assertion toolchain check so `npm test` has something to run. It goes away
+  in 1.3 when the real content test lands.
+- Verified: `npm run build` exits 0, `npm test` passes, and `npm run dev` serves the page and the
+  transformed `App.tsx` on :5173.
+- The commit also carries the earlier uncommitted formatting pass on `CLAUDE.md` (bullets, blank lines,
+  the new session-naming rule 7), plus the rule 7 fix: literal `\*\*` restored to bold, and the trailing
+  "Then commit that change" sentence removed.
 
 ## Open questions for the designer
 
