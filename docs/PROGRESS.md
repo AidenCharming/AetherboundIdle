@@ -3,23 +3,16 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.4: sim core.** Build to `docs/plan.md` sections 4.1-4.4, 4.6 and 4.7, and the phase 1 test list in
-section 6. Create `src/sim/` as pure functions (no React, no zustand, no `Date.now()`, no `Math.random()`):
-`rng.ts`, `formulas.ts` (stats, cooldown with the efficiency divisor and floor, xp curve, level <-> xp),
-`modifiers.ts` (collect effects, apply the registry caps and the strongest-only aura rule), `creature.ts`,
-`skills.ts` (slot unlocks, action resolution, output rolls, xp), `aether.ts` (continuous bench emission)
-and `events.ts`, each with unit tests in `test/`.
-
-Read game content through `import { content } from '../data'` (validated, with trait strengths filled in).
-Two things changed at 1.3 that affect this step: the bonus Health/Power/Guard traits are a **percentage of
-the stat** (plan 4.1 was amended), and the Overclocked `dynamic` effect has an open question (below), so
-skip modelling `dynamic` effects until that is answered. Then 1.5 (offline + save) is the step after.
+**Step 1.5: offline progress + save/load.** Build to `docs/plan.md` sections 4.5, 4.6 and 5, and the offline, RNG
+and save items in section 6. Add `src/sim/tick.ts` (`step(state, dtMs)` = `advanceSkills` then `accrueAether`; it lands
+here rather than 1.6 because offline is built on it), `src/sim/offline.ts`, `src/sim/save.ts` and
+`src/state/persistence.ts`, each with tests. Offline must call the same `step` with `dt = elapsed`: no maths of its own.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
 - [x] 1.2 Scaffold Vite + React + TS + Zustand + Vitest. Build and test commands work. Commands filled in CLAUDE.md. First git commit. *(2026-09-19)*
 - [x] 1.3 Convert `docs/content-data.md` into JSON in `src/data/` (types, skills, species, hybrids, traits, tuning knobs) plus loaders with type-checked schemas. Test that every species and hybrid loads. *(2026-09-19)*
-- [ ] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests.
+- [x] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests. *(2026-09-19)*
 - [ ] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests.
 - [ ] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources.
 - [ ] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot.
@@ -175,6 +168,58 @@ changes. That is intentional: it is what keeps the names honest.
    strengths" note from 1.3; the low roll weight stays.
 
 `test/content.test.ts` pins both (73 tests).
+
+### 2026-09-19, step 1.4 — sim core
+
+`src/sim/`: `rng`, `formulas`, `modifiers`, `creature`, `skills`, `aether`, `events`, plus `state` (new game) and
+`src/types/state.ts`. All pure: nothing imports React, zustand or `Date.now`/`Math.random`, and `src/sim` imports
+only `src/data` and `src/types`. 135 new tests; 208 pass and `npm run build` is clean.
+
+**Formulas follow plan 4.1-4.4 as amended.** Efficiency divides the base time; the floor is
+`adjustedBase * floorFraction`; Aether is `emissionPerMin * dt / 60000` accrued as a float from whatever `dt` the step
+carries (`benchEmissionTickMs` is not read anywhere in the sim, and a test proves changing it changes nothing); the
+RNG state lives in `GameState.rngState` and is written back by every function that consumes it. Every function takes
+its content as a trailing `c: Content = content` argument, so tests build variants of the real data instead of mocks.
+
+**Dynamic effects (Overclocked) are NOT modelled, by instruction.** `modifiers.ts` has one marked hook,
+`dynamicEffectValue`, which returns 0, so a `dynamic` effect contributes nothing. **The design question is still
+open** (see "Needs an answer before Phase 3" below): what "resets on task completion" means for an endless idle loop.
+Whatever the answer is lands in that hook and will probably need a stack counter in creature state. Tested: Coilchirp
+gets no cooldown reduction from Overclocked and its other sources are unaffected.
+
+**Deviations from plan.md shape** (plan.md updated to match):
+1. **`progressMs` moved from the skill onto each slot.** Plan 5 had one per skill, but every slot has its own creature
+   and cooldown, so two slots cannot share one progress counter.
+2. **`nextCreatureSeq` added to `GameState`**: creature ids are `creature-<n>`, so ids need no `Math.random`.
+3. **`settings.autoBind` left out.** Plan 5 wrote it as `...`; it is phase 3 and will be added with its migration.
+4. **Plan 4.5's per-level segmentation is not needed yet.** Nothing about a running slot depends on the skill's level
+   (cooldown uses creature level, rarity and form) and no skill consumes resources, so a window crossing a level-up gives
+   an identical result summed in one pass: XP added once, level derived once, a `skill-level-up` per level crossed and a
+   `slot-unlocked` at each threshold. `advanceSkills` says where segmentation goes if a later phase adds a level-dependent
+   input. `offline.maxSegmentsPerSlot` is therefore unused for now. Tested: one call and 14,400 small calls agree exactly.
+5. **New files beyond the plan's list:** `sim/state.ts` (`createInitialState(seed, now)`); `tick.ts` moves to step 1.5.
+6. **`action-complete` is aggregated**: one event per slot per call carrying `count`, `outputs` and `skillXp`, so a
+   12-hour window is one event per slot rather than tens of thousands.
+
+**Interpretations to confirm** (the plan defines cooldown, stats and bench Aether only; these read the design's trait list):
+- `extra_output_chance`: chance of +1 extra of the gathered resource per action, additive, capped (offline adds
+  `offline_extra_output_chance`). `bonus_xp`: multiplies XP per action. **`rare_drop_chance` scales the drop's own
+  chance** (+10% on 1% is 1.1%), not percentage points, since adding 10 points to a 1% drop would be 11x. Output rolls
+  are binomial draws, exact for small expected counts and a normal approximation above 30.
+- Not consumed yet, with a marked hook: `partner_element_drop_chance` (no hybrids before phase 2), `save_material_chance`
+  (no consuming skills before phase 3), `treasure_drop_chance` (Fishing).
+- `active-creatures` auras (Sea Breeze) include their own source; `other-active-in-skill` (Resonant Frequency) does not.
+  Both reach only creatures that are in a work slot. Two of the same aura take the strongest; different auras add.
+- **A hybrid on an open skill takes no off-primary penalty.** "Covered skills" are the locked skills of its two types
+  (plan 3.7), so Fabrication and Scavenging are nobody's off-primary. The secondary-aptitude bonus still applies.
+- **Working awards no creature XP**: design section 8 says only combat levels a creature. `grantCreatureXp` exists,
+  is tested (level-ups, automatic Form 2 at 30 and Form 3 at 60) and is called by nothing until phase 3.
+
+**A finding for the designer.** With the shipped placeholders the 20% cooldown floor is **unreachable**: the best case
+(level 99, Zenith, Form 3, and the 50% trait cap) is `1/2.032 * 0.5` = **24.6%** of the adjusted base. The floor is a
+safety net today, and the "an off-primary hybrid can never reach specialist speed" property still holds without it
+(1.667x slower at every point). Tests raise `floorFraction` to 0.6 to prove the floor maths where it binds. If you want
+the floor to matter, raise `floorFraction`, lower the cap, or steepen `levelTermPerLevel`.
 
 ## Open questions for the designer
 

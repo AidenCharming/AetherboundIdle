@@ -500,7 +500,9 @@ for each active work slot:
 ```
 
 Segmenting on level-ups keeps this bulk (a handful of divisions) while staying correct when a level-up
-changes the slot count or unlocks a resource tier. Output rolls across `n` actions use a binomial draw
+changes something a running slot depends on. **Today nothing does** (cooldown depends on creature level, not skill
+level, and no skill consumes resources), so `advanceSkills` sums XP and derives the level once; segment there if a
+later phase adds a level-dependent input. Output rolls across `n` actions use a binomial draw
 from the seeded RNG rather than `n` individual rolls. The whole thing returns a summary object that
 feeds the "welcome back" screen in step 1.8.
 
@@ -558,11 +560,12 @@ type GameState = {
   resources: Record<string, number>
   creatures: Creature[]     // id, speciesId, isHybrid, rarityTier, level, xp, form, shiny,
                             // poolTraits: [{ traitId, strength, locked }], assignment
+  nextCreatureSeq: number   // creature ids are `creature-<n>`, so ids need no Math.random
   skills: Record<string, {
-    level: number
-    xp: number
-    slots: ({ creatureId: string; resourceId: string } | null)[]
-    progressMs: number
+    level: number           // cached from xp; only addSkillXp changes either
+    xp: number              // cumulative
+    slots: ({ creatureId: string; resourceId: string; progressMs: number } | null)[]
+                            // progressMs is per SLOT: each slot's creature has its own cooldown
   }>
   collection: {
     speciesSeen: string[]
@@ -571,7 +574,7 @@ type GameState = {
     shiniesFound: string[]
     formsUnlocked: Record<string, number>
   }
-  settings: { autoBind: ..., offlineSummary: boolean, devPanelEnabled: boolean }
+  settings: { offlineSummary: boolean, devPanelEnabled: boolean }   // autoBind arrives in phase 3
 }
 ```
 
