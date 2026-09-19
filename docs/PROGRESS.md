@@ -3,14 +3,17 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.6, checkpoint B: the Skills screen** (checkpoint A, the state layer, is done, see below). Build, in `src/ui/`
-and reading only through `src/state/selectors.ts` / `useGameStore` / `useActions` (never `src/sim`):
-1. Woodcutting slot(s) driven by the skill's real slot count, each with the creature, a progress bar
-   (`selectSlotProgress`, smoothed by `uiTickMs`, no backwards sweep at the cycle boundary) and the oak/willow/yew
-   picker (locked tiers greyed with their level).
-2. Assign and unassign, showing the sim's rejection reason.
-3. Skill level, XP toward next level and slot count; the top bar (gold, floored Aether, resources held).
-4. The quarantine banner with a dismiss control. Do not build the welcome-back screen (1.8).
+**Step 1.7: roster screen** with placeholder art cards (type colors, emoji, rarity frame), filter and sort, and assign to
+slot. Same rules as 1.6: the UI reads only through `src/state/selectors.ts` / `useGameStore` / `useActions` and never
+imports `src/sim`; anything derived (rarity name and frame, stats, shiny hue) becomes a selector. Starting points:
+- `selectCreatureView` (selectors.ts) is deliberately minimal (name, emoji, type color, level, where it works). The roster
+  card needs rarity, form, shiny and the rest, so extend that view (it is cached per creature object) rather than adding a
+  second one. Type colors already come from `types.json`; rarity frames come from `rarities.json` `frame`.
+- Assigning from the roster can reuse `actions.assignCreature` and the picker rules in `SlotCard.tsx`. A slot needs a
+  resource to be assigned, and `selectDefaultResourceId` gives the lowest unlocked one.
+- Phase 1 still has one creature (the starter Sproutlet), so filter and sort are exercised mostly by tests. The dev panel
+  (1.8) is what will let you grant more.
+- No new art assets: emoji plus CSS. Rarity is a frame/tint/glow and shinies a runtime hue shift (CLAUDE.md rule 4).
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -18,7 +21,7 @@ and reading only through `src/state/selectors.ts` / `useGameStore` / `useActions
 - [x] 1.3 Convert `docs/content-data.md` into JSON in `src/data/` (types, skills, species, hybrids, traits, tuning knobs) plus loaders with type-checked schemas. Test that every species and hybrid loads. *(2026-09-19)*
 - [x] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests. *(2026-09-19)*
 - [x] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests. *(2026-09-19)*
-- [ ] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources.
+- [x] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources. *(2026-09-19; state layer in checkpoint A, screen in checkpoint B)*
 - [ ] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot.
 - [ ] 1.8 Bench and Aether emission display, "welcome back" offline summary, dev panel (see plan.md 7.1), polish pass. Phase 1 playable.
 
@@ -339,8 +342,79 @@ assignable creatures, floored Aether) all live there.
    needed. It allows `zod` in the sim (`save.ts` has used it since 1.5) and forbids React and zustand there.
 6. **Sim events are not stored.** The tick's `SimEvent`s are dropped; nothing consumes them until toasts or 1.8 exist.
 
-**Not verified in a browser yet:** all of the above is node-tested; the app has not been run. Checkpoint B and the final
-check do that.
+**Browser check:** this checkpoint was node-tested only; the driver, autosave and unload flush were then run in a real
+browser as part of checkpoint B (see below), which is where the progress-bar bug turned up.
+
+### 2026-09-19, step 1.6 checkpoint B: Skills screen
+
+`src/ui/`: `theme.css`, `format.ts`, `components/{ProgressBar,TopBar,NoticeBanner,SlotCard}.tsx`, `screens/Skills.tsx`;
+`App.tsx` is the layout shell (no router until 1.7 adds a second screen). The UI imports only `state/selectors`,
+`state/runtime` (the two hooks) and `state/actions` (types); a test scans for anything else. 386 tests pass and
+`npm run build` is clean.
+
+**What it shows.** One panel per skill that has something to gather (data-driven: Mining etc. appear when they get
+resources). The panel has the skill level, an XP bar with `xp in level / xp to next`, and `Slots n / total, next at level X`.
+It renders one `SlotCard` per **actual** unlocked slot (`selectSlotCount`, not a hardcoded 1). Each card has the creature
+(emoji, form name, level), a progress bar with percent and cooldown per action, the tier picker, Unassign, and an Assign /
+Replace list of the creatures that can work the skill. The top bar has gold, floored Aether, and a chip per resource held.
+A quarantine banner shows the sim's own message, the `save-broken-<timestamp>` key the old save was kept under, and Dismiss.
+
+**Decisions (all reversible):**
+1. **Locked tiers are natively `disabled`** and show `Needs level N`. So the sim's rejection reason is wired end to end
+   (`actions` return it, `SlotCard` renders it under the card) but the UI cannot produce one today: the only moves it
+   offers are ones the sim accepts. The reason text is covered by `test/store.test.ts`; the rendering path was **not**
+   exercised in a browser. Say so if you would rather have locked tiers clickable so they can show the sim's message.
+2. **An empty slot keeps the player's tier choice as local component state** until they assign someone, defaulting to the
+   lowest unlocked resource (`selectDefaultResourceId`). An occupied slot's picker calls `setSlotResource`. Unassigning
+   resets the choice to the default.
+3. **Resources show a type-colored dot and the name, not an emoji**, because `resources.json` has no emoji field (creatures
+   do). Gold and Aether are plain labels. Nothing in `ui/` writes a type color: skill accents, creature rings and resource
+   dots all come from `types.json` through the selectors, and `theme.css` holds neutral chrome only.
+4. **Aether is floored for display in a selector** (`selectAetherDisplay`); the stored float is never touched, and a
+   component re-renders once per whole Aether instead of once per tick.
+5. **Only the progress bar re-renders every tick.** Each component selects narrow primitives; `SlotProgress` is the sole
+   10 Hz subscriber.
+
+**A bug found only by running it, and fixed.** The bar smooths each 100 ms step with a CSS transition, so the fill must not
+transition when it falls back at the cycle boundary. The first version used a `snap` class, and in the browser 1 in 8 wraps
+still swept backwards: the 15 s autosave lands on the same tick (15000 is a multiple of the tick and of the 3000 ms cycle),
+and its second store update re-rendered the bar 1 ms after the wrap, removing the class before the browser painted. The fix
+(`ProgressBar.tsx`) disables the transition and forces a style flush on the element in a layout effect, so no later render
+can undo it. Re-measured over 12 wraps, three of them autosave-aligned: no backwards sweep (the only transitions left were
+about 0.1% forward nudges). This is verified in the browser only: there is no DOM test environment, and adding jsdom would
+be a new dependency.
+
+**Verified in a real browser (Vite dev server, Chromium pane):**
+- The bar fills and wraps every 3.0 s (oak), 4.0 s (willow) and 5.0 s (yew). Logs and XP climb in the top bar and skill
+  panel; the level went 1 to 9 in a few minutes.
+- The picker locks and unlocks by level, editing the saved XP: level 14 has Willow and Yew locked; level 15 unlocks Willow
+  (Yew still locked); level 30 unlocks Yew and gives two slots. Clicking Willow and Yew switches the slot and its cooldown.
+- Assign, unassign and move: choosing a tier on an empty slot, then Assign, moves the Sproutlet out of its old slot.
+- A plain reload keeps everything (only the seconds the reload took were credited: no loss, no double count).
+- **Offline catch-up**: `lastSeen` rewound one hour with the Sproutlet on yew gave exactly +36,000 XP (720 actions x 50),
+  +774 yew (720 plus Overgrowth extras, a low draw at -2.2 sd; I checked 400 seeds in node: mean 73.1, sd 7.9 against
+  72 / 8.05), +8 seedcache, level 30 to 42, and a third slot at level 40.
+- **The unload flush**: with the saved `lastSeen` 11.4 s stale, both `beforeunload` and `pagehide` had rewritten it to
+  0 ms by the time a later listener ran.
+- The quarantine banner: a corrupt save gives the banner with the sim's message and the backup key, the raw text is kept
+  byte for byte under that key, and Dismiss removes the banner.
+- Phone width (375 px): no horizontal overflow, every button at least 44 px tall.
+
+**Not verified:** the rejection-reason rendering (decision 1); the `visibilitychange` catch-up in a real backgrounded tab (only
+the node test covers it); a real phone, Safari or Firefox (Chromium only); and the ProgressBar has no automated test.
+
+**Two notes for whoever tests by hand.**
+- **"Set `lastSeen` back in localStorage and reload" does not work as written while the tab is open.** The tab's own
+  `pagehide`/`beforeunload` flush rewrites `lastSeen = now` before the reload, silently undoing the edit. I emulated a closed
+  tab by registering a later `pagehide` listener that re-wrote the edited save. Step 1.8's dev-panel fast-forward is the
+  proper answer and is exactly what plan 7.1 describes.
+- On the very first `vite` start of this step the console logged "Invalid hook call" once and the page recovered on Vite's
+  own reload. A second, fully cold start (`node_modules/.vite` deleted) did not reproduce it, so I treated it as dependency
+  pre-bundling on the first run and changed nothing.
+
+**Tooling.** The preview launcher would not run `npm` from a folder with a space in its path, so
+`C:\ClaudeProjects\.claude\launch.json` (workspace root, outside the repo, not committed) starts Vite through `node`
+directly. `npm run dev` is unchanged.
 
 ## Open questions for the designer
 

@@ -20,6 +20,7 @@ describe('layering', () => {
   it('finds the source tree', () => {
     expect(under('sim/').length).toBeGreaterThan(5)
     expect(under('state/').length).toBeGreaterThan(3)
+    expect(under('ui/').length).toBeGreaterThan(3)
   })
 
   it('the UI never imports the sim (it reads through state/selectors.ts)', () => {
