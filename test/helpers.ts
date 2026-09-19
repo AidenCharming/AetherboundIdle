@@ -4,6 +4,7 @@ import { makeCreature } from '../src/sim/creature'
 import { xpForLevel } from '../src/sim/formulas'
 import { addSkillXp, assignCreature } from '../src/sim/skills'
 import { createInitialState } from '../src/sim/state'
+import type { Env } from '../src/state/driver'
 import type { StorageLike } from '../src/state/persistence'
 import type { Creature, GameState, PoolTraitRoll } from '../src/types/state'
 
@@ -80,6 +81,8 @@ export class MemoryStorage implements StorageLike {
   data = new Map<string, string>()
   failWrites = false
   failReads = false
+  /** Successful writes so far, to tell one flush from two. */
+  writes = 0
   getItem(key: string): string | null {
     if (this.failReads) throw new Error('storage read blocked')
     return this.data.get(key) ?? null
@@ -87,5 +90,53 @@ export class MemoryStorage implements StorageLike {
   setItem(key: string, value: string): void {
     if (this.failWrites) throw new Error('quota exceeded')
     this.data.set(key, value)
+    this.writes++
   }
 }
+
+/**
+ * Everything the tick driver takes from the browser, under the test's control: a clock that only moves when the
+ * test moves it, timers that only fire when the test fires them, and window / document event targets.
+ */
+export class FakeEnv implements Env {
+  storage = new MemoryStorage()
+  clock = NOW
+  seedDraws = 0
+  seed = 424242
+  visibility = 'visible'
+  win = new EventTarget()
+  doc: EventTarget & { readonly visibilityState: string }
+  /** Live intervals by handle. */
+  intervals = new Map<number, { fn: () => void; ms: number }>()
+  private nextHandle = 1
+
+  constructor() {
+    // A live getter, so flipping `visibility` is seen by the driver's listener. (Object.assign would copy the value.)
+    const doc = new EventTarget()
+    Object.defineProperty(doc, 'visibilityState', { get: () => this.visibility })
+    this.doc = doc as EventTarget & { readonly visibilityState: string }
+  }
+
+  now = (): number => this.clock
+  randomSeed = (): number => {
+    this.seedDraws++
+    return this.seed
+  }
+  setInterval(fn: () => void, ms: number): number {
+    const handle = this.nextHandle++
+    this.intervals.set(handle, { fn, ms })
+    return handle
+  }
+  clearInterval(handle: unknown): void {
+    this.intervals.delete(handle as number)
+  }
+  /** Fires every live interval registered with this period. */
+  fire(ms: number): void {
+    for (const t of [...this.intervals.values()]) if (t.ms === ms) t.fn()
+  }
+  /** Periods of the live intervals, sorted. */
+  get periods(): number[] {
+    return [...this.intervals.values()].map((t) => t.ms).sort((a, b) => a - b)
+  }
+}
+

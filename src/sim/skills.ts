@@ -1,7 +1,7 @@
 // Skills: slot unlocks, assigning creatures to slots, and action resolution. `advanceSkills` is THE code path
 // for both the online tick and offline catch-up: a 200 ms frame and a 12-hour window differ only in `dt`
 // (plan.md 4.4, 4.5), so they cannot drift apart.
-import { content, type Content, type Skill } from '../data'
+import { content, type Content, type Resource, type Skill } from '../data'
 import type { Creature, GameState, SkillState, SlotState } from '../types/state'
 import { canWork, creatureCooldown } from './creature'
 import type { SimEvent, SimResult } from './events'
@@ -130,6 +130,36 @@ export function setSlotResource(state: GameState, skillId: string, slotIndex: nu
 
 // ---------- action resolution ----------
 
+/** A slot that is really working, with everything `advanceSkills` and the UI's progress bar both need. */
+export interface RunningSlot {
+  slot: SlotState
+  creature: Creature
+  resource: Resource
+  cooldownMs: number
+}
+
+/**
+ * The one place that decides whether a slot is working, so the tick and the progress bar cannot disagree. A slot
+ * whose creature or resource no longer resolves (a rebalance removed it), or whose resource is above the skill's
+ * level, idles instead of throwing: this returns null.
+ */
+export function runningSlot(
+  skill: Skill,
+  skillState: SkillState,
+  slotIndex: number,
+  creatureById: ReadonlyMap<string, Creature>,
+  active: readonly ActiveEntry[],
+  c: Content = content,
+): RunningSlot | null {
+  const slot = skillState.slots[slotIndex]
+  const creature = slot && creatureById.get(slot.creatureId)
+  const resource = slot && c.resourceById.get(slot.resourceId)
+  if (!slot || !creature || !resource) return null
+  if (resource.kind !== 'raw' || resource.skill !== skill.id) return null
+  if (resource.baseActionMs === null || resource.requiredSkillLevel === null || resource.requiredSkillLevel > skillState.level) return null
+  return { slot, creature, resource, cooldownMs: creatureCooldown(creature, skill.id, resource.baseActionMs, active, c).cooldownMs }
+}
+
 export interface AdvanceOptions {
   /** True on the offline path: adds `offline_extra_output_chance` to the extra-output roll. */
   offline?: boolean
@@ -166,16 +196,11 @@ export function advanceSkills(state: GameState, dtMs: number, opts: AdvanceOptio
     const slotEvents: SimEvent[] = []
     let xpGained = 0
 
-    skillState.slots.forEach((slot, slotIndex) => {
-      const creature = slot && creatureById.get(slot.creatureId)
-      const resource = slot && c.resourceById.get(slot.resourceId)
-      // A slot whose creature or resource no longer resolves (a rebalance removed it) or whose resource is
-      // above the skill's level just idles instead of throwing.
-      if (!slot || !creature || !resource) return
-      if (resource.kind !== 'raw' || resource.skill !== skill.id) return
-      if (resource.baseActionMs === null || resource.requiredSkillLevel === null || resource.requiredSkillLevel > skillState.level) return
+    skillState.slots.forEach((_, slotIndex) => {
+      const running = runningSlot(skill, skillState, slotIndex, creatureById, active, c)
+      if (!running) return
+      const { slot, creature, resource, cooldownMs } = running
 
-      const cooldownMs = creatureCooldown(creature, skill.id, resource.baseActionMs, active, c).cooldownMs
       const total = slot.progressMs + dt
       const n = completedActions(total, cooldownMs)
       slots[slotIndex] = { ...slot, progressMs: Math.max(0, total - n * cooldownMs) }

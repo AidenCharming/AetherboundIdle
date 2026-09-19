@@ -3,18 +3,14 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.6: state layer + Skills screen.** UI reads state through `src/state/selectors.ts` and never imports `src/sim`
-directly (plan.md section 1). Build, in order:
-1. `src/state/store.ts` (zustand, holds `GameState`), `actions.ts` and `selectors.ts`. Boot with
-   `loadGame(localStorage, Date.now(), <seed drawn once from crypto.getRandomValues>)` and keep the returned
-   `LoadOutcome` in the store: step 1.8 renders its `summary`, and 1.6 must at least show a banner for a
-   `quarantined` `notice`.
-2. The **tick driver** in `main.tsx`: a timer calling `step(state, now - lastTick)` (the sim's one step function), the
-   15 s autosave (`tuning.save.autosaveMs`) via `flushSave`, and a flush on `pagehide`/`beforeunload`.
-   `actions.ts` wraps `commitRoll` from `persistence.ts` for phase 2's breed/hatch/capture; nothing uses it yet.
-3. The Skills screen: one Woodcutting slot with a progress bar (`progressMs / cooldown`, the cooldown from
-   `creatureCooldown`), the oak/willow/yew picker (`setSlotResource`, locked tiers greyed with their level), assign
-   and unassign, a top bar with gold, Aether (rounded for display only), and resources.
+**Step 1.6, checkpoint B: the Skills screen** (checkpoint A, the state layer, is done, see below). Build, in `src/ui/`
+and reading only through `src/state/selectors.ts` / `useGameStore` / `useActions` (never `src/sim`):
+1. Woodcutting slot(s) driven by the skill's real slot count, each with the creature, a progress bar
+   (`selectSlotProgress`, smoothed by `uiTickMs`, no backwards sweep at the cycle boundary) and the oak/willow/yew
+   picker (locked tiers greyed with their level).
+2. Assign and unassign, showing the sim's rejection reason.
+3. Skill level, XP toward next level and slot count; the top bar (gold, floored Aether, resources held).
+4. The quarantine banner with a dismiss control. Do not build the welcome-back screen (1.8).
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -290,7 +286,72 @@ instead of dividing, Aether in whole-minute lumps, Aether reading `benchEmission
 ignored, `lastSeen` not re-anchored, `commitRoll` not flushing, auras stacking, cap not applied, the hybrid penalty on
 open skills, Overclocked modelled, the migration chain skipped, and an assignment/slot mismatch not detected.
 
+### 2026-09-19, step 1.6 checkpoint A: state layer and tick driver
+
+New in `src/state/`: `store.ts`, `driver.ts`, `actions.ts`, `selectors.ts`, `runtime.ts`. 81 new tests (305 before this step); 386 pass and
+`npm run build` is clean. `main.tsx` calls `bootGame()` once, outside React, before the first render.
+
+**Shape.** `store.ts` is a vanilla zustand store `{ game, loadReport, noticeDismissed }` with no timers, storage or clock.
+`driver.ts` is `createTickDriver(store, env)`; `actions.ts` is `createActions(store, driver, storage)`; `selectors.ts` is
+what the UI reads. `runtime.ts` is the only file in `src/state` that touches `window`, `localStorage`, `crypto` or
+`Date.now` (a test enforces it). It builds the real `Env`, boots the game, and exports the two hooks the UI uses,
+`useGameStore(selector)` and `useActions()`. Everything else takes the clock, storage, timers and window/document as
+arguments, so it is tested in node with a `FakeEnv` (`test/helpers.ts`).
+
+**Driver rules, each with a test that fails if the rule is broken** (I broke `flush` and the re-anchor on purpose to check):
+- dt is real elapsed time from the injected clock. Negative dt becomes 0 and the anchor moves to the new now, so progress
+  resumes instead of freezing until the clock catches up (same reasoning as `applyOffline`). A NaN clock is ignored.
+- A large dt goes to `step` in one call, never a loop. Tested with a ten-hour gap: one `step` call, result identical to
+  calling the sim directly.
+- **Every flush steps to now first**: the autosave (`tuning.save.autosaveMs`), `pagehide`, `beforeunload`, and
+  `actions.commitRoll`. Tested by advancing the clock an hour with no tick, flushing, and checking the saved file holds
+  the hour of work and that an immediate reload has a zero window (nothing forfeited, nothing double-counted).
+- `visibilitychange` to visible steps to now. `start()` is idempotent and `stop()` removes every timer and listener.
+- Tick period is `tuning.ui.tickMs` (new, 100, in schema, JSON, content test and plan 3.10). It is a presentation cadence
+  only, like `benchEmissionTickMs`: the sim takes any dt.
+- **Every action also steps to now before it acts**, so the sliver of time since the last tick is credited to the slot as it
+  was, not as it becomes. Tested (30 s pending, unassign, credited 10 actions, not double-counted on the next tick).
+
+**Boot.** `bootGame(env)` draws the seed once (`crypto.getRandomValues`, via `Env.randomSeed`), calls `loadGame`, builds the
+store and starts the driver. A second call returns the running game and starts nothing. If `window.localStorage` itself
+throws (some privacy modes) it plays on with a storage that reads empty and refuses writes, rather than a white screen.
+
+**Selectors** are the only read path, and a test scans `src/ui`, `App.tsx` and `main.tsx` for any import of `src/sim`. They
+return primitives, content lookups that never change, creature views cached per creature object, or lists passed through
+`stable()`, which returns the previous array when the ids are equal, because zustand v5 loops on a fresh object or array
+per call. A test calls every selector twice on the same state and requires the same identity. Derived values the UI needs
+(slot cooldown and progress, tier lock, slot count and next slot level, XP in level, creature name/emoji/type color,
+assignable creatures, floored Aether) all live there.
+
+**Deviations and decisions (all reversible, none change the design):**
+1. **`runningSlot` extracted in `sim/skills.ts`.** The progress bar needs "is this slot really working, and what is its
+   cooldown", which `advanceSkills` already decided inline. Copying those idle checks into the selectors would let the bar
+   and the tick drift apart, so the check became one exported function that both call. Behaviour-preserving: all 306
+   existing tests passed unchanged.
+2. **The autosave timer lives in `driver.ts`**, not `persistence.ts` as plan 1 listed it, so `persistence.ts` stays free of
+   timers and remains just the injected-argument read/write it was in 1.5.
+3. **`store.loadReport` is the `LoadOutcome` minus its `state`.** That field is the state as loaded; the live one is `game`,
+   and keeping both leaves a stale copy to be read by mistake. `summary`, `events`, `isNewGame`, `migratedFrom` and
+   `notice` are all kept for 1.8. Dismissing the banner sets `noticeDismissed`; the notice itself stays.
+4. **No `visibilitychange`-to-hidden flush**, since the brief listed pagehide/beforeunload/visible only. Nothing is lost
+   without it: whatever happened since the last save is recomputed as offline progress on the next load.
+5. `test/architecture.test.ts` reads the source through `import.meta.glob` rather than `node:fs`, so no `@types/node` was
+   needed. It allows `zod` in the sim (`save.ts` has used it since 1.5) and forbids React and zustand there.
+6. **Sim events are not stored.** The tick's `SimEvent`s are dropped; nothing consumes them until toasts or 1.8 exist.
+
+**Not verified in a browser yet:** all of the above is node-tested; the app has not been run. Checkpoint B and the final
+check do that.
+
 ## Open questions for the designer
+
+### Found in 1.6, not blocking
+- **Should the online tick honour the offline cap?** A closed tab is capped at `offline.capHours` (12 h) on load. But a tab
+  left open across a long suspend (laptop asleep for 20 h, then woken) hands its whole gap to `step` as one dt with no cap,
+  because the brief says to pass a large dt straight to `step`. So the same 20 h earns 12 h if the tab was closed and 20 h
+  if it was left open. I followed the brief and changed nothing. If the cap should apply, the driver can clamp the dt (or
+  route a gap over some threshold through `applyOffline`, which would also give 1.8's welcome-back summary for free).
+- **Resources have no emoji in the data**, only creatures do. 1.6 shows a type-colored dot plus the name. If you want an
+  emoji per resource it is one optional `emoji` field on `resources.json` (schema, five values, a content test).
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait

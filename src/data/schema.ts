@@ -289,6 +289,9 @@ export const TuningSchema = z.strictObject({
     tempo: z.strictObject({ quick: TempoSchema, standard: TempoSchema, heavy: TempoSchema }),
   }),
   save: z.strictObject({ version: PosInt, autosaveMs: PosInt }),
+  // How often the UI's tick driver steps the sim. Presentation cadence only: the sim takes any dt, so it never
+  // changes what a player earns (same rule as aether.benchEmissionTickMs).
+  ui: z.strictObject({ tickMs: PosInt }),
 })
 
 // ---------- zones.json / vessels.json / collection-tracks.json (phase 3/4; shipped empty) ----------

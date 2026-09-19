@@ -434,6 +434,13 @@ describe('loadContent rejects bad data instead of loading it', () => {
     expect(p.join('\n')).toContain('bind_rate')
   })
 
+  it('requires tuning.ui.tickMs to be a positive whole number', () => {
+    expect(Number.isInteger(content.tuning.ui.tickMs) && content.tuning.ui.tickMs > 0).toBe(true)
+    expect(problemsFor((r) => delete r.tuning.ui).join('\n')).toContain('tuning.json.ui')
+    expect(problemsFor((r) => (r.tuning.ui.tickMs = 0)).join('\n')).toContain('tuning.json.ui.tickMs')
+    expect(problemsFor((r) => (r.tuning.ui.tickMs = 12.5)).join('\n')).toContain('tuning.json.ui.tickMs')
+  })
+
   it('lists every problem at once, not just the first', () => {
     const p = problemsFor((r) => {
       r.species[0].ability = 'nope-a'

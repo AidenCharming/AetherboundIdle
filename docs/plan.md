@@ -374,7 +374,8 @@ is a data change, not a code change.
     "voidDealt": 1.25, "voidTaken": 0.75, "voidHybridFraction": 0.5,
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
-  "save": { "version": 1, "autosaveMs": 15000 }
+  "save": { "version": 1, "autosaveMs": 15000 },
+  "ui": { "tickMs": 100 }
 }
 ```
 
@@ -388,6 +389,9 @@ Two knobs in this file are easy to misread, so they are pinned down here:
   on the base action time, not multipliers. Higher is always better. See section 4.2.
 - `aether.benchEmissionTickMs` (60000) is a **save/display cadence only**. Aether accrues continuously
   from `dt`; changing this number must not change how much a player earns. See section 4.4.
+- `ui.tickMs` (100) is how often the tick driver in `main.tsx` steps the sim. Presentation cadence only, for
+  the same reason: the driver measures real elapsed time and hands it to `step`, so a slower or throttled
+  tick loses nothing. Added at step 1.6.
 
 ---
 

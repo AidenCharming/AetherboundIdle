@@ -24,5 +24,6 @@
     "voidHybridFraction": 0.5,
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
-  "save": { "version": 1, "autosaveMs": 15000 }
+  "save": { "version": 1, "autosaveMs": 15000 },
+  "ui": { "tickMs": 100 }
 }
