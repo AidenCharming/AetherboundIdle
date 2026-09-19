@@ -536,7 +536,10 @@
     "typeAffinity": null,
     "minStrength": null,
     "text": "Bonus Power and Guard.",
-    "effects": [{ "key": "bonus_power", "scope": { "target": "self" } }, { "key": "bonus_guard", "scope": { "target": "self" } }]
+    "effects": [
+      { "key": "bonus_power", "scope": { "target": "self" }, "valueByStrength": { "minor": 0.03, "moderate": 0.06, "major": 0.12 } },
+      { "key": "bonus_guard", "scope": { "target": "self" }, "valueByStrength": { "minor": 0.03, "moderate": 0.06, "major": 0.12 } }
+    ]
   },
   {
     "id": "green-thumb",

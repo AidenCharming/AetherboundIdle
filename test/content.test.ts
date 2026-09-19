@@ -226,6 +226,17 @@ describe('traits', () => {
     }
   })
 
+  it('keeps Champion a small upgrade over Brawn: rare, and about 60% of Brawn on each of two stats', () => {
+    const champion = content.traitById.get('champion')!
+    const brawn = content.traitById.get('brawn')!
+    expect(champion.effects.map((e) => e.key)).toEqual(['bonus_power', 'bonus_guard'])
+    for (const e of champion.effects) expect(e.valueByStrength).toEqual({ minor: 0.03, moderate: 0.06, major: 0.12 })
+    const brawnValues = brawn.effects[0]!.valueByStrength!
+    for (const s of STRENGTHS) {
+      expect(champion.effects[0]!.valueByStrength![s]! / brawnValues[s]!, s).toBeCloseTo(0.6, 10)
+    }
+  })
+
   it('keeps Geneticist under the shared mutation cap', () => {
     const cap = content.modifierByKey.get('mutation_odds')!.cap
     expect(cap).toBe(0.03)
@@ -240,6 +251,17 @@ describe('resources', () => {
     expect(logs.map((r) => r.tier)).toEqual([1, 2, 3])
     expect(logs.map((r) => r.requiredSkillLevel)).toEqual([1, 15, 30])
     expect(logs.every((r) => r.skill === 'woodcutting' && r.kind === 'raw')).toBe(true)
+  })
+
+  it('scales Woodcutting tiers up in time, xp and gold, so levelling into a tier has a point (placeholders)', () => {
+    const logs = ['oak-log', 'willow-log', 'yew-log'].map((id) => content.resourceById.get(id)!)
+    expect(logs.map((r) => r.baseActionMs)).toEqual([3000, 4000, 5000])
+    expect(logs.map((r) => r.xpPerAction)).toEqual([10, 25, 50])
+    expect(logs.map((r) => r.goldValue)).toEqual([2, 6, 15])
+    // Higher tiers must pay more xp per second than the tier below, or nobody would ever move up.
+    const xpPerSec = logs.map((r) => r.xpPerAction! / (r.baseActionMs! / 1000))
+    expect(xpPerSec[1]!).toBeGreaterThan(xpPerSec[0]!)
+    expect(xpPerSec[2]!).toBeGreaterThan(xpPerSec[1]!)
   })
 
   it('resolves every skill, element type and rare drop', () => {

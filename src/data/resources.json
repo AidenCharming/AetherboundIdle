@@ -20,9 +20,9 @@
     "kind": "raw",
     "elementType": "verdant",
     "requiredSkillLevel": 15,
-    "baseActionMs": 3000,
-    "xpPerAction": 10,
-    "goldValue": 4,
+    "baseActionMs": 4000,
+    "xpPerAction": 25,
+    "goldValue": 6,
     "rareDrop": { "id": "verdant-seedcache", "chance": 0.01 }
   },
   {
@@ -33,9 +33,9 @@
     "kind": "raw",
     "elementType": "verdant",
     "requiredSkillLevel": 30,
-    "baseActionMs": 3000,
-    "xpPerAction": 10,
-    "goldValue": 8,
+    "baseActionMs": 5000,
+    "xpPerAction": 50,
+    "goldValue": 15,
     "rareDrop": { "id": "verdant-seedcache", "chance": 0.01 }
   },
   {

@@ -124,8 +124,8 @@ in JSON, so changing them needs no code:
 | `types.json` colors | Telluric `#8D6E63`, Pyric `#FB8C00`, Aqueous `#2196F3`, Voltaic `#FDD835`, Void `#7E57C2` | Verdant `#4CAF50` is plan.md's; the rest match the color names in CLAUDE.md rule 4. `element` labels are design section 2. |
 | `rarities.json` `statMultiplier` | 1.0 / 1.8 / 2.8 / 4.2 / 6.0 / 8.5 / 12 / 17 / 24 | Dim = 1.0 is plan.md's; the rest are mine, chosen so even Faint clears Form 3's 1.4 comfortably. |
 | `rarities.json` `frame` | tints and glow 0 to 1 for tiers 2-9 | Dim (`#8a8a8a`, 0) is plan.md's. |
-| `resources.json` willow/yew | 3000 ms, 10 xp, same as oak | Plan decision 4 says "3s base action, 10 xp" without per-tier values. **T2/T3 are therefore no faster or richer than T1**; see open questions. |
-| `resources.json` gold | oak 2 (plan), willow 4, yew 8 | Mine, doubling per tier. |
+| `resources.json` willow/yew | ~~3000 ms, 10 xp, same as oak~~ | **Superseded** by the designer's tier values (see "two data changes" below). |
+| `resources.json` gold | ~~oak 2 (plan), willow 4, yew 8~~ | **Superseded**: 2 / 6 / 15. |
 | `resources.json` rare drop | all three logs drop `verdant-seedcache` at 1% | Plan only shows it on oak. The item itself (`Verdant Seedcache`, tier 1, gold 20) is mine; plan only named the id. |
 | `resources.json` names | Willow Log, Yew Log | From the ids in plan 3.4 and the design's oak/willow/yew example. |
 | `traits.json` Overclocked | `perStack` 0.02, `maxStacks` 5 (10% at cap, matching Moderate) | plan 3.6 names the fields but gives no numbers. |
@@ -162,6 +162,20 @@ Field choices come from design sections 8-9 and are provisional until phase 3/4.
 The content test imports `docs/content-data.md` as raw text, so it will fail if that doc's table layout
 changes. That is intentional: it is what keeps the names honest.
 
+### 2026-09-19, before step 1.4 — two data changes (designer's instruction)
+
+1. **Woodcutting placeholder tiers now scale.** oak-log 3000 ms / 10 xp / 2 gold, willow-log 4000 ms / 25 xp /
+   6 gold, yew-log 5000 ms / 50 xp / 15 gold. Unlock levels unchanged (1 / 15 / 30). xp per second rises with
+   each tier (3.33 → 6.25 → 10), so levelling into a tier has a point. This **supersedes** the 1.3 placeholder
+   rows for willow/yew time, xp and gold, and closes the "tiers differ only in unlock level" open question.
+   Still placeholders.
+2. **Champion is now a small upgrade over Brawn, not strictly better.** It keeps its low roll weight (2) and
+   both effects (bonus Power and bonus Guard) now carry an explicit `valueByStrength` of 0.03 / 0.06 / 0.12,
+   about 60% of Brawn's default 5 / 10 / 20% on each stat. This replaces answer 3's "Champion keeps normal
+   strengths" note from 1.3; the low roll weight stays.
+
+`test/content.test.ts` pins both (73 tests).
+
 ## Open questions for the designer
 
 ### Needs an answer before Phase 3
@@ -176,12 +190,6 @@ changes. That is intentional: it is what keeps the names honest.
   resolves slots changes the totals, and a wrong order can starve a downstream slot that would have run
   fine in real time. Options: fixed skill priority, player-set ordering, or interleaved time-sliced
   segments. Needs deciding before Phase 3 introduces consuming skills — Phase 1 and 2 are unaffected.
-
-### Not blocking
-- **Woodcutting tiers currently differ only in the level that unlocks them.** Oak, willow and yew all take
-  3 s and give 10 xp, which is what plan decision 4 literally says, but it means levelling into a higher
-  tier gains nothing yet. Say whether tiers should scale time, xp and gold, and by how much; it is a
-  three-line JSON change and can wait until 1.6 makes it visible.
 
 ### Carried from design.md section 15, not blocking
 - Full resource lists, prices and gold values per skill (placeholders in JSON for now).
