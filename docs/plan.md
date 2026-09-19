@@ -1,8 +1,9 @@
 # Aetherbound Idle: Implementation Plan
 
-Approved plan for folder structure, data schemas, and sim architecture. Written at step 1.1.
-Later sessions should read this instead of re-deriving it. Change it only with the designer's OK,
-and record the change in `docs/PROGRESS.md` under "Decisions and deviations".
+Approved plan for folder structure, data schemas, and sim architecture. Written at step 1.1 and
+approved 2026-09-19 with six amendments (section 8). Later sessions should read this instead of
+re-deriving it. Change it only with the designer's OK, and record the change in `docs/PROGRESS.md`
+under "Decisions and deviations".
 
 Source of truth for *content*: `docs/content-data.md`. Source of truth for *rules*: `docs/design.md`.
 This file is the source of truth for *shape*.
@@ -57,7 +58,7 @@ Aetherbound Idle/
       selectors.ts          memoized reads for UI
       persistence.ts        localStorage read/write, lastSeen, autosave timer
     ui/
-      screens/              Roster.tsx, Skills.tsx, Nexus.tsx, ...
+      screens/              Roster.tsx, Skills.tsx, Nexus.tsx, DevPanel.tsx, ...
       components/           CreatureCard.tsx, ProgressBar.tsx, ResourceBar.tsx, ...
       art/                  placeholder art helpers (type colors, rarity frames, hue shift)
       theme.css             CSS variables: type colors, rarity frames, spacing
@@ -126,7 +127,6 @@ a tuning knob, not a per-skill field.
 [{
   "tier": 1, "id": "dim", "name": "Dim",
   "statMultiplier": 1.0,
-  "cooldownTerm": 0.0,
   "benchEmissionPerMin": 1,
   "frame": { "tint": "#8a8a8a", "glow": 0 }
 }]
@@ -135,6 +135,10 @@ a tuning knob, not a per-skill field.
 Nine entries, Dim through Zenith. `gear-rarities.json` is `{tier, id, name}` only for now
 (Common through Primordial); design section 4 ties tier N creatures and tier N gear to the same
 resource tier.
+
+Rarity has **no per-entry cooldown field**. Its entire contribution to action speed is
+`tuning.cooldown.rarityTermPerTier * (tier - 1)` (section 4.2), so there is exactly one place to tune it.
+A per-rarity override would have to be added deliberately, not inherited from an unused field.
 
 ### 3.4 resources.json
 
@@ -280,7 +284,8 @@ Two entries need engine support beyond a static value:
 
 `pair` is stored sorted and is the default-hybrid lookup key. Base species do not store covered skills —
 they are derived from their type's `lockedSkills`. Efficiency on a covered skill that is not
-`primarySkill` is `tuning.skills.hybridOffPrimaryEfficiency` (PLACEHOLDER 0.60, design section 2).
+`primarySkill` is `tuning.skills.hybridOffPrimaryEfficiency` (PLACEHOLDER 0.60, design section 2),
+applied as a **divisor** on the base action time — see section 4.2.
 
 ### 3.8 recipes.json
 
@@ -364,6 +369,13 @@ Numbers marked PLACEHOLDER in the design doc are all here: form multipliers, coo
 strengths, mutation rates, shiny rates, attunement lock costs, breeding costs. Form bonuses (1.2 / 1.4)
 sit well below the rarity ladder's multipliers, as design section 4 requires.
 
+Two knobs in this file are easy to misread, so they are pinned down here:
+
+- `skills.hybridOffPrimaryEfficiency` (0.60) and `skills.secondaryAptitudeBonus` (0.15) are **divisors**
+  on the base action time, not multipliers. Higher is always better. See section 4.2.
+- `aether.benchEmissionTickMs` (60000) is a **save/display cadence only**. Aether accrues continuously
+  from `dt`; changing this number must not change how much a player earns. See section 4.4.
+
 ---
 
 ## 4. Sim formulas (phase 1)
@@ -384,22 +396,44 @@ stat = baseStats[stat] * lean
 
 ### 4.2 Action cooldown
 
-Two stages, so intrinsic growth and trait stacking cannot be confused, with one hard floor over both.
+Three stages: fit for the job, then intrinsic growth, then trait stacking — with one hard floor over
+the last two.
 
 ```
-intrinsicTerm  = levelTermPerLevel * (level - 1)
-               + rarityTermPerTier * (rarity.tier - 1)
-               + formTerm[form]
+// stage 1: efficiency. A DIVISOR, so 0.60 efficiency means the action takes 1/0.60 = 1.667x as long.
+efficiency    = 1.0
+if creature is a hybrid working a covered skill that is not its primarySkill:
+    efficiency *= hybridOffPrimaryEfficiency              // 0.60 -> base / 0.60
+if the skill is open and matches the creature's secondaryAptitude:
+    efficiency *= (1 + secondaryAptitudeBonus)            // 0.15 -> base / 1.15
 
-intrinsicMult  = 1 / (1 + intrinsicTerm)            // hyperbolic, i.e. diminishing returns
+adjustedBase  = baseActionMs / efficiency
+
+// stage 2: intrinsic growth from level, rarity and form
+intrinsicTerm = levelTermPerLevel * (level - 1)
+              + rarityTermPerTier * (rarity.tier - 1)
+              + formTerm[form]
+intrinsicMult = 1 / (1 + intrinsicTerm)                   // hyperbolic, i.e. diminishing returns
+
+// stage 3: capped trait reduction
 traitReduction = min(cap["cooldown_reduction"], sum of every cooldown_reduction source)
 
-raw        = baseActionMs * intrinsicMult * (1 - traitReduction)
-cooldownMs = max(raw, baseActionMs * floorFraction)
+raw        = adjustedBase * intrinsicMult * (1 - traitReduction)
+cooldownMs = max(raw, adjustedBase * floorFraction)
 ```
 
-Efficiency modifiers (hybrid off-primary, secondary aptitude on open skills) multiply `baseActionMs`
-before this, so they sit under the same floor.
+**The floor is relative to the efficiency-adjusted base, not the raw base.** This is the point of the
+divisor form: an off-primary hybrid's floor is `(base / 0.60) * floorFraction`, which is `1.667x` a
+specialist's floor, so no amount of level, rarity, form or trait stacking lets it reach specialist speed
+on a skill it is not built for. If the floor were taken from the unadjusted base, both would converge on
+the same number at the cap and the specialisation would vanish exactly where it matters most.
+
+The same reasoning is why efficiency divides rather than multiplies: a multiplier of 0.60 would make the
+off-primary hybrid *faster*, and a secondary-aptitude "bonus" of 1.15 would make an aptitude-matched
+creature *slower*. Both knobs read as "how well suited is this creature", where higher is always better.
+
+`efficiency` is multiplicative across its own sources but is **not** part of the
+`cooldown_reduction` cap — it describes job fit, not a stacking speed bonus, and it can be below 1.
 
 ### 4.3 XP and levels
 
@@ -410,12 +444,28 @@ the number of `slotUnlockLevels` entries less than or equal to the current level
 
 ### 4.4 Bench Aether
 
+Emission is a **continuous rate**, accrued fractionally from elapsed time. There is no once-a-minute
+lump, online or offline.
+
 ```
 emissionPerMin = sum over benched creatures of
                  rarity.benchEmissionPerMin * (1 + capped bench_aether_emission modifiers)
+
+// applied every step, with whatever dt the step happens to carry
+aetherGained = emissionPerMin * (dtMs / 60000)
+state.aether += aetherGained                      // fractional, never rounded in storage
 ```
 
 Creatures in a work slot or on an expedition are excluded (design sections 5 and 8).
+
+Consequences, all deliberate:
+- A 200ms UI frame and a 6-hour offline window use the **same function** with a different `dt`.
+  Section 4.5 calls it once with the capped elapsed time rather than reimplementing it.
+- Aether is stored as a float. Only the display rounds, so short sessions and small benches are not
+  silently worth zero.
+- `tuning.aether.benchEmissionTickMs` (60000) does **not** gate accrual. It controls only how often the
+  value is re-rendered and flushed to the save. Accrual itself is continuous and dt-driven; changing
+  this knob must never change how much Aether a player earns.
 
 ### 4.5 Offline progress
 
@@ -437,12 +487,38 @@ changes the slot count or unlocks a resource tier. Output rolls across `n` actio
 from the seeded RNG rather than `n` individual rolls. The whole thing returns a summary object that
 feeds the "welcome back" screen in step 1.8.
 
+Bench Aether for the same window is **not** computed here. `offline.ts` calls the section 4.4 function
+once with `dt = elapsed`, so the online and offline paths cannot drift apart.
+
 ### 4.6 Randomness
 
 `sim/rng.ts` exports `interface Rng { next(): number; int(n): number; chance(p): boolean; binomial(n, p): number }`
-with a mulberry32 implementation. Every sim function that rolls takes an `Rng`. The store holds a seeded
-instance whose seed is persisted, so reloading cannot reroll a pending breed or hatch. Tests inject a
-fixed seed.
+with a mulberry32 implementation. Every sim function that rolls takes an `Rng`. Tests inject a fixed
+state and assert exact sequences.
+
+**The save persists the current RNG state, not the initial seed.** mulberry32's state is a single uint32
+that advances on every `next()`; the save stores that live value, and it is written back on every
+consume:
+
+```ts
+type Rng = {
+  state: number           // uint32, advances on every consume
+  next(): number          // mutates state, returns [0, 1)
+}
+// state.rngState mirrors rng.state and is what the save file holds
+```
+
+Storing the initial seed instead would make the stream a pure function of *how many rolls have happened
+since the save*, so quitting and reloading would replay the same numbers — the exact reroll this is meant
+to prevent.
+
+**Outcome-committing rolls force an immediate save**, rather than waiting for the 15s autosave:
+breeding a pair, hatching an egg, and a capture/bind attempt. Each of these writes the result *and* the
+advanced RNG state in one commit, so a crash or a deliberate reload between the roll and the next
+autosave cannot rewind either. `state/actions.ts` exposes a `commitRoll(fn)` helper that runs the sim
+function, applies the result, and flushes the save synchronously; those three actions must go through it.
+Idle progress (work actions, rare-drop rolls, bench Aether) stays on the 15s autosave — the stakes are
+low and the write volume would be high.
 
 ### 4.7 Events
 
@@ -459,8 +535,8 @@ and, in phase 2, the hatch reveal — so the reveal needs no sim rework.
 type GameState = {
   version: number
   lastSeen: number          // epoch ms, written on autosave and on unload
-  rngSeed: number
-  aether: number
+  rngState: number          // CURRENT mulberry32 state, advanced on every consume (section 4.6)
+  aether: number            // float; only the display rounds
   gold: number
   resources: Record<string, number>
   creatures: Creature[]     // id, speciesId, isHybrid, rarityTier, level, xp, form, shiny,
@@ -478,11 +554,14 @@ type GameState = {
     shiniesFound: string[]
     formsUnlocked: Record<string, number>
   }
-  settings: { autoBind: ..., offlineSummary: boolean }
+  settings: { autoBind: ..., offlineSummary: boolean, devPanelEnabled: boolean }
 }
 ```
 
 - One localStorage key: `aetherbound-idle:save`, holding `{ version, state }`.
+- Writes happen on the `autosaveMs` timer, on unload, and **immediately after any outcome-committing
+  roll** (breed, hatch, capture — section 4.6).
+- `settings.devPanelEnabled` is part of the save, so the dev panel's visibility survives a reload.
 - `sim/save.ts` exports `MIGRATIONS: Record<number, (s: any) => any>`, applied in order from the file's
   version up to `tuning.save.version`.
 - A save that cannot be migrated is **not** silently discarded: it is copied to
@@ -494,11 +573,25 @@ type GameState = {
 
 ## 6. Testing (vitest)
 
-Phase 1 coverage: xp curve round-trip (level -> xp -> level), slot unlock thresholds at 1/20/40/65/90,
-cooldown floor and the shared cap, modifier stacking plus the aura "strongest only" rule, bench emission,
-offline progress (including a window that crosses a level-up, a zero window, and a negative/clock-skewed
-window), save round-trip plus a v1 -> v2 migration stub, and a content test that every species, hybrid,
-trait, ability and resource loads and cross-resolves.
+Phase 1 coverage:
+
+- xp curve round-trip (level -> xp -> level) and slot unlock thresholds at 1/20/40/65/90.
+- Cooldown: the shared `cooldown_reduction` cap, and the floor taken from the **efficiency-adjusted**
+  base. One test asserts the property that matters: a maxed off-primary hybrid is still strictly slower
+  than a floored specialist on the same resource.
+- Efficiency as a divisor: off-primary (0.60) makes the action longer, secondary aptitude (0.15) makes it
+  shorter, and the two compose.
+- Modifier stacking plus the aura "strongest only" rule.
+- Bench emission: continuous accrual, with the invariant that one call with `dt = 60min` equals
+  `N` calls summing to 60min (within float tolerance), and that changing `benchEmissionTickMs` changes
+  nothing about the total.
+- Offline progress: a window crossing a level-up, a zero window, a negative/clock-skewed window, and a
+  window longer than `capHours`. Plus: offline Aether for a window equals online Aether for the same
+  elapsed time.
+- RNG: the saved state is the *current* state, so save -> reload -> roll continues the stream instead of
+  replaying it. A round-trip through `save.ts` reproduces the same next value.
+- Save round-trip, a v1 -> v2 migration stub, and the broken-save quarantine path.
+- Content: every species, hybrid, trait, ability and resource loads and cross-resolves.
 
 ---
 
@@ -512,29 +605,59 @@ trait, ability and resource loads and cross-resolves.
 | 1.5 | `offline`, `save`, `state/persistence` + tests |
 | 1.6 | Skills screen, top bar, tick driver |
 | 1.7 | Roster screen, placeholder art, filter and sort, assign to slot |
-| 1.8 | Nexus bench + emission display, welcome-back summary, polish |
+| 1.8 | Nexus bench + emission display, welcome-back summary, **dev panel**, polish |
 
 Phase 1 ships one starter **Sproutlet**, Woodcutting with `oak-log` / `willow-log` / `yew-log`, and the
 bench. `zones.json`, `vessels.json` and `collection-tracks.json` are created empty in step 1.3 so their
 schemas exist and phase 3/4 sessions have somewhere to put content.
 
+### 7.1 Dev panel (step 1.8)
+
+`src/ui/screens/DevPanel.tsx`, hidden behind a Settings toggle (`settings.devPanelEnabled`, default off,
+persisted). It exists to make phase 2-4 content testable without grinding, and it starts in phase 1
+because every later phase needs it.
+
+| Control | Behaviour |
+|---|---|
+| Grant creature | Pick any species or hybrid, any rarity tier, level and form; optional shiny. Rolls pool traits normally unless overridden. |
+| Add resources | Any amount of any resource ID. |
+| Add Aether / gold | Direct numeric grant. |
+| Fast-forward N hours | Rewinds `lastSeen` by N hours and re-runs the **real** offline path. |
+| Reset save | Wipes the save and reloads, behind a confirmation. |
+
+The fast-forward control is the important one, and it must not have its own maths. It sets
+`lastSeen = now - N hours` and calls the same `sim/offline.ts` entry point the app calls on load, so it
+exercises the shipped code path — including the `capHours` clamp, which means fast-forwarding 100 hours
+with a 12-hour cap correctly yields 12 hours of progress rather than 100. A separate "simulate" path
+would let the offline code rot untested, which is the one thing this panel exists to prevent.
+
+Dev actions still flow through `state/actions.ts` and the normal save path; the panel gets no privileged
+access to the store. It ships in the production build behind the toggle rather than being stripped by a
+build flag, so the designer can use it on a deployed build.
+
 ---
 
-## 8. Decisions that need your OK
+## 8. Approved decisions
 
-1. **Add `zod`** as a dependency, for the "loaders with type-checked schemas" in step 1.3. It validates
-   the JSON at load and infers the TypeScript types from the same definition. Alternative: hand-written
-   interfaces plus a small custom validator — no dependency, more code, weaker guarantees. Recommending
-   zod.
-2. **Signature and pool traits share `traits.json`** instead of living in two files, so one effect engine
-   resolves both. Signature traits carry `kind: "signature"` and a `species` back-reference.
-3. **Max level 99** for both skills and creatures. The design fixes slot unlocks at 90 and Form 3 at 60
-   but never states a cap.
-4. **Woodcutting tier unlocks at skill level 1 / 15 / 30**, 3s base action, 10 xp — pure placeholders to
-   make phase 1 playable.
-5. **Offline cap 12 hours** as the starting value. Design section 3 says capped and tunable but gives no
-   number.
-6. **Seeded, persisted RNG** so a reload cannot reroll a pending breed or hatch. Costs nothing now and
-   makes the phase 2 rolls testable.
+All six approved by the designer on 2026-09-19, with six amendments folded into the sections above.
 
-Open questions that are not blocking step 1.2 stay in `docs/PROGRESS.md`.
+1. **`zod`** is the dependency for the type-checked loaders in step 1.3.
+2. **Signature and pool traits share `traits.json`**, resolved by one effect engine. Signature traits
+   carry `kind: "signature"` and a `species` back-reference.
+3. **Max level 99** for both skills and creatures.
+4. **Woodcutting tier unlocks at skill level 1 / 15 / 30**, 3s base action, 10 xp — placeholders.
+5. **Offline cap 12 hours** as the starting tunable value.
+6. **Seeded RNG**, persisted so a reload cannot reroll a pending breed or hatch.
+
+### Amendments made at approval
+
+| # | Amendment | Lands in |
+|---|---|---|
+| 1 | Efficiency modifiers **divide** the base action time instead of multiplying it, and the cooldown floor is taken from the **efficiency-adjusted** base, so an off-primary hybrid can never reach specialist speed | 3.7, 3.10, 4.2 |
+| 2 | Rarity's cooldown contribution has one home: `tuning.cooldown.rarityTermPerTier`. The `cooldownTerm` field is gone from `rarities.json` | 3.3 |
+| 3 | The save persists the **current** RNG state, advanced on every consume, and outcome-committing rolls (breed, hatch, capture) flush the save immediately rather than waiting for autosave | 4.6, 5 |
+| 4 | Bench Aether accrues **continuously** from `dt`, online and offline through the same function. `benchEmissionTickMs` controls save/display cadence only | 3.10, 4.4, 4.5 |
+| 5 | A **dev panel** ships in phase 1, behind a Settings toggle, with fast-forward running the real offline path | 1, 5, 7, 7.1 |
+| 6 | Offline slot-ordering needs a rule once skills consume resources | `docs/PROGRESS.md` open questions |
+
+Open questions that do not block step 1.2 live in `docs/PROGRESS.md`.
