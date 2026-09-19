@@ -1,0 +1,54 @@
+[
+  {
+    "id": "oak-log",
+    "name": "Oak Log",
+    "tier": 1,
+    "skill": "woodcutting",
+    "kind": "raw",
+    "elementType": "verdant",
+    "requiredSkillLevel": 1,
+    "baseActionMs": 3000,
+    "xpPerAction": 10,
+    "goldValue": 2,
+    "rareDrop": { "id": "verdant-seedcache", "chance": 0.01 }
+  },
+  {
+    "id": "willow-log",
+    "name": "Willow Log",
+    "tier": 2,
+    "skill": "woodcutting",
+    "kind": "raw",
+    "elementType": "verdant",
+    "requiredSkillLevel": 15,
+    "baseActionMs": 3000,
+    "xpPerAction": 10,
+    "goldValue": 4,
+    "rareDrop": { "id": "verdant-seedcache", "chance": 0.01 }
+  },
+  {
+    "id": "yew-log",
+    "name": "Yew Log",
+    "tier": 3,
+    "skill": "woodcutting",
+    "kind": "raw",
+    "elementType": "verdant",
+    "requiredSkillLevel": 30,
+    "baseActionMs": 3000,
+    "xpPerAction": 10,
+    "goldValue": 8,
+    "rareDrop": { "id": "verdant-seedcache", "chance": 0.01 }
+  },
+  {
+    "id": "verdant-seedcache",
+    "name": "Verdant Seedcache",
+    "tier": 1,
+    "skill": "woodcutting",
+    "kind": "rare",
+    "elementType": "verdant",
+    "requiredSkillLevel": null,
+    "baseActionMs": null,
+    "xpPerAction": null,
+    "goldValue": 20,
+    "rareDrop": null
+  }
+]

@@ -1,0 +1,388 @@
+[
+  {
+    "id": "sproutlet",
+    "name": "Sproutlet",
+    "types": ["verdant"],
+    "forms": [
+      { "form": 1, "name": "Sproutlet", "emoji": "🌱", "art": "tiny glowing leafy biped with a sapling on its head" },
+      { "form": 2, "name": "Timberhorn", "emoji": "🦌", "art": "sturdy bark-armored quadruped with wooden antler buds" },
+      { "form": 3, "name": "Lumbercrown", "emoji": "🌳", "art": "majestic forest beast with a glowing canopy of antlers" }
+    ],
+    "primarySkill": "woodcutting",
+    "secondaryAptitude": "scavenging",
+    "statLean": "guard",
+    "signatureTrait": "overgrowth",
+    "ability": "leaf-shield",
+    "origin": "wild"
+  },
+  {
+    "id": "brambletrundle",
+    "name": "Brambletrundle",
+    "types": ["verdant"],
+    "forms": [
+      { "form": 1, "name": "Brambletrundle", "emoji": "🌿", "art": "chaotic rolling ball of thorny vines and glowing bolts" },
+      { "form": 2, "name": "Briartread", "emoji": "🚜", "art": "tank-like creature on tracks of thorns" },
+      { "form": 3, "name": "Thicketroll", "emoji": "🌾", "art": "massive affectionate tumbleweed of vines" }
+    ],
+    "primarySkill": "woodcutting",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "briar-patch",
+    "ability": "thorn-roll",
+    "origin": "wild"
+  },
+  {
+    "id": "mossgear",
+    "name": "Mossgear",
+    "types": ["verdant"],
+    "forms": [
+      { "form": 1, "name": "Mossgear", "emoji": "⚙️", "art": "fuzzy green cog-shaped sphere" },
+      { "form": 2, "name": "Mosscrank", "emoji": "🤖", "art": "bipedal mossy mechanism" },
+      { "form": 3, "name": "Mossbastion", "emoji": "🍀", "art": "gentle lumbering botanical machine with emerald aura" }
+    ],
+    "primarySkill": "herbalism",
+    "secondaryAptitude": "fabrication",
+    "statLean": "health",
+    "signatureTrait": "lubricated-joints",
+    "ability": "soothing-spores",
+    "origin": "wild"
+  },
+  {
+    "id": "petalsprocket",
+    "name": "Petalsprocket",
+    "types": ["verdant"],
+    "forms": [
+      { "form": 1, "name": "Petalsprocket", "emoji": "🌸", "art": "hovering blossom with metal-trimmed petals" },
+      { "form": 2, "name": "Bloomwheel", "emoji": "🌼", "art": "larger rotor-flower" },
+      { "form": 3, "name": "Blossomcrank", "emoji": "🌺", "art": "intricate array of glowing petals and gears" }
+    ],
+    "primarySkill": "herbalism",
+    "secondaryAptitude": "scavenging",
+    "statLean": "power",
+    "signatureTrait": "pollinator",
+    "ability": "rotor-gust",
+    "origin": "wild"
+  },
+  {
+    "id": "quakemaw",
+    "name": "Quakemaw",
+    "types": ["telluric"],
+    "forms": [
+      { "form": 1, "name": "Quakemaw", "emoji": "🐊", "art": "stout jaw-heavy lizard with a glowing throat" },
+      { "form": 2, "name": "Faultjaw", "emoji": "🦖", "art": "armored reptile with shovel underbite" },
+      { "form": 3, "name": "Craterchomp", "emoji": "🐉", "art": "friendly earth-dragon with crystal teeth" }
+    ],
+    "primarySkill": "mining",
+    "secondaryAptitude": "scavenging",
+    "statLean": "power",
+    "signatureTrait": "deep-excavator",
+    "ability": "stone-crunch",
+    "origin": "wild"
+  },
+  {
+    "id": "geodecore",
+    "name": "Geodecore",
+    "types": ["telluric"],
+    "forms": [
+      { "form": 1, "name": "Geodecore", "emoji": "🪨", "art": "floating hollow stone orb with humming crystal" },
+      { "form": 2, "name": "Crystalheart", "emoji": "💎", "art": "faceted floating crystal creature, amber light" },
+      { "form": 3, "name": "Prismpulse", "emoji": "🪐", "art": "orbiting stones around a bright crystal nucleus" }
+    ],
+    "primarySkill": "mining",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "resonant-frequency",
+    "ability": "crystal-barrier",
+    "origin": "wild"
+  },
+  {
+    "id": "pebblescoot",
+    "name": "Pebblescoot",
+    "types": ["telluric"],
+    "forms": [
+      { "form": 1, "name": "Pebblescoot", "emoji": "🪲", "art": "skittish shale-carapace beetle" },
+      { "form": 2, "name": "Shalestride", "emoji": "🦂", "art": "multi-legged excavator" },
+      { "form": 3, "name": "Bedrockbound", "emoji": "🐛", "art": "gentle plated centipede giant" }
+    ],
+    "primarySkill": "mining",
+    "secondaryAptitude": "scavenging",
+    "statLean": "health",
+    "signatureTrait": "rhythmic-tunnels",
+    "ability": "shell-bash",
+    "origin": "wild"
+  },
+  {
+    "id": "tuskcub",
+    "name": "Tuskcub",
+    "types": ["telluric"],
+    "forms": [
+      { "form": 1, "name": "Tuskcub", "emoji": "🐗", "art": "playful boar with tiny crystal tusks" },
+      { "form": 2, "name": "Ridgecrest", "emoji": "🦏", "art": "sturdy boar with mineral armor" },
+      { "form": 3, "name": "Summitspike", "emoji": "🦣", "art": "proud woolly mineral beast with crystal spikes" }
+    ],
+    "primarySkill": "mining",
+    "secondaryAptitude": "fabrication",
+    "statLean": "power",
+    "signatureTrait": "mineral-diviner",
+    "ability": "tusk-charge",
+    "origin": "wild"
+  },
+  {
+    "id": "emberfang",
+    "name": "Emberfang",
+    "types": ["pyric"],
+    "forms": [
+      { "form": 1, "name": "Emberfang", "emoji": "🐱", "art": "fire-maned kitten with bright teeth" },
+      { "form": 2, "name": "Smolderbite", "emoji": "🐈", "art": "sleek ash-coated feline" },
+      { "form": 3, "name": "Emberroar", "emoji": "🐅", "art": "regal blazing tiger" }
+    ],
+    "primarySkill": "smithing",
+    "secondaryAptitude": "scavenging",
+    "statLean": "power",
+    "signatureTrait": "searing-bite",
+    "ability": "searing-swipe",
+    "origin": "wild"
+  },
+  {
+    "id": "cinderpup",
+    "name": "Cinderpup",
+    "types": ["pyric"],
+    "forms": [
+      { "form": 1, "name": "Cinderpup", "emoji": "🐶", "art": "hyperactive hound with a spark tail" },
+      { "form": 2, "name": "Cinderbark", "emoji": "🐕", "art": "bouncy fiery dog leaving embers" },
+      { "form": 3, "name": "Cinderhowl", "emoji": "🐺", "art": "majestic hound howling glowing ash" }
+    ],
+    "primarySkill": "smithing",
+    "secondaryAptitude": "scavenging",
+    "statLean": "health",
+    "signatureTrait": "eager-fetcher",
+    "ability": "happy-bark",
+    "origin": "wild",
+    "artNote": "Stays cute."
+  },
+  {
+    "id": "roastbelly",
+    "name": "Roastbelly",
+    "types": ["pyric"],
+    "forms": [
+      { "form": 1, "name": "Roastbelly", "emoji": "🦎", "art": "round sleepy salamander with a warm belly" },
+      { "form": 2, "name": "Oventummy", "emoji": "🐧", "art": "chubby waddler with a belly window showing fire" },
+      { "form": 3, "name": "Smolderplump", "emoji": "🦕", "art": "massive affectionate salamander radiating cozy heat" }
+    ],
+    "primarySkill": "cooking",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "slow-cooker",
+    "ability": "heat-sink",
+    "origin": "wild"
+  },
+  {
+    "id": "charwhisk",
+    "name": "Charwhisk",
+    "types": ["pyric"],
+    "forms": [
+      { "form": 1, "name": "Charwhisk", "emoji": "🐦", "art": "bird with a tail that stirs coals" },
+      { "form": 2, "name": "Coalstir", "emoji": "🦩", "art": "crane-like bird with metallic legs" },
+      { "form": 3, "name": "Hearthblend", "emoji": "🦚", "art": "fire-peacock with glowing culinary-tool feathers" }
+    ],
+    "primarySkill": "cooking",
+    "secondaryAptitude": "fabrication",
+    "statLean": "power",
+    "signatureTrait": "culinary-flow",
+    "ability": "cinder-gust",
+    "origin": "wild"
+  },
+  {
+    "id": "dewdrop",
+    "name": "Dewdrop",
+    "types": ["aqueous"],
+    "forms": [
+      { "form": 1, "name": "Dewdrop", "emoji": "💧", "art": "gelatinous water orb" },
+      { "form": 2, "name": "Rillstream", "emoji": "🐲", "art": "serpentine water elemental with silver bands" },
+      { "form": 3, "name": "Tideflow", "emoji": "🌊", "art": "serene looping water spirit" }
+    ],
+    "primarySkill": "fishing",
+    "secondaryAptitude": "scavenging",
+    "statLean": "health",
+    "signatureTrait": "pure-filter",
+    "ability": "purifying-splash",
+    "origin": "wild"
+  },
+  {
+    "id": "puddlescoop",
+    "name": "Puddlescoop",
+    "types": ["aqueous"],
+    "forms": [
+      { "form": 1, "name": "Puddlescoop", "emoji": "🐸", "art": "bucket-headed amphibian" },
+      { "form": 2, "name": "Basincatch", "emoji": "🐢", "art": "turtle with a basin of water on its back" },
+      { "form": 3, "name": "Lakehaul", "emoji": "🐘", "art": "gentle giant carrying a small pond" }
+    ],
+    "primarySkill": "fishing",
+    "secondaryAptitude": "scavenging",
+    "statLean": "guard",
+    "signatureTrait": "wide-net",
+    "ability": "bucket-block",
+    "origin": "wild"
+  },
+  {
+    "id": "frothsprite",
+    "name": "Frothsprite",
+    "types": ["aqueous"],
+    "forms": [
+      { "form": 1, "name": "Frothsprite", "emoji": "💦", "art": "bubbly seafoam spirit that giggles" },
+      { "form": 2, "name": "Foamspirit", "emoji": "🌫️", "art": "misty elemental riding tiny waves" },
+      { "form": 3, "name": "Brinesoul", "emoji": "🧜", "art": "radiant airy figure of seafoam" }
+    ],
+    "primarySkill": "fishing",
+    "secondaryAptitude": "fabrication",
+    "statLean": "health",
+    "signatureTrait": "sea-breeze",
+    "ability": "mist-veil",
+    "origin": "wild"
+  },
+  {
+    "id": "splashfin",
+    "name": "Splashfin",
+    "types": ["aqueous"],
+    "forms": [
+      { "form": 1, "name": "Splashfin", "emoji": "🐟", "art": "curious robotic fish" },
+      { "form": 2, "name": "Wavegill", "emoji": "🐬", "art": "sleek mechanical dolphin" },
+      { "form": 3, "name": "Tidetail", "emoji": "🐋", "art": "mechanical whale making gentle whirlpools" }
+    ],
+    "primarySkill": "fishing",
+    "secondaryAptitude": "fabrication",
+    "statLean": "power",
+    "signatureTrait": "deep-diver",
+    "ability": "hydro-jet",
+    "origin": "wild"
+  },
+  {
+    "id": "voltfluff",
+    "name": "Voltfluff",
+    "types": ["voltaic"],
+    "forms": [
+      { "form": 1, "name": "Voltfluff", "emoji": "🐩", "art": "Pomeranian-like ball of static" },
+      { "form": 2, "name": "Staticfleece", "emoji": "🐑", "art": "electrified sheepdog in crackling wool" },
+      { "form": 3, "name": "Arcwool", "emoji": "🦮", "art": "majestic fluffy canine discharging harmless arcs" }
+    ],
+    "primarySkill": "circuitry",
+    "secondaryAptitude": "scavenging",
+    "statLean": "health",
+    "signatureTrait": "static-cling",
+    "ability": "static-shock",
+    "origin": "wild",
+    "artNote": "Stays cute."
+  },
+  {
+    "id": "joulebug",
+    "name": "Joulebug",
+    "types": ["voltaic"],
+    "forms": [
+      { "form": 1, "name": "Joulebug", "emoji": "🐜", "art": "tiny glowing insect" },
+      { "form": 2, "name": "Ohmroach", "emoji": "🐞", "art": "metallic beetle with conductive antennae" },
+      { "form": 3, "name": "Wattbeetle", "emoji": "🔋", "art": "friendly scarab like a walking battery" }
+    ],
+    "primarySkill": "circuitry",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "high-voltage",
+    "ability": "capacitor-shell",
+    "origin": "wild"
+  },
+  {
+    "id": "plasmaplug",
+    "name": "Plasmaplug",
+    "types": ["voltaic"],
+    "forms": [
+      { "form": 1, "name": "Plasmaplug", "emoji": "🐍", "art": "snake with a pronged tail it chases" },
+      { "form": 2, "name": "Ionjack", "emoji": "🔌", "art": "insulated serpent" },
+      { "form": 3, "name": "Surgeport", "emoji": "🎛️", "art": "gentle cobra with a socket-hub hood" }
+    ],
+    "primarySkill": "circuitry",
+    "secondaryAptitude": "fabrication",
+    "statLean": "power",
+    "signatureTrait": "daisy-chain",
+    "ability": "arc-strike",
+    "origin": "wild"
+  },
+  {
+    "id": "coilchirp",
+    "name": "Coilchirp",
+    "types": ["voltaic"],
+    "forms": [
+      { "form": 1, "name": "Coilchirp", "emoji": "🐤", "art": "metallic bird wrapped in copper wire" },
+      { "form": 2, "name": "Wirebeak", "emoji": "🦜", "art": "conductive singing avian" },
+      { "form": 3, "name": "Gridtrill", "emoji": "🦅", "art": "electric eagle" }
+    ],
+    "primarySkill": "circuitry",
+    "secondaryAptitude": "scavenging",
+    "statLean": "power",
+    "signatureTrait": "overclocked",
+    "ability": "sonic-zap",
+    "origin": "wild"
+  },
+  {
+    "id": "eclipsa",
+    "name": "Eclipsa",
+    "types": ["void"],
+    "forms": [
+      { "form": 1, "name": "Eclipsa", "emoji": "🌑", "art": "silent floating dark disk with a soft rim" },
+      { "form": 2, "name": "Umbrax", "emoji": "🌙", "art": "crescent shadow entity" },
+      { "form": 3, "name": "Penumbrum", "emoji": "🕳️", "art": "multi-ringed dark body bending light" }
+    ],
+    "primarySkill": "aether-weaving",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "void-resonance",
+    "ability": "dark-eclipse",
+    "origin": "wild"
+  },
+  {
+    "id": "riftsneak",
+    "name": "Riftsneak",
+    "types": ["void"],
+    "forms": [
+      { "form": 1, "name": "Riftsneak", "emoji": "👤", "art": "shy shadowy biped peeking from portals" },
+      { "form": 2, "name": "Nullprowl", "emoji": "🐈‍⬛", "art": "sleek cat-like shadow" },
+      { "form": 3, "name": "Gloamstalk", "emoji": "🐆", "art": "elegant starry void panther" }
+    ],
+    "primarySkill": "vessel-crafting",
+    "secondaryAptitude": "scavenging",
+    "statLean": "power",
+    "signatureTrait": "spatial-pocket",
+    "ability": "shadow-strike",
+    "origin": "wild"
+  },
+  {
+    "id": "hushflutter",
+    "name": "Hushflutter",
+    "types": ["void"],
+    "forms": [
+      { "form": 1, "name": "Hushflutter", "emoji": "🦋", "art": "dark-energy moth with starry wingtips" },
+      { "form": 2, "name": "Hushglide", "emoji": "🦈", "art": "floating manta ray of twilight" },
+      { "form": 3, "name": "Silentwing", "emoji": "🕊️", "art": "four-winged phantom glider" }
+    ],
+    "primarySkill": "aether-weaving",
+    "secondaryAptitude": "scavenging",
+    "statLean": "health",
+    "signatureTrait": "silent-weaver",
+    "ability": "void-breeze",
+    "origin": "wild"
+  },
+  {
+    "id": "netherpod",
+    "name": "Netherpod",
+    "types": ["void"],
+    "forms": [
+      { "form": 1, "name": "Netherpod", "emoji": "🥚", "art": "dark metallic chrysalis with inner starlight" },
+      { "form": 2, "name": "Chasmshell", "emoji": "🐚", "art": "floating nautilus of condensed void" },
+      { "form": 3, "name": "Astralcarapace", "emoji": "🌌", "art": "slow void-tortoise carrying a tiny nebula" }
+    ],
+    "primarySkill": "vessel-crafting",
+    "secondaryAptitude": "fabrication",
+    "statLean": "guard",
+    "signatureTrait": "starlight-infusion",
+    "ability": "nebula-shell",
+    "origin": "wild"
+  }
+]

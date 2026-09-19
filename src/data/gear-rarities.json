@@ -1,0 +1,11 @@
+[
+  { "tier": 1, "id": "common", "name": "Common" },
+  { "tier": 2, "id": "uncommon", "name": "Uncommon" },
+  { "tier": 3, "id": "rare", "name": "Rare" },
+  { "tier": 4, "id": "epic", "name": "Epic" },
+  { "tier": 5, "id": "legendary", "name": "Legendary" },
+  { "tier": 6, "id": "mythic", "name": "Mythic" },
+  { "tier": 7, "id": "celestial", "name": "Celestial" },
+  { "tier": 8, "id": "ascendant", "name": "Ascendant" },
+  { "tier": 9, "id": "primordial", "name": "Primordial" }
+]

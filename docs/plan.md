@@ -160,6 +160,10 @@ partner-element-drop hybrid traits read. v1 authors tiers 1-5 (design section 3)
 Woodcutting T1-T3 only: `oak-log`, `willow-log`, `yew-log` at required skill levels **1 / 15 / 30**
 (PLACEHOLDER).
 
+`requiredSkillLevel`, `baseActionMs` and `xpPerAction` are null on items that are dropped rather than
+gathered (`kind: "rare"`, e.g. `verdant-seedcache`); a `raw` resource must have all three. Every
+`rareDrop.id` must resolve to a resource with `kind: "rare"`.
+
 ### 3.5 abilities.json
 
 ```json
@@ -174,7 +178,10 @@ Woodcutting T1-T3 only: `oak-log`, `willow-log`, `yew-log` at required skill lev
 
 `effect` enum, and nothing else (design section 8): `single-target-damage`, `multi-target-damage`,
 `heal-instant`, `heal-over-time`, `buff-power`, `buff-guard`, `shield-self`, `shield-party`, `thorns`.
-`damageType` is a type ID when the effect deals damage, otherwise null. `magnitude` multiplies the
+`damageType` is a type ID, and is required when the effect deals damage. Non-damage abilities may also
+carry one, because content-data.md gives six hybrid heals, shields and buffs a type (Briar Wash, Facet
+Ward, Warm Tides, Twilight Bough, Obsidian Shroud, Twilight Mend); the sim reads it only for damage.
+Base-species non-damage abilities have none in the doc, so theirs is null. `magnitude` multiplies the
 tempo's base value, so "strong self shield" (Bucket Block) is `shield-self` / `heavy` / `1.5` rather
 than a new effect. Base numbers per tempo live in `tuning.json` under `combat.tempo`.
 
@@ -224,7 +231,10 @@ relative (Geneticist, Champion and the Void-only traits get low weights, per con
 `scope.target` is one of `self | party | active-creatures | other-active-in-skill`; `skills` and `types`
 are optional filters. `aura` is present only on the two aura signatures (Resonant Frequency uses
 `other-active-in-skill` + `skills: ["mining"]`; Sea Breeze uses `active-creatures` + `types: ["aqueous"]`)
-and drives the "strongest only, never stacks" rule from design section 4. When `valueByStrength` is
+and drives the "strongest only, never stacks" rule from design section 4. Each aura is its own `group`
+(`resonant-frequency`, `sea-breeze`), since design says the strongest "of each kind" applies. An effect
+with key `partner_element_drop_chance` carries `"elementType": "<type id>"` (the partner type whose element
+resource it drops); no other effect may. When `valueByStrength` is
 absent the loader fills it from `tuning.json` -> `traitStrength.default` (PLACEHOLDER Minor 0.05 /
 Moderate 0.10 / Major 0.20, design section 4).
 
@@ -265,8 +275,10 @@ Two entries need engine support beyond a static value:
 }]
 ```
 
-`statLean` is `health | power | guard`. `emoji` holds the actual emoji character in the real file.
-`art` carries the form description from content-data.md so later art work does not need the doc.
+`statLean` is `health | power | guard`. `emoji` holds the actual emoji character in the real file, and the
+schema rejects anything that is not one. `art` carries the form description from content-data.md so later
+art work does not need the doc; content-data.md only describes base species, so hybrid forms omit it.
+Species may carry an optional `artNote` for whole-creature art direction (`"Stays cute."`).
 
 `hybrids.json` uses the same shape plus:
 
@@ -391,8 +403,13 @@ stat = baseStats[stat] * lean
      * (1 + statPerLevel * (level - 1))
      * rarity.statMultiplier
      * formMultiplier[form]
-     + cappedFlatTraitBonus(stat)
+     * (1 + cappedTraitBonus(stat))
 ```
+
+`cappedTraitBonus` sums the `bonus_health` / `bonus_power` / `bonus_guard` effects (Vitality, Brawn,
+Stalwart, Champion) at their `traitStrength` percentages and clamps to the modifier registry cap. It is a
+**percentage of the stat**, not a flat add, so the default Minor 5% / Moderate 10% / Major 20% apply to it
+unchanged (designer's decision, 2026-09-19).
 
 ### 4.2 Action cooldown
 

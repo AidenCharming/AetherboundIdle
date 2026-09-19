@@ -1,0 +1,33 @@
+[
+  { "key": "extra_output_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "offline_extra_output_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "save_material_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  {
+    "key": "cooldown_reduction",
+    "unit": "percent",
+    "stacking": "additive",
+    "cap": 0.5,
+    "note": "Shared by signature traits, pool traits, auras and gear (design section 3)."
+  },
+  { "key": "bonus_xp", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "rare_drop_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "treasure_drop_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "bench_aether_emission", "unit": "percent", "stacking": "additive", "cap": 1 },
+  { "key": "bind_rate", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "free_bind_attempts", "unit": "count", "stacking": "additive", "cap": 3 },
+  { "key": "hatch_time_reduction", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  {
+    "key": "mutation_odds",
+    "unit": "percent",
+    "stacking": "additive",
+    "cap": 0.03,
+    "note": "Design section 4: Geneticist bonus is capped at +3% total across all sources."
+  },
+  { "key": "attunement_cost_reduction", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "bonus_health", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "bonus_power", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "bonus_guard", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "ability_cooldown_reduction", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "bonus_combat_xp", "unit": "percent", "stacking": "additive", "cap": 0.5 },
+  { "key": "partner_element_drop_chance", "unit": "percent", "stacking": "additive", "cap": 0.5 }
+]

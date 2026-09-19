@@ -37,7 +37,7 @@ No real-money purchases. Everything is earned through play.
 ## 4. Creatures
 - Base species are captured. Hybrids are bred only.
 - Each creature has: species, type(s), rarity (9 tiers), level, form (1 to 3), stat lean (Health/Power/Guard), primary skill, secondary aptitude, one combat ability with a tempo tag, **one signature trait** (innate, not rerollable, not inherited), and **up to 3 pool traits**.
-- **Forms:** Form 2 at creature level 30, Form 3 at level 60 (tunable). Same creature growing stronger, never a different species. Bonus per form: PLACEHOLDER +20% at Form 2, +40% at Form 3 to stats and speed. Form bonuses must stay well below rarity bonuses. Evolution is automatic on reaching the level (v1). Offspring always hatch at Form 1, level 1.
+- **Forms:** Form 2 at creature level 30, Form 3 at level 60 (tunable). Same creature growing stronger, never a different species. Bonus per form: PLACEHOLDER +20% at Form 2, +40% at Form 3 to stats, and a smaller speed bonus (PLACEHOLDER about +8% / +16%, tunable in `tuning.json` under `cooldown.formTerm`). A full +20% / +40% speed bonus would nearly match the whole rarity ladder's speed contribution. Form bonuses must stay well below rarity bonuses. Evolution is automatic on reaching the level (v1). Offspring always hatch at Form 1, level 1.
 - **Rarity is a tier on the same species** (frame, tint, stat multiplier), not separate art.
 - **Creature rarity ladder (light intensity):** Dim, Faint, Steady, Gleaming, Luminous, Radiant, Brilliant, Resplendent, Zenith.
 - **Gear rarity ladder:** Common, Uncommon, Rare, Epic, Legendary, Mythic, Celestial, Ascendant, Primordial. Tier N creatures and tier N gear share the same resource and processed-goods tier (one spreadsheet internally).
