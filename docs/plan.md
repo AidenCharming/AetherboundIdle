@@ -51,6 +51,7 @@ Aetherbound Idle/
       offline.ts            bulk offline catch-up
       tick.ts               online step: (state, dtMs) -> { state, events }
       save.ts               serialize, versioning, migration chain
+      state.ts              createInitialState(seed, now): a brand-new game (added at 1.4)
       events.ts             SimEvent union (action-complete, level-up, hatch, ...)
     state/
       store.ts              zustand store: holds GameState, exposes actions
@@ -534,8 +535,8 @@ to prevent.
 **Outcome-committing rolls force an immediate save**, rather than waiting for the 15s autosave:
 breeding a pair, hatching an egg, and a capture/bind attempt. Each of these writes the result *and* the
 advanced RNG state in one commit, so a crash or a deliberate reload between the roll and the next
-autosave cannot rewind either. `state/actions.ts` exposes a `commitRoll(fn)` helper that runs the sim
-function, applies the result, and flushes the save synchronously; those three actions must go through it.
+autosave cannot rewind either. `commitRoll(storage, state, roll, now)` in `state/persistence.ts` runs the roll and flushes the result and the
+advanced RNG synchronously; `state/actions.ts` wraps it, and those three actions must go through it.
 Idle progress (work actions, rare-drop rolls, bench Aether) stays on the 15s autosave — the stakes are
 low and the write volume would be high.
 

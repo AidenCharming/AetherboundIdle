@@ -1,0 +1,262 @@
+import { describe, expect, it } from 'vitest'
+import { content } from '../src/data'
+import { createRng } from '../src/sim/rng'
+import { integrityProblems, MIGRATIONS, parseSave, reconcile, serializeSave, type LoadResult } from '../src/sim/save'
+import { step } from '../src/sim/tick'
+import type { GameState } from '../src/types/state'
+import { addCreature, HOUR, newGame, pool, setSkillLevel, sproutletAtWork, variant } from './helpers'
+
+/** A mid-game state with floats, pool traits, a working slot, a benched creature and a moved RNG. */
+function midGame(): GameState {
+  let s = addCreature(sproutletAtWork(), 'sproutlet', { rarityTier: 3, level: 12, xp: 400, poolTraits: [pool('glimmer', 'minor'), pool('swift-worker', 'major')] }).state
+  s = step(s, 2 * HOUR + 1234.567).state
+  return { ...s, gold: 17, resources: { ...s.resources, 'oak-log': s.resources['oak-log'] ?? 0 } }
+}
+
+const ok = (r: LoadResult) => {
+  if (!r.ok) throw new Error(`expected a good load, got ${r.reason}: ${r.message}`)
+  return r
+}
+const failed = (r: LoadResult) => {
+  if (r.ok) throw new Error('expected the load to fail')
+  return r
+}
+/** Serialize, let `tamper` edit the parsed JSON, and re-stringify: a save that was damaged or hand-edited. */
+const tampered = (state: GameState, tamper: (file: any) => void): string => {
+  const file = JSON.parse(serializeSave(state))
+  tamper(file)
+  return JSON.stringify(file)
+}
+
+describe('round trip', () => {
+  it('serialize -> parse gives back exactly the same state, floats included', () => {
+    const s = midGame()
+    expect(Number.isInteger(s.aether)).toBe(false) // the point: a fractional value survives
+    const r = ok(parseSave(serializeSave(s)))
+    expect(r.state).toEqual(s)
+    expect(r.migratedFrom).toBeNull()
+  })
+
+  it('is written as { version, state }', () => {
+    const file = JSON.parse(serializeSave(newGame()))
+    expect(Object.keys(file)).toEqual(['version', 'state'])
+    expect(file.version).toBe(content.tuning.save.version)
+    expect(file.state.version).toBe(file.version)
+  })
+
+  it('holds IDs and progress only: no display names or balance numbers leak in', () => {
+    const text = serializeSave(midGame())
+    for (const banned of ['Sproutlet', 'Woodcutting', 'baseActionMs', 'statMultiplier', 'benchEmissionPerMin']) expect(text).not.toContain(banned)
+    expect(text).toContain('"speciesId":"sproutlet"')
+  })
+
+  it('a fresh game, and a game where every skill has moved, both survive', () => {
+    expect(ok(parseSave(serializeSave(newGame()))).state).toEqual(newGame())
+    let s = newGame()
+    for (const skill of content.skills) s = setSkillLevel(s, skill.id, 65)
+    expect(ok(parseSave(serializeSave(s))).state).toEqual(s)
+  })
+})
+
+describe('the RNG state in a save is the current one, not the seed (plan 4.6)', () => {
+  it('advances with play, so a reload cannot replay the same numbers', () => {
+    const seed = 424242
+    const s0 = sproutletAtWork(content, seed)
+    expect(s0.rngState).toBe(seed)
+    const played = step(s0, 3000 * 5000, { offline: true }).state
+    expect(played.rngState).not.toBe(seed)
+
+    const reloaded = ok(parseSave(serializeSave(played))).state
+    expect(reloaded.rngState).toBe(played.rngState) // the live state, not the initial seed
+    expect(reloaded.rngState).not.toBe(seed)
+  })
+
+  it('a round trip through save.ts reproduces the same next value', () => {
+    const played = step(sproutletAtWork(content, 99), 3000 * 4000).state
+    const live = createRng(played.rngState)
+    const reloaded = createRng(ok(parseSave(serializeSave(played))).state.rngState)
+    for (let i = 0; i < 50; i++) expect(reloaded.next()).toBe(live.next())
+  })
+
+  it('save -> reload -> roll continues the stream instead of replaying it', () => {
+    const s = sproutletAtWork(content, 7)
+    const rng = createRng(s.rngState)
+    const first = rng.next()
+    const saved = serializeSave({ ...s, rngState: rng.state }) // saved after the first roll
+    const second = createRng(ok(parseSave(saved)).state.rngState).next()
+    expect(second).toBe(rng.next()) // continues
+    expect(second).not.toBe(first) // does not replay
+    // The mistake this prevents: persisting only the initial seed makes the reloaded stream start over.
+    expect(createRng(s.rngState).next()).toBe(first)
+  })
+})
+
+describe('migrations', () => {
+  const SHIPPED = content.tuning.save.version
+
+  it('ships with no migrations yet, and the chain is empty for the current version', () => {
+    expect(Object.keys(MIGRATIONS)).toEqual([])
+    expect(SHIPPED).toBe(1)
+  })
+
+  // A "v1" save that stored gold under an old name; the v2 build expects `gold`.
+  const legacy = (): string => tampered(newGame(), (file) => {
+    file.state.legacyGold = 250
+    delete file.state.gold
+  })
+
+  it('a v1 -> v2 migration stub upgrades an old save, stamps the version, and reports where it came from', () => {
+    const migrations = {
+      1: (s: any) => {
+        const { legacyGold, ...rest } = s
+        return { ...rest, gold: legacyGold }
+      },
+    }
+    const r = ok(parseSave(legacy(), content, { targetVersion: 2, migrations }))
+    expect(r.state.gold).toBe(250)
+    expect(r.state.version).toBe(2)
+    expect(r.migratedFrom).toBe(1)
+    expect('legacyGold' in r.state).toBe(false)
+  })
+
+  it('chains several steps in order, each seeing the previous step\'s output', () => {
+    const seen: number[] = []
+    const migrations = {
+      1: (s: any) => (seen.push(1), { ...s, gold: 1 }),
+      2: (s: any) => (seen.push(2), { ...s, gold: s.gold + 10 }),
+      3: (s: any) => (seen.push(3), { ...s, gold: s.gold * 5 }),
+    }
+    const r = ok(parseSave(serializeSave(newGame()), content, { targetVersion: 4, migrations }))
+    expect(seen).toEqual([1, 2, 3])
+    expect(r.state.gold).toBe(55)
+    expect(r.migratedFrom).toBe(1)
+  })
+
+  it('starts the chain at the file\'s own version, not at 1', () => {
+    const v3 = tampered(newGame(), (file) => {
+      file.version = 3
+      file.state.version = 3
+    })
+    const seen: number[] = []
+    ok(parseSave(v3, content, { targetVersion: 4, migrations: { 1: (s) => (seen.push(1), s), 2: (s) => (seen.push(2), s), 3: (s) => (seen.push(3), s) } }))
+    expect(seen).toEqual([3])
+  })
+
+  it('fails cleanly when a step is missing or throws', () => {
+    const missing = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 3, migrations: { 1: (s) => s } }))
+    expect(missing).toMatchObject({ reason: 'migration-failed' })
+    expect(missing.message).toMatch(/no migration from version 2 to 3/)
+    const boom = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 2, migrations: { 1: () => { throw new Error('boom') } } }))
+    expect(boom).toMatchObject({ reason: 'migration-failed' })
+    expect(boom.message).toMatch(/boom/)
+  })
+
+  it('refuses a save from a newer build instead of mangling it', () => {
+    const newer = tampered(newGame(), (file) => {
+      file.version = SHIPPED + 1
+    })
+    expect(failed(parseSave(newer))).toMatchObject({ reason: 'too-new' })
+  })
+
+  it('a migration that returns a bad shape is caught by validation, not trusted', () => {
+    const r = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 2, migrations: { 1: (s) => ({ ...s, aether: 'lots' }) } }))
+    expect(r.reason).toBe('invalid')
+  })
+})
+
+describe('bad saves are reported, never thrown', () => {
+  const good = midGame()
+
+  for (const [label, text] of [
+    ['an empty string', ''],
+    ['not JSON', '{oops'],
+    ['a JSON array', '[1,2,3]'],
+    ['null', 'null'],
+    ['no state', JSON.stringify({ version: 1 })],
+    ['no version', JSON.stringify({ state: {} })],
+  ] as const) {
+    it(`${label} is corrupt`, () => {
+      expect(failed(parseSave(text)).reason).toBe('corrupt')
+    })
+  }
+
+  it('a non-integer, zero or textual version is corrupt', () => {
+    for (const v of [0, -1, 1.5, '1', null]) expect(failed(parseSave(tampered(good, (f) => { f.version = v }))).reason, String(v)).toBe('corrupt')
+  })
+
+  const invalid: [string, (file: any) => void][] = [
+    ['a wrong type', (f) => { f.state.aether = 'lots' }],
+    ['a NaN turned null by JSON', (f) => { f.state.aether = null }],
+    ['negative Aether', (f) => { f.state.aether = -1 }],
+    ['a fractional rngState', (f) => { f.state.rngState = 1.5 }],
+    ['an rngState beyond uint32', (f) => { f.state.rngState = 2 ** 32 }],
+    ['an unknown extra field', (f) => { f.state.cheatCode = true }],
+    ['a missing field', (f) => { delete f.state.creatures }],
+    ['a bad form', (f) => { f.state.creatures[0].form = 4 }],
+    ['negative XP', (f) => { f.state.skills.woodcutting.xp = -5 }],
+    ['negative slot progress', (f) => { f.state.skills.woodcutting.slots[0].progressMs = -1 }],
+    ['an unknown strength', (f) => { f.state.creatures[1].poolTraits[0].strength = 'ultra' }],
+    ['state.version disagreeing with the file', (f) => { f.state.version = 9 }],
+    ['an unknown species', (f) => { f.state.creatures[0].speciesId = 'ghost' }],
+    ['a rarity tier that does not exist', (f) => { f.state.creatures[0].rarityTier = 10 }],
+    ['a level above the max', (f) => { f.state.creatures[0].level = 100 }],
+    ['a pool trait that is not a pool trait', (f) => { f.state.creatures[1].poolTraits[0].traitId = 'overgrowth' }],
+    ['a duplicate creature id', (f) => { f.state.creatures[1].id = f.state.creatures[0].id }],
+    ['an unknown skill', (f) => { f.state.skills.telepathy = { level: 1, xp: 0, slots: [null] } }],
+    ['a creature claiming a slot that holds someone else', (f) => { f.state.creatures[1].assignment = { skillId: 'woodcutting', slotIndex: 0 } }],
+    ['a slot holding a creature that says it is benched', (f) => { f.state.creatures[0].assignment = null }],
+    ['a slot holding a creature that does not exist', (f) => { f.state.skills.woodcutting.slots[0].creatureId = 'ghost' }],
+  ]
+  for (const [label, tamper] of invalid) {
+    it(`${label} is invalid`, () => {
+      const r = failed(parseSave(tampered(good, tamper)))
+      expect(r.reason).toBe('invalid')
+      expect(r.message.length).toBeGreaterThan(0)
+    })
+  }
+
+  it('says what was wrong, so the notice can be specific', () => {
+    expect(failed(parseSave(tampered(good, (f) => { f.state.creatures[0].speciesId = 'ghost' }))).message).toMatch(/unknown species "ghost"/)
+  })
+
+  it('the untouched save is fine, so the cases above are failing for their own reason', () => {
+    expect(ok(parseSave(serializeSave(good))).state).toEqual(good)
+    expect(integrityProblems(good)).toEqual([])
+  })
+})
+
+describe('content can change under an existing save (a save holds IDs, not copies)', () => {
+  it('a skill added since the save is created at level 1 with its first slot', () => {
+    const r = ok(parseSave(tampered(newGame(), (f) => { delete f.state.skills.mining })))
+    expect(r.state.skills.mining).toEqual({ level: 1, xp: 0, slots: [null] })
+  })
+
+  it('a stale cached level is re-derived from XP, and slots grow to match', () => {
+    const s = setSkillLevel(newGame(), 'woodcutting', 25)
+    const r = ok(parseSave(tampered(s, (f) => { f.state.skills.woodcutting.level = 1; f.state.skills.woodcutting.slots = [null] })))
+    expect(r.state.skills.woodcutting.level).toBe(25)
+    expect(r.state.skills.woodcutting.slots).toHaveLength(2)
+  })
+
+  it('a retuned XP curve re-levels the player from their XP, and never removes a slot', () => {
+    const s = setSkillLevel(newGame(), 'woodcutting', 25)
+    const harder = variant((raw) => {
+      raw.tuning.xp.skillCurve.growth = 1.2
+    })
+    const r = ok(parseSave(serializeSave(s), harder))
+    expect(r.state.skills.woodcutting.level).toBeLessThan(25)
+    expect(r.state.skills.woodcutting.xp).toBe(s.skills.woodcutting!.xp) // progress is never taken away
+    expect(r.state.skills.woodcutting.slots.length).toBeGreaterThanOrEqual(2)
+  })
+
+  it('a slot whose resource was removed by a rebalance loads fine; the sim just idles it', () => {
+    const s = sproutletAtWork()
+    const r = ok(parseSave(tampered(s, (f) => { f.state.skills.woodcutting.slots[0].resourceId = 'deleted-log' })))
+    expect(r.state.skills.woodcutting.slots[0]!.resourceId).toBe('deleted-log')
+  })
+
+  it('reconcile never removes creatures or shrinks slots, and returns equal data for an up-to-date state', () => {
+    const s = midGame()
+    expect(reconcile(s)).toEqual(s)
+  })
+})

@@ -4,6 +4,7 @@ import { makeCreature } from '../src/sim/creature'
 import { xpForLevel } from '../src/sim/formulas'
 import { addSkillXp, assignCreature } from '../src/sim/skills'
 import { createInitialState } from '../src/sim/state'
+import type { StorageLike } from '../src/state/persistence'
 import type { Creature, GameState, PoolTraitRoll } from '../src/types/state'
 
 /** Loads a copy of the content with `mutate` applied to its raw JSON, e.g. to move a tuning knob. */
@@ -72,4 +73,19 @@ export function assignmentProblems(state: GameState): string[] {
     })
   }
   return problems
+}
+
+/** localStorage stand-in for node. `failWrites` / `failReads` simulate a full, blocked or absent store. */
+export class MemoryStorage implements StorageLike {
+  data = new Map<string, string>()
+  failWrites = false
+  failReads = false
+  getItem(key: string): string | null {
+    if (this.failReads) throw new Error('storage read blocked')
+    return this.data.get(key) ?? null
+  }
+  setItem(key: string, value: string): void {
+    if (this.failWrites) throw new Error('quota exceeded')
+    this.data.set(key, value)
+  }
 }

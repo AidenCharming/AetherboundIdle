@@ -3,17 +3,25 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.5: offline progress + save/load.** Build to `docs/plan.md` sections 4.5, 4.6 and 5, and the offline, RNG
-and save items in section 6. Add `src/sim/tick.ts` (`step(state, dtMs)` = `advanceSkills` then `accrueAether`; it lands
-here rather than 1.6 because offline is built on it), `src/sim/offline.ts`, `src/sim/save.ts` and
-`src/state/persistence.ts`, each with tests. Offline must call the same `step` with `dt = elapsed`: no maths of its own.
+**Step 1.6: state layer + Skills screen.** UI reads state through `src/state/selectors.ts` and never imports `src/sim`
+directly (plan.md section 1). Build, in order:
+1. `src/state/store.ts` (zustand, holds `GameState`), `actions.ts` and `selectors.ts`. Boot with
+   `loadGame(localStorage, Date.now(), <seed drawn once from crypto.getRandomValues>)` and keep the returned
+   `LoadOutcome` in the store: step 1.8 renders its `summary`, and 1.6 must at least show a banner for a
+   `quarantined` `notice`.
+2. The **tick driver** in `main.tsx`: a timer calling `step(state, now - lastTick)` (the sim's one step function), the
+   15 s autosave (`tuning.save.autosaveMs`) via `flushSave`, and a flush on `pagehide`/`beforeunload`.
+   `actions.ts` wraps `commitRoll` from `persistence.ts` for phase 2's breed/hatch/capture; nothing uses it yet.
+3. The Skills screen: one Woodcutting slot with a progress bar (`progressMs / cooldown`, the cooldown from
+   `creatureCooldown`), the oak/willow/yew picker (`setSlotResource`, locked tiers greyed with their level), assign
+   and unassign, a top bar with gold, Aether (rounded for display only), and resources.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
 - [x] 1.2 Scaffold Vite + React + TS + Zustand + Vitest. Build and test commands work. Commands filled in CLAUDE.md. First git commit. *(2026-09-19)*
 - [x] 1.3 Convert `docs/content-data.md` into JSON in `src/data/` (types, skills, species, hybrids, traits, tuning knobs) plus loaders with type-checked schemas. Test that every species and hybrid loads. *(2026-09-19)*
 - [x] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests. *(2026-09-19)*
-- [ ] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests.
+- [x] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests. *(2026-09-19)*
 - [ ] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources.
 - [ ] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot.
 - [ ] 1.8 Bench and Aether emission display, "welcome back" offline summary, dev panel (see plan.md 7.1), polish pass. Phase 1 playable.
@@ -220,6 +228,67 @@ gets no cooldown reduction from Overclocked and its other sources are unaffected
 safety net today, and the "an off-primary hybrid can never reach specialist speed" property still holds without it
 (1.667x slower at every point). Tests raise `floorFraction` to 0.6 to prove the floor maths where it binds. If you want
 the floor to matter, raise `floorFraction`, lower the cap, or steepen `levelTermPerLevel`.
+
+### 2026-09-19, step 1.5 — offline progress and save/load
+
+New: `sim/tick.ts`, `sim/offline.ts`, `sim/save.ts`, `state/persistence.ts`. 97 new tests; 305 pass and `npm run build`
+is clean. `src/sim` is still pure (no clock, no `Math.random`, no storage, imports only `data` and `types`).
+
+**Offline is `step` with `dt = elapsed`, and nothing else.** `tick.ts` exports the one step function
+(`advanceSkills` then `accrueAether`); the online tick will call it per frame and `applyOffline` calls it once with the
+window, with `offline: true` so Night Owl's `offline_extra_output_chance` applies. `offline.ts` owns only the window:
+`min(now - lastSeen, capHours)`, where the cap comes from `tuning.offline.capHours`. It returns
+`{ state, events, summary }` and the summary (window, cap hit, clock skew, Aether gained, per-skill actions, XP, levels
+and slots unlocked, resources gained) is what 1.8's welcome-back screen shows.
+
+**The three windows you asked for, all tested at both `applyOffline` and `loadGame` level:**
+- **Crosses a level-up:** 1 hour of oak is 1,200 actions and 12,000 XP, which is level 27 and crosses the level-20 slot
+  unlock. Lands on the right XP, level, slot count and resources, emits a `skill-level-up` per level and the
+  `slot-unlocked`, and equals stepping the same hour online in 14,400 small steps exactly.
+- **Zero:** changes nothing but `lastSeen`, consumes no randomness, empty events and summary.
+- **Clock-skewed (negative):** grants nothing, sets `clockSkewed`, consumes no randomness, and **re-anchors
+  `lastSeen` to `now`**. Leaving it in the future would freeze progress until the real clock caught up. Tested from a
+  few minutes to a decade back, plus NaN and infinite clocks (treated as a zero window). Also tested: a window over the
+  cap (100 h grants exactly 12 h and still moves `lastSeen`), and that offline Aether equals online Aether over the same
+  time, including a ragged frame pattern with a dropped-tab frame.
+
+**Save format (`sim/save.ts`).** `{ version, state }` under `aetherbound-idle:save`. `parseSave` returns a result and never
+throws: `corrupt` (not JSON / no version), `invalid` (strict zod schema, then integrity checks: every ID resolves, and
+a creature's `assignment` and its slot agree), `too-new`, or `migration-failed`. `MIGRATIONS[n]` upgrades n to n+1 and is
+empty today; the chain is tested with a v1 -> v2 stub, a multi-step chain, a missing step and a throwing step. On load,
+`reconcile` re-derives each skill's cached level from its XP (so a retuned XP curve applies to existing saves and never
+removes XP or slots) and adds skills introduced since the save. A slot pointing at a removed resource loads fine and
+the sim idles it.
+
+**RNG (plan 4.6, and the reason for this checklist).** The save holds `GameState.rngState`, the *live* state, and every
+step writes it back. Tests: the saved state is not the seed; a round trip reproduces the next 50 values; and
+save -> reload -> roll continues the stream, including an end-to-end run that reloads between every roll and matches an
+uninterrupted run. `commitRoll(storage, state, roll, now)` runs a roll and flushes the result *and* the advanced RNG in one
+write, with a test that a reload straight after cannot re-roll the committed outcome.
+
+**Persistence (`state/persistence.ts`).** Storage and the clock come in as arguments (`StorageLike`, `now`), so it is tested
+in node. `flushSave` stamps `lastSeen = now` and reports a failed write instead of throwing. `loadGame(storage, now, seed)`
+loads, applies offline progress, writes back so a second load does not double-count, and returns a `LoadOutcome`. A save
+that cannot be loaded is copied byte-for-byte to `aetherbound-idle:save-broken-<now>`, a fresh game starts, and the
+outcome carries a `quarantined` notice with the reason. This includes a save from a newer build, whose raw text is kept.
+
+**Deviations from plan.md** (plan.md updated where it describes the shape):
+1. `commitRoll` lives in `state/persistence.ts`, not `state/actions.ts`. It needs no store, so it is testable now;
+   `actions.ts` will wrap it when the store exists (1.6).
+2. `tick.ts` and `sim/state.ts` (`createInitialState`) exist as of 1.4/1.5; plan.md's build table put the tick with 1.6,
+   but offline needs it, and the 1.6 driver only *calls* it.
+3. `flushSave` stamps `lastSeen = now` on every write, so it assumes the sim has been stepped up to `now`. That holds while
+   the tick driver runs; a driver that pauses without flushing would forfeit the paused time on the next load.
+
+**Not built yet, deliberately:** the autosave timer and unload flush (they need the store and a driver; 1.6), and
+any cleanup policy for old `save-broken-*` copies (each is one save's worth of localStorage; only matters if a save
+is corrupted repeatedly).
+
+**How these tests were checked.** Beyond a green run, I broke the code on purpose 18 ways and confirmed each is caught: RNG
+not written back (in step, in offline, on load, on write), floor from the unadjusted base, efficiency multiplying
+instead of dividing, Aether in whole-minute lumps, Aether reading `benchEmissionTickMs`, negative window let through, cap
+ignored, `lastSeen` not re-anchored, `commitRoll` not flushing, auras stacking, cap not applied, the hybrid penalty on
+open skills, Overclocked modelled, the migration chain skipped, and an assignment/slot mismatch not detected.
 
 ## Open questions for the designer
 
