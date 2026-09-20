@@ -7,6 +7,7 @@
 // creature), or a list that goes through `stable`, which hands back the previous array when nothing changed.
 // Selectors taking arguments are used as `useGameStore((s) => selectSlotProgress(s, skillId, slotIndex))`.
 import { content, STRENGTHS, type StatLean, type Strength } from '../data'
+import { benchedCreatures, creatureEmissionPerMin, emissionPerMin } from '../sim/aether'
 import { canWork, creatureDef } from '../sim/creature'
 import { xpForLevel, xpToNext } from '../sim/formulas'
 import type { OfflineSummary } from '../sim/offline'
@@ -533,3 +534,59 @@ export function selectAssignableCreatureIds(s: GameStore, skillId: string, slotI
     .map((cr) => cr.id)
   return stable(`assignable:${skillId}:${slotIndex}`, ids)
 }
+
+// ---------- bench and Aether per minute ----------
+
+/** One benched creature and what it emits, straight from the sim (`creatureEmissionPerMin`): rarity's rate plus its capped emission traits. */
+export interface BenchEntry {
+  view: CreatureView
+  /** Aether per minute. Fractional once a trait scales it. */
+  perMin: number
+}
+
+// Emission depends on the creature alone, so an entry is cached per creature object like its view is.
+const benchEntries = new WeakMap<Creature, BenchEntry>()
+
+function benchEntryOf(creature: Creature): BenchEntry {
+  let entry = benchEntries.get(creature)
+  if (!entry) {
+    entry = { view: viewOf(creature), perMin: creatureEmissionPerMin(creature) }
+    benchEntries.set(creature, entry)
+  }
+  return entry
+}
+
+// Who is benched changes only when `game.creatures` is replaced (an assignment, a grant, later a hatch), never on the
+// tick, so both the list and the total are cached on the array itself, as `selectCreatureViews` does.
+const benchLists = new WeakMap<readonly Creature[], readonly BenchEntry[]>()
+const benchTotals = new WeakMap<readonly Creature[], number>()
+let lastBenchList: readonly BenchEntry[] = []
+
+/** Benched creatures, biggest emitter first (then the older creature first). Stable by identity while nobody moves on or off the bench. */
+export function selectBenchEntries(s: GameStore): readonly BenchEntry[] {
+  const creatures = s.game.creatures
+  const cached = benchLists.get(creatures)
+  if (cached) return cached
+  const next = benchedCreatures(s.game)
+    .map(benchEntryOf)
+    .sort((a, b) => b.perMin - a.perMin || a.view.seq - b.view.seq)
+  const list = lastBenchList.length === next.length && lastBenchList.every((e, i) => e === next[i]) ? lastBenchList : next
+  benchLists.set(creatures, list)
+  lastBenchList = list
+  return list
+}
+
+/** The sim's own total (`emissionPerMin`): exactly what `accrueAether` adds, online and offline. */
+export function selectAetherPerMinute(s: GameStore): number {
+  const creatures = s.game.creatures
+  let total = benchTotals.get(creatures)
+  if (total === undefined) {
+    total = emissionPerMin(s.game)
+    benchTotals.set(creatures, total)
+  }
+  return total
+}
+
+const MINUTES_PER_HOUR = 60
+
+export const selectAetherPerHour = (s: GameStore): number => selectAetherPerMinute(s) * MINUTES_PER_HOUR

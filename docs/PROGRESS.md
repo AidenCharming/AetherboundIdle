@@ -3,14 +3,12 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.8b, in three checkpoints. A (the dev panel) is DONE and committed; B (bench and Aether per minute, the Nexus
-tab) is next, then C (polish pass and the Phase 1 acceptance run).** 1.8a and the 1.8t tuning pass are done. Starting points:
+**Step 1.8b, in three checkpoints. A (the dev panel) and B (bench, Aether per minute, the Nexus tab) are DONE and
+committed; C (polish pass and the Phase 1 acceptance run) is next.** 1.8a and the 1.8t tuning pass are done. Starting points:
 - ~~**Dev panel**~~ **Done in checkpoint A** (see "1.8b checkpoint A" below): grant creature (picked by hand, nothing rolled),
   add resources / Aether / gold, set skill level, reset save. To test with a varied roster, grant creatures from the Dev tab.
-- **Bench and Aether per minute**: rarity's `benchEmissionPerMin` is in `rarities.json` and the sim accrues it
-  continuously (`sim/aether.ts`). A roster card could show it per benched creature and the top bar could show Aether
-  per minute; both need a selector, because the UI never imports `src/sim`. Note the top bar shows floored Aether, so
-  a small bench looks frozen until the first whole point — a per-minute rate is what makes it legible.
+- ~~**Bench and Aether per minute**~~ **Done in checkpoint B** (see "1.8b checkpoint B" below): the top bar shows Aether per
+  minute (always, `0/min` when empty) and the Nexus tab lists the benched creatures with their emission and the totals.
 - **Polish pass**: whatever 1.6/1.7/1.8a left rough. The known list is in the "Not verified" notes of each checkpoint.
 - Same UI rules throughout: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
   selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
@@ -917,6 +915,47 @@ to `createActions`. **Mutation-checked:** dropping `retire()` fails 4 tests, dro
 
 **For whoever tests by hand.** The browser tool's `form_input` sets a checkbox's DOM state without React seeing it, so a controlled checkbox snaps back: use a real
 click on the label. And a Vite hot reload after any edit sends the app back to the Skills tab and invalidates the tool's element refs: re-`find` them.
+
+### 2026-09-20, step 1.8b checkpoint B: the bench, Aether per minute, and the Nexus tab
+
+New: `ui/screens/Nexus.tsx`, `ui/components/{NexusCard,cardStyle}.tsx`, `test/bench.test.ts` (14 tests). Changed: `state/selectors.ts`, `ui/format.ts` (`formatRate`), `ui/components/{TopBar,RosterCard}.tsx`,
+`App.tsx`, `ui/theme.css`. 610 tests pass and `npm run build` is clean. No new dependency, no new tuning number.
+
+**Selectors (the sim's own numbers, no maths in components).** `selectBenchEntries` is every benched creature as `{ view, perMin }`, where `perMin` is the sim's `creatureEmissionPerMin` (the
+rarity's `benchEmissionPerMin` scaled by the creature's capped `bench_aether_emission` traits: Glimmer, Aether-Drenched, Singularity Glow). `selectAetherPerMinute` is the sim's own
+`emissionPerMin(state)` and `selectAetherPerHour` is that times 60. The total is **the function `accrueAether` uses**, not a re-sum, and a test asserts it is `toBe` equal to it and equal (to 9
+places) to the sum of the entries. The list is sorted biggest emitter first, then the older creature (by `creature-<n>`), which a test pins with the game's creature array reversed. Both are cached
+on `game.creatures`, which only an assignment or a grant replaces, so the 10 Hz tick costs a lookup, and the entry is cached per creature object like the roster view. (Identity is also held by
+reusing the previous list when every entry is the same object, so that cache is a cost optimisation and a mutation-check that removes it does not fail a test.)
+
+**Top bar.** Aether has its rate beside it: `Aether 15,643  257/min`, muted and smaller, with an `aria-label` of "257 Aether per minute". **My call on the empty bench: it always shows, as `0/min`, and is never
+hidden.** Hiding it would make a bench that is empty because everyone is working look the same as a broken counter, and the number would jump into the bar the first time someone is benched. At the start
+of a new game the Sproutlet is benched, so the bar opens on `1/min`. `formatRate` keeps up to two decimals below 10, one below 1,000, none above, drops trailing zeros ("0.5", "12.5", "256", "1,024",
+"15,360") and says "<0.01" for a tiny nonzero rate rather than "0".
+
+**Nexus tab** (the name plan.md 7 and design.md section 11 use), between Roster and Settings. A panel with the placeholder line, **per minute, per hour and benched count**, then the benched creatures in the
+roster's card language: type-colored art, rarity frame and glow, shiny hue, name, level and form, rarity, and `N Aether/min`. It is read-only. **No habitat, capacity or bench-upgrade system** (design.md
+section 11 lists them as future); an empty bench says so and points at Unassign. `cardStyle.ts` is the custom-property block both cards use, lifted out of `RosterCard` so a creature looks the same in both
+(behaviour unchanged, the roster tests still pass). Five tabs fit at 375 px (73 to 83 px each, 56 px tall).
+
+**Verified in a real browser (Vite dev server, Chromium pane, 375 px):**
+- New game: top bar `Aether 8  1/min`; the Nexus shows the starter with `1 Aether/min`, totals 1 per minute, 60 per hour, 1 benched.
+- Granted a Zenith Sproutlet from the Dev tab: the bar reads `257/min` at once. **Online**: over 30.02 s of wall clock Aether went 8 to 137, +129 against 257 x 30.02 / 60 = 128.6 (the display floors, so
+  within 1). **Fast-forward 1 h**: the welcome-back dialog says `Aether +15,420`, which is exactly 257 x 60, and the bar moved by 15,428 (the 15,420 plus 1.7 s of live accrual, about 8). So the online
+  rate and the offline gain are the same number. The Nexus then listed the Zenith first (glowing frame, `256 Aether/min`) and the Dim starter (`1 Aether/min`), totals 257 / 15,420 / 2.
+- No horizontal overflow at 375 px; console clean.
+
+**Not verified:** the Nexus and the top-bar rate on a wide desktop layout (done in the acceptance run below), a real phone, Safari or Firefox, screen-reader output of the rate, and the tick-time render
+cost with a very large bench (the roster's 121-creature test covers the same caching pattern; there is no render-count test for the Nexus).
+
+**Decisions and deviations (all reversible):**
+1. **The empty-bench rate shows as `0/min`** (see above).
+2. **No emission on the roster card.** The old Next up said a roster card "could" show it; the brief for this checkpoint asked for the Nexus tab and the top bar only, so the roster card is unchanged (its
+   Details panel already says whether a creature is benched). Say if you want it there too.
+3. **Per hour is per minute x 60 in the selector**, a unit conversion and not a balance number.
+
+**For whoever tests by hand.** After several quick file swaps (my mutation checks) the Vite dev server kept serving a stale transform of `App.tsx` under its HMR-stamped URL while a fresh query string returned the
+new code, so the pane showed the old app. `preview_stop` and `preview_start` fixed it; a page reload did not.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:

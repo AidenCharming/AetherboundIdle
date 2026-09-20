@@ -1,6 +1,6 @@
 import { useGameStore } from '../../state/runtime'
-import { resourceInfo, selectAetherDisplay, selectGold, selectHeldResourceIds, selectResourceQty } from '../../state/selectors'
-import { formatCount } from '../format'
+import { resourceInfo, selectAetherDisplay, selectAetherPerMinute, selectGold, selectHeldResourceIds, selectResourceQty } from '../../state/selectors'
+import { formatCount, formatRate } from '../format'
 import { ResourceIcon } from './ResourceIcon'
 
 function ResourceChip({ resourceId }: { resourceId: string }) {
@@ -18,6 +18,7 @@ function ResourceChip({ resourceId }: { resourceId: string }) {
 export function TopBar() {
   const gold = useGameStore(selectGold)
   const aether = useGameStore(selectAetherDisplay) // whole Aether for display; the stored value keeps its fraction
+  const perMin = useGameStore(selectAetherPerMinute) // the sim's own bench emission; 0 when nobody is benched, and always shown
   const held = useGameStore(selectHeldResourceIds)
   return (
     <header className="topbar">
@@ -31,6 +32,9 @@ export function TopBar() {
           <div>
             <dt>Aether</dt>
             <dd>{formatCount(aether)}</dd>
+            <dd className="rate" aria-label={`${formatRate(perMin)} Aether per minute`}>
+              {formatRate(perMin)}/min
+            </dd>
           </div>
         </dl>
       </div>

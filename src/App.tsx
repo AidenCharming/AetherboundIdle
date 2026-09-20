@@ -6,16 +6,18 @@ import { TabBar, type Tab } from './ui/components/TabBar'
 import { TopBar } from './ui/components/TopBar'
 import { WelcomeBack } from './ui/components/WelcomeBack'
 import { DevPanel } from './ui/screens/DevPanel'
+import { Nexus } from './ui/screens/Nexus'
 import { Roster } from './ui/screens/Roster'
 import { Settings } from './ui/screens/Settings'
 import { Skills } from './ui/screens/Skills'
 import './ui/theme.css'
 
-type ScreenId = 'skills' | 'roster' | 'settings' | 'dev'
+type ScreenId = 'skills' | 'roster' | 'nexus' | 'settings' | 'dev'
 
 const TABS: readonly Tab<ScreenId>[] = [
   { id: 'skills', label: 'Skills' },
   { id: 'roster', label: 'Roster' },
+  { id: 'nexus', label: 'Nexus' },
   { id: 'settings', label: 'Settings' },
 ]
 
@@ -45,6 +47,7 @@ export function App() {
       <main id={PANEL_ID} role="tabpanel" aria-labelledby={`tab-${screen}`} style={{ display: 'contents' }}>
         {screen === 'skills' && <Skills />}
         {screen === 'roster' && <Roster filter={filter} sort={sort} onFilter={setFilter} onSort={setSort} />}
+        {screen === 'nexus' && <Nexus />}
         {screen === 'settings' && <Settings />}
         {screen === 'dev' && <DevPanel />}
       </main>

@@ -5,11 +5,10 @@ import {
   selectSlotAssignResourceId,
   selectSlotCount,
   selectSlotCreatureId,
-  shinyHueDeg,
   skillInfo,
   type CreatureView,
 } from '../../state/selectors'
-import { cssVars } from '../format'
+import { cardStyle } from './cardStyle'
 
 type Outcome = { ok: true } | { ok: false; reason: string }
 
@@ -155,15 +154,7 @@ function Details({ view, id }: { view: CreatureView; id: string }) {
  * creature changes or it is opened or closed: not on the 10 Hz tick, and not when a neighbour changes.
  */
 export const RosterCard = memo(function RosterCard({ view, expanded, onToggle }: { view: CreatureView; expanded: boolean; onToggle: (id: string) => void }) {
-  const first = view.types[0]?.color ?? view.color
-  const style = cssVars({
-    // Dual-type hybrids split the art panel between their two type colors; a single type fills it with one.
-    '--type-a': first,
-    '--type-b': view.types[1]?.color ?? first,
-    '--rarity': view.rarity.tint,
-    '--glow': String(view.rarity.glow),
-    '--shiny-hue': view.shiny ? `${shinyHueDeg}deg` : null,
-  })
+  const style = cardStyle(view)
   const detailsId = `details-${view.id}`
 
   return (

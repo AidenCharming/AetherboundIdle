@@ -33,3 +33,18 @@ export const formatGain = (n: number): string => `+${formatCount(n)}`
 export function cssVars(vars: Record<`--${string}`, string | null | undefined>): CSSProperties {
   return Object.fromEntries(Object.entries(vars).filter(([, v]) => v != null)) as CSSProperties
 }
+
+// A rate is small and often fractional (a Dim creature is 1 a minute, a trait makes it 1.05), so fewer decimals show as it grows.
+const rate2 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 })
+const rate1 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 })
+const rate0 = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 })
+
+/**
+ * Aether per minute (or per hour) for display: "0", "0.5", "12.5", "256", "1,024". Up to two decimals below 10, one below 1,000,
+ * none above, trailing zeros dropped, and anything tiny but not zero says "<0.01" rather than a misleading "0".
+ */
+export function formatRate(n: number): string {
+  if (!(n > 0)) return '0'
+  if (n < 0.01) return '<0.01'
+  return (n < 10 ? rate2 : n < 1000 ? rate1 : rate0).format(n)
+}
