@@ -1,7 +1,14 @@
 // Display-only formatting. Nothing here changes a stored value.
 import type { CSSProperties } from 'react'
+import type { NotificationKind } from '../state/selectors'
 
 const count = new Intl.NumberFormat('en-US')
+
+/** What each kind of notification is called, as a small heading on a toast and a line in the bell's list. */
+export const KIND_LABEL: Record<NotificationKind, string> = {
+  'skill-level-up': 'Level up',
+  'slot-unlocked': 'Slot unlocked',
+}
 
 /** A whole-number count with thousands separators. Fractions are dropped, not rounded up. */
 export const formatCount = (n: number): string => count.format(Math.floor(n))

@@ -3,15 +3,17 @@
 // launched with --smoke=<mode>: the window stays hidden, the page is driven from here with executeJavaScript (which
 // needs no IPC and no preload), and the process exits 0 (pass) or 1 (fail) after printing what it found.
 //
-//   load      the page loads, shows "Woodcutting", logged no console error, and the window has its security flags
-//   progress  a hidden (so throttled) window really plays: assign, wait, and the XP matches the time that passed; then
-//             a reload keeps the progress (this is the "throttled timers lose nothing" check)
+//   load      the page loads and renders the Woodcutting page (its heading, next to the sidebar nav), logged no console error,
+//             and the window has its security flags
+//   progress  a hidden (so throttled) window really plays: open Woodcutting from the sidebar, assign, see the creature in
+//             the sidebar's current activity, wait, and the XP matches the time that passed; then a reload keeps the
+//             progress (this is the "throttled timers lose nothing" check)
 //   hold      loads, then stays open. Only the runner's single-instance check uses it.
 const { app } = require('electron')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-// Text of the progress line the Skills screen prints, and of the "next slot / level" line above it.
+// Text of the progress line the skill page prints under its XP bar, and of the cooldown line on a slot.
 const XP_LINE = /([\d,]+) \/ ([\d,]+) XP to level (\d+)/
 const PER_ACTION = /([\d.]+) s per action/
 
@@ -47,8 +49,15 @@ function attach(win, mode, print) {
 
   async function loadCheck(loaded) {
     await loaded
+    // The sidebar names every skill, so the word alone would appear even if the page failed to render: wait for the page's own
+    // heading and for the sidebar nav that sits beside it (the window is 1280 px wide, so the nav is a column, not a drawer).
+    await waitFor(
+      async () => page(`document.querySelector('main h1')?.textContent === 'Woodcutting' && document.querySelector('nav[aria-label="Pages"] [data-nav-id="skill:woodcutting"]') !== null`),
+      15000,
+      'the Woodcutting page and the sidebar to render',
+    )
     await waitFor(async () => (await text()).includes('Woodcutting'), 15000, 'the page to show "Woodcutting"')
-    say(`page text contains "Woodcutting" (electron ${process.versions.electron}, packaged=${app.isPackaged}, userData=${app.getPath('userData')})`)
+    say(`the sidebar and the Woodcutting page rendered, and page text contains "Woodcutting" (electron ${process.versions.electron}, packaged=${app.isPackaged}, userData=${app.getPath('userData')})`)
     // The flags the window really has, not the ones the source asks for.
     const prefs = wc.getLastWebPreferences()
     say(`window flags: sandbox=${prefs.sandbox} contextIsolation=${prefs.contextIsolation} nodeIntegration=${prefs.nodeIntegration}`)
@@ -74,12 +83,21 @@ function attach(win, mode, print) {
     const ticks = await page('new Promise((done) => { let n = 0; const id = setInterval(() => n++, 100); setTimeout(() => { clearInterval(id); done(n) }, 3000) })')
     say(`window is ${visibility}: a 100 ms interval ran ${ticks} times in 3 s (${ticks < 20 ? 'throttled' : 'NOT throttled, so this run proves less'})`)
 
+    // Click the sidebar entry as a player does. The page is already the default, so this proves the entry exists and works.
+    await page(`(() => {
+      const entry = document.querySelector('[data-nav-id="skill:woodcutting"]')
+      if (!entry) throw new Error('no Woodcutting entry in the sidebar')
+      entry.click()
+    })()`)
     await page(`(() => {
       const button = document.querySelector('article[aria-label="Slot 1"] fieldset.assign button')
       if (!button) throw new Error('no creature offered for Woodcutting slot 1')
       button.click()
     })()`)
     const assignedAt = Date.now()
+    // The sidebar's current activity lists the creature that is now working.
+    await waitFor(async () => page(`document.querySelector('[aria-label="Current activity"]')?.innerText.includes('Sproutlet') === true`), 5000, 'the sidebar to list the working creature')
+    say('the sidebar lists the working Sproutlet under current activity')
     const cooldown = await waitFor(async () => PER_ACTION.exec(await text()), 5000, 'the slot to show its cooldown')
     const cooldownMs = Number(cooldown[1]) * 1000
 

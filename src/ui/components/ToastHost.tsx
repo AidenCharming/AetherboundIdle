@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useGameStore } from '../../state/runtime'
 import { maxToasts, selectNextNotificationId, selectNotifications, skillInfo, toastMs, visibleToasts, type Notification } from '../../state/selectors'
-import { KIND_LABEL } from './NotificationBell'
+import { KIND_LABEL } from '../format'
 
 function Toast({ n, onDismiss }: { n: Notification; onDismiss: (id: number, at: number) => void }) {
   const [hover, setHover] = useState(false)

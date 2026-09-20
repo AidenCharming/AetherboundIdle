@@ -29,7 +29,7 @@ export function DevPanel() {
       <PageTitle lead="For testing. Everything here goes through the same actions and the same save path the game uses.">Dev panel</PageTitle>
       <div className="panel">
         <div className="dev-control">
-          <h3>Fast-forward</h3>
+          <h2>Fast-forward</h2>
           <p className="small muted">
             Re-runs the real offline catch-up as if you had been away that long, so the offline cap applies: asking for
             more than the cap grants the cap, not the hours you typed.
@@ -47,7 +47,7 @@ export function DevPanel() {
                 onChange={(e) => setHours(e.target.value)}
               />
             </label>
-            <button type="button" disabled={!valid} onClick={() => actions.fastForwardHours(typed)}>
+            <button type="button" className="primary" disabled={!valid} onClick={() => actions.fastForwardHours(typed)}>
               Fast-forward
             </button>
           </div>

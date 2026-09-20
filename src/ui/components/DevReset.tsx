@@ -17,7 +17,7 @@ export function DevReset() {
 
   return (
     <div className="dev-control">
-      <h3>Reset save</h3>
+      <h2>Reset save</h2>
       <p className="small muted">Wipes the save and reloads into a new game with one Sproutlet. Backup copies of broken saves are kept.</p>
       {step === 'idle' && (
         <div className="dev-row">

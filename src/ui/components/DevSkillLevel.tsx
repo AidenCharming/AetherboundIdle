@@ -18,7 +18,7 @@ export function DevSkillLevel() {
 
   return (
     <div className="dev-control">
-      <h3>Set skill level</h3>
+      <h2>Set skill level</h2>
       <p className="small muted">
         Raises the skill's XP to what that level takes; slots unlock as normal. It only raises, never lowers.
       </p>
@@ -45,7 +45,7 @@ export function DevSkillLevel() {
           </span>
           <input className="dev-input" type="text" inputMode="numeric" value={level} placeholder="Target level" onChange={(e) => setLevel(e.target.value)} />
         </label>
-        <button type="button" onClick={() => setOutcome(toOutcome(actions.setSkillLevel(skillId, level)))}>
+        <button type="button" className="primary" onClick={() => setOutcome(toOutcome(actions.setSkillLevel(skillId, level)))}>
           Set level
         </button>
       </div>

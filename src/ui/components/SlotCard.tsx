@@ -6,6 +6,7 @@ import {
   selectAssignableCreatureIds,
   selectCreatureView,
   selectDefaultResourceId,
+  selectResourceQty,
   selectResourceUnlocked,
   selectSlotCooldownMs,
   selectSlotCreatureId,
@@ -13,7 +14,7 @@ import {
   selectSlotResourceId,
   skillInfo,
 } from '../../state/selectors'
-import { cssVars, formatSeconds } from '../format'
+import { cssVars, formatCount, formatSeconds } from '../format'
 import { ProgressBar } from './ProgressBar'
 import { ResourceIcon } from './ResourceIcon'
 
@@ -52,16 +53,29 @@ function SlotProgress({ skillId, slotIndex }: Slot) {
   )
 }
 
-function Tier({ skillId, resourceId, selected, onPick }: { skillId: string; resourceId: string; selected: boolean; onPick: (id: string) => void }) {
+/**
+ * One resource the slot can gather, as a card: emoji, name, the base time and XP of an action, and how many the player
+ * holds. The selected one is marked, and one the skill's level does not reach yet is greyed out, disabled, and says
+ * what level it needs. Choosing it does what the old tier button did.
+ */
+function Option({ skillId, resourceId, selected, onPick }: { skillId: string; resourceId: string; selected: boolean; onPick: (id: string) => void }) {
   const unlocked = useGameStore((s) => selectResourceUnlocked(s, skillId, resourceId))
+  const have = useGameStore((s) => selectResourceQty(s, resourceId))
   const info = resourceInfo(resourceId)
   return (
-    <button type="button" className="tier" aria-pressed={selected} disabled={!unlocked} onClick={() => onPick(resourceId)}>
-      <span className="tier-name">
+    <button type="button" className="option" aria-pressed={selected} disabled={!unlocked} onClick={() => onPick(resourceId)}>
+      <span className="option-icon" aria-hidden="true">
         <ResourceIcon info={info} />
-        {info.name}
       </span>
-      <span className="small muted">{unlocked ? `Level ${info.requiredLevel}` : `Needs level ${info.requiredLevel}`}</span>
+      <span className="option-body">
+        <span className="option-name">{info.name}</span>
+        {info.baseActionMs !== null && info.xpPerAction !== null && (
+          <span className="small muted">
+            {formatSeconds(info.baseActionMs)} base · {formatCount(info.xpPerAction)} XP
+          </span>
+        )}
+        <span className="small option-status">{unlocked ? <>You have <strong>{formatCount(have)}</strong></> : `Needs level ${info.requiredLevel}`}</span>
+      </span>
     </button>
   )
 }
@@ -112,7 +126,7 @@ export function SlotCard({ skillId, slotIndex }: Slot) {
   return (
     <article className="slot" aria-label={`Slot ${slotIndex + 1}`}>
       <div className="slot-head">
-        {creatureId ? <Creature creatureId={creatureId} /> : <span className="muted">Slot {slotIndex + 1}: empty</span>}
+        {creatureId ? <Creature creatureId={creatureId} /> : <span className="slot-empty">Slot {slotIndex + 1}: empty</span>}
         {creatureId && (
           <button type="button" onClick={unassign}>
             Unassign
@@ -125,7 +139,7 @@ export function SlotCard({ skillId, slotIndex }: Slot) {
       <fieldset className="picker">
         <legend>Gathering</legend>
         {gatherableResourceIds(skillId).map((id) => (
-          <Tier key={id} skillId={skillId} resourceId={id} selected={id === selected} onPick={pick} />
+          <Option key={id} skillId={skillId} resourceId={id} selected={id === selected} onPick={pick} />
         ))}
       </fieldset>
 

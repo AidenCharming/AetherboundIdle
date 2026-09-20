@@ -1,11 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
-import { selectNotifications, selectUnreadCount, skillInfo, type Notification, type NotificationKind } from '../../state/selectors'
-
-export const KIND_LABEL: Record<NotificationKind, string> = {
-  'skill-level-up': 'Level up',
-  'slot-unlocked': 'Slot unlocked',
-}
+import { selectNotifications, selectUnreadCount, skillInfo, type Notification } from '../../state/selectors'
+import { KIND_LABEL } from '../format'
 
 const time = (at: number): string => new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
 

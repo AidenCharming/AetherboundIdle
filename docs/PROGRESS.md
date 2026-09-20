@@ -3,14 +3,14 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9b comes first (designer's request, 2026-09-20): the UI shell redesign and an exe rebuild.** See its checklist line below and `docs/design.md` section 11 ("UI direction"). It is presentation only and should not change the sim or the save format. After it, continue with Phase 2 planning as described in the next paragraph.
+**Step 1.9b is done (2026-09-20): the UI shell redesign (dark gold theme, sidebar and phone drawer, per-skill pages, current activity, toasts and a bell, option cards) and the rebuilt exe, version 0.1.0.** Presentation only; the sim and the save are untouched.
 
-**Step 1.9 is done (2026-09-20): Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait
+**Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait
 roll**, because nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is, or how much `typeAffinity` should tilt a trait's `rollWeight`. Reroll and
 trait inheritance need the same answer, and the dev panel's grant deliberately does not roll (see 1.8b checkpoint A). Then break Phase 2 into steps in this file and write the plan into `docs/plan.md`
 (folder structure and JSON schemas for the new content, as the protocol asks), and wait for the designer's OK before building.
 
-**Before Phase 2, one thing for the designer: run the manual checklist for the portable exe** (see "Manual checklist" under 1.9 checkpoint C below). It is the one part of 1.9 nobody could see: the window
+**Before Phase 2, one thing for the designer: run the manual checklist for the new portable exe** (see "Manual checklist for 0.1.0" under 1.9b checkpoint C below; the older list under 1.9 checkpoint C is for the 0.0.0 build). The old `release\Aetherbound-Idle-0.0.0-*` files are still there and are the old UI. It is the one part of 1.9 nobody could see: the window
 on screen, the Save and Open dialogs, and the second launch bringing the first window forward.
 
 Things a fresh session should know before starting:
@@ -34,7 +34,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
 
-- [ ] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild.
+- [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
 ### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
 The designer wants the game to run as an `.exe`, not as a browser link. `npm run dev` is only the development server; the game is
@@ -1263,8 +1263,66 @@ hover.
 2. **Dev-panel actions do not notify**, which follows from "the online tick only". If you would rather a dev set-level toast, that is one line in `actions.ts`.
 3. **A toast for a coalesced level-up restarts its timer** and reappears if it had been dismissed.
 
+### 2026-09-20, step 1.9b checkpoint C: every screen restyled, and the exe rebuilt (0.1.0)
+
+Changed: `SlotCard.tsx` (option cards), `selectors.ts` (`ResourceInfo.baseActionMs` / `xpPerAction`), `theme.css`, the Dev / Settings / welcome-back components (heading levels, gold primary buttons), `ui/format.ts` (`KIND_LABEL` moved out of a component
+file), `vite.config.ts`, `electron/smoke.cjs`, `package.json` (0.1.0), `CLAUDE.md`, `design.md`. No behaviour change: every action, selector rule and save path is what it was. 724 tests pass and `npm run build` is clean.
+
+**Option cards.** A slot's resource tiers are now cards: the resource's emoji, name, "3.0 s base · 10 XP", and "You have N"; the selected one has the skill's accent border and a tinted fill; one the skill's level does not reach is greyed out, still
+disabled, and says "Needs level N". They are the same buttons as before (`aria-pressed`, `disabled`, the same `setSlotResource` / pending-choice logic). "Base" because the slot's own cooldown (creature, rarity, form) is the line above it. The assign list is a set of chips in a box that
+scrolls (it can hold the whole roster). Roster, Nexus, Settings, Dev, the welcome-back dialog and the quarantine banner take the same tokens (mostly done by checkpoint A's CSS); C adds gold primary buttons (Close, Export save, Fast-forward, Grant, Add, Set level),
+stat tiles on the Nexus, a tinted "on" state on the setting rows, and `h2` instead of `h3` in the Dev and Settings panels (a page now has one `h1`, then `h2`s).
+
+**Rebuild.** `package.json` is 0.1.0; `npm run electron:pack` wrote (in `release/`, gitignored):
+
+| File | Size |
+|---|---|
+| `Aetherbound-Idle-0.1.0-setup.exe` (NSIS installer) | 102,948,971 bytes (98.2 MiB) |
+| `Aetherbound-Idle-0.1.0-portable.exe` | 102,665,642 bytes (97.9 MiB) |
+| `Aetherbound-Idle-0.1.0-setup.exe.blockmap` | 107,876 bytes |
+| `win-unpacked/` | 321 MB on disk |
+
+**The old `Aetherbound-Idle-0.0.0-*` files are still in `release/`** (portable, setup and blockmap); I did not delete them. They are the old UI. Delete them by hand when you like.
+
+`electron/smoke.cjs` is updated, keeping what it proved: load now waits for the Woodcutting page's own `h1` and the sidebar nav (the word "Woodcutting" alone would now appear in the sidebar even if the page broke); progress opens Woodcutting from the sidebar entry, assigns
+through the same `article[aria-label="Slot 1"] fieldset.assign button`, and checks the sidebar's current activity lists the Sproutlet, before the XP-versus-time check and the reload. Results, all three checks each time, exit 0: dev (`npm run electron:smoke`; that run's window was NOT
+throttled, so it proved less), **`win-unpacked`** (4 ticks of a 100 ms timer in 3 s: throttled; 4 actions of 10 XP in 12.1 s at a 3.0 s cooldown; the same after a reload; single instance) and **the portable exe** (4 ticks in 3 s: throttled; 4 actions in 13.1 s; reload; single instance).
+The installer was built and not run.
+
+**A tooling fix.** Rebuilding the exe while the Vite dev server ran crashed the server (`EBUSY` on a file in `release/win-unpacked`, which its watcher tried to watch). `vite.config.ts` now ignores `**/release/**`.
+
+**Manual checklist for 0.1.0** (designer; about 20 minutes, mostly waiting). It replaces the checklist under 1.9 checkpoint C, which is for the 0.0.0 build. Use `release\Aetherbound-Idle-0.1.0-portable.exe`; the save lives in `%APPDATA%\Aetherbound Idle`. Tick each line and write down anything that differs.
+1. **Launch.** Double-click it (a few seconds' pause, maybe SmartScreen: More info, Run anyway). Expect one window about 1280 x 800 titled "Aetherbound Idle", no menu bar, dark with gold accents: **a sidebar on the left** (🔮 Aetherbound Idle; SKILLS: Woodcutting; CREATURES: Roster, Nexus; SYSTEM: Settings), the **Woodcutting page** with a level card and one empty slot, and gold, Aether and any resources across the top with a 🔔 at the right end. At the bottom of the sidebar: **Current activity** ("Nothing is working...") and "Autosaves locally". F12 does nothing.
+2. **Play.** Under "Assign" click the Sproutlet. Expect: the slot's bar fills every 3.0 s, Oak Log and XP rise, the Oak Log option card's "You have N" goes up, and **Current activity** lists the Sproutlet with a gold bar.
+3. **Sidebar keys.** Click a nav entry and press Tab: focus leaves the nav after one stop. Click a nav entry and press Up, Down, Home, End: focus moves through the entries (Enter opens the page). A Roster filter you set is still there after visiting another page and coming back.
+4. **The drawer.** Drag the window narrower than about 768 px (it goes down to 375). Expect the sidebar to disappear and a **☰ button** and the game's name to appear in the header. Press ☰: the sidebar slides in over the page and the page behind dims. Escape, the ✕, or a click on the dim area closes it, and focus returns to ☰. Choosing a page closes it. Widen the window: the sidebar is a column again.
+5. **A toast and the bell.** With the Sproutlet working, wait for the first level-up (about 75 s). Expect a **toast** bottom-right ("Level up, Woodcutting reached level 2") that leaves after about 5 s, stays while the mouse is on it, and has a working ✕. The 🔔 shows a **1**. Open it: the entry is listed with a time and "new"; "Mark all read" clears the number, "Clear" empties the list, Escape closes it. Close and reopen the game: the list starts empty (it is not saved).
+6. **Close and reopen after a few minutes** (at least 3): a **welcome-back dialog** (gold Close button) reports what you earned, the Sproutlet is still working, and the bell stays empty: away time is reported by the dialog, never by notifications.
+7. **Minimize** for 3 minutes and restore: the logs and XP jumped by about that much (with the dialog if it was over 2 minutes).
+8. **Second launch**: no second window; the first comes to the front. One "Aetherbound Idle" group in Task Manager.
+9. **Export.** Settings, "Export save": a native Save dialog suggesting `aetherbound-idle-save-<date>-<time>.json`. Open it in Notepad: one line starting `{"version":1,"state":{`.
+10. **Reset.** Settings, tick "Dev panel": a **Dev** entry appears under SYSTEM. Dev, "Reset save...", "Yes, wipe my save": a new game.
+11. **Import it back.** Settings, "Import save...": a native Open dialog; pick the file; confirm: the game from step 9 returns (with a welcome-back dialog if over 2 minutes passed).
+12. **A bad file.** Import a `.txt`: a red message with the reason, nothing changes.
+13. **Optional, the installer.** Run `Aetherbound-Idle-0.1.0-setup.exe`, pick a folder, launch from the Start menu, check it opens with the same save (they share `%APPDATA%\Aetherbound Idle`), then uninstall from Windows Settings, Apps.
+
+**Verified in a real browser** (Vite dev server, Browser pane, Chromium; a fresh save from the Dev panel's Reset save, then 14 granted creatures and Woodcutting set to level 170 for a full roster and four working slots):
+- **Every page and screen at 1280, 1024, 768 and 375 px** (Woodcutting, Roster, Nexus, Settings, Dev, with the filter panel open; at 375 also a Roster card expanded, including a working one): no horizontal overflow and no control under 43.5 px in either direction (measured by script over every button, select, input and summary; checkboxes sit in 44 px labels). The welcome-back dialog, the bell panel (at 1280 and at 375, where it sits inside the 16 px gutters) and a toast were also looked at, at 1280 and 375; the quarantine banner (made by writing a corrupt save) at 1280.
+- **The drawer with the keyboard** at 375 px: opened, focus on the current page's entry; Down, Up, Home and End (real key events) move focus; Escape closes it and focus is on the menu button; the page column is inert and the body scroll locked while open; choosing a page closes it.
+- **A toast**: the first level-up came at 43 to 76 s on fresh saves (bottom-right at 1280, bottom-centred at 375), with the bell's badge counting 1, 2, 3 as levels came; hover and focus pausing and the dismiss button are described under checkpoint B.
+- **Scrolled**: the sidebar and (from 1024 px) the header stay pinned while a long Roster scrolls.
+
+**What still looks rough (honestly):**
+- The header's stats (gold, Aether, one chip per resource) wrap to two or three lines on a phone and in a narrow tablet window, and will grow with every new resource. On a phone only the menu, the name and the bell are pinned, so it stays slim, but the stats will need a fold or a summary once there are ten resources.
+- A slot on a phone is long: three full-width option cards, then the assign list. It is correct, not compact.
+- The nav glyphs 🐾 ⚙️ 🌀 render dimmer than the skills' colour emoji, because the system emoji font draws them that way. The skill page's empty right half (one slot in a two-column grid) looks sparse.
+- The activity panel's second line ("Woodcutting · 🪵 Oak Log") wraps to two lines at the sidebar's width when the resource name is long.
+- Placeholder art throughout: emoji on flat tiles, as CLAUDE.md rule 4 says.
+
+**Not verified:** the window on screen, the native Save and Open dialogs, the second launch bringing the first window to the front, and the installer (all on the manual checklist above); a slot-unlocked toast in a real browser (node-tested); a real pointer hover on a toast (I dispatched the events; focus was a real `focus()`); Enter and Space activating buttons (the Browser pane's key tool cannot send them, see checkpoint A); the live window-resize path while the Browser pane was hidden (a hidden pane delivers no resize or media-query events, which for a while looked like a bug; it worked while the pane was visible, and a fresh load at each width was measured); a real phone or touch device; Firefox and Safari; a screen reader.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
-- **UI shell restyle** (designer's request, 2026-09-20). Sidebar navigation with section headings, a pinned current-activity panel, toast notifications and a bell, per-option cards. Reference image and the list of what to borrow (and what not to) are in `docs/design.md` section 11 ("UI direction") and `docs/reference/`. Presentation only, no game logic; needs `SimEvent`s kept in the store for toasts. Now scheduled as **step 1.9b**, before Phase 2 (see the checklist). Not started.
+- ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
   (assigned, locked).

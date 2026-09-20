@@ -76,14 +76,14 @@ export function SaveFile() {
 
   return (
     <div className="dev-control">
-      <h3>Save file</h3>
+      <h2>Save file</h2>
       <p className="small muted">
         Export keeps a copy of your game as a file, for a backup or to move it to another computer. Import replaces the game you are playing with such a file.
       </p>
 
       {step.kind !== 'done' && (
         <div className="dev-row">
-          <button type="button" onClick={exportSave}>
+          <button type="button" className="primary" onClick={exportSave}>
             Export save
           </button>
           <button type="button" onClick={() => picker.current?.click()} disabled={step.kind === 'asking'}>

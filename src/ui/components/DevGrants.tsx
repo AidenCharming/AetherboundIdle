@@ -19,7 +19,7 @@ function AmountRow({ label, onAdd, children }: { label: string; onAdd: (amount: 
           <span className="small muted">{label}</span>
           <input className="dev-input" type="text" inputMode="decimal" value={amount} placeholder="Amount" onChange={(e) => setAmount(e.target.value)} />
         </label>
-        <button type="button" onClick={() => setOutcome(toOutcome(onAdd(amount)))}>
+        <button type="button" className="primary" onClick={() => setOutcome(toOutcome(onAdd(amount)))}>
           Add
         </button>
       </div>
@@ -34,7 +34,7 @@ export function DevGrants() {
   const [resourceId, setResourceId] = useState(resourceOptions[0]!.id)
   return (
     <div className="dev-control">
-      <h3>Add resources, Aether and gold</h3>
+      <h2>Add resources, Aether and gold</h2>
       <p className="small muted">Whole numbers for resources and gold; Aether may have a fraction.</p>
       <AmountRow label="Resource amount" onAdd={(amount) => actions.addResource(resourceId, amount)}>
         <label className="field">

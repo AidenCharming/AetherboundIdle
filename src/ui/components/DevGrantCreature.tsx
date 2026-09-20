@@ -44,7 +44,7 @@ export function DevGrantCreature() {
 
   return (
     <div className="dev-control">
-      <h3>Grant creature</h3>
+      <h2>Grant creature</h2>
       <p className="small muted">
         Adds a benched creature exactly as picked; nothing is rolled. Form is stored separately from level, so any form at
         any level is allowed.
@@ -134,7 +134,7 @@ export function DevGrantCreature() {
       </fieldset>
 
       <div className="dev-row">
-        <button type="button" onClick={grant}>
+        <button type="button" className="primary" onClick={grant}>
           Grant creature
         </button>
       </div>

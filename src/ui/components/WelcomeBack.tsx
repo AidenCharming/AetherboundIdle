@@ -142,7 +142,7 @@ export function WelcomeBack() {
       <h2 id="wb-title">Welcome back</h2>
       <Body view={view} />
       <p className="wb-close">
-        <button type="button" onClick={actions.dismissWelcomeBack}>
+        <button type="button" className="primary" onClick={actions.dismissWelcomeBack}>
           Close
         </button>
       </p>

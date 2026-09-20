@@ -100,6 +100,23 @@ button:disabled {
   cursor: not-allowed;
 }
 
+/* The one main action of a place: gold, with dark text. */
+button.primary {
+  color: var(--gold-ink);
+  font-weight: 700;
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--gold-strong);
+  border-color: var(--gold-strong);
+}
+
+button.primary:disabled {
+  opacity: 0.5;
+}
+
 /* One visible focus ring for everything a keyboard can reach. */
 :focus-visible {
   outline: 2px solid var(--focus);
@@ -728,7 +745,7 @@ button.danger {
   font-size: 1.15rem;
 }
 
-.panel h3 {
+.dev-control h2 {
   font-size: 1rem;
 }
 
@@ -893,13 +910,12 @@ button.danger {
   }
 }
 
-.picker {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+.picker,
+.assign {
   margin: 0;
   padding: 0;
   border: 0;
+  min-width: 0;
 }
 
 .picker legend,
@@ -910,36 +926,94 @@ button.danger {
   font-size: 0.875rem;
 }
 
-.tier {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 2px;
-  text-align: left;
+/* The resource options of a slot: one card each. */
+.picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr));
+  gap: 10px;
 }
 
-.tier[aria-pressed='true'] {
+.picker legend {
+  grid-column: 1 / -1;
+  margin-bottom: 0;
+}
+
+.option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  text-align: left;
+  background: var(--panel-raised);
+  border-radius: 14px;
+}
+
+.option-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  font-size: 1.4rem;
+  line-height: 1;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.option-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.option-name {
+  font-weight: 700;
+}
+
+.option-status {
+  margin-top: 2px;
+}
+
+.option[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 10%, var(--panel-raised));
   border-color: var(--accent);
   box-shadow: inset 0 0 0 1px var(--accent);
 }
 
-.tier:disabled {
-  opacity: 0.45;
+.option[aria-pressed='true'] .option-icon {
+  border-color: var(--accent);
 }
 
-.tier-name {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+/* A locked option is greyed out but stays readable: it is the promise of what level unlocks. */
+.option:disabled {
+  opacity: 0.5;
 }
 
+.slot-empty {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* Everyone who could work here, as chips. The list can be long, so it scrolls inside its own box. */
 .assign {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 0;
-  padding: 0;
-  border: 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.assign legend {
+  flex-basis: 100%;
+}
+
+.assign button {
+  padding: 6px 14px;
+  text-align: left;
+  border-radius: 14px;
 }
 
 /* ---------- roster ---------- */
@@ -1196,11 +1270,18 @@ button.danger {
 /* ---------- nexus ---------- */
 
 .nexus-totals {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 32px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
   margin: 0;
   font-variant-numeric: tabular-nums;
+}
+
+.nexus-totals div {
+  padding: 12px 14px;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 12px;
 }
 
 .nexus-totals dt {
@@ -1232,6 +1313,11 @@ button.danger {
   border: 1px solid var(--line);
   border-radius: 12px;
   cursor: pointer;
+}
+
+.setting:has(input:checked) {
+  background: color-mix(in srgb, var(--gold) 8%, var(--panel-raised));
+  border-color: color-mix(in srgb, var(--gold) 40%, var(--line));
 }
 
 .setting input {

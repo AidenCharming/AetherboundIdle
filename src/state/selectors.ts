@@ -79,6 +79,9 @@ export interface ResourceInfo {
   emoji: string | null
   /** The skill level a gatherable resource needs; null for anything that is only dropped. */
   requiredLevel: number | null
+  /** The action time before any creature speeds it up, in ms, and the XP one action gives. Null for anything that is only dropped. */
+  baseActionMs: number | null
+  xpPerAction: number | null
   /** The color of its element type. */
   color: string
 }
@@ -93,7 +96,7 @@ const skillInfos = new Map<string, SkillInfo>(
 const resourceInfos = new Map<string, ResourceInfo>(
   content.resources.map((r) => [
     r.id,
-    { id: r.id, name: r.name, emoji: r.emoji ?? null, requiredLevel: r.requiredSkillLevel, color: typeColor(r.elementType) },
+    { id: r.id, name: r.name, emoji: r.emoji ?? null, requiredLevel: r.requiredSkillLevel, baseActionMs: r.baseActionMs, xpPerAction: r.xpPerAction, color: typeColor(r.elementType) },
   ]),
 )
 
@@ -113,7 +116,7 @@ export const gatherableSkillIds: readonly string[] = content.skills.filter((s) =
 export const skillInfo = (skillId: string): SkillInfo => skillInfos.get(skillId) ?? { id: skillId, name: skillId, emoji: null, color: null, maxLevel: 1, totalSlots: 0 }
 
 export const resourceInfo = (resourceId: string): ResourceInfo =>
-  resourceInfos.get(resourceId) ?? { id: resourceId, name: resourceId, emoji: null, requiredLevel: null, color: NEUTRAL }
+  resourceInfos.get(resourceId) ?? { id: resourceId, name: resourceId, emoji: null, requiredLevel: null, baseActionMs: null, xpPerAction: null, color: NEUTRAL }
 
 export const gatherableResourceIds = (skillId: string): readonly string[] => gatherableBySkill.get(skillId) ?? []
 
