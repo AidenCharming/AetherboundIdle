@@ -385,7 +385,7 @@ is a data change, not a code change.
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
   "save": { "version": 1, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100, "shinyHueDeg": 150 }
+  "ui": { "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3, "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000 }
 }
 ```
 
@@ -405,6 +405,11 @@ Two knobs in this file are easy to misread, so they are pinned down here:
 - `ui.shinyHueDeg` (150) is the CSS `hue-rotate` applied at runtime to a shiny creature's art. It is never a
   separate asset (CLAUDE.md rule 4). Must be strictly between 0 and 360, or a shiny would look like a normal
   creature. Presentation only. Added at step 1.7 (PLACEHOLDER value).
+- `ui.activityPanelMax` (3), `ui.maxNotifications` (50), `ui.maxToasts` (3) and `ui.toastMs` (5000) are the notification UI's
+  numbers (step 1.9b, all PLACEHOLDERS, all positive whole numbers, none of them read by the sim). `activityPanelMax` is how many
+  running slots the sidebar's "Current activity" panel lists before it says "+N more". `maxNotifications` bounds the bell's list
+  (oldest dropped first). `maxToasts` is how many toasts show at once and `toastMs` how long one stays. `toastMs` is also the
+  window inside which consecutive level-ups of one skill coalesce into a single entry.
 - `offline.awayThresholdMs` (120000, PLACEHOLDER) is the gap that counts as **away** while the tab is still open:
   a sleeping laptop, a tab throttled for hours. A gap at or under it is an ordinary `step`; a longer one is routed
   through `applyOffline`, so `capHours` and Night Owl's offline bonus apply to an open tab exactly as they do to a

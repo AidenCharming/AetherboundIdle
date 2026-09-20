@@ -26,5 +26,5 @@
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
   "save": { "version": 1, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100, "shinyHueDeg": 150 }
+  "ui": { "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3, "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000 }
 }

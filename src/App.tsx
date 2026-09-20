@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from './state/runtime'
 import { DEFAULT_SORT, NO_FILTER, resolvePage, selectNav, skillIdOfPage, type PageId, type RosterFilter, type RosterSort } from './state/selectors'
+import { ActivityPanel } from './ui/components/ActivityPanel'
 import { Header } from './ui/components/Header'
 import { NoticeBanner } from './ui/components/NoticeBanner'
+import { NotificationBell } from './ui/components/NotificationBell'
 import { Sidebar } from './ui/components/Sidebar'
+import { ToastHost } from './ui/components/ToastHost'
 import { WelcomeBack } from './ui/components/WelcomeBack'
 import { DevPanel } from './ui/screens/DevPanel'
 import { Nexus } from './ui/screens/Nexus'
@@ -45,10 +48,10 @@ export function App() {
   const skillId = skillIdOfPage(page)
   return (
     <div className="shell" data-drawer={drawer} data-modal={modal}>
-      <Sidebar nav={nav} page={page} onSelect={select} drawer={drawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} returnFocus={menuRef} />
+      <Sidebar nav={nav} page={page} onSelect={select} drawer={drawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} returnFocus={menuRef} footer={<ActivityPanel />} />
       {/* While the drawer is open, everything behind it is inert: no focus, no clicks, and hidden from screen readers. */}
       <div className="main-col" inert={modal}>
-        <Header drawer={drawer} drawerOpen={drawerOpen} onMenu={() => setDrawerOpen(true)} menuRef={menuRef} />
+        <Header drawer={drawer} drawerOpen={drawerOpen} onMenu={() => setDrawerOpen(true)} menuRef={menuRef} end={<NotificationBell />} />
         <NoticeBanner />
         <main id="main" className="content">
           {skillId && <SkillPage key={skillId} skillId={skillId} />}
@@ -57,6 +60,7 @@ export function App() {
           {page === 'settings' && <Settings />}
           {page === 'dev' && <DevPanel />}
         </main>
+        <ToastHost />
       </div>
       <WelcomeBack />
     </div>

@@ -8,6 +8,8 @@ interface Props {
   /** What the bar measures, for screen readers. */
   label: string
   thin?: boolean
+  /** The gold of the UI chrome, for bars that are not a skill's (the sidebar's activity). Otherwise the skill's own accent. */
+  tone?: 'gold'
 }
 
 /**
@@ -20,7 +22,7 @@ interface Props {
  * autosave lands on the same tick) re-renders the bar, and a class would be gone again before the browser painted.
  * A flushed style cannot be taken back by a later render.
  */
-export function ProgressBar({ value, label, thin }: Props) {
+export function ProgressBar({ value, label, thin, tone }: Props) {
   const fill = useRef<HTMLDivElement>(null)
   const clamped = Math.min(1, Math.max(0, value))
   const previous = useRef(clamped)
@@ -38,6 +40,7 @@ export function ProgressBar({ value, label, thin }: Props) {
   return (
     <div
       className={thin ? 'bar thin' : 'bar'}
+      data-tone={tone}
       role="progressbar"
       aria-label={label}
       aria-valuemin={0}

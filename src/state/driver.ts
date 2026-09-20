@@ -15,6 +15,7 @@
 import { content, type Content } from '../data'
 import { applyOffline as simApplyOffline } from '../sim/offline'
 import { step as simStep } from '../sim/tick'
+import { notify } from './notifications'
 import { flushSave, type StorageLike } from './persistence'
 import type { GameStoreApi } from './store'
 import { queueWelcomeBack } from './welcomeBack'
@@ -84,8 +85,7 @@ export function createTickDriver(
     const caughtUp = applyOffline({ ...game, lastSeen: since }, now, c)
     store.setState({
       game: caughtUp.state,
-      welcomeBack: queueWelcomeBack(welcomeBack, caughtUp.summary, { isNewGame: false, settings: game.settings }, c),
-    })
+      welcomeBack: queueWelcomeBack(welcomeBack, caughtUp.summary, { isNewGame: false, settings: game.settings }, c),    })
   }
 
   function stepToNow(): number {
@@ -98,8 +98,11 @@ export function createTickDriver(
     lastTick = now
     if (dt > c.tuning.offline.awayThresholdMs) catchUp(since, now)
     else if (dt > 0) {
-      const { game } = store.getState()
-      store.setState({ game: step(game, dt, {}, c).state })
+      const { game, notifications } = store.getState()
+      const stepped = step(game, dt, {}, c)
+      // The events of an ordinary online step become notifications. The away path above never does this: its events are
+      // reported once, by the welcome-back summary, and reporting them here too would say everything twice.
+      store.setState({ game: stepped.state, notifications: notify(notifications, stepped.events, now, c) })
     }
     return now
   }

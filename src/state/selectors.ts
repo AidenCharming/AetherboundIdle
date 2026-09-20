@@ -14,6 +14,7 @@ import type { OfflineSummary } from '../sim/offline'
 import { activeEntries, runningSlot } from '../sim/skills'
 import type { Creature, Settings } from '../types/state'
 import { buildNav, type NavSection } from './nav'
+import { unreadCount, type Notification } from './notifications'
 import type { LoadNotice } from './persistence'
 import type { GameStore } from './store'
 
@@ -22,6 +23,9 @@ import type { GameStore } from './store'
 export * from './roster'
 // The navigation model (nav.ts) is pure too, and reaches the UI the same way.
 export * from './nav'
+export type { NotificationKind } from './notifications'
+export type { Notification }
+export { visibleToasts } from './notifications'
 // The biggest save file an import will read, so the file picker can refuse a wrong pick before reading it.
 export { MAX_IMPORT_BYTES } from './persistence'
 
@@ -48,6 +52,13 @@ export const uiTickMs: number = content.tuning.ui.tickMs
 
 /** The CSS hue rotation, in degrees, that makes a shiny's art differ from a normal one (tuning.ui.shinyHueDeg). */
 export const shinyHueDeg: number = content.tuning.ui.shinyHueDeg
+
+/** How many running slots the sidebar's activity panel lists before it says "+N more" (tuning.ui.activityPanelMax). */
+export const activityPanelMax: number = content.tuning.ui.activityPanelMax
+
+/** How many toasts show at once, and how long one stays, in ms (tuning.ui.maxToasts, tuning.ui.toastMs). */
+export const maxToasts: number = content.tuning.ui.maxToasts
+export const toastMs: number = content.tuning.ui.toastMs
 
 export interface SkillInfo {
   id: string
@@ -224,6 +235,57 @@ export function selectNav(s: GameStore): readonly NavSection[] {
   }
   return nav
 }
+
+// ---------- current activity (the sidebar panel) ----------
+
+/** A slot that is really working: a creature on a resource it can gather. */
+export interface ActivitySlot {
+  skillId: string
+  slotIndex: number
+}
+
+// One object per slot, kept for good, so the list below can be identical by reference while nothing changes.
+const activitySlots = new Map<string, ActivitySlot>()
+let lastActivity: readonly ActivitySlot[] = []
+
+/**
+ * Every slot that is working right now, skills in the data's order and slots ascending. "Working" is the sim's own
+ * `runningSlot` (the same check the tick and the progress bars use), so an idle slot, one whose resource is above the
+ * skill's level, or one whose creature is gone is not listed. The tick changes progress but not this list, so it keeps
+ * its identity from one tick to the next and the panel re-renders only when a slot starts or stops. Only the progress
+ * bars read the tick.
+ */
+export function selectActivity(s: GameStore): readonly ActivitySlot[] {
+  const next: ActivitySlot[] = []
+  let creatureById: Map<string, Creature> | null = null
+  let active: ReturnType<typeof activeEntries> | null = null
+  for (const skill of content.skills) {
+    const skillState = s.game.skills[skill.id]
+    if (!skillState) continue
+    skillState.slots.forEach((slot, slotIndex) => {
+      if (!slot) return
+      creatureById ??= new Map(s.game.creatures.map((cr) => [cr.id, cr]))
+      active ??= activeEntries(s.game)
+      if (!runningSlot(skill, skillState, slotIndex, creatureById, active, content)) return
+      const key = `${skill.id}:${slotIndex}`
+      let entry = activitySlots.get(key)
+      if (!entry) activitySlots.set(key, (entry = { skillId: skill.id, slotIndex }))
+      next.push(entry)
+    })
+  }
+  if (next.length === lastActivity.length && next.every((e, i) => e === lastActivity[i])) return lastActivity
+  return (lastActivity = next)
+}
+
+// ---------- notifications (the bell and the toasts) ----------
+
+/** Oldest first. The same array until a notification is added, changed, read or cleared. */
+export const selectNotifications = (s: GameStore): readonly Notification[] => s.notifications.items
+
+export const selectUnreadCount = (s: GameStore): number => unreadCount(s.notifications.items)
+
+/** The id the next notification will get: a toast host that mounts now shows only what comes after this. */
+export const selectNextNotificationId = (s: GameStore): number => s.notifications.nextId
 
 // ---------- load notice ----------
 

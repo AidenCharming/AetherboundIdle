@@ -4,6 +4,7 @@
 import { createStore, type StoreApi } from 'zustand/vanilla'
 import type { OfflineSummary } from '../sim/offline'
 import type { GameState } from '../types/state'
+import { emptyLog, type NotificationLog } from './notifications'
 import type { LoadOutcome } from './persistence'
 import { queueWelcomeBack } from './welcomeBack'
 
@@ -24,6 +25,11 @@ export interface GameStore {
    * the player dismisses it, or when there was nothing worth reporting (welcomeBack.ts decides which).
    */
   welcomeBack: OfflineSummary | null
+  /**
+   * What the bell lists and the toasts announce (notifications.ts). UI state: it is not in `game`, so it is never saved and
+   * a reload starts it empty. Only the online tick writes to it; a load, an away window and a fast-forward never do.
+   */
+  notifications: NotificationLog
 }
 
 export type GameStoreApi = StoreApi<GameStore>
@@ -31,5 +37,5 @@ export type GameStoreApi = StoreApi<GameStore>
 export function createGameStore(outcome: LoadOutcome): GameStoreApi {
   const { state, ...loadReport } = outcome
   const welcomeBack = queueWelcomeBack(null, loadReport.summary, { isNewGame: loadReport.isNewGame, settings: state.settings })
-  return createStore<GameStore>()(() => ({ game: state, loadReport, noticeDismissed: false, welcomeBack }))
+  return createStore<GameStore>()(() => ({ game: state, loadReport, noticeDismissed: false, welcomeBack, notifications: emptyLog() }))
 }

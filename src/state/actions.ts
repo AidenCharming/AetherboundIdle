@@ -10,6 +10,7 @@ import { serializeSave } from '../sim/save'
 import { assignCreature, setSlotResource, unassignCreature } from '../sim/skills'
 import type { GameState, Settings } from '../types/state'
 import type { TickDriver } from './driver'
+import { clearLog, markAllRead } from './notifications'
 import { checkImport, commitRoll, exportFileName, replaceSave, SAVE_KEY, type ImportCheck, type StorageLike } from './persistence'
 import type { GameStoreApi } from './store'
 
@@ -37,6 +38,10 @@ export interface Actions {
   dismissNotice(): void
   /** Closes the welcome-back summary. It is gone for good: the progress it reported was already granted. */
   dismissWelcomeBack(): void
+  /** Marks every notification read (the bell's badge goes to zero). */
+  markNotificationsRead(): void
+  /** Empties the bell's list. */
+  clearNotifications(): void
   /** Flips one of the player's settings and saves at once, so it survives a reload however the tab ends. */
   setSetting(key: keyof Settings, value: boolean): void
   /**
@@ -149,6 +154,14 @@ export function createActions(
 
     dismissWelcomeBack() {
       store.setState({ welcomeBack: null })
+    },
+
+    markNotificationsRead() {
+      store.setState({ notifications: markAllRead(store.getState().notifications) })
+    },
+
+    clearNotifications() {
+      store.setState({ notifications: clearLog(store.getState().notifications) })
     },
 
     setSetting(key, value) {

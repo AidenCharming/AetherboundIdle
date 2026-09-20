@@ -483,6 +483,15 @@ describe('loadContent rejects bad data instead of loading it', () => {
     for (const bad of [0, 360, -30, 400]) expect(problemsFor((r) => (r.tuning.ui.shinyHueDeg = bad)).join('\n'), String(bad)).toContain('tuning.json.ui.shinyHueDeg')
   })
 
+  it('requires the notification numbers (activityPanelMax, maxNotifications, maxToasts, toastMs) to be positive whole numbers', () => {
+    for (const key of ['activityPanelMax', 'maxNotifications', 'maxToasts', 'toastMs'] as const) {
+      const value = content.tuning.ui[key]
+      expect(Number.isInteger(value) && value > 0, key).toBe(true)
+      expect(problemsFor((r) => delete r.tuning.ui[key]).join('\n'), `${key} missing`).toContain(`tuning.json.ui.${key}`)
+      for (const bad of [0, -1, 2.5]) expect(problemsFor((r) => (r.tuning.ui[key] = bad)).join('\n'), `${key} = ${bad}`).toContain(`tuning.json.ui.${key}`)
+    }
+  })
+
   it('requires tuning.offline.awayThresholdMs to be a positive whole number below the cap', () => {
     const { awayThresholdMs, capHours } = content.tuning.offline
     expect(Number.isInteger(awayThresholdMs) && awayThresholdMs > 0).toBe(true)

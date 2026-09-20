@@ -34,7 +34,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
 
-- [ ] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications, C restyle of every screen and the exe rebuild.
+- [ ] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild.
 
 ### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
 The designer wants the game to run as an `.exe`, not as a browser link. `npm run dev` is only the development server; the game is
@@ -1220,6 +1220,48 @@ the drawer; the roster's filter and sort survive a visit to Woodcutting and back
 **Not verified:** Enter and Space on a focused button. The Browser pane's key tool sends `keydown` and `keyup` without `keypress`, so a browser does not run the button's default action (I logged the events to confirm);
 I used `click()` on the focused element, which is exactly what those keys do on a native button. The Tab order inside the open drawer with a real keyboard (everything else is inert, so it should only cycle through the drawer).
 A screen reader. Firefox and Safari.
+
+### 2026-09-20, step 1.9b checkpoint B: current activity, notifications, toasts
+
+New: `state/notifications.ts` (pure), `ui/components/{ActivityPanel,NotificationBell,ToastHost}.tsx`, `test/notifications.test.ts`, `test/notifications-driver.test.ts`, `test/activity.test.ts`. Changed: `store.ts` (`notifications`), `driver.ts`,
+`actions.ts` (`markNotificationsRead`, `clearNotifications`), `selectors.ts`, `ProgressBar.tsx` (`tone="gold"`), `App.tsx`, `theme.css`, and four numbers in `tuning.json` under `ui` (with schema, content test and plan.md 3.10): `activityPanelMax` 3,
+`maxNotifications` 50, `maxToasts` 3, `toastMs` 5000 (all PLACEHOLDERS). 724 tests pass (680 before) and `npm run build` is clean. Nothing in `src/sim` changed and nothing is written to the save.
+
+**Current activity** (pinned at the bottom of the sidebar, so also in the drawer): for each working slot the creature (emoji, name), the skill and the resource, and a thin gold bar; at most `activityPanelMax`, then "+N more"; with
+nothing working, "Nothing is working. Put a creature in a skill slot and it shows up here."; then "Autosaves locally" with a green dot. `selectActivity` lists the slots the sim's own `runningSlot` says are running (an idle slot,
+a resource above the skill's level, a vanished creature are not listed) and keeps its identity through ticks, so the panel re-renders only when a slot starts or stops. **Measured in the browser**: over 6 s of ticking, a
+MutationObserver saw 252 DOM changes inside progress bars and none anywhere else in the sidebar (3 in the header when a resource count moved). The "Autosaves locally" line is static text: it does not know if a write failed.
+
+**Notifications** live in the store as `notifications: { items, nextId }`, next to `game`, never inside it. Each item is `{ id, at, kind, text, read, skillId, level }` (`skillId` and `level` are two fields beyond the four you listed: the toast needs
+the skill's emoji, and coalescing needs the level). Kinds are `skill-level-up` and `slot-unlocked`; the text is built from the data's names ("Woodcutting reached level 2", "Woodcutting unlocked slot 2"). Bounded by
+`maxNotifications` (oldest dropped). Ids are never reused, even after Clear.
+- **Source**: `driver.stepToNow` only, in its ordinary-step branch, with the injected clock's `now`. `catchUp` (a long open-tab gap, and the dev fast-forward) and the load path never touch the log; `action-complete`,
+  `creature-level-up` and `form-evolved` are ignored. The dev panel's grants and set-skill-level do not notify either (they do not go through a step).
+- **Coalescing**: a level-up joins the NEWEST entry when that is a level-up of the same skill recorded within `toastMs` of its last update: the entry then says the latest level, its `at` moves forward (so a steady burst stays
+  one line) and it becomes unread again. A slot unlock is never merged, and one between two level-ups breaks the run. At level 50 the level-up and the slot arrive together, so that is two lines.
+- **Toasts**: `ToastHost`, bottom-right on a wide screen and bottom-centred on a phone, `role="status"` with `aria-live="polite"`, at most `maxToasts`, each with a 44 px dismiss button, gone after `toastMs`. The timer is an effect in
+  the toast (`setTimeout`, cleared on unmount), stopped while the pointer or focus is on it, restarted in full when they leave. Which toasts are up is derived (`visibleToasts`, pure and tested): notifications recorded after the
+  host mounted, minus the dismissed ones (remembered as id -> `at`, so a level-up that coalesces into a dismissed toast shows it again with the new text), newest `maxToasts`. Hidden while the drawer is open.
+- **Bell**: in the header's right end, with an unread badge (hidden at 0, "99+" at most, and the count is in the button's accessible name). It opens a non-modal dialog listing the notifications newest first (skill emoji, text, kind, local
+  time, "new"), with "Mark all read" and "Clear" (both stay enabled, so focus is never lost to a disabled button). Opening moves focus into the panel; Escape closes it and returns focus to the bell; a press outside closes it.
+
+**Tests** (node): pure log (texts from data, the two kinds only, ids, the bound and its knob, every coalescing rule and its edge, unread, mark, clear, `visibleToasts`), the driver end to end (level-up across the first level at 76 s gives
+"reached level 2" and "unlocked slot 2", a quiet tick leaves the log object untouched, a fast skill is one line and a pause over the window is a second), **offline never notifies** (a load after 4 h, a long open-tab gap, the dev
+fast-forward, each asserting the away window really did level the skill and produced a welcome-back, so the test is not vacuous), online ticks after an away window still notify and do not repeat the away levels, and **nothing reaches
+the save** (no `notifications` key in `GameState`, the serialized save is byte-identical with and without notifications, the flushed file contains none of their words, a reload starts empty, a flush leaves the log alone), and `selectActivity`.
+**I broke the code on purpose for the two that matter and each was caught:** (1) offline events leaking in: adding `notify(..., caughtUp.events, ...)` to `catchUp` failed 3 tests (the open-tab gap, the dev fast-forward, and "online ticks
+after an away window"), and adding `notify(emptyLog(), outcome.events, 0)` to `createGameStore` failed the load test; (2) no coalescing: `if (false && ...)` in `notify` failed 7 tests (same step, successive steps, sixty in a minute, the window edge, the sliding
+window, the read entry becoming unread, and the end-to-end fast skill). Both changes were reverted; `grep BROKEN` finds nothing.
+
+**Verified in a real browser** (Vite dev server; Dev panel Reset save, then the Sproutlet on Woodcutting): the first level-up came at 43-76 s and produced a toast ("Level up / Woodcutting reached level 2") bottom-right at 1280 px and bottom-centred at 375 px, the bell badge went 1, 2, 3 as
+levels came, and Escape / Mark all read / Clear behave as described (read entries stay listed, Clear shows the empty text). Toast timing, with a synthetic hover event and a real `focus()`: held 8 s while hovered, gone 5 s after the pointer left; held 7.5 s while its
+dismiss button had focus; the dismiss click removed it at once and the bell's count was unaffected. The drawer shows the activity panel. **Not verified in a real browser: a slot-unlocked toast** (the first one is level 50; node tests cover it, as you allowed), and a real (not synthetic) pointer
+hover.
+
+**Deviations and decisions (all reversible):**
+1. **Two extra fields on a notification** (`skillId`, `level`), see above.
+2. **Dev-panel actions do not notify**, which follows from "the online tick only". If you would rather a dev set-level toast, that is one line in `actions.ts`.
+3. **A toast for a coalesced level-up restarts its timer** and reappears if it had been dismissed.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 - **UI shell restyle** (designer's request, 2026-09-20). Sidebar navigation with section headings, a pinned current-activity panel, toast notifications and a bell, per-option cards. Reference image and the list of what to borrow (and what not to) are in `docs/design.md` section 11 ("UI direction") and `docs/reference/`. Presentation only, no game logic; needs `SimEvent`s kept in the store for toasts. Now scheduled as **step 1.9b**, before Phase 2 (see the checklist). Not started.
