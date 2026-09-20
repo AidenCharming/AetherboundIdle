@@ -28,6 +28,7 @@ playable after it.** 1.8a is done and committed. Starting points:
 - [x] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources. *(2026-09-19; state layer in checkpoint A, screen in checkpoint B)*
 - [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
 - [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
+- [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
 - [ ] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, reset save), bench and Aether-per-minute display, polish pass. Phase 1 playable.
 - [ ] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). Do this right after 1.8b so the designer can double-click the game from the first playable version on.
 
@@ -726,6 +727,39 @@ raise it with the designer if it matters.)
 5. **A skill with nothing to report is dropped from the dialog**, and an away window with nothing at all says so
    rather than showing empty lists.
 6. **The fast-forward field is disabled rather than clamped** when it is empty or not a positive number.
+
+### 2026-09-19, step 1.8t — skill levels, XP curve and slot unlocks retuned (designer's decision)
+
+A **tuning pass only**: no new systems, no new code paths. **Every number below is a PLACEHOLDER and lives in JSON
+only** (`src/data/tuning.json`, `src/data/skills.json`). Nothing in `src/` or `test/` hardcodes any of them.
+
+**What changed**
+| Knob | Was | Now | Where |
+|---|---|---|---|
+| Skill max level | 99 | **250** | `skills.json` `maxLevel`, all 11 skills |
+| Skill XP curve | base 100, growth 1.1 | **base 250, growth 1.04** | `tuning.xp.skillCurve` |
+| Work-slot unlock levels | 1 / 20 / 40 / 65 / 90 | **1 / 50 / 100 / 165 / 225** | `skills.json` `slotUnlockLevels`, all 11 skills |
+
+Growth 1.1 over 250 levels would need about 20 trillion XP for the last level, which is why the curve flattened as
+the cap rose. Total XP to level 250 on the new curve is **108,932,283**.
+
+**Not changed, on the designer's instruction:** `tuning.xp.creatureCurve`, `creature.maxLevel` (99), the Form 2 / 3
+thresholds (30 / 60), and the Woodcutting resource tier unlock levels (1 / 15 / 30).
+
+**Pacing targets (one unupgraded Sproutlet, level 1, tier 1, Form 1, no traits, on the shipped Woodcutting tiers:
+oak 3000 ms / 10 XP, willow at 15 = 4000 ms / 25 XP, yew at 30 = 5000 ms / 50 XP).** These are the target feel; a
+retune that silently breaks them fails `test/pacing.test.ts`.
+
+| Milestone | Time | Cumulative XP |
+|---|---|---|
+| First level-up (1 -> 2) | **75 s** | 250 |
+| Level 15 (willow) | 22.9 min | 4,571 |
+| Level 30 (yew) | **46 min** | 13,239 |
+| Level 50 (slot 2) | 1.41 h | 36,456 |
+| Level 100 (slot 3) | **8.66 h** | 297,267 |
+| Level 165 (slot 4) | 4.5 d | 3,878,365 |
+| Level 225 (slot 5) | 47.3 d | 40,858,428 |
+| Level 250 (cap) | **126 d, about 4.1 months** | 108,932,283 |
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:

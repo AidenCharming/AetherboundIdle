@@ -13,6 +13,9 @@ function midGame(): GameState {
   return { ...s, gold: 17, resources: { ...s.resources, 'oak-log': s.resources['oak-log'] ?? 0 } }
 }
 
+/** The level the second work slot opens at, read from skills.json so a retune moves these tests with it. */
+const SLOT2 = content.skillById.get('woodcutting')!.slotUnlockLevels[1]!
+
 const ok = (r: LoadResult) => {
   if (!r.ok) throw new Error(`expected a good load, got ${r.reason}: ${r.message}`)
   return r
@@ -232,19 +235,20 @@ describe('content can change under an existing save (a save holds IDs, not copie
   })
 
   it('a stale cached level is re-derived from XP, and slots grow to match', () => {
-    const s = setSkillLevel(newGame(), 'woodcutting', 25)
+    // SLOT2 is the level the second work slot opens at, read from skills.json.
+    const s = setSkillLevel(newGame(), 'woodcutting', SLOT2)
     const r = ok(parseSave(tampered(s, (f) => { f.state.skills.woodcutting.level = 1; f.state.skills.woodcutting.slots = [null] })))
-    expect(r.state.skills.woodcutting.level).toBe(25)
+    expect(r.state.skills.woodcutting.level).toBe(SLOT2)
     expect(r.state.skills.woodcutting.slots).toHaveLength(2)
   })
 
   it('a retuned XP curve re-levels the player from their XP, and never removes a slot', () => {
-    const s = setSkillLevel(newGame(), 'woodcutting', 25)
+    const s = setSkillLevel(newGame(), 'woodcutting', SLOT2)
     const harder = variant((raw) => {
-      raw.tuning.xp.skillCurve.growth = 1.2
+      raw.tuning.xp.skillCurve.growth *= 1.15
     })
     const r = ok(parseSave(serializeSave(s), harder))
-    expect(r.state.skills.woodcutting.level).toBeLessThan(25)
+    expect(r.state.skills.woodcutting.level).toBeLessThan(SLOT2)
     expect(r.state.skills.woodcutting.xp).toBe(s.skills.woodcutting!.xp) // progress is never taken away
     expect(r.state.skills.woodcutting.slots.length).toBeGreaterThanOrEqual(2)
   })

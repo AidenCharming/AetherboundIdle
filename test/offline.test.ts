@@ -2,13 +2,18 @@ import { describe, expect, it } from 'vitest'
 import { content } from '../src/data'
 import { emissionPerMin } from '../src/sim/aether'
 import type { SimEvent } from '../src/sim/events'
+import { xpForLevel } from '../src/sim/formulas'
 import { applyOffline } from '../src/sim/offline'
+import { slotCount } from '../src/sim/skills'
 import { step } from '../src/sim/tick'
 import type { GameState } from '../src/types/state'
 import { addCreature, assignmentProblems, HOUR, newGame, NOW, pool, quietContent, sproutletAtWork, variant, work } from './helpers'
 
 const q = quietContent()
 const MIN = 60_000
+const woodcutting = content.skillById.get('woodcutting')!
+const curve = content.tuning.xp.skillCurve
+const SLOT2 = woodcutting.slotUnlockLevels[1]!
 
 /** A working Sproutlet plus one benched Steady creature (4 Aether/min), on the given content. */
 function busy(c = content): GameState {
@@ -16,13 +21,13 @@ function busy(c = content): GameState {
   return s
 }
 
-/** Independent re-derivation of the level for a cumulative XP total. */
+/** Independent re-derivation of the level for a cumulative XP total, from the tuned curve. */
 function expectedLevel(xp: number): number {
   let level = 1
   let need = 0
   for (;;) {
-    need += Math.round(100 * 1.1 ** (level - 1))
-    if (xp < need || level >= 99) return level
+    need += Math.round(curve.base * curve.growth ** (level - 1))
+    if (xp < need || level >= woodcutting.maxLevel) return level
     level++
   }
 }
@@ -87,26 +92,37 @@ describe('clock-skewed (negative) window', () => {
 })
 
 describe('a window that crosses a level-up', () => {
-  // 1 hour = 1200 oak actions = 12,000 XP: level 27, so it crosses the level-20 slot unlock.
+  // 1 hour = 1200 oak actions = 12,000 XP. Which level that is depends on the tuned curve, so it is re-derived.
   const start = busy(q)
   const r = applyOffline(start, start.lastSeen + HOUR, q)
   const level = expectedLevel(12_000)
 
   it('is worked out in bulk to the right totals', () => {
-    expect(level).toBeGreaterThan(20)
+    expect(level).toBeGreaterThan(1)
     expect(r.state.resources['oak-log']).toBe(1200)
     expect(r.state.skills.woodcutting).toMatchObject({ xp: 12_000, level })
-    expect(r.state.skills.woodcutting!.slots).toHaveLength(2)
+    expect(r.state.skills.woodcutting!.slots).toHaveLength(slotCount(woodcutting, level))
     expect(r.state.lastSeen).toBe(start.lastSeen + HOUR)
     expect(assignmentProblems(r.state)).toEqual([])
   })
 
-  it('emits every level-up and the slot unlock, and summarises them for the welcome-back screen', () => {
+  it('emits every level-up and summarises them for the welcome-back screen', () => {
     const levels = r.events.filter((e): e is Extract<SimEvent, { type: 'skill-level-up' }> => e.type === 'skill-level-up').map((e) => e.level)
     expect(levels).toEqual(Array.from({ length: level - 1 }, (_, i) => i + 2))
-    expect(r.summary.skills).toEqual([{ skillId: 'woodcutting', actions: 1200, xpGained: 12_000, levelBefore: 1, levelAfter: level, slotsUnlocked: [1] }])
+    expect(r.summary.skills).toEqual([{ skillId: 'woodcutting', actions: 1200, xpGained: 12_000, levelBefore: 1, levelAfter: level, slotsUnlocked: [] }])
     expect(r.summary).toMatchObject({ requestedMs: HOUR, elapsedMs: HOUR, capped: false, clockSkewed: false })
     expect(r.summary.resourcesGained).toEqual({ 'oak-log': 1200 })
+  })
+
+  it('reports a slot unlock in the summary when the window reaches one', () => {
+    // Long enough to cross the second slot unlock, whatever level it is tuned to: that level's XP, rounded up
+    // to a whole 3000 ms oak action at 10 XP each. Still inside the offline cap.
+    const window = Math.ceil(xpForLevel(curve, SLOT2, woodcutting.maxLevel) / 10) * 3000
+    expect(window).toBeLessThanOrEqual(content.tuning.offline.capHours * HOUR)
+    const deep = applyOffline(start, start.lastSeen + window, q)
+    expect(deep.state.skills.woodcutting!.level).toBe(SLOT2)
+    expect(deep.state.skills.woodcutting!.slots).toHaveLength(2)
+    expect(deep.summary.skills[0]).toMatchObject({ skillId: 'woodcutting', levelBefore: 1, levelAfter: SLOT2, slotsUnlocked: [1] })
   })
 
   it('also banks the bench Aether for the same window: 4/min for an hour', () => {

@@ -16,6 +16,7 @@ const view = (game: GameState, extra: Partial<GameStore> = {}): GameStore => {
 }
 
 const OAK_MS = content.resourceById.get('oak-log')!.baseActionMs!
+const WOODCUTTING = content.skillById.get('woodcutting')!
 const at = (game: GameState, ms: number): GameState => step(game, ms).state
 
 describe('top bar', () => {
@@ -56,9 +57,10 @@ describe('skills', () => {
 
   it('names the next slot level, and null once they are all open', () => {
     const game = newGame()
-    expect(sel.selectNextSlotLevel(view(game), 'woodcutting')).toBe(20)
-    expect(sel.selectNextSlotLevel(view(setSkillLevel(game, 'woodcutting', 20)), 'woodcutting')).toBe(40)
-    expect(sel.selectNextSlotLevel(view(setSkillLevel(game, 'woodcutting', 90)), 'woodcutting')).toBeNull()
+    const unlocks = WOODCUTTING.slotUnlockLevels
+    expect(sel.selectNextSlotLevel(view(game), 'woodcutting')).toBe(unlocks[1])
+    expect(sel.selectNextSlotLevel(view(setSkillLevel(game, 'woodcutting', unlocks[1]!)), 'woodcutting')).toBe(unlocks[2])
+    expect(sel.selectNextSlotLevel(view(setSkillLevel(game, 'woodcutting', unlocks[unlocks.length - 1]!)), 'woodcutting')).toBeNull()
   })
 
   it('locks a tier until the skill reaches its level, straight from the data', () => {
@@ -90,7 +92,7 @@ describe('skills', () => {
     expect(sel.selectSkillXpInLevel(view(worked), 'woodcutting')).toBe(50)
     expect(sel.selectSkillLevel(view(worked), 'woodcutting')).toBe(1)
 
-    const top = setSkillLevel(game, 'woodcutting', 99)
+    const top = setSkillLevel(game, 'woodcutting', WOODCUTTING.maxLevel)
     expect(sel.selectSkillXpToNext(view(top), 'woodcutting')).toBeNull()
   })
 
@@ -415,8 +417,10 @@ describe('the welcome-back view', () => {
   })
 
   it('carries the summary numbers per skill, with 1-based slot numbers and the display name', () => {
-    const summary = summaryFor(3)
-    const v = wb(3)
+    // One level below the second slot unlock, so three hours of oak is certain to cross it whatever it is tuned to.
+    const nearSlot2 = setSkillLevel(sproutletAtWork(), 'woodcutting', WOODCUTTING.slotUnlockLevels[1]! - 1)
+    const summary = summaryFor(3, nearSlot2)
+    const v = wb(3, nearSlot2)
     const raw = summary.skills.find((s) => s.skillId === 'woodcutting')!
     const shown = v.skills.find((s) => s.id === 'woodcutting')!
     expect(shown.name).toBe(content.skillById.get('woodcutting')!.name)

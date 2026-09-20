@@ -17,14 +17,18 @@ import { variant } from './helpers'
 
 const { tuning } = content
 const curve = tuning.xp.skillCurve
-const MAX = tuning.creature.maxLevel
+// The skill curve's own ceiling, so the round-trip and clamp tests cover the range the game really uses.
+const MAX = content.skillById.get('woodcutting')!.maxLevel
 
 describe('xp curve (plan 4.3)', () => {
-  it('xpToNext is round(base * growth^(L-1))', () => {
-    expect(xpToNext(curve, 1)).toBe(100)
-    expect(xpToNext(curve, 2)).toBe(110)
-    expect(xpToNext(curve, 3)).toBe(121)
-    expect(xpToNext(curve, 10)).toBe(Math.round(100 * 1.1 ** 9))
+  it('xpToNext is round(base * growth^(L-1)), from whatever the tuned curve is', () => {
+    const { base, growth } = curve
+    expect(xpToNext(curve, 1)).toBe(base)
+    expect(xpToNext(curve, 2)).toBe(Math.round(base * growth))
+    expect(xpToNext(curve, 3)).toBe(Math.round(base * growth ** 2))
+    expect(xpToNext(curve, 10)).toBe(Math.round(base * growth ** 9))
+    // A curve with different numbers is read the same way, so nothing here is baked in.
+    expect(xpToNext({ base: 100, growth: 1.1 }, 3)).toBe(121)
   })
 
   it('level -> xp -> level round-trips at every level, and one XP short is the level below', () => {
@@ -52,17 +56,23 @@ describe('xp curve (plan 4.3)', () => {
   })
 
   it('a level-xp table is built per curve, so the skill and creature curves do not share one', () => {
-    expect(xpForLevel(tuning.xp.creatureCurve, 2, MAX)).toBe(80)
-    expect(xpForLevel(curve, 2, MAX)).toBe(100)
+    const creatureCurve = tuning.xp.creatureCurve
+    expect(xpForLevel(creatureCurve, 2, tuning.creature.maxLevel)).toBe(creatureCurve.base)
+    expect(xpForLevel(curve, 2, MAX)).toBe(curve.base)
+    expect(creatureCurve).not.toEqual(curve) // they are tuned separately; skills went to 250, creatures did not
   })
 })
 
 describe('slot unlocks (plan 4.3)', () => {
   const skill = content.skillById.get('woodcutting')!
-  it('unlocks at exactly levels 1 / 20 / 40 / 65 / 90', () => {
-    expect(skill.slotUnlockLevels).toEqual([1, 20, 40, 65, 90])
+  it('opens the nth slot at exactly the nth tuned level, and not one level earlier', () => {
     const count = (l: number) => slotCount(skill, l)
-    expect([1, 19, 20, 39, 40, 64, 65, 89, 90, 99].map(count)).toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5])
+    skill.slotUnlockLevels.forEach((unlock, i) => {
+      expect(count(unlock), `at level ${unlock}`).toBe(i + 1)
+      if (unlock > 1) expect(count(unlock - 1), `at level ${unlock - 1}`).toBe(i)
+    })
+    expect(count(1)).toBe(1) // a skill always has its first slot
+    expect(count(skill.maxLevel)).toBe(skill.slotUnlockLevels.length) // and all of them at the cap
   })
 })
 

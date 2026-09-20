@@ -8,14 +8,21 @@ import { addCreature, assignmentProblems, newGame, pool, quietContent, setSkillL
 
 const q = quietContent()
 const woodcutting = content.skillById.get('woodcutting')!
+const curve = content.tuning.xp.skillCurve
+/** The level each work slot opens at, read from skills.json so a retune moves these tests with it. */
+const [, SLOT2] = woodcutting.slotUnlockLevels as [number, number, ...number[]]
 
-/** Independent re-derivation of the level for a cumulative XP total (round(100 * 1.1^(L-1)) per level). */
+/**
+ * Independent re-derivation of the level for a cumulative XP total: a plain running sum of
+ * round(base * growth^(L-1)), against formulas.ts's memoized table and binary search. The curve's numbers come
+ * from tuning.json, so this checks the code agrees with the formula, not with a remembered balance pass.
+ */
 function expectedLevel(xp: number): number {
   let level = 1
   let need = 0
   for (;;) {
-    need += Math.round(100 * 1.1 ** (level - 1))
-    if (xp < need || level >= 99) return level
+    need += Math.round(curve.base * curve.growth ** (level - 1))
+    if (xp < need || level >= woodcutting.maxLevel) return level
     level++
   }
 }
@@ -25,25 +32,28 @@ const ofType = <T extends SimEvent['type']>(events: SimEvent[], type: T) => even
 describe('addSkillXp and slot unlocks', () => {
   const start = { level: 1, xp: 0, slots: [null] as null[] }
 
-  it('grows the slot count at exactly levels 20 / 40 / 65 / 90 and emits slot-unlocked for each', () => {
+  it('grows the slot count at exactly each tuned unlock level and emits slot-unlocked for each', () => {
     const at = (level: number) => setSkillLevel(newGame(), 'woodcutting', level).skills.woodcutting!
-    expect([19, 20, 39, 40, 64, 65, 89, 90].map((l) => at(l).slots.length)).toEqual([1, 2, 2, 3, 3, 4, 4, 5])
+    woodcutting.slotUnlockLevels.forEach((unlock, i) => {
+      expect(at(unlock).slots.length, `at level ${unlock}`).toBe(i + 1)
+      if (unlock > 1) expect(at(unlock - 1).slots.length, `at level ${unlock - 1}`).toBe(i)
+    })
 
-    const all = addSkillXp(start, woodcutting, 1e9)
-    expect(all.state.level).toBe(99)
-    expect(all.state.slots).toHaveLength(5)
-    expect(ofType(all.events, 'slot-unlocked').map((e) => e.slotIndex)).toEqual([1, 2, 3, 4])
+    const all = addSkillXp(start, woodcutting, xpForLevel(curve, woodcutting.maxLevel, woodcutting.maxLevel))
+    expect(all.state.level).toBe(woodcutting.maxLevel)
+    expect(all.state.slots).toHaveLength(woodcutting.slotUnlockLevels.length)
+    expect(ofType(all.events, 'slot-unlocked').map((e) => e.slotIndex)).toEqual(woodcutting.slotUnlockLevels.map((_, i) => i).slice(1))
   })
 
   it('emits one skill-level-up per level, in order, with slot-unlocked right after its level-up', () => {
-    const { events } = addSkillXp(start, woodcutting, 1e9)
-    expect(ofType(events, 'skill-level-up').map((e) => e.level)).toEqual(Array.from({ length: 98 }, (_, i) => i + 2))
-    const at20 = events.findIndex((e) => e.type === 'skill-level-up' && e.level === 20)
-    expect(events[at20 + 1]).toEqual({ type: 'slot-unlocked', skillId: 'woodcutting', slotIndex: 1 })
+    const { events } = addSkillXp(start, woodcutting, xpForLevel(curve, woodcutting.maxLevel, woodcutting.maxLevel))
+    expect(ofType(events, 'skill-level-up').map((e) => e.level)).toEqual(Array.from({ length: woodcutting.maxLevel - 1 }, (_, i) => i + 2))
+    const atSlot2 = events.findIndex((e) => e.type === 'skill-level-up' && e.level === SLOT2)
+    expect(events[atSlot2 + 1]).toEqual({ type: 'slot-unlocked', skillId: 'woodcutting', slotIndex: 1 })
   })
 
   it('never shrinks the slots and never lowers the level', () => {
-    const xp40 = xpForLevel(content.tuning.xp.skillCurve, 40, 99)
+    const xp40 = xpForLevel(curve, 40, woodcutting.maxLevel)
     const roomy = { level: 40, xp: xp40, slots: [null, null, null, null, null] as null[] }
     expect(addSkillXp(roomy, woodcutting, 0).state.slots).toHaveLength(5)
     expect(addSkillXp(roomy, woodcutting, -500).state).toEqual(roomy)
@@ -52,11 +62,12 @@ describe('addSkillXp and slot unlocks', () => {
   })
 
   it('keeps level consistent with xp', () => {
-    for (const xp of [0, 99, 100, 1234, 88_888, 5e6]) expect(addSkillXp(start, woodcutting, xp).state.level).toBe(expectedLevel(xp))
+    for (const xp of [0, 99, 100, 1234, 88_888, 5e6, 5e8]) expect(addSkillXp(start, woodcutting, xp).state.level).toBe(expectedLevel(xp))
   })
 
   it('slotCount agrees', () => {
-    expect([1, 20, 90].map((l) => slotCount(woodcutting, l))).toEqual([1, 2, 5])
+    const levels = [1, SLOT2, woodcutting.maxLevel]
+    expect(levels.map((l) => slotCount(woodcutting, l))).toEqual([1, 2, woodcutting.slotUnlockLevels.length])
   })
 })
 
@@ -101,7 +112,7 @@ describe('assignCreature', () => {
   })
 
   it('moving a working creature empties its old slot; benching whoever held the target', () => {
-    let s = setSkillLevel(newGame(), 'woodcutting', 20)
+    let s = setSkillLevel(newGame(), 'woodcutting', SLOT2) // high enough for a second slot
     s = addCreature(s, 'sproutlet').state // creature-2
     s = work(s, 'creature-1', 'woodcutting', 0)
     s = work(s, 'creature-1', 'woodcutting', 1) // move
@@ -191,7 +202,7 @@ describe('advanceSkills: action resolution', () => {
   })
 
   it('runs every occupied slot with its own progress and cooldown', () => {
-    let s = setSkillLevel(newGame(q), 'woodcutting', 20, q)
+    let s = setSkillLevel(newGame(q), 'woodcutting', SLOT2, q) // high enough for a second slot
     s = addCreature(s, 'sproutlet', { rarityTier: 4 }, q).state // Gleaming: term 0.18 -> 3000/1.18
     s = work(work(s, 'creature-1', 'woodcutting', 0, 'oak-log', q), 'creature-2', 'woodcutting', 1, 'oak-log', q)
     const { state, events } = advanceSkills(s, 30_000, {}, q)
@@ -232,31 +243,45 @@ describe('advanceSkills: action resolution', () => {
 })
 
 describe('advanceSkills: a window that crosses level-ups', () => {
-  // 1 hour = 1200 oak actions = 12,000 XP, which is level 27 and crosses the level-20 slot unlock.
+  // 1 hour = 1200 oak actions = 12,000 XP. Which level that is depends on the tuned curve, so it is re-derived.
   const HOUR = 3_600_000
+  const OAK_MS = 3000
+  const OAK_XP = 10
   const result = advanceSkills(sproutletAtWork(q), HOUR, {}, q)
   const level = expectedLevel(12_000)
 
+  // Long enough to cross the second slot unlock, whatever level that is tuned to: the XP that level needs,
+  // rounded up to a whole oak action. A slot unlock is much further out than an hour on the shipped curve.
+  const slot2Window = Math.ceil(xpForLevel(curve, SLOT2, woodcutting.maxLevel) / OAK_XP) * OAK_MS
+  const slot2 = advanceSkills(sproutletAtWork(q), slot2Window, {}, q)
+
   it('lands on the right total XP and level', () => {
-    expect(level).toBeGreaterThan(20)
+    expect(level).toBeGreaterThan(1)
     expect(result.state.skills.woodcutting).toMatchObject({ xp: 12_000, level })
     expect(result.state.resources['oak-log']).toBe(1200)
   })
 
-  it('emits a level-up for every level crossed and the level-20 slot unlock, in order', () => {
+  it('emits a level-up for every level crossed, in order, after the actions that earned them', () => {
     expect(ofType(result.events, 'skill-level-up').map((e) => e.level)).toEqual(Array.from({ length: level - 1 }, (_, i) => i + 2))
-    expect(ofType(result.events, 'slot-unlocked')).toEqual([{ type: 'slot-unlocked', skillId: 'woodcutting', slotIndex: 1 }])
-    const order = result.events.map((e) => e.type)
+    expect(result.events.map((e) => e.type)[0]).toBe('action-complete')
+    expect(result.state.skills.woodcutting!.slots).toHaveLength(slotCount(woodcutting, level))
+  })
+
+  it('emits the slot unlock right after the level-up that earned it', () => {
+    expect(slot2.state.skills.woodcutting!.level).toBe(SLOT2)
+    expect(ofType(slot2.events, 'slot-unlocked')).toEqual([{ type: 'slot-unlocked', skillId: 'woodcutting', slotIndex: 1 }])
+    const order = slot2.events.map((e) => e.type)
     expect(order[0]).toBe('action-complete')
-    expect(order.indexOf('slot-unlocked')).toBe(order.indexOf('skill-level-up') + 19) // right after level 20
+    // The level-ups run 2..SLOT2, so the unlock sits (SLOT2 - 1) events after the first one.
+    expect(order.indexOf('slot-unlocked')).toBe(order.indexOf('skill-level-up') + (SLOT2 - 1))
   })
 
   it('opens the new slot, empty, without disturbing the working one', () => {
-    const slots = result.state.skills.woodcutting!.slots
+    const slots = slot2.state.skills.woodcutting!.slots
     expect(slots).toHaveLength(2)
     expect(slots[0]).toMatchObject({ creatureId: 'creature-1', resourceId: 'oak-log' })
     expect(slots[1]).toBeNull()
-    expect(assignmentProblems(result.state)).toEqual([])
+    expect(assignmentProblems(slot2.state)).toEqual([])
   })
 
   it('a single big step and thousands of small steps agree exactly (online and offline cannot drift)', () => {
