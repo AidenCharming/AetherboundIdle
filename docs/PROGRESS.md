@@ -4,7 +4,7 @@ Read this at the start of every session. Update it after every checkpoint (see S
 
 ## Next up
 **Step 1.8b: the rest of the dev panel, the bench and Aether-per-minute display, and the polish pass. Phase 1
-playable after it.** 1.8a is done and committed. Starting points:
+playable after it.** 1.8a and the 1.8t tuning pass are done and committed. Starting points:
 - **Dev panel** (`src/ui/screens/DevPanel.tsx`): fast-forward is built; plan 7.1 still wants **grant creature** (any
   species or hybrid, any rarity tier, level and form, optional shiny, pool traits rolled normally unless
   overridden), **add resources** (any amount of any resource id), **add Aether / gold**, and **reset save** behind a
@@ -18,6 +18,11 @@ playable after it.** 1.8a is done and committed. Starting points:
 - **Polish pass**: whatever 1.6/1.7/1.8a left rough. The known list is in the "Not verified" notes of each checkpoint.
 - Same UI rules throughout: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
   selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
+- **After 1.8t, skills run to level 250 on a 250 / 1.04 curve and the work slots open at 1 / 50 / 100 / 165 / 225.**
+  A **reset save** control in the dev panel is now the cheap way to re-check early pacing; this session had to clear
+  localStorage by hand and block the tab's unload flush to get a fresh save. A **skill XP grant** (or set-level)
+  control would be worth adding alongside it: fast-forward is capped at 12 h a press, so the upper levels cannot be
+  reached from the UI at all. Neither is in plan 7.1 as written; ask the designer before adding the XP one.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -821,6 +826,31 @@ levels, and that the second work slot is more than an hour out.
 pacing targets, all marked PLACEHOLDER with the JSON key they live under, and section 4 says creature level is a
 separate knob that did not move. `plan.md` section 3.2, section 3.10, section 4.3 and section 6 carry the new numbers,
 and approved decision 3 now reads "skills 250, creatures 99" with a note that the designer amended it here.
+
+**Verified in the browser (Chromium, `npm run dev`), not only in tests:**
+- **First level-up at 74.98 s** of wall-clock play on a fresh save, one starter Sproutlet on oak. Target 75 s.
+- **Fresh save reads `0 / 250 XP to level 2` and `Slots 1 / 5 · next at level 50`.** Willow still says "Needs level
+  15" and yew "Needs level 30", so the tier gates did not move.
+- **Fast-forward 1 h: `1,200 actions · +12,000 XP`, `Level 1 -> 28`.** Exactly the brief.
+- **Fast-forward 12 h: `14,400 actions · +144,000 XP`, `Level 28 -> 84`, `New slot: 2`.** 43,200 s / 3,000 ms =
+  14,400 actions at 10 XP, and 156,000 cumulative XP is level 84 on the new table. The level-50 slot is reported.
+- **Fast-forward 100 h: capped, and says so** ("away for 4 d 4 h", "Offline progress is capped at 12 h"). It granted
+  the same 14,400 actions and 144,000 XP, `Level 84 -> 100`, `New slot: 3`, and 300,000 cumulative XP is level 100.
+- **A reload keeps everything**: level 100, three slots, the creature still working, no console errors.
+- **375 px**: level 100 (`2,913 / 12,141 XP to level 101`, `next at level 165`), level 249 with the widest caption
+  the game can produce (`1,234,627 / 4,189,943 XP to level 250`) and level 250 (`Max level`, `Slots 5 / 5`, no "next
+  at" line) all render on one line each, with no horizontal scroll at any of them.
+- **A real pre-retune save** was on this machine and was used as the migration test: Woodcutting, 187,980 XP, **five
+  occupied slots**, 40 creatures. It loads with no console error, re-levels to 88 (it was stored as 88 with XP worth
+  old level 55, so the cached level was stale either way), keeps all 40 creatures and all five occupied slots while
+  its level now earns two, shows `Slots 5 / 5` with no misleading "next at" line, and every creature keeps working.
+  XP only ever grew. It was backed up before the session and restored afterwards; the local save is untouched.
+
+**Could not verify:** nothing in the brief. Two things are out of reach by their nature and are covered by the
+pacing test instead: the level 100 (8.7 h) and level 250 (about 4 months) milestones cannot be played in real time,
+and fast-forward is capped at 12 h per press, so reaching them in the UI would take hundreds of presses. The level
+249 and 250 screens above were reached by writing the XP into the save directly, which exercises the same render
+path but not the play that would earn it.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
