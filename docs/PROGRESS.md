@@ -3,18 +3,21 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.8: bench and Aether emission display, "welcome back" offline summary, dev panel (plan.md 7.1), polish pass.** Phase 1
-playable after it. Starting points:
-- The dev panel is what lets you grant creatures at any species/rarity/level/form and fast-forward N hours through the real offline
-  path (`settings.devPanelEnabled`, default off, behind a Settings toggle). It also replaces the hand-injected 40-creature saves used
-  to test 1.7 (see "How to test the roster by hand" in the 1.7 checkpoint B notes).
-- `store.loadReport` already carries `summary`, `events`, `isNewGame`, `migratedFrom` and `notice` for the welcome-back screen; the
-  quarantine banner (`NoticeBanner`) is the existing pattern. Nothing renders `summary` yet.
-- Bench emission: rarity's `benchEmissionPerMin` is in `rarities.json` and the sim accrues it continuously. A roster card could show it
-  per benched creature and the top bar could show Aether per minute; both need a selector (the UI never imports `src/sim`).
-- Same UI rules as 1.6/1.7: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`, selectors keep
-  identity (`test/architecture.test.ts` and the selector tests enforce these).
-- The roster is a tab in `App.tsx` (`TabBar`); a Settings/Dev screen can be a third tab.
+**Step 1.8a checkpoint B: the welcome-back modal, the Settings tab, and the dev panel's fast-forward.** Checkpoint A
+(the state layer) is done and committed. Starting points:
+- `store.welcomeBack` is the pending `OfflineSummary`, set at boot and by the driver's away path;
+  `actions.dismissWelcomeBack()` clears it. Nothing renders it yet, and there is no selector for it yet.
+- `driver.fastForwardHours(n)` already exists and is tested (100 h under the 12 h cap grants 12 h). The Dev tab only
+  has to call it through an action; it must have no maths of its own.
+- `GameState.settings` already has `offlineSummary` and `devPanelEnabled` in the save schema, so no migration is
+  needed. An action to change a setting does not exist yet.
+- The tabs are in `App.tsx` (`TabBar`); the Dev tab shows only while `settings.devPanelEnabled` is true.
+- Same UI rules as 1.6/1.7: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
+  selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
+
+After 1.8a, **1.8b** is the rest of step 1.8: the remaining dev-panel controls (grant creature at any
+species/rarity/level/form, add resources, add Aether and gold, reset the save), the bench and Aether-per-minute
+display (`benchEmissionPerMin` from `rarities.json`, needs a selector), and the polish pass. Phase 1 playable after it.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -24,7 +27,8 @@ playable after it. Starting points:
 - [x] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests. *(2026-09-19)*
 - [x] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources. *(2026-09-19; state layer in checkpoint A, screen in checkpoint B)*
 - [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
-- [ ] 1.8 Bench and Aether emission display, "welcome back" offline summary, dev panel (see plan.md 7.1), polish pass. Phase 1 playable.
+- [ ] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(step 1.8 was split at the designer's instruction, 2026-09-19)*
+- [ ] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, reset save), bench and Aether-per-minute display, polish pass. Phase 1 playable.
 
 ## Phase 2: Breeding and hatching
 Not started. Break into steps at the start of the phase.
@@ -546,6 +550,78 @@ and register `pagehide`/`beforeunload` listeners that write the same text back, 
 overwrite it; see the 1.6 note). The Browser pane must be fronted for screenshots, and a screenshot in an emulated viewport can time out once;
 a retry works.
 
+### 2026-09-19, step 1.8a checkpoint A: the away path in the driver
+
+New: `src/state/welcomeBack.ts`. Changed: `tuning.json` + `schema.ts` + `index.ts` (one new knob), `state/driver.ts`,
+`state/store.ts`, `state/actions.ts`. 489 tests pass (470 before this checkpoint) and `npm run build` is clean. No new
+dependency, no UI yet.
+
+**The designer's decision (2026-09-19), which closes the 1.6 open question.** The 12-hour offline cap applies to a tab
+left open across a long gap (a sleeping laptop, a throttled tab) exactly as it does to a closed tab. A gap over a
+threshold is routed through `applyOffline` rather than handed to `step` as one big dt.
+
+**The knob.** `tuning.offline.awayThresholdMs` = 120000 (PLACEHOLDER), `PosInt` in the schema, with a loader
+cross-check that it stays below `offline.capHours` (a threshold at or above the cap would silently become the cap).
+The content test covers all of that. plan.md 3.10 updated.
+
+**One catch-up path, three callers** (plan.md 4.5 now carries the table):
+
+| Away | Caller | Window measured from |
+|---|---|---|
+| Closed tab | `loadGame` | the save's `lastSeen` |
+| Open tab, gap > `awayThresholdMs` | `driver.stepToNow` | the driver's own tick anchor |
+| Dev fast-forward N hours | `driver.fastForwardHours` | `now - N hours` |
+
+`driver.catchUp(since, now)` is the single private function both driver routes use; `stepToNow` and
+`fastForwardHours` differ only in the `since` they pass.
+
+**The trap, and the test that catches it.** `state.lastSeen` is only stamped at a flush (every 15 s), but the driver's
+`lastTick` has advanced since, and that time has **already been stepped**. So the away path passes
+`{ ...game, lastSeen: since }` where `since` is the driver's anchor, never the state's own `lastSeen`. Measuring from
+the stale one would re-grant up to one autosave period. The test ticks 90 s with no flush (so the save still reads the
+old `lastSeen`), then opens a gap of `threshold + 7 min`, and asserts the result equals `applyOffline` called directly
+on the anchored state, plus an exact oak count of `(90 s + gap) / 3 s` rather than `(180 s + gap) / 3 s`.
+
+**Also tested:** a 20 h gap on an open tab grants exactly 12 h and reports `capped` (deep-equal to `applyOffline`
+called directly, so resources, XP, levels, Aether and the RNG state all match); a gap exactly at the threshold takes
+the plain `step` path and produces no summary; a backwards clock grants nothing, produces no summary and re-anchors so
+ordinary time resumes at once; after a routed catch-up `lastSeen` and the anchor are both `now`, a second
+`stepToNow` at the same clock grants nothing more, and a flush straight afterwards reloads with a zero window; the
+RNG state advances exactly as the sim's does on real content; and the autosave timer and `visibilitychange`-to-visible
+route the same way as the tick.
+
+**`store.welcomeBack`** is the pending `OfflineSummary | null`. `state/welcomeBack.ts` decides what goes in it:
+- Set at boot from `loadReport.summary`, and by every routed catch-up.
+- Only when the window is over `awayThresholdMs`, it is not a new game, and `settings.offlineSummary` is true.
+  **The catch-up itself always happens**; the setting only controls the report. A test loads an 8 h absence with the
+  setting off and asserts no summary but the full 8 h of logs.
+- If one is still unread when another arrives they are **combined**, not dropped: time, Aether, resources, actions
+  and XP add up; a skill's span runs from the earliest `levelBefore` to the latest `levelAfter`; unlocked slots are
+  the union, sorted and de-duplicated. A clock-skewed window's negative `requestedMs` is clamped to 0 before adding,
+  so it cannot subtract time away.
+- `actions.dismissWelcomeBack()` clears it.
+
+**`driver.fastForwardHours(hours)`** (plan 7.1) ships in this checkpoint, tested, with no UI yet: it steps to now, then
+runs `catchUp(now - hours, now)`. 100 h under the 12 h cap grants exactly 12 h; 1 h grants exactly 1 h and deep-equals
+the sim; un-ticked time since the last tick is credited once, not twice; and it grants time without moving the clock,
+so a flush plus a reload re-grants nothing.
+
+**Decisions (all reversible):**
+1. **A backwards clock is not an away window.** It is still clamped to 0 and re-anchored as in 1.6, and produces no
+   summary. Only a gap *forward* past the threshold is "away".
+2. **`applyOffline` is injectable into `createTickDriver`** as a fifth argument, the way `step` already was, so a test
+   can assert *which* path ran rather than only what it produced.
+3. **`welcomeBack.ts` is a separate file, not part of `store.ts`**, because the driver queues into it too. It is
+   internal to the state layer; the UI reads it through `selectors.ts` in checkpoint B.
+4. **Turning `offlineSummary` off does not clear a summary that is already pending.** The modal takes focus, so the
+   Settings toggle is not reachable while one is open; the rule would be dead code.
+
+**How these tests were checked.** Beyond a green run, I broke the code on purpose seven ways and confirmed each is
+caught: the `lastSeen` re-anchor skipped (4 tests fail), the cap dropped from `applyOffline` (8), the threshold
+replaced by a hardcoded 24 h (7), a second summary replacing the pending one instead of combining (1), the threshold
+gate removed from `queueWelcomeBack` (3), the loader's below-the-cap cross-check removed (1), and `awayThresholdMs`
+loosened from `PosInt` in the schema (1).
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
@@ -557,11 +633,10 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 ## Open questions for the designer
 
 ### Found in 1.6, not blocking
-- **Should the online tick honour the offline cap?** A closed tab is capped at `offline.capHours` (12 h) on load. But a tab
-  left open across a long suspend (laptop asleep for 20 h, then woken) hands its whole gap to `step` as one dt with no cap,
-  because the brief says to pass a large dt straight to `step`. So the same 20 h earns 12 h if the tab was closed and 20 h
-  if it was left open. I followed the brief and changed nothing. If the cap should apply, the driver can clamp the dt (or
-  route a gap over some threshold through `applyOffline`, which would also give 1.8's welcome-back summary for free).
+- ~~**Should the online tick honour the offline cap?**~~ **Resolved by the designer, 2026-09-19, and built in 1.8a
+  checkpoint A.** Yes: the cap applies to a tab left open across a long gap exactly as it does to a closed tab. A gap
+  over `tuning.offline.awayThresholdMs` (120 s) is routed through `applyOffline` rather than handed to `step`, so the
+  cap, Night Owl's offline bonus and the welcome-back summary all apply either way.
 - ~~**Resources have no emoji in the data**~~ **Resolved in 1.7 checkpoint A**: optional `emoji` on `resources.json`.
 
 ### Needs an answer before Phase 3

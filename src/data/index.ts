@@ -328,11 +328,14 @@ export function loadContent(raw: Record<ContentKey, unknown>): Content {
   }
 
   // ----- tuning -----
-  const { creature, traitStrength } = data.tuning
+  const { creature, traitStrength, offline } = data.tuning
   check(creature.formUnlockLevels['2'] < creature.formUnlockLevels['3'], 'tuning.json: form 2 must unlock before form 3')
   check(creature.formUnlockLevels['3'] <= creature.maxLevel, 'tuning.json: form 3 unlocks above creature.maxLevel')
   check(traitStrength.default.minor < traitStrength.default.moderate && traitStrength.default.moderate < traitStrength.default.major,
     'tuning.json: traitStrength.default must increase minor < moderate < major')
+  // A gap longer than awayThresholdMs is routed through the offline path, which clamps it to capHours. A threshold
+  // at or above the cap would make every routed gap a capped one, and the cap would silently become the threshold.
+  check(offline.awayThresholdMs < offline.capHours * 3_600_000, 'tuning.json: offline.awayThresholdMs must be below offline.capHours')
 
   // ----- phase 3/4 files -----
   for (const z of data.zones) {

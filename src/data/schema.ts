@@ -264,7 +264,11 @@ export const TuningSchema = z.strictObject({
   }),
   xp: z.strictObject({ skillCurve: Curve, creatureCurve: Curve }),
   skills: z.strictObject({ secondaryAptitudeBonus: z.number().min(0), hybridOffPrimaryEfficiency: z.number().gt(0).max(1) }),
-  offline: z.strictObject({ capHours: Positive, maxSegmentsPerSlot: PosInt }),
+  // awayThresholdMs is the gap that counts as "away" while the tab is open (a sleeping laptop, a throttled tab).
+  // A gap at or under it is a plain step; a longer one is routed through the offline path, so `capHours` applies to
+  // an open tab exactly as it does to a closed one (designer, 2026-09-19). It must stay below the cap, or a gap
+  // could never be both routed and uncapped.
+  offline: z.strictObject({ capHours: Positive, maxSegmentsPerSlot: PosInt, awayThresholdMs: PosInt }),
   aether: z.strictObject({ benchEmissionTickMs: PosInt }),
   traitStrength: z.strictObject({
     default: z.strictObject({ minor: Positive, moderate: Positive, major: Positive }),

@@ -10,7 +10,7 @@
   "cooldown": { "floorFraction": 0.2, "levelTermPerLevel": 0.004, "rarityTermPerTier": 0.06, "formTerm": { "1": 0, "2": 0.08, "3": 0.16 } },
   "xp": { "skillCurve": { "base": 100, "growth": 1.1 }, "creatureCurve": { "base": 80, "growth": 1.12 } },
   "skills": { "secondaryAptitudeBonus": 0.15, "hybridOffPrimaryEfficiency": 0.6 },
-  "offline": { "capHours": 12, "maxSegmentsPerSlot": 200 },
+  "offline": { "capHours": 12, "maxSegmentsPerSlot": 200, "awayThresholdMs": 120000 },
   "aether": { "benchEmissionTickMs": 60000 },
   "traitStrength": { "default": { "minor": 0.05, "moderate": 0.1, "major": 0.2 } },
   "breeding": { "mutationPlusOne": 0.15, "mutationPlusTwo": 0.025, "costByCeiling": [100, 400, 1600, 6400], "costGrowthPerTier": 4 },

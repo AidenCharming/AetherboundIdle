@@ -21,6 +21,8 @@ export interface Actions {
   setSlotResource(skillId: string, slotIndex: number, resourceId: string): ActionResult
   /** Closes the quarantine banner. */
   dismissNotice(): void
+  /** Closes the welcome-back summary. It is gone for good: the progress it reported was already granted. */
+  dismissWelcomeBack(): void
   /**
    * For breed, hatch and capture (plan 4.6): runs `roll`, then saves the result and the advanced RNG state in
    * the same write, so a reload cannot replay the roll. Nothing calls it before phase 2. `saved` is false when
@@ -57,6 +59,10 @@ export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'ste
 
     dismissNotice() {
       store.setState({ noticeDismissed: true })
+    },
+
+    dismissWelcomeBack() {
+      store.setState({ welcomeBack: null })
     },
 
     commitRoll(roll) {

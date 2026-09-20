@@ -463,6 +463,15 @@ describe('loadContent rejects bad data instead of loading it', () => {
     for (const bad of [0, 360, -30, 400]) expect(problemsFor((r) => (r.tuning.ui.shinyHueDeg = bad)).join('\n'), String(bad)).toContain('tuning.json.ui.shinyHueDeg')
   })
 
+  it('requires tuning.offline.awayThresholdMs to be a positive whole number below the cap', () => {
+    const { awayThresholdMs, capHours } = content.tuning.offline
+    expect(Number.isInteger(awayThresholdMs) && awayThresholdMs > 0).toBe(true)
+    expect(awayThresholdMs).toBeLessThan(capHours * 3_600_000)
+    expect(problemsFor((r) => delete r.tuning.offline.awayThresholdMs).join('\n')).toContain('tuning.json.offline.awayThresholdMs')
+    for (const bad of [0, -1, 1500.5]) expect(problemsFor((r) => (r.tuning.offline.awayThresholdMs = bad)).join('\n'), String(bad)).toContain('tuning.json.offline.awayThresholdMs')
+    expect(problemsFor((r) => (r.tuning.offline.awayThresholdMs = r.tuning.offline.capHours * 3_600_000)).join('\n')).toContain('awayThresholdMs must be below')
+  })
+
   it('lists every problem at once, not just the first', () => {
     const p = problemsFor((r) => {
       r.species[0].ability = 'nope-a'

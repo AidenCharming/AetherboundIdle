@@ -359,7 +359,7 @@ is a data change, not a code change.
     "creatureCurve": { "base": 80, "growth": 1.12 }
   },
   "skills": { "secondaryAptitudeBonus": 0.15, "hybridOffPrimaryEfficiency": 0.60 },
-  "offline": { "capHours": 12, "maxSegmentsPerSlot": 200 },
+  "offline": { "capHours": 12, "maxSegmentsPerSlot": 200, "awayThresholdMs": 120000 },
   "aether": { "benchEmissionTickMs": 60000 },
   "traitStrength": { "default": { "minor": 0.05, "moderate": 0.10, "major": 0.20 } },
   "breeding": {
@@ -397,6 +397,11 @@ Two knobs in this file are easy to misread, so they are pinned down here:
 - `ui.shinyHueDeg` (150) is the CSS `hue-rotate` applied at runtime to a shiny creature's art. It is never a
   separate asset (CLAUDE.md rule 4). Must be strictly between 0 and 360, or a shiny would look like a normal
   creature. Presentation only. Added at step 1.7 (PLACEHOLDER value).
+- `offline.awayThresholdMs` (120000, PLACEHOLDER) is the gap that counts as **away** while the tab is still open:
+  a sleeping laptop, a tab throttled for hours. A gap at or under it is an ordinary `step`; a longer one is routed
+  through `applyOffline`, so `capHours` and Night Owl's offline bonus apply to an open tab exactly as they do to a
+  closed one, and the welcome-back summary is produced either way (designer, 2026-09-19; this resolves the 1.6 open
+  question). It must stay below `capHours`, which the loader checks. Added at step 1.8a.
 
 ---
 
@@ -518,6 +523,18 @@ feeds the "welcome back" screen in step 1.8.
 
 Bench Aether for the same window is **not** computed here. `offline.ts` calls the section 4.4 function
 once with `dt = elapsed`, so the online and offline paths cannot drift apart.
+
+**`applyOffline` is the only catch-up path.** All three ways of being away go through it, so none of them can rot:
+
+| Away | Who calls it | Window measured from |
+|---|---|---|
+| Closed tab | `state/persistence.ts` `loadGame` | the save's `lastSeen` |
+| Open tab, gap > `offline.awayThresholdMs` | `state/driver.ts` `stepToNow` | the **driver's own tick anchor** |
+| Dev panel fast-forward N hours | `state/driver.ts` `fastForwardHours` | `now - N hours` |
+
+The open-tab case must measure from the driver's anchor, not from `state.lastSeen`: `lastSeen` is only stamped when
+the save is flushed (every `save.autosaveMs`), while the driver has already stepped the sim past it. Measuring from
+the stale `lastSeen` would grant up to one autosave period of progress twice.
 
 ### 4.6 Randomness
 
