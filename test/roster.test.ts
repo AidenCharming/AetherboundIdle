@@ -1,11 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { content } from '../src/data'
 import { canWork } from '../src/sim/creature'
+import { createActions } from '../src/state/actions'
+import { createTickDriver } from '../src/state/driver'
+import { flushSave, loadGame } from '../src/state/persistence'
 import * as sel from '../src/state/selectors'
 import { createGameStore, type GameStore } from '../src/state/store'
-import { loadGame } from '../src/state/persistence'
 import type { Creature, GameState } from '../src/types/state'
-import { MemoryStorage, NOW, rosterGame } from './helpers'
+import { FakeEnv, HOUR, MemoryStorage, NOW, rosterGame } from './helpers'
 
 const view = (game: GameState): GameStore => ({ ...createGameStore(loadGame(new MemoryStorage(), NOW, 1)).getState(), game })
 
@@ -229,5 +231,90 @@ describe('arrangeRoster', () => {
   it('gives an empty list, not an error, when nothing matches', () => {
     expect(sel.arrangeRoster(views, { ...sel.NO_FILTER, rarity: 99 }, sel.DEFAULT_SORT)).toEqual([])
     expect(sel.arrangeRoster([], sel.NO_FILTER, sel.DEFAULT_SORT)).toEqual([])
+  })
+})
+
+// ---------- the roster must not re-render on the 100 ms tick ----------
+// React re-renders a component when a value its hook selected changes by identity. The roster screen selects the list of
+// creature views, and each card gets one view, so what has to hold is: a tick (or any step) that only moves slot progress,
+// resources, XP or Aether hands back the very same objects.
+
+describe('the roster is identity-stable through ticks', () => {
+  /** The real store, real driver and real actions around the 121-creature roster, with a clock the test moves. */
+  function live() {
+    const env = new FakeEnv()
+    flushSave(env.storage, game, NOW)
+    const store = createGameStore(loadGame(env.storage, NOW, 1))
+    expect(store.getState().loadReport.isNewGame, 'the roster saved and loaded').toBe(false)
+    const driver = createTickDriver(store, env)
+    const actions = createActions(store, driver, env.storage)
+    driver.start()
+    const tick = (ms = content.tuning.ui.tickMs): void => {
+      env.clock += ms
+      env.fire(content.tuning.ui.tickMs)
+    }
+    return { env, store, actions, tick }
+  }
+
+  it('a tick changes progress, resources and XP but not one creature-related value', () => {
+    const { store, tick } = live()
+    const before = store.getState()
+    const listBefore = sel.selectCreatureViews(before)
+    const viewsBefore = before.game.creatures.map((cr) => sel.selectCreatureView(before, cr.id))
+
+    for (let i = 0; i < 3; i++) tick()
+    expect(sel.selectSlotProgress(store.getState(), 'woodcutting', 0), 'a bar moved').toBeGreaterThan(0)
+    for (let i = 0; i < 57; i++) tick() // six seconds in all: at least one action finished in every working slot
+
+    const after = store.getState()
+    // The premise: the tick really did change what it is meant to.
+    expect(after.game).not.toBe(before.game)
+    expect(after.game.resources).not.toEqual(before.game.resources)
+    expect(after.game.skills.woodcutting!.xp).toBeGreaterThan(before.game.skills.woodcutting!.xp)
+    // The claim: nothing the roster selected changed by identity.
+    expect(after.game.creatures).toBe(before.game.creatures)
+    expect(sel.selectCreatureViews(after)).toBe(listBefore)
+    after.game.creatures.forEach((cr, i) => expect(sel.selectCreatureView(after, cr.id), cr.id).toBe(viewsBefore[i]))
+    const arranged = (s: GameStore) => sel.arrangeRoster(sel.selectCreatureViews(s), sel.NO_FILTER, sel.DEFAULT_SORT)
+    expect(arranged(after)).toEqual(arranged(before))
+  })
+
+  it('so does a long catch-up step, and the assign menu selectors', () => {
+    const { store, tick } = live()
+    const before = store.getState()
+    tick(3 * HOUR)
+    const after = store.getState()
+    expect(after.game.resources).not.toEqual(before.game.resources)
+    expect(sel.selectCreatureViews(after)).toBe(sel.selectCreatureViews(before))
+    for (let slot = 0; slot < sel.selectSlotCount(after, 'woodcutting'); slot++) {
+      expect(sel.selectSlotCreatureId(after, 'woodcutting', slot)).toBe(sel.selectSlotCreatureId(before, 'woodcutting', slot))
+      expect(sel.selectSlotAssignResourceId(after, 'woodcutting', slot)).toBe(sel.selectSlotAssignResourceId(before, 'woodcutting', slot))
+    }
+    expect(sel.selectSlotCount(after, 'woodcutting')).toBe(sel.selectSlotCount(before, 'woodcutting'))
+  })
+
+  it('the moment the player acts is the opposite: only the creatures the move touched get a new view', () => {
+    const { store, actions } = live()
+    const before = store.getState()
+    const viewsBefore = new Map(sel.selectCreatureViews(before).map((v) => [v.id, v]))
+    const benched = sel.selectCreatureViews(before).find((v) => !v.working && v.assignableSkillIds.includes('woodcutting'))!
+    const occupant = sel.selectSlotCreatureId(before, 'woodcutting', 0)!
+
+    // The roster's own move: put a benched creature into slot 1, replacing whoever is there.
+    expect(actions.assignCreature(benched.id, 'woodcutting', 0, sel.selectSlotAssignResourceId(before, 'woodcutting', 0)!)).toEqual({ ok: true })
+
+    const after = store.getState()
+    const list = sel.selectCreatureViews(after)
+    expect(list).not.toBe(sel.selectCreatureViews(before))
+    const changed = list.filter((v) => v !== viewsBefore.get(v.id)).map((v) => v.id)
+    expect(changed.sort()).toEqual([benched.id, occupant].sort())
+    expect(list.find((v) => v.id === benched.id)!.workingAt).toBe('Woodcutting, slot 1')
+    expect(list.find((v) => v.id === occupant)!.workingAt).toBeNull()
+
+    // ...and unassigning changes only that creature.
+    const mid = new Map(list.map((v) => [v.id, v]))
+    actions.unassignCreature(benched.id)
+    const end = sel.selectCreatureViews(store.getState())
+    expect(end.filter((v) => v !== mid.get(v.id)).map((v) => v.id)).toEqual([benched.id])
   })
 })

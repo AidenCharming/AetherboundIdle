@@ -322,3 +322,326 @@ button:disabled {
 .error {
   color: var(--danger);
 }
+
+/* ---------- screen switch ---------- */
+
+/* On a phone the switch is pinned to the bottom edge, where a thumb reaches it, and the app leaves room for it. */
+.app {
+  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+}
+
+.tabbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  background: var(--panel);
+  border-top: 1px solid var(--line);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.tabbar-inner {
+  display: flex;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.tabbar button {
+  flex: 1;
+  min-height: 56px;
+  border: 0;
+  border-top: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  font-weight: 600;
+}
+
+.tabbar button[aria-selected='true'] {
+  background: var(--panel-raised);
+  border-top-color: var(--text);
+}
+
+@media (min-width: 768px) {
+  .app {
+    padding-bottom: var(--gap);
+  }
+
+  .tabbar {
+    position: static;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .tabbar-inner {
+    max-width: none;
+  }
+
+  .tabbar button {
+    min-height: 48px;
+  }
+}
+
+/* ---------- roster ---------- */
+
+.roster {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  font: inherit;
+  color: inherit;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.filters {
+  padding: 0 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.filters summary {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.filters[open] summary {
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+@media (min-width: 560px) {
+  .filters-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.field button {
+  width: 100%;
+}
+
+.filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.roster-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.roster-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 12px;
+  text-align: center;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius);
+}
+
+/* A card. Its type colors, rarity frame and glow all arrive as custom properties from the data (RosterCard.tsx):
+   --type-a / --type-b (the art panel; equal for a single type), --rarity (the frame tint) and --glow (0 to 1). */
+.rcard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--rarity) 14%, var(--panel-raised));
+  border: 3px solid var(--rarity);
+  border-radius: var(--radius);
+  box-shadow: 0 0 calc(var(--glow) * 14px) calc(var(--glow) * 2px) color-mix(in srgb, var(--rarity) 80%, transparent);
+}
+
+.rcard[data-expanded='true'] {
+  grid-column: 1 / -1;
+}
+
+.rcard-toggle {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 100%;
+  padding: 0;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+
+.rcard[data-expanded='true'] .rcard-toggle {
+  flex-direction: row;
+}
+
+.rcard-art {
+  display: grid;
+  place-items: center;
+  height: 84px;
+  background: linear-gradient(135deg, var(--type-a) 50%, var(--type-b) 50%);
+}
+
+.rcard[data-expanded='true'] .rcard-art {
+  flex: none;
+  width: 96px;
+  height: auto;
+}
+
+.rcard-emoji {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+/* A shiny is the same art with its hue turned by the tuned amount: no separate asset. */
+.rcard[data-shiny='true'] .rcard-emoji {
+  filter: hue-rotate(var(--shiny-hue));
+}
+
+.rcard-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 8px 10px 10px;
+}
+
+.rcard-name {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.shiny-tag {
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.rcard-rarity {
+  color: var(--rarity);
+  font-weight: 600;
+}
+
+.badge {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  border: 1px solid var(--muted);
+  border-radius: 999px;
+}
+
+.badge[data-state='working'] {
+  font-weight: 600;
+  color: var(--bg);
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.rcard-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background: var(--panel-raised);
+  border-top: 1px solid var(--line);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.cap {
+  text-transform: capitalize;
+}
+
+.block {
+  display: block;
+}
+
+.traits p + p {
+  margin-top: 8px;
+}
+
+.work {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.assign-skill {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.assign-skill legend {
+  margin-bottom: 6px;
+  padding: 0;
+  font-weight: 600;
+}
+
+.slot-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  text-align: left;
+}
+
+.slot-option:disabled {
+  opacity: 0.55;
+}

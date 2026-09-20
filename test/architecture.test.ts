@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 // The layering rules from plan.md section 1 and CLAUDE.md, checked against the source so they cannot rot.
 
 const sources = import.meta.glob('../src/**/*.{ts,tsx}', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
+const styles = import.meta.glob('../src/**/*.css', { query: '?raw', import: 'default', eager: true }) as Record<string, string>
 
 /** 'src/sim/tick.ts' style paths, sorted. */
 const all = Object.entries(sources)
@@ -51,6 +52,18 @@ describe('layering', () => {
 
   it('nothing in src calls Math.random (seeds come from crypto.getRandomValues, rolls from the seeded RNG)', () => {
     for (const f of all) expect(/Math\.random\s*\(/.test(code(f.source)), f.path).toBe(false)
+  })
+
+  it('nothing in ui/ hardcodes a color: type and rarity colors come from the data, and CSS holds only the neutral chrome tokens', () => {
+    const hex = /#[0-9a-fA-F]{3,8}(?![0-9a-zA-Z])/
+    for (const f of under('ui/')) expect(hex.test(code(f.source)), `${f.path} contains a hex color`).toBe(false)
+    expect(Object.keys(styles).length).toBeGreaterThan(0)
+    for (const [path, css] of Object.entries(styles)) {
+      expect(css.length, `${path} was read as empty (vitest.config.ts must let .css through)`).toBeGreaterThan(0)
+      // The one place a hex may live: the `:root` block of custom properties (neutral background, text and line colors).
+      const outsideRoot = css.replace(/\/\*[\s\S]*?\*\//g, '').replace(/:root\s*\{[^}]*\}/, '')
+      expect(hex.test(outsideRoot), `${path} has a hex color outside :root`).toBe(false)
+    }
   })
 
   it('only runtime.ts touches the browser globals in the state layer', () => {

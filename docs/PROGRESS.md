@@ -3,18 +3,18 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.7 in progress: checkpoint A (data, selectors, pure roster logic) is done; checkpoint B (roster screen, tabs, assign) is next.**
-Original brief: **Step 1.7: roster screen** with placeholder art cards (type colors, emoji, rarity frame), filter and sort, and assign to
-slot. Same rules as 1.6: the UI reads only through `src/state/selectors.ts` / `useGameStore` / `useActions` and never
-imports `src/sim`; anything derived (rarity name and frame, stats, shiny hue) becomes a selector. Starting points:
-- `selectCreatureView` (selectors.ts) is deliberately minimal (name, emoji, type color, level, where it works). The roster
-  card needs rarity, form, shiny and the rest, so extend that view (it is cached per creature object) rather than adding a
-  second one. Type colors already come from `types.json`; rarity frames come from `rarities.json` `frame`.
-- Assigning from the roster can reuse `actions.assignCreature` and the picker rules in `SlotCard.tsx`. A slot needs a
-  resource to be assigned, and `selectDefaultResourceId` gives the lowest unlocked one.
-- Phase 1 still has one creature (the starter Sproutlet), so filter and sort are exercised mostly by tests. The dev panel
-  (1.8) is what will let you grant more.
-- No new art assets: emoji plus CSS. Rarity is a frame/tint/glow and shinies a runtime hue shift (CLAUDE.md rule 4).
+**Step 1.8: bench and Aether emission display, "welcome back" offline summary, dev panel (plan.md 7.1), polish pass.** Phase 1
+playable after it. Starting points:
+- The dev panel is what lets you grant creatures at any species/rarity/level/form and fast-forward N hours through the real offline
+  path (`settings.devPanelEnabled`, default off, behind a Settings toggle). It also replaces the hand-injected 40-creature saves used
+  to test 1.7 (see "How to test the roster by hand" in the 1.7 checkpoint B notes).
+- `store.loadReport` already carries `summary`, `events`, `isNewGame`, `migratedFrom` and `notice` for the welcome-back screen; the
+  quarantine banner (`NoticeBanner`) is the existing pattern. Nothing renders `summary` yet.
+- Bench emission: rarity's `benchEmissionPerMin` is in `rarities.json` and the sim accrues it continuously. A roster card could show it
+  per benched creature and the top bar could show Aether per minute; both need a selector (the UI never imports `src/sim`).
+- Same UI rules as 1.6/1.7: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`, selectors keep
+  identity (`test/architecture.test.ts` and the selector tests enforce these).
+- The roster is a tab in `App.tsx` (`TabBar`); a Settings/Dev screen can be a third tab.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -23,7 +23,7 @@ imports `src/sim`; anything derived (rarity name and frame, stats, shiny hue) be
 - [x] 1.4 Sim core in `src/sim/` (pure functions): creature stats, action cooldown with floor, skill XP and levels, slot unlocks, Aether emission. Unit tests. *(2026-09-19)*
 - [x] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests. *(2026-09-19)*
 - [x] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources. *(2026-09-19; state layer in checkpoint A, screen in checkpoint B)*
-- [ ] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot.
+- [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
 - [ ] 1.8 Bench and Aether emission display, "welcome back" offline summary, dev panel (see plan.md 7.1), polish pass. Phase 1 playable.
 
 ## Phase 2: Breeding and hatching
@@ -469,6 +469,82 @@ test's allowlist is unchanged.
 2. The filter offers **every** skill under "can work", not just gatherable ones (everyone can work the open skills, so those two
    filters are simply "all"); only the *assign* menu is limited to skills with something to gather.
 3. The signature trait's `strength` in the view is its `defaultStrength` (signature traits have no roll).
+
+### 2026-09-19, step 1.7 checkpoint B: roster screen and navigation
+
+New: `ui/screens/Roster.tsx`, `ui/components/{RosterCard,RosterFilters,TabBar}.tsx`; `App.tsx` gets the screen switch. 470 tests pass
+and `npm run build` is clean. No new dependency.
+
+**Navigation.** A plain `useState` screen switch (Skills / Roster), no router. `TabBar` is a tablist. At phone width it is pinned to the
+bottom edge (thumb reach, 57 px tall, and `.app` leaves room so nothing hides behind it); from 768 px it sits under the top bar. The tick
+driver runs whichever screen shows. **Filter and sort live in `App` state**, not `Roster`, so a trip to Skills and back keeps them (I first
+had them in `Roster`, saw them reset in the browser, and lifted them). Which card is open is `Roster`-local and closes when you leave. None
+of it is in `GameState` or the save.
+
+**Cards.** A grid (`auto-fill, minmax(150px, 1fr)`, so 2 columns at 375 px). The art panel is filled by the type color(s) from `types.json`:
+a diagonal split for a dual-type hybrid, solid for a single type. Rarity is the frame color (`frame.tint`), a tint wash on the card body and
+a glow sized by `frame.glow`; all reach CSS as custom properties (`--rarity`, `--glow`) set from the data. A shiny's emoji gets
+`hue-rotate(var(--shiny-hue))` with `--shiny-hue` = `tuning.ui.shinyHueDeg`, plus a "Shiny" text tag so it is not colour-only. Working
+shows a filled badge with `Woodcutting, slot 3`; benched an outlined one. Tapping a card opens it in place (full grid width): species,
+type(s), rarity, form number and name, stat lean, primary skill, aptitude, signature trait and each pool trait with its strength and effect
+text, then work status. Placeholder art only (emoji plus CSS). `test/architecture.test.ts` now also fails on any hex color in `ui/` code, or
+in a CSS file outside the `:root` token block. That needed `css: { include: [/\.css/] }` in `vitest.config.ts`: vitest otherwise blanks
+every `.css` import, `?raw` included, so the test would have passed on empty strings (I caught this by planting a hex and seeing it pass).
+
+**Assign / unassign from the roster.** A creature offers "Assign to..." for each skill it can work **that has something to gather**
+(`assignableSkillIds`; only Woodcutting today), listing every unlocked slot: `empty`, `replaces <occupant>` (the sim benches them, as the
+Skills screen's "Replace with" already does), or `working here now` (disabled). The resource is `selectSlotAssignResourceId` (the slot's own,
+else `selectDefaultResourceId`). A working creature also gets Unassign. The sim's rejection reason is shown as written under the card
+(`role="alert"`). A creature that can work nothing gatherable says so instead.
+
+**Performance.** `Roster` selects `selectCreatureViews` once and passes each `memo`'d card its view; there is no per-card subscription.
+`test/roster.test.ts` runs the real store, driver and actions around a 121-creature roster: 60 ticks (and a 3-hour step) change resources,
+XP and slot progress but leave `game.creatures`, the view list, every view and the slot selectors identical, and an assign changes only the
+two creatures it touches. Mutation-checked both ways (uncached views, uncached list).
+
+**Verified in the real browser (Vite dev server, Chromium pane), on a hand-injected 40-creature save** (all 24 species and 15 hybrids, all 9
+rarities, 3 forms, 5 shinies, 4 assigned):
+- Every filter (type incl. hybrids on either side, rarity, form, shiny, working, benched, can work Woodcutting/Mining/Scavenging) compared
+  against an expectation computed in the page from the game data and the save: all equal. "N of M" and the empty state ("0 of 40", "No
+  creatures match these filters", Clear filters at 44 px) work; the clear button restores 40 of 40.
+- All 5 sort keys in both directions equal an independently written oracle, including the sequence-number tiebreak (ascending in both
+  directions).
+- Assign to an empty slot, replace an occupant, Unassign from the Roster, and Unassign from the Skills screen: each shows the same on the
+  other screen (the Petalsprocket had its real 1.7 s cooldown on Skills).
+- Shiny: computed `filter: hue-rotate(150deg)` from the tuned value, and visibly a different-hued sprite beside the normal one. Rarity: Dim
+  is a grey frame with no glow (`#8a8a8a`), Zenith `#fff4c2` with a glow, straight from `rarities.json`. Dual-type hybrids show the diagonal
+  two-color panel.
+- **No re-render on the tick**: with temporary render counters in `Roster` and `RosterCard` (removed afterwards), 3.5 s of ticks with 40 cards
+  and one open gave 0 roster renders, 0 card renders and 0 DOM writes inside the roster while the top bar's resources changed; one assignment
+  re-rendered one card.
+- **The sim's rejection reason renders**: a save with Woodcutting at level 1 and slot 1 on Yew Log makes the roster's assign onto slot 1 refuse
+  with "Yew Log needs woodcutting level 30", in the alert colour, and nothing moved. This closes the 1.6 "not verified" item for the same path
+  on the Skills screen (the same corner exists there).
+- 375 px: no horizontal overflow on Skills, Roster (filters folded or open) or an opened card; every button, select, summary and tab is at
+  least 44 px tall; 2 card columns; the tab bar sits at the bottom of the viewport with 15 to 28 px of clearance under the last content.
+
+**Not verified:** a real phone, Safari or Firefox (Chromium only; `color-mix` and `env(safe-area-inset-bottom)` were only exercised there);
+the "filters open by default on a wide screen" branch reads `matchMedia` once at mount (checked at 800 px open and 375 px folded, not on
+resize); keyboard-only use of the tablist (arrow keys are not wired, tabs are plain buttons) and screen-reader behaviour; and there is no
+automated DOM test (no jsdom), so the components are covered by the browser run above and not by the suite.
+
+**Decisions and deviations (all reversible):**
+1. Filters are `<select>`s inside a `<details>` (folded on a phone, open from 768 px), not chips: eight controls fit two-up at 375 px.
+2. Opening a card is in-place expansion (one open at a time), not a modal.
+3. A creature that stops matching the filter (say "Benched", then you assign it) drops out of the list, and its open card with it.
+4. The filter offers all 11 skills under "Can work" (the two open skills match everyone); only the assign menu is limited to gatherable skills.
+5. The brief said five resources need emoji; there are four (see checkpoint A).
+
+**Observation for the designer (not changed):** the roster (and the Skills screen's "Replace with") assigns onto an occupied slot using **that
+slot's own resource**. If a slot sits on a tier its skill's level no longer unlocks (only reachable through a retuned or hand-edited save; the
+sim idles such a slot), the assign is refused until the tier is changed on the Skills screen. If you want it smoother, fall back to the default
+resource when the slot's is locked. Normal play never hits it.
+
+**How to test the roster by hand.** Until the 1.8 dev panel exists: build a save with the real code (a throwaway vitest file using
+`rosterGame(39)` from `test/helpers.ts` plus `flushSave`), write it to `localStorage['aetherbound-idle:save']` with `lastSeen = Date.now()`,
+and register `pagehide`/`beforeunload` listeners that write the same text back, then reload (the tab's own unload flush would otherwise
+overwrite it; see the 1.6 note). The Browser pane must be fronted for screenshots, and a screenshot in an emulated viewport can time out once;
+a retry works.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
