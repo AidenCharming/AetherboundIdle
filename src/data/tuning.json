@@ -1,6 +1,7 @@
 {
   "creature": {
     "maxLevel": 99,
+    "maxPoolTraits": 3,
     "baseStats": { "health": 50, "power": 10, "guard": 10 },
     "statLeanMultiplier": { "leaned": 1.25, "other": 0.9 },
     "statPerLevel": 0.04,

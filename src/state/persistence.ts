@@ -15,6 +15,8 @@ export const brokenSaveKey = (now: number): string => `aetherbound-idle:save-bro
 export interface StorageLike {
   getItem(key: string): string | null
   setItem(key: string, value: string): void
+  /** Only the dev panel's reset save uses it, and only on `SAVE_KEY`. */
+  removeItem(key: string): void
 }
 
 // ---------- writing ----------

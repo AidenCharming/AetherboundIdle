@@ -92,6 +92,9 @@ export class MemoryStorage implements StorageLike {
     this.data.set(key, value)
     this.writes++
   }
+  removeItem(key: string): void {
+    this.data.delete(key)
+  }
 }
 
 /**
@@ -103,6 +106,8 @@ export class FakeEnv implements Env {
   clock = NOW
   seedDraws = 0
   seed = 424242
+  /** How many times the page was asked to reload (the dev panel's reset save). */
+  reloads = 0
   visibility = 'visible'
   win = new EventTarget()
   doc: EventTarget & { readonly visibilityState: string }
@@ -118,6 +123,9 @@ export class FakeEnv implements Env {
   }
 
   now = (): number => this.clock
+  reload = (): void => {
+    this.reloads++
+  }
   randomSeed = (): number => {
     this.seedDraws++
     return this.seed

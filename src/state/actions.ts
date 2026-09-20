@@ -4,13 +4,19 @@
 //
 // Stepping to now first matters: the tick lands every `ui.tickMs`, so without it the last few dozen milliseconds
 // would be credited to whatever the slot looks like after the change instead of before it.
+import { addAether, addGold, addResource, grantCreature, setSkillLevel, type DevResult, type GrantSpec } from '../sim/dev'
 import { assignCreature, setSlotResource, unassignCreature } from '../sim/skills'
 import type { GameState, Settings } from '../types/state'
 import type { TickDriver } from './driver'
-import { commitRoll, type StorageLike } from './persistence'
+import { commitRoll, SAVE_KEY, type StorageLike } from './persistence'
 import type { GameStoreApi } from './store'
 
 export type ActionResult = { ok: true } | { ok: false; reason: string }
+
+/** A dev action's outcome: what it did in words, or why it refused. Neither case throws. */
+export type DevActionResult = { ok: true; message: string } | { ok: false; reason: string }
+
+export type { GrantSpec }
 
 export interface Actions {
   /** Puts a creature in a slot on a resource. A creature already working elsewhere is moved. */
@@ -37,11 +43,59 @@ export interface Actions {
    * the write failed (storage full or blocked); the roll still happened in memory.
    */
   commitRoll<R>(roll: (state: GameState) => { state: GameState; result: R }): { result: R; saved: boolean }
+
+  // ---- the dev panel (plan 7.1, step 1.8b). Each validates, never throws, saves at once, and leaves the RNG alone. ----
+
+  /** Adds a benched creature exactly as specified (nothing is rolled). Any species, rarity, level, form and shiny flag. */
+  grantCreature(spec: GrantSpec): DevActionResult
+  /** Adds a whole number of any resource. `amount` is what the field holds: empty, negative, non-finite and huge are refused. */
+  addResource(resourceId: string, amount: unknown): DevActionResult
+  /** Adds Aether (a fraction is fine). */
+  addAether(amount: unknown): DevActionResult
+  /** Adds gold (whole numbers). */
+  addGold(amount: unknown): DevActionResult
+  /**
+   * Raises a skill's XP to what `level` takes, through the sim's own XP code so slots unlock and the level cache is
+   * right. It only raises: a skill already at or past the level is refused with a reason.
+   */
+  setSkillLevel(skillId: string, level: unknown): DevActionResult
+  /**
+   * Wipes the save (only `SAVE_KEY`; the `save-broken-*` copies stay) and reloads the page. The driver is retired
+   * FIRST, so this tab's own pagehide / beforeunload flush cannot write the old game back over the wipe. After it
+   * runs nothing saves any more; the reload starts a new game.
+   */
+  resetSave(): void
 }
 
-export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'stepToNow' | 'flush' | 'fastForwardHours'>, storage: StorageLike): Actions {
+export function createActions(
+  store: GameStoreApi,
+  driver: Pick<TickDriver, 'stepToNow' | 'flush' | 'fastForwardHours' | 'retire' | 'retired'>,
+  storage: StorageLike,
+  reload: () => void = () => {},
+): Actions {
   const game = (): GameState => store.getState().game
   const commit = (state: GameState): void => store.setState({ game: state })
+
+  // commitRoll writes straight to storage rather than through the driver, so once the save has been reset it must
+  // be refused here too: a throwing write is what `flushSave` reports as `saved: false`.
+  const rollStorage: StorageLike = {
+    getItem: (key) => storage.getItem(key),
+    setItem: (key, value) => {
+      if (driver.retired) throw new Error('the save was reset')
+      storage.setItem(key, value)
+    },
+    removeItem: (key) => storage.removeItem(key),
+  }
+
+  /** Steps to now, applies a dev change, commits it and saves, or hands back the reason. */
+  const dev = (change: (state: GameState) => DevResult): DevActionResult => {
+    driver.stepToNow()
+    const result = change(game())
+    if (!result.ok) return result
+    commit(result.state)
+    driver.flush()
+    return { ok: true, message: result.message }
+  }
 
   return {
     assignCreature(creatureId, skillId, slotIndex, resourceId) {
@@ -88,9 +142,28 @@ export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'ste
     commitRoll(roll) {
       // commitRoll stamps lastSeen = now, so the sim must be stepped to that same now first.
       const now = driver.stepToNow()
-      const committed = commitRoll(storage, game(), roll, now)
+      const committed = commitRoll(rollStorage, game(), roll, now)
       commit(committed.state)
       return { result: committed.result, saved: committed.saved }
+    },
+
+    grantCreature: (spec) => dev((state) => grantCreature(state, spec)),
+    addResource: (resourceId, amount) => dev((state) => addResource(state, resourceId, amount)),
+    addAether: (amount) => dev((state) => addAether(state, amount)),
+    addGold: (amount) => dev((state) => addGold(state, amount)),
+
+    setSkillLevel: (skillId, level) => dev((state) => setSkillLevel(state, skillId, level)),
+
+    resetSave() {
+      // Order matters. Retire first: it removes the pagehide / beforeunload listeners and the autosave timer and blocks
+      // every later flush. Only then wipe, and only the main key. Then reload into a new game.
+      driver.retire()
+      try {
+        storage.removeItem(SAVE_KEY)
+      } catch {
+        // Storage blocked: nothing was saved to wipe, and the reload starts fresh regardless.
+      }
+      reload()
     },
   }
 }

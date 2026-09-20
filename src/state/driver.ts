@@ -32,6 +32,8 @@ export interface Env {
   clearInterval(handle: unknown): void
   /** `window`: `pagehide` and `beforeunload`. */
   win: Pick<EventTarget, 'addEventListener' | 'removeEventListener'>
+  /** Reloads the page. Only the dev panel's reset save calls it. */
+  reload(): void
   /** `document`: `visibilitychange`. */
   doc: Pick<EventTarget, 'addEventListener' | 'removeEventListener'> & { readonly visibilityState: string }
 }
@@ -50,6 +52,14 @@ export interface TickDriver {
   /** Starts the tick and autosave timers and the unload / visibility hooks. Calling it again does nothing. */
   start(): void
   stop(): void
+  /**
+   * `stop()`, and from then on nothing this driver does may write the save: `flush` becomes a no-op. The dev panel's
+   * reset save calls it BEFORE it wipes the save. Without it this tab's own pagehide / beforeunload flush (or a click
+   * on a flushing action while the page is going away) would rewrite the save the moment after it was wiped.
+   */
+  retire(): void
+  /** True once `retire()` has run. */
+  readonly retired: boolean
 }
 
 export function createTickDriver(
@@ -99,7 +109,10 @@ export function createTickDriver(
     catchUp(now - hours * MS_PER_HOUR, now)
   }
 
+  let retired = false
+
   function flush(): void {
+    if (retired) return
     const now = stepToNow()
     const flushed = flushSave(env.storage, store.getState().game, now)
     store.setState({ game: flushed.state })
@@ -134,5 +147,20 @@ export function createTickDriver(
     cleanup = null
   }
 
-  return { stepToNow, flush, fastForwardHours, start, stop }
+  function retire(): void {
+    stop()
+    retired = true
+  }
+
+  return {
+    stepToNow,
+    flush,
+    fastForwardHours,
+    start,
+    stop,
+    retire,
+    get retired() {
+      return retired
+    },
+  }
 }

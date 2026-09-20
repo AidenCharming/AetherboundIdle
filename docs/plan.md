@@ -346,6 +346,7 @@ is a data change, not a code change.
 {
   "creature": {
     "maxLevel": 99,
+    "maxPoolTraits": 3,
     "baseStats": { "health": 50, "power": 10, "guard": 10 },
     "statLeanMultiplier": { "leaned": 1.25, "other": 0.9 },
     "statPerLevel": 0.04,
@@ -681,10 +682,17 @@ because every later phase needs it.
 | Control | Behaviour | Built |
 |---|---|---|
 | Fast-forward N hours | Rewinds `lastSeen` by N hours and re-runs the **real** offline path. | 1.8a |
-| Grant creature | Pick any species or hybrid, any rarity tier, level and form; optional shiny. Rolls pool traits normally unless overridden. | 1.8b |
+| Grant creature | Pick any species or hybrid, any rarity tier, level and form; optional shiny; up to `creature.maxPoolTraits` pool traits **picked by hand** (see the note below). | 1.8b |
 | Add resources | Any amount of any resource ID. | 1.8b |
 | Add Aether / gold | Direct numeric grant. | 1.8b |
-| Reset save | Wipes the save and reloads, behind a confirmation. | 1.8b |
+| Set skill level | Raises a skill's XP to the cumulative XP of a target level (1 to the skill's `maxLevel`) through `addSkillXp`, so slots unlock as normal. Only raises. Added by the designer's approval in 1.8b: fast-forward is capped at 12 h a press, so levels above about 100 are otherwise unreachable. | 1.8b |
+| Reset save | Wipes the save and reloads, behind a two-step confirmation. Stops the tick driver first so this tab's own unload flush cannot rewrite the save. Only the main save key is wiped. | 1.8b |
+
+**Pool traits in the grant (designer's decision, 2026-09-20).** No pool-trait roll exists yet (how many traits, how rare Major
+is and how much `typeAffinity` weighs are all undesigned; the designer will design them at the start of Phase 2). So the grant
+does not roll: it offers up to three trait dropdowns, each with a strength dropdown limited to what that trait allows (a trait
+with a `minStrength`, the Void-only ones, cannot go below it), no duplicates, default none. Nothing is rolled, so a grant
+consumes no RNG and needs no `commitRoll`: it is a normal action that flushes the save.
 
 Step 1.8 was split in two at the designer's instruction (2026-09-19): 1.8a is the away path, the summary, the
 Settings tab and the fast-forward; 1.8b is the rest.

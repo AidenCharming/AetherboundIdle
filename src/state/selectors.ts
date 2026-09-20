@@ -6,7 +6,7 @@
 // here returns a primitive, a value that is stable by reference (content lookups, and creature views cached per
 // creature), or a list that goes through `stable`, which hands back the previous array when nothing changed.
 // Selectors taking arguments are used as `useGameStore((s) => selectSlotProgress(s, skillId, slotIndex))`.
-import { content, type StatLean, type Strength } from '../data'
+import { content, STRENGTHS, type StatLean, type Strength } from '../data'
 import { canWork, creatureDef } from '../sim/creature'
 import { xpForLevel, xpToNext } from '../sim/formulas'
 import type { OfflineSummary } from '../sim/offline'
@@ -133,6 +133,53 @@ export const formNumbers: readonly number[] = Object.keys(content.tuning.creatur
 const typeChip = (typeId: string): TypeChip => typeChips.get(typeId) ?? { id: typeId, name: typeId, color: NEUTRAL, order: typeChips.size }
 /** A creature whose rarity tier the data no longer has still shows: plain frame, no glow. */
 const rarityInfo = (tier: number): RarityInfo => rarityInfos[tier - 1] ?? { tier, id: `tier-${tier}`, name: `Tier ${tier}`, tint: NEUTRAL, glow: 0 }
+
+// ---------- dev panel choices (content lookups, so every value is stable) ----------
+
+export type { Strength }
+
+export interface CreatureOption {
+  id: string
+  /** The species or hybrid name (its Form 1 name). */
+  name: string
+  isHybrid: boolean
+  /** Type names, one or two, so two creatures with similar names can be told apart. */
+  typeNames: readonly string[]
+}
+
+/** Every species, then every hybrid, in the data's order: what the dev panel's grant offers. */
+export const creatureOptions: readonly CreatureOption[] = [...content.species, ...content.hybrids].map((def) => ({
+  id: def.id,
+  name: def.name,
+  isHybrid: def.origin === 'breed',
+  typeNames: def.types.map((t) => typeChip(t).name),
+}))
+
+/** The highest creature level a grant may ask for (tuning.creature.maxLevel). */
+export const creatureMaxLevel: number = content.tuning.creature.maxLevel
+
+/** How many pool traits one creature can carry (tuning.creature.maxPoolTraits). */
+export const maxPoolTraits: number = content.tuning.creature.maxPoolTraits
+
+export interface PoolTraitOption {
+  id: string
+  name: string
+  text: string
+  /** The strengths it can be given: everything from its `minStrength` up (Void-only traits start at moderate). */
+  allowedStrengths: readonly Strength[]
+}
+
+export const poolTraitOptions: readonly PoolTraitOption[] = content.traits
+  .filter((t) => t.kind === 'pool')
+  .map((t) => ({ id: t.id, name: t.name, text: t.text, allowedStrengths: STRENGTHS.slice(t.minStrength ? STRENGTHS.indexOf(t.minStrength) : 0) }))
+
+export interface ResourceOption {
+  id: string
+  name: string
+}
+
+/** Every resource the data lists, in the data's order. */
+export const resourceOptions: readonly ResourceOption[] = content.resources.map((r) => ({ id: r.id, name: r.name }))
 
 // ---------- currencies and resources (top bar) ----------
 

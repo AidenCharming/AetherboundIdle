@@ -19,6 +19,7 @@ const unavailableStorage: StorageLike = {
   setItem: () => {
     throw new Error('localStorage is unavailable')
   },
+  removeItem: () => {},
 }
 
 export function browserEnv(): Env {
@@ -36,6 +37,7 @@ export function browserEnv(): Env {
     randomSeed: () => crypto.getRandomValues(new Uint32Array(1))[0]!,
     setInterval: (fn, ms) => window.setInterval(fn, ms),
     clearInterval: (handle) => window.clearInterval(handle as number),
+    reload: () => window.location.reload(),
     win: window,
     doc: document,
   }
@@ -56,7 +58,7 @@ export function bootGame(env: Env = browserEnv()): Runtime {
   const outcome = loadGame(env.storage, env.now(), env.randomSeed())
   const store = createGameStore(outcome)
   const driver = createTickDriver(store, env)
-  runtime = { store, actions: createActions(store, driver, env.storage), driver }
+  runtime = { store, actions: createActions(store, driver, env.storage, () => env.reload()), driver }
   driver.start()
   return runtime
 }

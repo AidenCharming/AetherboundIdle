@@ -5,7 +5,7 @@ import { content, type Content, type Resource, type Skill } from '../data'
 import type { Creature, GameState, SkillState, SlotState } from '../types/state'
 import { canWork, creatureCooldown } from './creature'
 import type { SimEvent, SimResult } from './events'
-import { completedActions, levelForXp, sanitizeDt } from './formulas'
+import { completedActions, levelForXp, sanitizeDt, xpForLevel } from './formulas'
 import { cappedModifier, type ActiveEntry } from './modifiers'
 import { createRng } from './rng'
 
@@ -38,6 +38,27 @@ export function addSkillXp(state: SkillState, skill: Skill, amount: number, c: C
   const slots = state.slots.slice()
   while (slots.length < slotCount(skill, level)) slots.push(null)
   return { state: { level, xp, slots }, events }
+}
+
+export type RaiseResult = { ok: true; state: GameState; events: SimEvent[] } | { ok: false; reason: string }
+
+/**
+ * The dev panel's "set skill level" (designer-approved, step 1.8b): raises a skill's XP to the cumulative XP its
+ * `level` needs, through `addSkillXp`, so the cached level and the slot unlocks come out exactly as if the XP had
+ * been earned. It only raises: a skill already at or past `level` is refused with a reason and nothing changes.
+ * The XP lands exactly on that level's threshold, also when the current `xp` is fractional (bonus_xp makes it so):
+ * for 0 <= xp < target, `xp + (target - xp)` rounds back to `target`, and the tests pin that on fractional totals.
+ * Fast-forward is capped at 12 h a press, so without this the upper levels cannot be reached from the UI.
+ */
+export function raiseSkillToLevel(state: GameState, skillId: string, level: number, c: Content = content): RaiseResult {
+  const skill = c.skillById.get(skillId)
+  const skillState = state.skills[skillId]
+  if (!skill || !skillState) return { ok: false, reason: `unknown skill "${skillId}"` }
+  if (!Number.isInteger(level) || level < 1 || level > skill.maxLevel) return { ok: false, reason: `${skill.name} level must be a whole number from 1 to ${skill.maxLevel}` }
+  const target = xpForLevel(c.tuning.xp.skillCurve, level, skill.maxLevel)
+  if (skillState.xp >= target) return { ok: false, reason: `${skill.name} is already level ${skillState.level}; this only raises` }
+  const raised = addSkillXp(skillState, skill, target - skillState.xp, c)
+  return { ok: true, state: { ...state, skills: { ...state.skills, [skillId]: raised.state } }, events: raised.events }
 }
 
 /** Everyone currently in a work slot. Auras and `active-creatures` scopes read this. */

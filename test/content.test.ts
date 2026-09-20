@@ -449,6 +449,12 @@ describe('loadContent rejects bad data instead of loading it', () => {
     expect(p.join('\n')).toContain('bind_rate')
   })
 
+  it('requires tuning.creature.maxPoolTraits (the dev panel picker slot count) to be a positive whole number', () => {
+    expect(content.tuning.creature.maxPoolTraits).toBe(3) // design.md section 3: up to 3 pool traits
+    expect(problemsFor((r) => delete r.tuning.creature.maxPoolTraits).join('\n')).toContain('tuning.json.creature.maxPoolTraits')
+    for (const bad of [0, -1, 2.5]) expect(problemsFor((r) => (r.tuning.creature.maxPoolTraits = bad)).join('\n'), String(bad)).toContain('tuning.json.creature.maxPoolTraits')
+  })
+
   it('requires tuning.ui.tickMs to be a positive whole number', () => {
     expect(Number.isInteger(content.tuning.ui.tickMs) && content.tuning.ui.tickMs > 0).toBe(true)
     expect(problemsFor((r) => delete r.tuning.ui).join('\n')).toContain('tuning.json.ui')

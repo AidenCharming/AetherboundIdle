@@ -250,6 +250,8 @@ const TempoSchema = z.strictObject({ effectMultiplier: Positive.optional(), cool
 export const TuningSchema = z.strictObject({
   creature: z.strictObject({
     maxLevel: PosInt,
+    /** design.md section 3: a creature has up to 3 pool traits. Only the dev panel's picker reads it before phase 2. */
+    maxPoolTraits: PosInt,
     baseStats: z.strictObject({ health: Positive, power: Positive, guard: Positive }),
     statLeanMultiplier: z.strictObject({ leaned: Positive, other: Positive }),
     statPerLevel: z.number().min(0),

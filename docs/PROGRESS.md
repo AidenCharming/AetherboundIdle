@@ -3,14 +3,10 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.8b: the rest of the dev panel, the bench and Aether-per-minute display, and the polish pass. Phase 1
-playable after it.** 1.8a and the 1.8t tuning pass are done and committed. Starting points:
-- **Dev panel** (`src/ui/screens/DevPanel.tsx`): fast-forward is built; plan 7.1 still wants **grant creature** (any
-  species or hybrid, any rarity tier, level and form, optional shiny, pool traits rolled normally unless
-  overridden), **add resources** (any amount of any resource id), **add Aether / gold**, and **reset save** behind a
-  confirmation. `makeCreature` in `sim/creature.ts` is what a grant should go through; every control needs an action
-  in `state/actions.ts`, and the grant and the reset both need a save flush. A grant replaces the hand-injected
-  40-creature saves used to test 1.7 (see "How to test the roster by hand" in the 1.7 checkpoint B notes).
+**Step 1.8b, in three checkpoints. A (the dev panel) is DONE and committed; B (bench and Aether per minute, the Nexus
+tab) is next, then C (polish pass and the Phase 1 acceptance run).** 1.8a and the 1.8t tuning pass are done. Starting points:
+- ~~**Dev panel**~~ **Done in checkpoint A** (see "1.8b checkpoint A" below): grant creature (picked by hand, nothing rolled),
+  add resources / Aether / gold, set skill level, reset save. To test with a varied roster, grant creatures from the Dev tab.
 - **Bench and Aether per minute**: rarity's `benchEmissionPerMin` is in `rarities.json` and the sim accrues it
   continuously (`sim/aether.ts`). A roster card could show it per benched creature and the top bar could show Aether
   per minute; both need a selector, because the UI never imports `src/sim`. Note the top bar shows floored Aether, so
@@ -19,10 +15,8 @@ playable after it.** 1.8a and the 1.8t tuning pass are done and committed. Start
 - Same UI rules throughout: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
   selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
 - **After 1.8t, skills run to level 250 on a 250 / 1.04 curve and the work slots open at 1 / 50 / 100 / 165 / 225.**
-  A **reset save** control in the dev panel is now the cheap way to re-check early pacing; this session had to clear
-  localStorage by hand and block the tab's unload flush to get a fresh save. A **skill XP grant** (or set-level)
-  control would be worth adding alongside it: fast-forward is capped at 12 h a press, so the upper levels cannot be
-  reached from the UI at all. Neither is in plan 7.1 as written; ask the designer before adding the XP one.
+  The Dev tab's **reset save** is the cheap way to get a fresh save, and **set skill level** (designer-approved) reaches
+  the upper levels that fast-forward's 12 h cap cannot.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -852,6 +846,78 @@ and fast-forward is capped at 12 h per press, so reaching them in the UI would t
 249 and 250 screens above were reached by writing the XP into the save directly, which exercises the same render
 path but not the play that would earn it.
 
+### 2026-09-20, step 1.8b checkpoint A: the rest of the dev panel
+
+New: `src/sim/dev.ts` (pure grants), `raiseSkillToLevel` in `sim/skills.ts`, `ui/components/{DevGrantCreature,DevGrants,DevSkillLevel,DevReset,DevMessage}.tsx`,
+`test/dev.test.ts` (62 tests). Changed: `state/{actions,driver,persistence,runtime,selectors}.ts`, `data/{tuning.json,schema.ts}`, `ui/screens/DevPanel.tsx`,
+`ui/theme.css`, `test/{helpers,content}.test.ts`, `docs/plan.md` (3.10 and 7.1). 596 tests pass and `npm run build` is clean. No new dependency.
+
+**What the Dev tab has now.** Fast-forward (1.8a), then grant creature, add resources / Aether / gold, set skill level and reset save. Every control is an
+action in `state/actions.ts` that steps to now, changes the state, commits and flushes the save; none touches the RNG.
+
+**The designer's answer on pool traits (2026-09-20), which changed the brief.** No pool-trait roll exists in any document (how many traits, how rare Major is,
+how much `typeAffinity` weighs), so "roll normally" had nothing to call. Decision: **no roll**. The grant has up to three trait dropdowns, each with a strength
+dropdown limited to what that trait allows (`minStrength` respected: the Void-only traits start at Moderate), no duplicates, default none; shiny is a plain
+checkbox. Because nothing is rolled the grant **consumes no RNG and does not use `commitRoll`** (a normal action plus a flush); the tests assert `rngState` is
+unchanged instead of advanced. **No `tuning.poolTraits` block and no roll were added.** The designer will design the roll at the start of Phase 2 (see "Open
+questions").
+
+**Form versus level: checked, no contradiction.** `Creature.form` is stored, not derived; `integrityProblems` deliberately does not check it against the level,
+and only `grantCreatureXp` (combat, Phase 3) ever raises it. So plan 7.1's "any combination allowed" is what the sim already permits: a level-1 Form 3 and a
+level-99 Form 1 both load, save and reload cleanly (tested). The grant sets the creature's **XP to the cumulative XP its level takes** on the creature curve, so
+level and XP agree and a later `grantCreatureXp` continues from the right place. A level above `creature.maxLevel` (99) is **refused**, not clamped.
+
+**Set skill level (designer-approved).** No existing sim function fit, so one thin wrapper was added: `raiseSkillToLevel(state, skillId, level)` in `sim/skills.ts`,
+next to `addSkillXp` and calling it, so the level cache and the slot unlocks (grow the slot array, emit `slot-unlocked`) are the sim's own. It raises the skill's XP
+to `xpForLevel(level)` **exactly**, also from a fractional XP total. (I first added a `Math.ceil` against float dust, then searched 20 million random pairs and
+found none: `xp + (target - xp)` rounds back to `target`, so the ceil only overshot the level's XP by up to 1 and was removed; the test pins exactness on
+fractional totals.) It **only raises**: a skill already at or past the level is refused with "Woodcutting is already level 120; this only raises". The 1 to
+`maxLevel` bound is read from the skill's data. `dev.ts`'s `setSkillLevel` adds the text parsing and the message. Tested at levels 49/50, 99/100, 164/165 and
+224/225 (1, 2, 3, 4, 5 slots), for all 11 skills to their max, keeping an occupant and its progress, and never lowering.
+
+**Input validation.** Amount fields take **text** through to the sim (an `unknown` in the action), because `Number('')` is 0 and would pass an empty box for a real
+entry. Refused, with a visible reason and no throw: empty or blank, not a number (`abc`, `1,000`, `12 logs`), NaN, Infinity, `1e999`, negative, zero, a fraction
+where a whole number is needed (resources and gold; **Aether may be fractional**, it is stored as a float), and anything above **1,000,000,000,000 per grant**
+(`DEV_MAX_AMOUNT`, an input guard for the tool and not a balance number) or that would push a total past `Number.MAX_SAFE_INTEGER`. A refusal leaves the store and
+the saved text byte-identical (tested: no write happens).
+
+**Reset save, and the trap.** `resetSave()` calls `driver.retire()` first: `stop()` (timers and the pagehide / beforeunload / visibilitychange listeners) and then
+`flush` is a no-op for good, so a click on a flushing action while the page goes away cannot rewrite the save either. Only then does it `removeItem` the main key
+(`aetherbound-idle:save`; `save-broken-*` and everything else stays) and ask the page to reload. The UI is two steps ("Reset save..." asks; "Yes, wipe my save"
+acts), focus lands on Cancel, Escape cancels. `commitRoll` wrote straight to storage rather than through the driver, so its storage is guarded by `driver.retired`
+too. New plumbing: `StorageLike.removeItem`, `Env.reload` (`window.location.reload()` lives in `runtime.ts` like every other browser global) and a fourth argument
+to `createActions`. **Mutation-checked:** dropping `retire()` fails 4 tests, dropping the flush guard 1, dropping the `commitRoll` guard 1; dropping the
+`minStrength` check, allowing empty text and letting set-level lower fail 1, 1 and 5.
+
+**Verified in a real browser (Vite dev server, Chromium pane):**
+- Grant: a Zenith Sproutlet, level 40, Form 3, Void Grasp (Moderate) and Night Owl (Minor). The Void Grasp strength list offered only Moderate and Major, and
+  picked traits were disabled in the other slots. The saved file held the creature the moment the button was pressed (`creature-41`, XP 54,719, `nextCreatureSeq`
+  42). With the shiny box really clicked, `creature-42` was saved as shiny. Both new creatures showed up in the Skills screen's assign lists.
+- Invalid amounts on the gold row: empty ("Enter an amount."), `-5` ("Amount cannot be negative."), `1e999`, `abc`, and `1e30` ("Amount must be at most
+  1,000,000,000,000.") each showed a red alert and changed nothing. `1000` gold, `12.5` Aether and `250` Oak Log showed a status line and were in `localStorage` at once.
+- **Reset**: the first click only asks (save untouched, focus on Cancel); Cancel leaves the save; confirming wipes. A write log installed before the confirm shows
+  the last autosave (42 creatures) **before** the confirm, then the `remove`, then **no write of any kind** as the old page unloaded. The reloaded page held a new game
+  (1 creature, 0 gold, Woodcutting 1, Dev panel off), the backup key survived, and a **second reload still showed the new game**. Console clean.
+- 375 px: no horizontal overflow on the Dev tab and every button, select and text input at least 44 px. (The species select now takes its own row so
+  "Brambletrundle (Verdant)" is not cut.)
+
+**Not verified:** a real phone, Safari or Firefox; Escape on the reset question; keyboard-only use of the panel; the reset in a browser that blocks localStorage
+(node covers the throw); and there is still no DOM test environment, so the five new components are covered by the browser run and the action tests under them.
+
+**Decisions and deviations (all reversible):**
+1. **One new tuning knob: `tuning.creature.maxPoolTraits` = 3** (design.md section 3: "up to 3 pool traits"). The picker needs the number, and rule 1 says no hardcoded
+   balance numbers. It sits in the existing `creature` block, not a `poolTraits` block, and drives nothing but the picker and the sim's own check. Say if you would
+   rather it moved into whatever Phase 2 designs.
+2. **A grant does not touch `collection`** (`speciesSeen`, `rarityTiersSeen`, `shiniesFound`, `formsUnlocked`). Nothing reads it in Phase 1 and no rule says when it is
+   updated, so a granted creature is not "seen". Whoever builds the collection tracks (Phase 4) decides whether a grant should count.
+3. **`sim/dev.ts` is a new sim file** for the pure, validated grants, so the actions stay thin. It ships in the production build behind the Settings toggle, as plan 7.1
+   says.
+4. **Reset turns the Dev panel off**, because `devPanelEnabled` lives in the save and a reset is a real wipe. Re-check the box in Settings to keep testing.
+5. `setSkillLevel` also works on the skills that have nothing to gather yet (Mining and so on); it only raises their level and opens their slots.
+
+**For whoever tests by hand.** The browser tool's `form_input` sets a checkbox's DOM state without React seeing it, so a controlled checkbox snaps back: use a real
+click on the label. And a Vite hot reload after any edit sends the app back to the Skills tab and invalidates the tool's element refs: re-`find` them.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
@@ -874,6 +940,12 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
   over `tuning.offline.awayThresholdMs` (120 s) is routed through `applyOffline` rather than handed to `step`, so the
   cap, Night Owl's offline bonus and the welcome-back summary all apply either way.
 - ~~**Resources have no emoji in the data**~~ **Resolved in 1.7 checkpoint A**: optional `emoji` on `resources.json`.
+
+### Needed at the start of Phase 2 (designer will design it, decided 2026-09-20)
+- **The pool-trait roll.** How many pool traits a new creature rolls (design says "up to 3"), how rare Major is ("Major is rare" has no number), and how much a
+  trait's `typeAffinity` should tilt its `rollWeight`. The dev panel's grant deliberately does not roll (see 1.8b checkpoint A); reroll and inheritance need the same
+  answer. `traits.json` already carries `rollWeight`, `typeAffinity` and `minStrength`; there is no `tuning.poolTraits` block yet.
+- Whether a dev grant should count toward the collection (`Collection` is written by nothing in Phase 1).
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait

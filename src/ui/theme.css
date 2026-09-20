@@ -712,7 +712,13 @@ select {
   flex: 1 1 120px;
 }
 
-.dev-hours {
+/* A field that gets a row to itself (a long select, like the species picker). */
+.dev-row .field.wide {
+  flex-basis: 100%;
+}
+
+.dev-hours,
+.dev-input {
   width: 100%;
   min-height: 44px;
   padding: 8px;
@@ -721,6 +727,55 @@ select {
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 8px;
+}
+
+/* The rest of the dev panel: grants, set skill level, reset save. */
+.dev-input {
+  min-width: 0;
+}
+
+.dev-amount {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dev-traits {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.check input {
+  width: 22px;
+  height: 22px;
+  accent-color: var(--text);
+}
+
+.dev-confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  border: 1px solid var(--danger);
+  border-radius: 8px;
+}
+
+button.danger {
+  border-color: var(--danger);
+  color: var(--danger);
 }
 
 /* ---------- welcome back ---------- */
