@@ -4,7 +4,9 @@ import { createRng } from '../src/sim/rng'
 import { integrityProblems, MIGRATIONS, parseSave, reconcile, serializeSave, type LoadResult } from '../src/sim/save'
 import { step } from '../src/sim/tick'
 import type { GameState } from '../src/types/state'
-import { addCreature, HOUR, newGame, pool, setSkillLevel, sproutletAtWork, variant } from './helpers'
+import { levelForXp } from '../src/sim/formulas'
+import { slotCount } from '../src/sim/skills'
+import { addCreature, HOUR, newGame, pool, setSkillLevel, sproutletAtWork, variant, work } from './helpers'
 
 /** A mid-game state with floats, pool traits, a working slot, a benched creature and a moved RNG. */
 function midGame(): GameState {
@@ -225,6 +227,88 @@ describe('bad saves are reported, never thrown', () => {
   it('the untouched save is fine, so the cases above are failing for their own reason', () => {
     expect(ok(parseSave(serializeSave(good))).state).toEqual(good)
     expect(integrityProblems(good)).toEqual([])
+  })
+})
+
+describe('a save written before the 1.8t retune (old XP curve, old slot unlock levels)', () => {
+  // The tuning this project shipped before step 1.8t, pinned here so these tests keep describing a real old
+  // save whatever today's numbers are.
+  const OLD = variant((raw) => {
+    raw.tuning.xp.skillCurve = { base: 100, growth: 1.1 }
+    for (const skill of raw.skills) {
+      skill.slotUnlockLevels = [1, 20, 40, 65, 90]
+      skill.maxLevel = 99
+    }
+  })
+  const woodcutting = content.skillById.get('woodcutting')!
+
+  /** An old-tuning game at `oldLevel` with `occupied` creatures cutting oak, serialized as that build wrote it. */
+  function oldSave(oldLevel: number, occupied: number, resourceId = 'oak-log'): { text: string; state: GameState } {
+    let s = setSkillLevel(newGame(OLD), 'woodcutting', oldLevel, OLD)
+    for (let i = 1; i < occupied; i++) s = addCreature(s, 'sproutlet', {}, OLD).state
+    for (let i = 0; i < occupied; i++) s = work(s, `creature-${i + 1}`, 'woodcutting', i, resourceId, OLD)
+    return { text: serializeSave(s), state: s }
+  }
+
+  it('a high-XP skill with three occupied slots loads cleanly', () => {
+    const { text } = oldSave(65, 3) // old level 65 had four slots open
+    const r = parseSave(text)
+    expect(r.ok).toBe(true)
+    const loaded = ok(r).state
+    expect(integrityProblems(loaded)).toEqual([])
+    expect(loaded.skills.woodcutting!.slots.filter(Boolean)).toHaveLength(3)
+  })
+
+  it('no creature disappears, and none is silently benched', () => {
+    const { text, state } = oldSave(65, 3)
+    const loaded = ok(parseSave(text)).state
+    expect(loaded.creatures.map((c) => c.id)).toEqual(state.creatures.map((c) => c.id))
+    expect(loaded.creatures.map((c) => c.assignment)).toEqual(state.creatures.map((c) => c.assignment))
+  })
+
+  it('XP is untouched: the level is re-derived from it, never the other way round', () => {
+    for (const oldLevel of [5, 20, 40, 65, 90, 99]) {
+      const { text, state } = oldSave(oldLevel, 1)
+      const loaded = ok(parseSave(text)).state
+      expect(loaded.skills.woodcutting!.xp, `old level ${oldLevel}`).toBe(state.skills.woodcutting!.xp)
+      expect(loaded.skills.woodcutting!.level).toBe(levelForXp(content.tuning.xp.skillCurve, state.skills.woodcutting!.xp, woodcutting.maxLevel))
+    }
+  })
+
+  it('a second load changes nothing (reconcile is idempotent)', () => {
+    const { text } = oldSave(65, 3)
+    const once = ok(parseSave(text)).state
+    expect(ok(parseSave(serializeSave(once))).state).toEqual(once)
+    expect(reconcile(once)).toEqual(once)
+  })
+
+  it('keeps a slot the new level no longer earns, with its creature still working it', () => {
+    // Old level 20 opened a second slot; its XP is worth less than that under the new curve.
+    const { text } = oldSave(20, 2)
+    const loaded = ok(parseSave(text)).state
+    const sk = loaded.skills.woodcutting!
+    expect(slotCount(woodcutting, sk.level)).toBeLessThan(sk.slots.length) // the case this test is about
+    expect(sk.slots.filter(Boolean)).toHaveLength(2) // grandfathered: neither slot nor creature is taken away
+    expect(integrityProblems(loaded)).toEqual([])
+
+    // And the sim still runs the grandfathered slot rather than ignoring it.
+    const { events } = step(loaded, 3000 * 10)
+    const done = events.filter((e): e is Extract<typeof e, { type: 'action-complete' }> => e.type === 'action-complete')
+    expect(done.map((e) => [e.slotIndex, e.count])).toEqual([
+      [0, 10],
+      [1, 10],
+    ])
+  })
+
+  it('a slot whose tier the new level no longer unlocks idles, and is not emptied', () => {
+    const willow = content.resourceById.get('willow-log')!
+    const { text } = oldSave(15, 1, 'willow-log') // old level 15 opened willow
+    const loaded = ok(parseSave(text)).state
+    expect(loaded.skills.woodcutting!.level).toBeLessThan(willow.requiredSkillLevel!) // the case this test is about
+    expect(loaded.skills.woodcutting!.slots[0]).toMatchObject({ creatureId: 'creature-1', resourceId: 'willow-log' })
+    const worked = step(loaded, 3_600_000).state
+    expect(worked.resources).toEqual({}) // idle, not throwing and not gathering
+    expect(worked.creatures).toHaveLength(1)
   })
 })
 

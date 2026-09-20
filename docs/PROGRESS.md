@@ -761,6 +761,43 @@ retune that silently breaks them fails `test/pacing.test.ts`.
 | Level 225 (slot 5) | 47.3 d | 40,858,428 |
 | Level 250 (cap) | **126 d, about 4.1 months** | 108,932,283 |
 
+**What happens to an existing save, checked rather than assumed.** A save holds XP, not levels, so `reconcile`
+re-derives each skill's level from its XP on load. Measured against the real old and new tuning:
+
+| Old level (slots it had) | XP | New level (slots it earns) |
+|---|---|---|
+| 5 (1) | 464 | 2 (1) |
+| 15 (1) | 2,796 | 10 (1) |
+| 20 (2) | 5,114 | 16 (1) |
+| 28 (2) | 12,108 | 28 (1) |
+| 40 (3) | 40,141 | 52 (2) |
+| 65 (4) | 444,788 | 110 (3) |
+| 90 (5) | 4,829,015 | 170 (4) |
+| 99 (5) | 11,387,930 | 192 (4) |
+
+- **Levels do not simply drop.** The two curves cross at old level 28: below it a save loses levels (old 20 becomes
+  16), at or above it a save *gains* them (old 90 becomes 170). A long-played save is not demoted.
+- **Slots always go down relative to what the save had**, because the unlock levels rose 2.5x while the XP re-levels
+  by less than that. Every save above old level 20 keeps at least one slot its new level would not earn.
+- **Nothing crashes, nothing is lost.** `reconcile` grows the slot array and never shrinks it, `integrityProblems`
+  does not check slots against the level, and `advanceSkills` walks the slots the state has. So the load is clean,
+  XP is byte-identical, no creature is dropped and no creature is benched.
+
+**Decision: grandfather the extra slots instead of benching.** The designer's fallback was to bench a creature in a
+slot beyond the new count. The existing rule is better and was kept: the player keeps the slot and keeps working, and
+loses nothing for a balance change they did not make. It cannot create a slot the player did not already have, and it
+only affects saves written before this step. Two consequences, both handled:
+- `selectNextSlotLevel` now counts from the slots that exist rather than from the level, so a grandfathered save is
+  never offered a slot it already holds (it would have said "next at level 50" next to two open slots).
+- A slot on a resource tier the new level no longer unlocks **idles**, as already documented for `runningSlot`: the
+  creature and the slot stay, nothing is gathered. Only saves that fall below a tier's level hit this (old level 15 on
+  willow becomes level 10); old level 20 on willow lands at 16 and keeps cutting.
+
+Seven new tests in `test/save.test.ts` (`a save written before the 1.8t retune`) pin all of it, against an old-tuning
+content variant pinned inside the test: a clean load with three occupied slots, no creature lost or benched, XP
+unchanged at six different levels, a second load that changes nothing, the grandfathered slot still producing, and the
+idled tier. One more in `test/selectors.test.ts` covers the next-slot label.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released

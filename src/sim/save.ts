@@ -113,6 +113,14 @@ export function integrityProblems(state: GameState, c: Content = content): strin
  * Brings a loaded state in line with today's content: skills added since the save get a fresh entry; each
  * skill's cached level is re-derived from its XP (the XP curve may have been retuned); slots grow to the
  * count that level unlocks. Never removes a slot or a creature.
+ *
+ * Slots are grandfathered on purpose. A retune can lower the level a save's XP is worth, or raise the levels
+ * the slots unlock at (step 1.8t did both), leaving a save holding more slots than its level now earns. Those
+ * slots and the creatures in them stay exactly as they are: the player keeps working, and nothing they had is
+ * taken away for a balance change they did not make. The alternative, benching the creature and dropping the
+ * slot, costs a player production for someone else's decision, so it is not done. `selectNextSlotLevel` counts
+ * from the slots that exist so the UI never offers a slot such a save already has. A slot whose resource tier
+ * the new level no longer unlocks simply idles (`runningSlot`), it is not emptied.
  */
 export function reconcile(state: GameState, c: Content = content): GameState {
   const skills: GameState['skills'] = { ...state.skills }

@@ -55,6 +55,18 @@ describe('skills', () => {
     })
   })
 
+  it('offers the next slot the player does not have, not one a grandfathered save already holds', () => {
+    // A pre-1.8t save can hold more slots than its level earns; reconcile keeps them (see sim/save.ts).
+    const unlocks = WOODCUTTING.slotUnlockLevels
+    const game = newGame()
+    const grandfathered: GameState = {
+      ...game,
+      skills: { ...game.skills, woodcutting: { ...game.skills.woodcutting!, level: 1, slots: [null, null] } },
+    }
+    expect(sel.selectSlotCount(view(grandfathered), 'woodcutting')).toBe(2)
+    expect(sel.selectNextSlotLevel(view(grandfathered), 'woodcutting')).toBe(unlocks[2]) // the third slot, not the second
+  })
+
   it('names the next slot level, and null once they are all open', () => {
     const game = newGame()
     const unlocks = WOODCUTTING.slotUnlockLevels

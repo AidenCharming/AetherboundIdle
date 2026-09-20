@@ -290,11 +290,19 @@ export function selectSkillXpToNext(s: GameStore, skillId: string): number | nul
 /** How many slots the skill has unlocked at its current level. */
 export const selectSlotCount = (s: GameStore, skillId: string): number => s.game.skills[skillId]?.slots.length ?? 0
 
-/** The level the next slot unlocks at; null once every slot is open. */
+/**
+ * The level the NEXT slot the player does not have yet unlocks at; null once every slot is open. Counted from
+ * the slots that exist, not from the level, because a save can hold more slots than its level currently earns:
+ * `reconcile` grows the slot array but never shrinks it, so a retune that raised the unlock levels leaves the
+ * slots already granted in place (see docs/PROGRESS.md, step 1.8t). Reading the level alone would offer a slot
+ * such a save already has.
+ */
 export function selectNextSlotLevel(s: GameStore, skillId: string): number | null {
   const skill = content.skillById.get(skillId)
-  const level = s.game.skills[skillId]?.level ?? 1
-  return skill?.slotUnlockLevels.find((l) => l > level) ?? null
+  const sk = s.game.skills[skillId]
+  const level = sk?.level ?? 1
+  const have = sk?.slots.length ?? 0
+  return skill?.slotUnlockLevels.slice(have).find((l) => l > level) ?? null
 }
 
 /** Whether the skill's level is high enough to gather this resource. This is what greys a tier out. */
