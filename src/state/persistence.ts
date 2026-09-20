@@ -10,6 +10,8 @@ import type { GameState } from '../types/state'
 
 export const SAVE_KEY = 'aetherbound-idle:save'
 export const brokenSaveKey = (now: number): string => `aetherbound-idle:save-broken-${now}`
+/** Where the game that an import replaced is kept, byte for byte (like the save-broken-* copies, and never touched again). */
+export const saveReplacedKey = (now: number): string => `aetherbound-idle:save-replaced-${now}`
 
 /** The slice of localStorage this uses. */
 export interface StorageLike {
@@ -113,4 +115,69 @@ export function loadGame(storage: StorageLike, now: number, freshSeed: number, c
   const caughtUp = applyOffline(parsed.state, now, c)
   const state = flushSave(storage, caughtUp.state, now).state
   return { state, events: caughtUp.events, summary: caughtUp.summary, isNewGame: false, migratedFrom: parsed.migratedFrom, notice: null }
+}
+
+// ---------- export and import (Settings, step 1.9) ----------
+
+/** The largest file an import will read: about what a browser lets localStorage hold, so a bigger one could not be kept anyway. An input guard, not a balance number. */
+export const MAX_IMPORT_BYTES = 5_000_000
+
+/** `aetherbound-idle-save-2026-09-20-101411.json`, in the player's local time. */
+export function exportFileName(now: number): string {
+  const d = new Date(now)
+  const two = (n: number): string => String(n).padStart(2, '0')
+  const date = `${d.getFullYear()}-${two(d.getMonth() + 1)}-${two(d.getDate())}`
+  return `aetherbound-idle-save-${date}-${two(d.getHours())}${two(d.getMinutes())}${two(d.getSeconds())}.json`
+}
+
+export type ImportCheck =
+  | { ok: true; creatures: number; /** When the file was saved (its `lastSeen`). */ savedAt: number; migratedFrom: number | null }
+  | { ok: false; reason: string }
+
+const FAILURE_TEXT: Record<LoadFailure, string> = {
+  corrupt: 'That file is not a readable Aetherbound save',
+  invalid: 'That file is not a valid Aetherbound save',
+  'too-new': 'That save was written by a newer version of the game',
+  'migration-failed': 'That save is too old to be upgraded',
+}
+
+/**
+ * Reads an import file with the real `parseSave` (JSON, version, migrations, strict schema, integrity, reconcile) and
+ * changes nothing: no storage, no state. A file that fails is rejected with the reason and is NOT quarantined the way a
+ * broken stored save is, because nothing was replaced and the player still has the file.
+ */
+export function checkImport(text: string, c: Content = content): ImportCheck {
+  if (text.length > MAX_IMPORT_BYTES) return { ok: false, reason: `That file is too large to be a save (over ${MAX_IMPORT_BYTES / 1_000_000} MB).` }
+  const parsed = parseSave(text, c)
+  if (!parsed.ok) return { ok: false, reason: `${FAILURE_TEXT[parsed.reason]}: ${parsed.message}.` }
+  return { ok: true, creatures: parsed.state.creatures.length, savedAt: parsed.state.lastSeen, migratedFrom: parsed.migratedFrom }
+}
+
+/**
+ * Makes `text` the save: first copies the current save byte for byte to `save-replaced-<now>`, then writes the file's
+ * text as the save. The caller has already flushed, so what is copied is the game as it is now. If either write fails
+ * the player is told and the old save is still the save.
+ *
+ * It does not load anything. The page reloads and boots through `loadGame`, which parses, migrates, reconciles and
+ * applies offline progress to the file like any stored save (there is no second loader).
+ */
+export function replaceSave(storage: StorageLike, text: string, now: number): { ok: true } | { ok: false; reason: string } {
+  const backupKey = saveReplacedKey(now)
+  try {
+    const current = storage.getItem(SAVE_KEY)
+    if (current !== null) storage.setItem(backupKey, current)
+  } catch {
+    return { ok: false, reason: 'Could not keep a backup copy of your current game (the storage is full or blocked), so nothing was changed.' }
+  }
+  try {
+    storage.setItem(SAVE_KEY, text)
+  } catch {
+    try {
+      storage.removeItem(backupKey)
+    } catch {
+      // A leftover copy of a save that is still the save is harmless.
+    }
+    return { ok: false, reason: 'Could not write the imported save (the storage is full or blocked), so nothing was changed.' }
+  }
+  return { ok: true }
 }

@@ -19,6 +19,8 @@ import type { GameStore } from './store'
 // The roster's pure filter and sort live in roster.ts (node-testable, no React). The UI reads them from here so that
 // selectors.ts stays its one door into the state layer.
 export * from './roster'
+// The biggest save file an import will read, so the file picker can refuse a wrong pick before reading it.
+export { MAX_IMPORT_BYTES } from './persistence'
 
 // ---------- stable references ----------
 

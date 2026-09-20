@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
 import { selectSetting, type SettingKey } from '../../state/selectors'
+import { SaveFile } from '../components/SaveFile'
 
 function Toggle({ setting, label, children }: { setting: SettingKey; label: string; children: ReactNode }) {
   const value = useGameStore((s) => selectSetting(s, setting))
@@ -16,7 +17,7 @@ function Toggle({ setting, label, children }: { setting: SettingKey; label: stri
   )
 }
 
-/** The player's own switches. Both live in the save, so they survive a reload (plan.md section 5). */
+/** The player's own switches (both live in the save, so they survive a reload: plan.md section 5), and the save file export and import. */
 export function Settings() {
   return (
     <section className="panel" aria-label="Settings">
@@ -27,6 +28,7 @@ export function Settings() {
       <Toggle setting="devPanelEnabled" label="Dev panel">
         Adds a Dev tab for testing the game. Off by default.
       </Toggle>
+      <SaveFile />
     </section>
   )
 }

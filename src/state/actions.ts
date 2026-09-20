@@ -4,11 +4,13 @@
 //
 // Stepping to now first matters: the tick lands every `ui.tickMs`, so without it the last few dozen milliseconds
 // would be credited to whatever the slot looks like after the change instead of before it.
+import { content, type Content } from '../data'
 import { addAether, addGold, addResource, grantCreature, setSkillLevel, type DevResult, type GrantSpec } from '../sim/dev'
+import { serializeSave } from '../sim/save'
 import { assignCreature, setSlotResource, unassignCreature } from '../sim/skills'
 import type { GameState, Settings } from '../types/state'
 import type { TickDriver } from './driver'
-import { commitRoll, SAVE_KEY, type StorageLike } from './persistence'
+import { checkImport, commitRoll, exportFileName, replaceSave, SAVE_KEY, type ImportCheck, type StorageLike } from './persistence'
 import type { GameStoreApi } from './store'
 
 export type ActionResult = { ok: true } | { ok: false; reason: string }
@@ -16,7 +18,13 @@ export type ActionResult = { ok: true } | { ok: false; reason: string }
 /** A dev action's outcome: what it did in words, or why it refused. Neither case throws. */
 export type DevActionResult = { ok: true; message: string } | { ok: false; reason: string }
 
-export type { GrantSpec }
+export type { GrantSpec, ImportCheck }
+
+/** A save file for the player to keep: what `sim/save.ts` writes, and the name to offer it under. */
+export interface ExportedSave {
+  fileName: string
+  text: string
+}
 
 export interface Actions {
   /** Puts a creature in a slot on a resource. A creature already working elsewhere is moved. */
@@ -43,6 +51,21 @@ export interface Actions {
    * the write failed (storage full or blocked); the roll still happened in memory.
    */
   commitRoll<R>(roll: (state: GameState) => { state: GameState; result: R }): { result: R; saved: boolean }
+
+  // ---- save files (Settings, step 1.9) ----
+
+  /** Steps to now and saves, then returns exactly the text just written (`serializeSave`), with a file name carrying the game and the time. */
+  exportSave(): ExportedSave
+  /** Reads a save file the way a load would and says what is in it, or why it is refused. Changes nothing at all. */
+  inspectSave(text: string): ImportCheck
+  /**
+   * Replaces the current game with a save file. A file that fails to parse or validate is refused with the reason and
+   * nothing changes (it is not quarantined). Otherwise: save the current game, copy that save byte for byte to
+   * `save-replaced-<now>`, write the file's text as the save, RETIRE the driver, and reload, so the page boots through
+   * `loadGame` (parse, migrations, reconcile, `applyOffline`, welcome-back) like any stored save. Retiring is what stops
+   * this tab's own pagehide / beforeunload flush from writing the old game back over the import (the reset trap).
+   */
+  importSave(text: string): ActionResult
 
   // ---- the dev panel (plan 7.1, step 1.8b). Each validates, never throws, saves at once, and leaves the RNG alone. ----
 
@@ -72,6 +95,7 @@ export function createActions(
   driver: Pick<TickDriver, 'stepToNow' | 'flush' | 'fastForwardHours' | 'retire' | 'retired'>,
   storage: StorageLike,
   reload: () => void = () => {},
+  c: Content = content,
 ): Actions {
   const game = (): GameState => store.getState().game
   const commit = (state: GameState): void => store.setState({ game: state })
@@ -145,6 +169,30 @@ export function createActions(
       const committed = commitRoll(rollStorage, game(), roll, now)
       commit(committed.state)
       return { result: committed.result, saved: committed.saved }
+    },
+
+    exportSave() {
+      const now = driver.stepToNow()
+      driver.flush()
+      return { fileName: exportFileName(now), text: serializeSave(game()) }
+    },
+
+    inspectSave: (text) => checkImport(text, c),
+
+    importSave(text) {
+      // Validate first: a bad file must not cost the player anything, not even a flush.
+      const checked = checkImport(text, c)
+      if (!checked.ok) return checked
+      // Save now, so the backup is the game as it is at this moment and not up to one autosave old.
+      const now = driver.stepToNow()
+      driver.flush()
+      const replaced = replaceSave(storage, text, now)
+      if (!replaced.ok) return replaced
+      // Retire in the same synchronous block as the write, before anything else can run: after this nothing this
+      // driver does may write the save, or the pagehide flush of the reload below would put the old game back.
+      driver.retire()
+      reload()
+      return { ok: true }
     },
 
     grantCreature: (spec) => dev((state) => grantCreature(state, spec)),

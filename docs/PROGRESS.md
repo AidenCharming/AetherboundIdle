@@ -3,8 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9 is in progress (session 2026-09-20). Checkpoint A (the wrapper runs the built game, smoke test) is done and committed. Next: checkpoint B (Settings save export and
-import), then C (electron-builder: installer + portable exe, placeholder icon, packaged smoke test, manual checklist).** The paragraph below is the original brief.
+**Step 1.9 is in progress (session 2026-09-20). Checkpoints A (the wrapper runs the built game, smoke test) and B (Settings save export and
+import) are done and committed. Next: checkpoint C (electron-builder: installer + portable exe, placeholder icon, packaged smoke test, manual checklist).** The paragraph below is the original brief.
 
 **Phase 1 is complete and playable (step 1.8b done, 2026-09-20). Next is step 1.9: the desktop wrapper, as written in "Desktop packaging"
 below. The designer confirmed Electron (2026-09-19).** Start there and follow that section: an Electron main process in `electron/` (never in
@@ -1060,6 +1060,50 @@ warning, not an error, about the missing Content-Security-Policy in a dev run) a
 
 **A note for a fresh machine.** npm 11 skips dependency install scripts here, so Electron's 100 MB binary is downloaded the first time it is required (`npm run electron:*`), not by
 `npm install`.
+
+### 2026-09-20, step 1.9 checkpoint B: save export and import (Settings tab)
+
+New: `src/ui/components/SaveFile.tsx`, `test/savefile.test.ts` (35 tests). Changed: `state/persistence.ts` (`saveReplacedKey`, `exportFileName`, `checkImport`, `replaceSave`, `MAX_IMPORT_BYTES`),
+`state/actions.ts` (`exportSave`, `inspectSave`, `importSave`, and a trailing `c: Content = content` argument to `createActions` like every other function that reads content), `state/selectors.ts`
+(re-exports `MAX_IMPORT_BYTES`), `ui/screens/Settings.tsx`. `loadGame`, the driver and the save format are unchanged. 658 tests pass (623 before) and `npm run build` is clean. No new dependency, no new tuning number,
+no migration.
+
+**Export.** A button on Settings. `actions.exportSave()` steps to now, flushes like every save, and returns `{ fileName, text }` where `text` is `serializeSave(game())`: the text `sim/save.ts` just wrote. The
+file is `aetherbound-idle-save-YYYY-MM-DD-HHMMSS.json` in local time. The page turns it into a Blob download (in the desktop app that opens the native Save dialog; no IPC). Tested: the exported text equals the stored
+save byte for byte, holds the minute of work that no tick had seen, and is a real save (strict-schema parse, RNG state kept).
+
+**Import goes through the normal load, not a copy of it.** The Settings button picks a file and the page calls `actions.inspectSave(text)` (the real `parseSave`: JSON, version, migrations, strict schema, integrity, reconcile;
+it changes nothing) so a bad file is refused at once with the reason. A good file shows a confirmation naming the file, its creature count and when it was saved; only "Yes, replace my game" acts (same two-step as Reset, focus on
+Cancel, Escape cancels). `actions.importSave(text)` then: validates again, steps to now and **flushes** (so the backup is the game as it is right now, not up to 15 s old), copies the stored save **byte for byte** to
+`aetherbound-idle:save-replaced-<now>`, writes the file's own text as the save, **retires the driver**, and reloads. The reload boots through `loadGame`: `parseSave`, migrations, `reconcile`, `applyOffline` (a stale file
+grants its offline time under the 12 h cap) and the welcome-back summary. There is no second loader, so nothing can drift. Tested against `applyOffline` directly: the booted state equals `applyOffline(parsed file)` exactly.
+
+**Decision: reload, not a live swap.** A live swap would have needed a new driver method to re-anchor the clock and a second place that queues the summary. Reload reuses the reset pattern (`retire()` then reload) and the
+whole load path. The cost is one page reload (about a second).
+
+**A bad file is refused, not quarantined.** Nothing was replaced and the player still has the file, so `save-broken-*` is not written. Refused with a reason and *nothing* changed (not even a flush, no key written, the state
+object identical): empty, not JSON, truncated, no version, a bad version, no state, an array, a schema violation (`gold: -5`), an unknown field, an unknown species, a file newer than this build, and a file over 5 MB
+(`MAX_IMPORT_BYTES`, about what localStorage holds; an input guard, not a balance number). If the backup or the write cannot be stored, the player is told and the old save is still the save (the copy is removed).
+
+**The trap and the write order.** `importSave` writes the file and calls `retire()` in the same synchronous block, before `reload()`; nothing can run between. After it, `pagehide`, `beforeunload`, `visibilitychange`,
+the autosave, the tick and every flushing action (`setSetting`, `addGold`, `fastForwardHours`, `exportSave`, `commitRoll`) leave the save as the file, byte for byte. Tested, including a `reload()` that runs its unload
+handlers synchronously as a real page does. **Mutation-checked** (each restored afterwards): removing `retire()` fails 3 tests, retiring after `reload()` fails 1 (the synchronous-unload one), skipping the backup copy fails 2,
+skipping the flush before the backup fails 1 (stale backup), and skipping validation fails 16. The two that matter most are the first (old game written back over the import) and the backup (nothing replaced without a copy).
+
+**Verified in a real browser** (Vite dev server, Chromium pane): export handed over a Blob equal to the stored save with the right name; garbage, a too-new file and a schema violation each showed their reason with no
+dialog and no key changed; Cancel and Escape left everything untouched; a confirmed import of a file that was 3 h stale (Sproutlet cutting, 777 gold) logged exactly three writes on the old page (flush, backup, file) and
+**none** from the real pagehide/beforeunload that followed, then booted into the imported game (gold 777) with the welcome-back dialog ("away for 3 h", 3,601 actions, +36,010 XP, level 1 to 49) and the old game (gold 0,
+74,367 oak) under `save-replaced-<time>`. 375 px: no horizontal overflow, every button at least 44 px, a long file name wraps.
+
+**Not verified:** the native Save dialog and file picker inside the Electron window (only the packaged-app checklist covers them); a file that is 12 h or more stale in the browser (node covers the cap); Firefox and
+Safari; keyboard-only use of the two-step confirmation beyond Escape and the initial focus; and there is still no DOM test environment, so `SaveFile.tsx` is covered by the browser run above and the action tests under it.
+
+**Decisions and deviations (all reversible):**
+1. The confirmation shows the file's creature count and save time, which the brief did not ask for, so the player can tell an old backup from a new one before replacing the game. It costs one small read of the file.
+2. There is no "restore backup" button: the copy exists for a person (or a later step) to recover by hand. The confirmation says so in words.
+3. `save-replaced-*` copies are never cleaned up, like `save-broken-*` (each is one save's worth of localStorage; only matters with many imports).
+4. The section reuses the Dev tab's `.dev-control`, `.dev-row` and `.dev-confirm` styles rather than adding near-identical ones.
+5. Vite's hot reload logged one stale "bootGame() must run" error in a tab that was open while I edited; a clean load in a new tab logs nothing.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
