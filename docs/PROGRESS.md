@@ -3,18 +3,23 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.8b, in three checkpoints. A (the dev panel) and B (bench, Aether per minute, the Nexus tab) are DONE and
-committed; C (polish pass and the Phase 1 acceptance run) is next.** 1.8a and the 1.8t tuning pass are done. Starting points:
-- ~~**Dev panel**~~ **Done in checkpoint A** (see "1.8b checkpoint A" below): grant creature (picked by hand, nothing rolled),
-  add resources / Aether / gold, set skill level, reset save. To test with a varied roster, grant creatures from the Dev tab.
-- ~~**Bench and Aether per minute**~~ **Done in checkpoint B** (see "1.8b checkpoint B" below): the top bar shows Aether per
-  minute (always, `0/min` when empty) and the Nexus tab lists the benched creatures with their emission and the totals.
-- **Polish pass**: whatever 1.6/1.7/1.8a left rough. The known list is in the "Not verified" notes of each checkpoint.
-- Same UI rules throughout: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
-  selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
-- **After 1.8t, skills run to level 250 on a 250 / 1.04 curve and the work slots open at 1 / 50 / 100 / 165 / 225.**
-  The Dev tab's **reset save** is the cheap way to get a fresh save, and **set skill level** (designer-approved) reaches
-  the upper levels that fast-forward's 12 h cap cannot.
+**Phase 1 is complete and playable (step 1.8b done, 2026-09-20). Next is step 1.9: the desktop wrapper, as written in "Desktop packaging"
+below. The designer confirmed Electron (2026-09-19).** Start there and follow that section: an Electron main process in `electron/` (never in
+`src/`), an `npm run` script that opens the built game in a window, an installer or portable `.exe` build script, an app name and a placeholder
+icon, `base: './'` in `vite.config.ts` (and check the browser build still works), file-based save export and import as a Settings button, the
+single-instance lock, a check that a minimized window's throttled timers lose nothing, and the new commands in CLAUDE.md. Verify it in the
+packaged app: launch, play a minute, close, reopen after a few minutes, and confirm the welcome-back summary and that progress survived.
+
+Things a fresh session should know before starting:
+- **Nothing in `src/` should change for the wrapper** except what the section already lists (`base`, and the Settings export/import that needs a
+  state-layer action). Keep the UI rules: it reads through `selectors.ts` and the two hooks; no hex colors or balance numbers in `ui/`.
+- **The project path has a space** (`Aetherbound Idle`) and this machine is Windows. `npm` from a path with a space did not work under the
+  preview launcher (see the 1.6 tooling note: `.claude/launch.json` starts Vite through `node` directly), and the dev server has twice served a stale
+  module here (see the 1.8b checkpoint C tooling note). Expect the same care with electron-builder paths.
+- **Saves live in the wrapper's own localStorage.** `SAVE_KEY` is `aetherbound-idle:save`; a reset wipes only that key. Whether the exported file
+  should ever become the primary save is a separate designer decision (see "Desktop packaging").
+- **Open for the designer at the start of Phase 2** (not 1.9): the pool-trait roll, and whether a dev grant counts toward the collection (see "Open
+  questions").
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -26,7 +31,7 @@ committed; C (polish pass and the Phase 1 acceptance run) is next.** 1.8a and th
 - [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
 - [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
 - [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
-- [ ] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, reset save), bench and Aether-per-minute display, polish pass. Phase 1 playable.
+- [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [ ] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). Do this right after 1.8b so the designer can double-click the game from the first playable version on.
 
 ### Desktop packaging (planned step 1.9, designer's request)
@@ -53,7 +58,7 @@ dependency.
   that progress and the save survived.
 
 ## Phase 2: Breeding and hatching
-Not started. Break into steps at the start of the phase.
+Not started. Break into steps at the start of the phase. **First the designer designs the pool-trait roll** (see "Open questions").
 
 ## Phase 3: Expeditions and capture
 Not started.
@@ -899,7 +904,7 @@ to `createActions`. **Mutation-checked:** dropping `retire()` fails 4 tests, dro
 - 375 px: no horizontal overflow on the Dev tab and every button, select and text input at least 44 px. (The species select now takes its own row so
   "Brambletrundle (Verdant)" is not cut.)
 
-**Not verified:** a real phone, Safari or Firefox; Escape on the reset question; keyboard-only use of the panel; the reset in a browser that blocks localStorage
+**Not verified:** a real phone, Safari or Firefox; keyboard-only use of the panel (Escape on the reset question was checked in checkpoint C); the reset in a browser that blocks localStorage
 (node covers the throw); and there is still no DOM test environment, so the five new components are covered by the browser run and the action tests under them.
 
 **Decisions and deviations (all reversible):**
@@ -957,6 +962,62 @@ cost with a very large bench (the roster's 121-creature test covers the same cac
 **For whoever tests by hand.** After several quick file swaps (my mutation checks) the Vite dev server kept serving a stale transform of `App.tsx` under its HMR-stamped URL while a fresh query string returned the
 new code, so the pane showed the old app. `preview_stop` and `preview_start` fixed it; a page reload did not.
 
+### 2026-09-20, step 1.8b checkpoint C: polish pass and the Phase 1 acceptance run (Phase 1 complete)
+
+New: `ui/tabKeys.ts`, `test/tabkeys.test.ts` (5 tests). Changed: `ui/components/{TabBar,WelcomeBack,SlotCard}.tsx`, `ui/theme.css`. 615 tests pass and `npm run build` is clean. No new dependency, no new
+tuning number, no new system. The polish is bounded to the documented rough spots plus what the acceptance run turned up.
+
+**What changed.**
+- **Tab bar keyboard support** (the ARIA tabs pattern). Only the selected tab is in the Tab order (a roving tabindex, `aria-orientation="horizontal"`); Right and Left step and wrap, Home and End jump to the ends,
+  and the new tab is selected and focused. Arrow selects at once ("automatic activation"): a screen costs nothing to show and the tick driver runs whichever is open. The key logic is a pure `nextTabIndex`
+  (`ui/tabKeys.ts`), tested for wrapping, both ends, one tab, keys it must leave alone and a focus that is not a tab.
+- **Welcome-back dialog `cancel`.** `onCancel` calls `preventDefault` and then `dismissWelcomeBack`, so a browser-level cancel that is not Escape (the Android back button, a close request) cannot close the dialog
+  and leave the summary pending. Escape and Close are unchanged. It is React's `onCancel` prop, not a native listener.
+- **Reduced motion.** The progress bar's smoothing was already switched off under `prefers-reduced-motion: reduce` (`.bar-fill { transition: none }`); that block now says it is the game's only motion.
+  **The rarity glows are static box-shadows with no animation or transition, so there was nothing in them to switch off**; I left them and did not invent a toned-down variant. Anything animated later belongs in that block.
+- **Visible focus.** The one 2 px ring used to be on buttons only. It now covers `select`, `input` and `summary` too. A control that fills a clipping container (a roster card, the wide-screen tab bar, both
+  `overflow: hidden`) would lose an outward ring, so those two draw it inside (`outline-offset: -4px`).
+- **Empty state.** An empty slot when none of your creatures can work the skill said only "Slot N: empty". It now says "None of your creatures can work Woodcutting yet." Not reachable with the Phase 1 starter, but
+  it will be once creatures can leave the roster.
+
+**Phase 1 acceptance run, in the real browser (Vite dev server, Chromium pane), from a fresh save made with the new Reset:**
+| Item | Result |
+|---|---|
+| Fresh save | After Reset (Escape on the question cancelled it first, then the two-step wipe): one benched Sproutlet, 0 gold, 0 Aether, `1/min` in the top bar, no resources; Woodcutting `0 / 250 XP to level 2`, `Slots 1 / 5 · next at level 50`. |
+| First level-up about 75 s | Assigned on the Skills screen: **level 2 at 75.10 s** by the page clock (100 ms poll, and the pane was hidden, so read it as within about a second). At 64.7 s it read `210 / 250 XP`, level 1. |
+| Woodcutting works and levels | 21 actions at 64.7 s (oak 23 with Overgrowth extras, 1 Verdant Seedcache), then level 2 with `10 / 260 XP to level 3`. The top bar showed `0/min` while the only creature worked. |
+| Set skill level: slots | 49 gives 1 slot; **50 gives 2** (slot 1 kept working); 99 gives 2; **100 gives 3 at 297,267 XP**; 165 gives 4 at 3,878,365; 225 gives 5 at 40,858,428. Every XP figure equals the 1.8t pacing table. Asking for 60 at level 100 was refused ("Woodcutting is already level 100; this only raises.") and changed nothing. |
+| Levels above 99 at 375 px | Level 249: `40 / 4,189,943 XP to level 250`, `Slots 5 / 5`, five slot cards, no horizontal overflow, nothing wider than the viewport. |
+| Varied roster from the Dev panel | Nine creatures: Quakemaw (Telluric, Steady, L20), Dewdrop (Aqueous, Faint, L10), Ashwood (Verdant/Pyric hybrid, Gleaming, L60, Form 3), Eclipsa (Void, Brilliant, L35, Form 2), Mosscoil (Verdant/Voltaic hybrid, Radiant, L30), Petalsprocket (Resplendent, L50), Emberfang (Luminous, L45, shiny), Voltfluff (Zenith, L99, Form 3, shiny), plus the starter. |
+| Assign and unassign from both screens | Skills: Bloomwheel (Petalsprocket) into slot 2. Roster: Hearthtrunk (Ashwood) into slot 3. Roster Unassign of Hearthtrunk, then Skills Unassign of Bloomwheel. Each change showed on the other screen at once (badge `Woodcutting, slot 2` and so on) and the bench rate moved by that creature's emission (510, 382, 374, 382, 510 per minute). |
+| Bench emission | 510/min with eight benched creatures (4 + 2 + 8 + 64 + 32 + 128 + 16 + 256); see checkpoint B for online against fast-forward. |
+| Fast-forward and the 12 h cap | 100 h gave "away for 4 d 4 h", "Offline progress is capped at 12 h, so only the first 12 h earned anything", **Aether +367,200 (510 x 720)**, 14,400 actions, +144,000 XP. The dialog was 337 px wide with no overflow, modal, focus on Close. A `cancel` event on it was refused and dismissed the summary, with focus back on the button that opened it. |
+| Reload keeps everything | All nine creatures (species, rarity, level, form, shiny), the slot, the level and the Dev setting were identical after a reload. The gap from the flush to the boot was 20.17 s (from the saved `lastSeen` values) and Aether rose by exactly 171 = 510 x 20.17 / 60: nothing lost, nothing double-counted. |
+| Reset really resets | Done at the start of this run and twice in checkpoint A (with a write log proving no write after the wipe); a second reload stayed reset. |
+| 375 px, every screen | One pass over Skills, Roster (filters open, and a card opened), Nexus, Settings and Dev: no horizontal overflow, nothing wider than the viewport and no button, select, input, summary or tab under 44 px. Top bar with 13-digit Gold, Aether and Oak Log wraps to rows with no overflow. |
+| Desktop width (1024 px) | No overflow; the tab bar sits in the page (static) and its focus ring is visible inside it. |
+| Keyboard | Tab bar: Right moved Skills to Roster, End went to Dev, Right wrapped to Skills, Left wrapped to Dev, Home returned, Tab left the bar. Focus rings measured as a 2 px solid outline for a button, select, text input, checkbox, summary and tab (inset on the tab and the card). Escape cancels the Reset question. |
+
+**Not verified:** a real phone, Safari or Firefox (Chromium only; the dialog and `color-mix` are the things most likely to differ); **the browser's own `cancel`** (I dispatched the event by hand, so the wiring is proved
+but not that a real Android back press raises it); **reduced motion switched on** (the rule is present and parsed in the browser, and nothing else animates, but the pane cannot emulate the OS setting);
+`visibilitychange` catch-up in a genuinely backgrounded tab (only the node test covers it; the pane reported itself hidden while I timed things, and the game's real-time accounting was right regardless);
+screen-reader output (the top-bar rate label, the tablist, the dialog); the level 250 "Max level" line in this run (checked in 1.8t); and there is still no DOM test environment, so every component is covered by
+these browser runs and the selector and action tests under them.
+
+**Deliberately not built (documented rough spots, none of them needed to call Phase 1 done):**
+1. The roster filter bar opens by default from `matchMedia` read once at mount; resizing across 768 px does not re-decide it. Listening to it would override a player's own open or close, so it stays.
+2. The progress bar has no automated test (no DOM environment; adding jsdom is a new dependency and the designer's call).
+3. The empty-slot line repeats on each empty slot. Fine at one to five slots; a single line per skill would be tidier once more skills work.
+4. The roster card does not show bench emission (checkpoint B decision 2).
+5. Reset turns the Dev panel off (checkpoint A decision 4).
+6. Two tabs on one save still fight each other (already under "Deferred").
+
+**Decisions and deviations (all reversible):** the tab bar selects on arrow; `onCancel` rather than a native listener; the rarity glows are left static; the focus ring is inset where a container clips; the empty-slot line is new copy.
+
+**A tooling note for whoever tests by hand.** The Vite dev server on this machine (a path with a space, Windows) twice served a stale transform of a file I had just changed (once after several quick file swaps, once after a single edit): a fresh
+query string returned the new code while the page's HMR-stamped URL returned the old. Reloading does not help; `preview_stop` and `preview_start` does. And the browser tool's `form_input` on a React checkbox does not
+register (use a real click); its 45 s limit means a long wait has to be split into a watcher plus a later read.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
@@ -967,9 +1028,8 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Two tabs or windows on the same save** (found in 1.8a). Each copy autosaves from its own state and they overwrite each other,
   so progress is lost. Not in the design. The `.exe` build (step 1.9) gets a single-instance lock; the browser build would need a
   cross-tab lock or an "open elsewhere" notice. Designer to decide whether the browser build needs one.
-- **Native `<dialog>` cancel path** (found in the 1.8a review): the welcome-back dialog handles Escape itself, but a browser-level
-  cancel (for example the Android back button) fires a `cancel` event that nothing handles, which would close the dialog and leave the
-  summary pending. Handle `cancel` (preventDefault, then dismiss) in the 1.8b polish pass, and re-check the dialog in Firefox and Safari.
+- ~~**Native `<dialog>` cancel path**~~ **Done in 1.8b checkpoint C** (`onCancel` refuses the browser's close and dismisses the summary). Still open: re-check the
+  dialog in Firefox and Safari, and with a real Android back press (the event was only dispatched by hand).
 
 ## Open questions for the designer
 

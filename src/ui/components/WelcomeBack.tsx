@@ -83,7 +83,8 @@ function Body({ view }: { view: WelcomeBackView }) {
  * It is a native `<dialog>` opened with `showModal()`, which is what makes it accessible without hand-rolling any of
  * it: an implicit `role="dialog"` with `aria-modal`, focus moved inside and restored to where it was on close, the
  * rest of the page inert, and Escape closing it. Closing however it happens runs one handler, so the summary is
- * cleared exactly once.
+ * cleared exactly once. Escape and the Close button do it directly, and a browser-level `cancel` (which is not Escape)
+ * is caught and does the same.
  */
 export function WelcomeBack() {
   const view = useGameStore(selectWelcomeBack)
@@ -127,6 +128,13 @@ export function WelcomeBack() {
       // preventDefault keeps the browser's own close watcher out of it, so the one path above is the only one.
       onKeyDown={(e) => {
         if (e.key !== 'Escape') return
+        e.preventDefault()
+        actions.dismissWelcomeBack()
+      }}
+      // A browser-level cancel that is not the Escape key (the Android back button, a close request) fires `cancel`,
+      // and left alone it would close the dialog and leave the summary pending. Refuse the browser's close and dismiss
+      // through the one path instead. (Where the browser closes it anyway, the summary is already gone.)
+      onCancel={(e) => {
         e.preventDefault()
         actions.dismissWelcomeBack()
       }}

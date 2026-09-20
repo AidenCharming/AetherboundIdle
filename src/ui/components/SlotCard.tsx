@@ -11,6 +11,7 @@ import {
   selectSlotCreatureId,
   selectSlotProgress,
   selectSlotResourceId,
+  skillInfo,
 } from '../../state/selectors'
 import { cssVars, formatSeconds } from '../format'
 import { ProgressBar } from './ProgressBar'
@@ -127,6 +128,10 @@ export function SlotCard({ skillId, slotIndex }: Slot) {
           <Tier key={id} skillId={skillId} resourceId={id} selected={id === selected} onPick={pick} />
         ))}
       </fieldset>
+
+      {candidates.length === 0 && !creatureId && (
+        <p className="small muted">None of your creatures can work {skillInfo(skillId).name} yet.</p>
+      )}
 
       {candidates.length > 0 && (
         <fieldset className="assign">

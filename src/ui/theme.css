@@ -51,9 +51,20 @@ button:hover:not(:disabled) {
   border-color: var(--muted);
 }
 
-button:focus-visible {
+/* One visible focus ring for everything a keyboard can reach, not only buttons. */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+summary:focus-visible {
   outline: 2px solid var(--text);
   outline-offset: 2px;
+}
+
+/* A control that fills a container that clips (a card, the wide-screen tab bar) would lose an outward ring, so its ring
+   is drawn inside it instead. */
+.rcard-toggle:focus-visible,
+.tabbar button:focus-visible {
+  outline-offset: -4px;
 }
 
 button:disabled {
@@ -272,6 +283,9 @@ button:disabled {
   border-radius: 4px;
 }
 
+/* Reduced motion: the bar jumps to each value instead of gliding between them. This is the only motion in the game:
+   the rarity glows on the cards are static box-shadows, with no animation or transition, so there is nothing in them to
+   switch off. Anything animated added later belongs in this block. */
 @media (prefers-reduced-motion: reduce) {
   .bar-fill {
     transition: none;
