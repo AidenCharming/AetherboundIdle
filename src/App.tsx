@@ -1,56 +1,63 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useGameStore } from './state/runtime'
-import { DEFAULT_SORT, NO_FILTER, selectDevPanelEnabled, type RosterFilter, type RosterSort } from './state/selectors'
+import { DEFAULT_SORT, NO_FILTER, resolvePage, selectNav, skillIdOfPage, type PageId, type RosterFilter, type RosterSort } from './state/selectors'
+import { Header } from './ui/components/Header'
 import { NoticeBanner } from './ui/components/NoticeBanner'
-import { TabBar, type Tab } from './ui/components/TabBar'
-import { TopBar } from './ui/components/TopBar'
+import { Sidebar } from './ui/components/Sidebar'
 import { WelcomeBack } from './ui/components/WelcomeBack'
 import { DevPanel } from './ui/screens/DevPanel'
 import { Nexus } from './ui/screens/Nexus'
 import { Roster } from './ui/screens/Roster'
 import { Settings } from './ui/screens/Settings'
-import { Skills } from './ui/screens/Skills'
+import { SkillPage } from './ui/screens/SkillPage'
+import { useMediaQuery } from './ui/useMediaQuery'
 import './ui/theme.css'
 
-type ScreenId = 'skills' | 'roster' | 'nexus' | 'settings' | 'dev'
+// The width from which the sidebar is a fixed column instead of a drawer. It is the only place the breakpoint is written
+// for the shell: the layout CSS follows the `data-drawer` attribute this decides, so CSS and script cannot disagree.
+const DESKTOP = '(min-width: 768px)'
 
-const TABS: readonly Tab<ScreenId>[] = [
-  { id: 'skills', label: 'Skills' },
-  { id: 'roster', label: 'Roster' },
-  { id: 'nexus', label: 'Nexus' },
-  { id: 'settings', label: 'Settings' },
-]
-
-const DEV_TAB: Tab<ScreenId> = { id: 'dev', label: 'Dev' }
-const PANEL_ID = 'screen'
-
-// The layout shell and the screen switch. Which screen is open is plain UI state (no router, and not in the save).
-// The tick driver runs whichever screen is showing, so nothing pauses while you look at the roster.
+// The layout shell and the page switch. Which page is open is plain UI state (no router, and not in the save). The tick
+// driver runs whichever page is showing, so nothing pauses while you look at the roster.
 export function App() {
-  const [chosen, setChosen] = useState<ScreenId>('skills')
-  // The roster's filter and sort live here, not in the Roster, so a trip to the Skills screen and back keeps them.
+  const nav = useGameStore(selectNav)
+  const [chosen, setChosen] = useState<PageId | null>(null)
+  const page = resolvePage(nav, chosen)
+  // The roster's filter and sort live here, not in the Roster, so a trip to another page and back keeps them.
   // Still UI-local: none of it is in the game state or the save.
   const [filter, setFilter] = useState<RosterFilter>(NO_FILTER)
   const [sort, setSort] = useState<RosterSort>(DEFAULT_SORT)
 
-  // The Dev tab exists only while the setting is on, so switching the setting off while standing on it has to send
-  // the player somewhere real rather than leave an empty panel.
-  const devEnabled = useGameStore(selectDevPanelEnabled)
-  const tabs = devEnabled ? [...TABS, DEV_TAB] : TABS
-  const screen = tabs.some((t) => t.id === chosen) ? chosen : 'settings'
+  const drawer = !useMediaQuery(DESKTOP)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const menuRef = useRef<HTMLButtonElement>(null)
+  // Widening the window while the drawer is open makes it a column again, so it must not stay "open".
+  useEffect(() => {
+    if (!drawer) setDrawerOpen(false)
+  }, [drawer])
+  const modal = drawer && drawerOpen
 
+  const select = (id: PageId): void => {
+    setChosen(id)
+    setDrawerOpen(false)
+  }
+
+  const skillId = skillIdOfPage(page)
   return (
-    <div className="app">
-      <TopBar />
-      <NoticeBanner />
-      <TabBar tabs={tabs} current={screen} onSelect={setChosen} panelId={PANEL_ID} />
-      <main id={PANEL_ID} role="tabpanel" aria-labelledby={`tab-${screen}`} style={{ display: 'contents' }}>
-        {screen === 'skills' && <Skills />}
-        {screen === 'roster' && <Roster filter={filter} sort={sort} onFilter={setFilter} onSort={setSort} />}
-        {screen === 'nexus' && <Nexus />}
-        {screen === 'settings' && <Settings />}
-        {screen === 'dev' && <DevPanel />}
-      </main>
+    <div className="shell" data-drawer={drawer} data-modal={modal}>
+      <Sidebar nav={nav} page={page} onSelect={select} drawer={drawer} open={drawerOpen} onClose={() => setDrawerOpen(false)} returnFocus={menuRef} />
+      {/* While the drawer is open, everything behind it is inert: no focus, no clicks, and hidden from screen readers. */}
+      <div className="main-col" inert={modal}>
+        <Header drawer={drawer} drawerOpen={drawerOpen} onMenu={() => setDrawerOpen(true)} menuRef={menuRef} />
+        <NoticeBanner />
+        <main id="main" className="content">
+          {skillId && <SkillPage key={skillId} skillId={skillId} />}
+          {page === 'roster' && <Roster filter={filter} sort={sort} onFilter={setFilter} onSort={setSort} />}
+          {page === 'nexus' && <Nexus />}
+          {page === 'settings' && <Settings />}
+          {page === 'dev' && <DevPanel />}
+        </main>
+      </div>
       <WelcomeBack />
     </div>
   )

@@ -63,6 +63,8 @@ export const TypeSchema = z
 export const SkillSchema = z
   .strictObject({
     id: Id,
+    /** Optional: the nav and the skill page fall back to a plain glyph for a skill without one. */
+    emoji: Emoji.optional(),
     name: Name,
     requiredType: Id.nullable(),
     open: z.boolean(),

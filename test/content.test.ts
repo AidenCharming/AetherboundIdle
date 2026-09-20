@@ -279,6 +279,20 @@ describe('resources', () => {
     expect(problemsFor((r) => (r.resources[0].emoji = '')).join('\n')).toContain('resources.json[0].emoji')
   })
 
+  it('gives every skill its own emoji (the sidebar and the skill page show it)', () => {
+    const emojis = content.skills.map((s) => s.emoji)
+    expect(emojis.every((e) => typeof e === 'string' && e.length > 0), 'every skill has an emoji').toBe(true)
+    expect(new Set(emojis).size, 'no two skills share an emoji').toBe(content.skills.length)
+  })
+
+  it('treats a skill emoji as optional but rejects a non-emoji', () => {
+    const raw = structuredClone(rawContent) as Record<string, any>
+    delete raw.skills[0].emoji
+    expect(loadContent(raw).skills[0]!.emoji).toBeUndefined()
+    expect(problemsFor((r) => (r.skills[0].emoji = '(axe)')).join('\n')).toContain('skills.json[0].emoji')
+    expect(problemsFor((r) => (r.skills[0].emoji = '')).join('\n')).toContain('skills.json[0].emoji')
+  })
+
   it('resolves every skill, element type and rare drop', () => {
     for (const r of content.resources) {
       expect(content.skillById.has(r.skill), `${r.id}: skill`).toBe(true)

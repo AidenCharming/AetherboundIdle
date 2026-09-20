@@ -111,7 +111,7 @@ in `tuning.json` under `combat`.
 
 ```json
 [{
-  "id": "woodcutting", "name": "Woodcutting",
+  "id": "woodcutting", "emoji": "🪓", "name": "Woodcutting",
   "requiredType": "verdant",
   "open": false,
   "slotUnlockLevels": [1, 50, 100, 165, 225],
@@ -122,6 +122,9 @@ in `tuning.json` under `combat`.
 `maxLevel` and `slotUnlockLevels` are per skill in the file and identical across all 11 today. They were
 retuned in step 1.8t (was `[1, 20, 40, 65, 90]` / `99`); both are PLACEHOLDERS. Creature max level is a
 different knob, `tuning.creature.maxLevel`, and is still 99.
+
+`emoji` is optional, like a resource's (step 1.9b): the sidebar and the skill page show it, and fall back to a plain glyph
+without one. The content test requires every skill that ships to have a distinct one.
 
 Open skills (Scavenging, Fabrication) have `requiredType: null`. The secondary-aptitude bonus for them is
 a tuning knob, not a per-skill field.

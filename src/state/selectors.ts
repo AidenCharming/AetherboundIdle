@@ -13,12 +13,15 @@ import { xpForLevel, xpToNext } from '../sim/formulas'
 import type { OfflineSummary } from '../sim/offline'
 import { activeEntries, runningSlot } from '../sim/skills'
 import type { Creature, Settings } from '../types/state'
+import { buildNav, type NavSection } from './nav'
 import type { LoadNotice } from './persistence'
 import type { GameStore } from './store'
 
 // The roster's pure filter and sort live in roster.ts (node-testable, no React). The UI reads them from here so that
 // selectors.ts stays its one door into the state layer.
 export * from './roster'
+// The navigation model (nav.ts) is pure too, and reaches the UI the same way.
+export * from './nav'
 // The biggest save file an import will read, so the file picker can refuse a wrong pick before reading it.
 export { MAX_IMPORT_BYTES } from './persistence'
 
@@ -49,6 +52,8 @@ export const shinyHueDeg: number = content.tuning.ui.shinyHueDeg
 export interface SkillInfo {
   id: string
   name: string
+  /** Null when the data gives the skill none. */
+  emoji: string | null
   /** The color of the type the skill belongs to; null for the open skills. */
   color: string | null
   maxLevel: number
@@ -70,7 +75,7 @@ export interface ResourceInfo {
 const skillInfos = new Map<string, SkillInfo>(
   content.skills.map((s) => [
     s.id,
-    { id: s.id, name: s.name, color: s.requiredType ? typeColor(s.requiredType) : null, maxLevel: s.maxLevel, totalSlots: s.slotUnlockLevels.length },
+    { id: s.id, name: s.name, emoji: s.emoji ?? null, color: s.requiredType ? typeColor(s.requiredType) : null, maxLevel: s.maxLevel, totalSlots: s.slotUnlockLevels.length },
   ]),
 )
 
@@ -94,7 +99,7 @@ for (const skill of content.skills) {
 /** Skills a player can work right now: the ones with at least one gatherable resource. Phase 1 has Woodcutting. */
 export const gatherableSkillIds: readonly string[] = content.skills.filter((s) => gatherableBySkill.get(s.id)!.length > 0).map((s) => s.id)
 
-export const skillInfo = (skillId: string): SkillInfo => skillInfos.get(skillId) ?? { id: skillId, name: skillId, color: null, maxLevel: 1, totalSlots: 0 }
+export const skillInfo = (skillId: string): SkillInfo => skillInfos.get(skillId) ?? { id: skillId, name: skillId, emoji: null, color: null, maxLevel: 1, totalSlots: 0 }
 
 export const resourceInfo = (resourceId: string): ResourceInfo =>
   resourceInfos.get(resourceId) ?? { id: resourceId, name: resourceId, emoji: null, requiredLevel: null, color: NEUTRAL }
@@ -203,6 +208,22 @@ export function selectHeldResourceIds(s: GameStore): readonly string[] {
 }
 
 export const selectResourceQty = (s: GameStore, resourceId: string): number => s.game.resources[resourceId] ?? 0
+
+// ---------- navigation ----------
+
+// The nav depends on the content (fixed at runtime) and on one setting, so there are only two of them.
+const navs = new Map<boolean, readonly NavSection[]>()
+
+/** The sidebar's sections. Stable by identity: it changes only when the dev panel setting does. */
+export function selectNav(s: GameStore): readonly NavSection[] {
+  const devPanelEnabled = s.game.settings.devPanelEnabled
+  let nav = navs.get(devPanelEnabled)
+  if (!nav) {
+    nav = buildNav({ devPanelEnabled })
+    navs.set(devPanelEnabled, nav)
+  }
+  return nav
+}
 
 // ---------- load notice ----------
 

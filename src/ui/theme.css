@@ -1,16 +1,37 @@
-/* Neutral chrome only. Type colors, skill accents and resource dots come from the data JSON through the
-   selectors and are handed to components as --accent / --dot, so no type color is written here. */
+/* A quiet dark theme: layered surfaces, one warm gold accent for UI chrome, rounded cards, generous spacing.
+   Every hex color in the game's CSS lives in this one :root block (test/architecture.test.ts enforces it).
+   Type colors, skill accents, rarity frames and resource dots come from the data JSON through the selectors and are
+   handed to components as --accent / --dot / --rarity / --type-a, so no type color is written here.
+   --bg is also the Electron window's own background (BACKGROUND in electron/main.cjs, checked by test/electron.test.ts):
+   change both together. */
 :root {
-  --bg: #14171c;
-  --panel: #1d222a;
-  --panel-raised: #262c36;
-  --line: #333b48;
-  --text: #e8ebf0;
+  /* surfaces, darkest to lightest: page, sidebar and cards, raised (inputs, nested cards), hover */
+  --bg: #0d1015;
+  --panel: #141920;
+  --panel-raised: #1a212a;
+  --panel-high: #232b36;
+  --line: #262e39;
+  --line-strong: #37414f;
+  /* text */
+  --text: #eceff4;
   --muted: #9aa4b2;
-  --danger: #e57373;
-  --accent: #8b97ab; /* fallback for a skill with no type (the open skills) */
-  --gap: 12px;
-  --radius: 10px;
+  --faint: #7d8794;
+  /* the one warm accent, for UI chrome only (selected page, primary buttons, the activity bars) */
+  --gold: #e2b866;
+  --gold-strong: #f3cf8a;
+  --gold-ink: #241a08;
+  --focus: #f6d998;
+  /* state */
+  --ok: #6fbf8f;
+  --danger: #ea7f7f;
+  /* the type / skill accent, overridden per element from the data; this is the fallback for a skill with no type */
+  --accent: #8b97ab;
+  --gap: 16px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-sm: 10px;
+  --shadow: 0 10px 30px rgb(0 0 0 / 40%);
+  --sidebar-w: 240px;
   color-scheme: dark;
 }
 
@@ -26,7 +47,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--text);
-  font: 16px/1.4 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font: 16px/1.45 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
 
 h1,
@@ -36,117 +57,359 @@ p {
   margin: 0;
 }
 
+.muted {
+  color: var(--muted);
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--faint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- controls ---------- */
+
 button {
   font: inherit;
   color: inherit;
   background: var(--panel-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 8px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+  padding: 8px 16px;
   min-height: 44px; /* a comfortable touch target at phone width */
   cursor: pointer;
 }
 
 button:hover:not(:disabled) {
-  border-color: var(--muted);
-}
-
-/* One visible focus ring for everything a keyboard can reach, not only buttons. */
-button:focus-visible,
-select:focus-visible,
-input:focus-visible,
-summary:focus-visible {
-  outline: 2px solid var(--text);
-  outline-offset: 2px;
-}
-
-/* A control that fills a container that clips (a card, the wide-screen tab bar) would lose an outward ring, so its ring
-   is drawn inside it instead. */
-.rcard-toggle:focus-visible,
-.tabbar button:focus-visible {
-  outline-offset: -4px;
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--line-strong));
+  background: var(--panel-high);
 }
 
 button:disabled {
   cursor: not-allowed;
 }
 
-.muted {
-  color: var(--muted);
+/* One visible focus ring for everything a keyboard can reach. */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }
 
-.app {
-  max-width: 760px;
+/* A control that fills a container that clips (a card, the nav list) would lose an outward ring, so its ring is drawn
+   inside it instead. */
+.rcard-toggle:focus-visible,
+.nav-item:focus-visible {
+  outline-offset: -3px;
+}
+
+select {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  font: inherit;
+  color: inherit;
+  background: var(--panel-raised);
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
+}
+
+button.danger {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.error {
+  color: var(--danger);
+}
+
+/* A round icon button: the menu, close and bell buttons. */
+.icon-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+/* ---------- shell ---------- */
+
+/* `data-drawer` comes from App (a media query read in script), so the layout and the drawer's focus and inert handling
+   always agree about which mode the window is in. */
+.shell {
+  min-height: 100vh;
+}
+
+.shell[data-drawer='false'] {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+}
+
+.main-col {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: 1080px;
   margin: 0 auto;
-  padding: var(--gap);
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
+  padding: 16px 16px 48px;
 }
 
-/* ---------- top bar ---------- */
+.shell[data-drawer='false'] .content {
+  padding: 24px 40px 64px;
+}
 
-.topbar {
+/* ---------- sidebar ---------- */
+
+.sidebar {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  min-height: 0;
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border-right: 1px solid var(--line);
 }
 
-.topbar-row {
+.sidebar[data-drawer='false'] {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
+}
+
+.sidebar[data-drawer='true'] {
+  position: fixed;
+  z-index: 40;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(300px, 88vw);
+  box-shadow: var(--shadow);
+  overscroll-behavior: contain;
+  transform: translateX(-105%);
+  transition: transform 0.2s ease;
+}
+
+.sidebar[data-drawer='true'][data-open='true'] {
+  transform: none;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: rgb(0 0 0 / 55%);
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 18px 16px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.brand-glyph {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  font-size: 1.35rem;
+  background: color-mix(in srgb, var(--gold) 14%, var(--panel-raised));
+  border: 1px solid color-mix(in srgb, var(--gold) 40%, var(--line));
+  border-radius: 12px;
+}
+
+.brand-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.nav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 8px 12px 16px;
+}
+
+.nav-section ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.nav-section li + li {
+  margin-top: 2px;
+}
+
+.nav-heading {
+  padding: 16px 12px 6px;
+  color: var(--faint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--muted);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 12px;
+}
+
+.nav-item:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--panel-raised);
+  border-color: transparent;
+}
+
+.nav-item[aria-current='page'] {
+  color: var(--gold-strong);
+  background: color-mix(in srgb, var(--gold) 13%, var(--panel));
+  border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+}
+
+.nav-icon {
+  flex: none;
+  width: 1.6em;
+  text-align: center;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.sidebar-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---------- header ---------- */
+
+/* Sticky, and slim on a phone: the menu button, the name and the bell. The stats sit under it (.stats-bar) and scroll
+   away. From 768 px it is one line with the stats in it and the bell at the right end. */
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line);
+}
+
+.shell[data-drawer='false'] .header {
+  position: static; /* the stats can take three lines in a narrow window, which is too much to pin */
+  align-items: flex-start;
+  padding: 14px 40px;
+}
+
+@media (min-width: 1024px) {
+  .shell[data-drawer='false'] .header {
+    position: sticky;
+  }
+}
+
+.header-end {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.stats {
+  flex: 1 1 0;
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 16px;
+  align-items: center;
+  gap: 8px 12px;
+  min-width: 0;
 }
 
-.topbar h1 {
-  font-size: 1.1rem;
+.stats-bar {
+  padding: 12px 16px 0;
 }
 
 .currencies {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 16px;
-  font-variant-numeric: tabular-nums;
-}
-
-.currencies dt {
-  display: inline;
-  color: var(--muted);
-}
-
-.currencies dd {
-  display: inline;
-  margin: 0 0 0 4px;
-  font-weight: 600;
-}
-
-/* The bench's Aether per minute, beside the Aether it adds to. */
-.currencies dd.rate {
-  color: var(--muted);
-  font-size: 0.85rem;
-  font-weight: 400;
+  gap: 8px;
+  margin: 0;
 }
 
 .resources {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 14px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
-  font-variant-numeric: tabular-nums;
 }
 
-.resource {
+.chip {
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 10px;
+  font-size: 0.9rem;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chip-gold {
+  border-color: color-mix(in srgb, var(--gold) 32%, var(--line));
+}
+
+.chip dt {
+  color: var(--muted);
+}
+
+.chip dd {
+  margin: 0;
+  font-weight: 700;
+}
+
+.chip dd.rate {
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 400;
 }
 
 .dot {
@@ -170,10 +433,15 @@ button:disabled {
   align-items: center;
   justify-content: space-between;
   gap: 8px 16px;
-  padding: 12px;
-  background: var(--panel);
-  border: 1px solid var(--danger);
+  margin: 16px 16px 0;
+  padding: 14px 16px;
+  background: color-mix(in srgb, var(--danger) 8%, var(--panel));
+  border: 1px solid color-mix(in srgb, var(--danger) 60%, var(--line));
   border-radius: var(--radius);
+}
+
+.shell[data-drawer='false'] .banner {
+  margin: 20px 40px 0;
 }
 
 .banner p + p {
@@ -184,42 +452,127 @@ button:disabled {
   word-break: break-all;
 }
 
-/* ---------- skills ---------- */
+/* ---------- pages ---------- */
 
-.skill {
+.page {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
+  gap: 20px;
+  min-width: 0;
+}
+
+.page-title h1 {
+  font-size: clamp(1.9rem, 1.3rem + 2.6vw, 2.75rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.page-title p {
+  margin-top: 8px;
+  max-width: 60ch;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 20px;
   background: var(--panel);
   border: 1px solid var(--line);
-  border-left: 4px solid var(--accent);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
 }
 
-.skill-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.skill-head h2 {
+.panel h2 {
   font-size: 1.15rem;
 }
 
-.small {
-  font-size: 0.875rem;
+.panel h3 {
+  font-size: 1rem;
+}
+
+/* ---------- skill page ---------- */
+
+.skill-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 9%, var(--panel-raised)), var(--panel));
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--line));
+  border-radius: var(--radius-lg);
+}
+
+.skill-emoji {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  font-size: 2rem;
+  line-height: 1;
+  background: var(--panel);
+  border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--line));
+  border-radius: var(--radius);
+}
+
+.skill-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.skill-level {
+  font-size: 1.4rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.skill-slots {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  margin: 0;
+  text-align: right;
+}
+
+.skill-slots strong {
+  font-size: 1.25rem;
+}
+
+@media (max-width: 559px) {
+  .skill-card {
+    grid-template-columns: auto minmax(0, 1fr);
+    padding: 16px;
+  }
+
+  .skill-slots {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 10px;
+    text-align: left;
+  }
+}
+
+.slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: var(--gap);
 }
 
 .slot {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 12px;
-  background: var(--panel-raised);
+  gap: 14px;
+  min-width: 0;
+  padding: 18px;
+  background: var(--panel);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius);
 }
 
 .slot-head {
@@ -233,7 +586,7 @@ button:disabled {
 .creature {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   min-width: 0;
 }
 
@@ -245,14 +598,14 @@ button:disabled {
   font-size: 1.6rem;
   border-radius: 50%;
   border: 2px solid var(--accent);
-  background: var(--panel);
+  background: var(--panel-raised);
   flex: none;
 }
 
 .slot-progress {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .slot-progress-text {
@@ -265,10 +618,10 @@ button:disabled {
 /* The bar smooths each tick's step with a linear transition as long as the tick. ProgressBar.tsx switches it off for
    the one frame where the value falls back (the action finished), so the fill never sweeps backwards. */
 .bar {
-  height: 14px;
+  height: 12px;
   background: var(--bg);
   border: 1px solid var(--line);
-  border-radius: 7px;
+  border-radius: 999px;
   overflow: hidden;
 }
 
@@ -280,14 +633,17 @@ button:disabled {
 
 .bar.thin {
   height: 8px;
-  border-radius: 4px;
 }
 
-/* Reduced motion: the bar jumps to each value instead of gliding between them. This is the only motion in the game:
-   the rarity glows on the cards are static box-shadows, with no animation or transition, so there is nothing in them to
-   switch off. Anything animated added later belongs in this block. */
+/* Reduced motion: the bar jumps to each value instead of gliding, and the drawer opens without sliding. The rarity glows
+   on the cards are static box-shadows, so there is nothing in them to switch off. Anything animated added later belongs
+   in this block. */
 @media (prefers-reduced-motion: reduce) {
   .bar-fill {
+    transition: none;
+  }
+
+  .sidebar[data-drawer='true'] {
     transition: none;
   }
 }
@@ -304,7 +660,7 @@ button:disabled {
 .picker legend,
 .assign legend {
   padding: 0;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   color: var(--muted);
   font-size: 0.875rem;
 }
@@ -341,91 +697,14 @@ button:disabled {
   border: 0;
 }
 
-.error {
-  color: var(--danger);
-}
-
-/* ---------- screen switch ---------- */
-
-/* On a phone the switch is pinned to the bottom edge, where a thumb reaches it, and the app leaves room for it. */
-.app {
-  padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
-}
-
-.tabbar {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 10;
-  background: var(--panel);
-  border-top: 1px solid var(--line);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-
-.tabbar-inner {
-  display: flex;
-  max-width: 760px;
-  margin: 0 auto;
-}
-
-.tabbar button {
-  flex: 1;
-  min-height: 56px;
-  border: 0;
-  border-top: 3px solid transparent;
-  border-radius: 0;
-  background: transparent;
-  font-weight: 600;
-}
-
-.tabbar button[aria-selected='true'] {
-  background: var(--panel-raised);
-  border-top-color: var(--text);
-}
-
-@media (min-width: 768px) {
-  .app {
-    padding-bottom: var(--gap);
-  }
-
-  .tabbar {
-    position: static;
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    overflow: hidden;
-  }
-
-  .tabbar-inner {
-    max-width: none;
-  }
-
-  .tabbar button {
-    min-height: 48px;
-  }
-}
-
 /* ---------- roster ---------- */
 
 .roster {
-  display: flex;
-  flex-direction: column;
   gap: var(--gap);
 }
 
-select {
-  width: 100%;
-  min-height: 44px;
-  padding: 8px;
-  font: inherit;
-  color: inherit;
-  background: var(--panel-raised);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-}
-
 .filters {
-  padding: 0 12px;
+  padding: 0 16px;
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: var(--radius);
@@ -435,7 +714,7 @@ select {
   display: flex;
   align-items: center;
   gap: 4px;
-  min-height: 44px;
+  min-height: 48px;
   font-weight: 600;
   cursor: pointer;
 }
@@ -448,7 +727,7 @@ select {
 .filters-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 @media (min-width: 560px) {
@@ -472,7 +751,7 @@ select {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 0;
+  padding: 12px 0 16px;
 }
 
 .roster-count {
@@ -493,9 +772,9 @@ select {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 24px 12px;
+  padding: 28px 16px;
   text-align: center;
-  border: 1px dashed var(--line);
+  border: 1px dashed var(--line-strong);
   border-radius: var(--radius);
 }
 
@@ -506,7 +785,7 @@ select {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  background: color-mix(in srgb, var(--rarity) 14%, var(--panel-raised));
+  background: color-mix(in srgb, var(--rarity) 12%, var(--panel-raised));
   border: 3px solid var(--rarity);
   border-radius: var(--radius);
   box-shadow: 0 0 calc(var(--glow) * 14px) calc(var(--glow) * 2px) color-mix(in srgb, var(--rarity) 80%, transparent);
@@ -593,16 +872,16 @@ select {
 
 .badge[data-state='working'] {
   font-weight: 600;
-  color: var(--bg);
-  background: var(--text);
-  border-color: var(--text);
+  color: var(--gold-ink);
+  background: var(--gold);
+  border-color: var(--gold);
 }
 
 .rcard-details {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 12px;
+  padding: 14px;
   background: var(--panel-raised);
   border-top: 1px solid var(--line);
 }
@@ -671,16 +950,10 @@ select {
 
 /* ---------- nexus ---------- */
 
-.nexus {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-}
-
 .nexus-totals {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 24px;
+  gap: 8px 32px;
   margin: 0;
   font-variant-numeric: tabular-nums;
 }
@@ -692,8 +965,8 @@ select {
 
 .nexus-totals dd {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.5rem;
+  font-weight: 800;
 }
 
 .nexus-rate {
@@ -704,33 +977,15 @@ select {
 
 /* ---------- settings and dev panel ---------- */
 
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: var(--gap);
-  padding: 12px;
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-}
-
-.panel h2 {
-  font-size: 1.15rem;
-}
-
-.panel h3 {
-  font-size: 1rem;
-}
-
 .setting {
   display: flex;
   align-items: flex-start;
   gap: 12px;
   min-height: 44px;
-  padding: 8px;
+  padding: 12px;
   background: var(--panel-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
 }
 
@@ -738,7 +993,7 @@ select {
   width: 22px;
   height: 22px;
   margin: 2px 0 0;
-  accent-color: var(--text);
+  accent-color: var(--gold);
   flex: none;
 }
 
@@ -751,10 +1006,10 @@ select {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 12px;
+  padding: 14px;
   background: var(--panel-raised);
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .dev-row {
@@ -777,12 +1032,12 @@ select {
 .dev-input {
   width: 100%;
   min-height: 44px;
-  padding: 8px;
+  padding: 8px 12px;
   font: inherit;
   color: inherit;
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: 12px;
 }
 
 /* The rest of the dev panel: grants, set skill level, reset save. */
@@ -801,9 +1056,9 @@ select {
   flex-direction: column;
   gap: 8px;
   margin: 0;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: 12px;
 }
 
 .check {
@@ -817,21 +1072,16 @@ select {
 .check input {
   width: 22px;
   height: 22px;
-  accent-color: var(--text);
+  accent-color: var(--gold);
 }
 
 .dev-confirm {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  padding: 8px;
+  padding: 10px;
   border: 1px solid var(--danger);
-  border-radius: 8px;
-}
-
-button.danger {
-  border-color: var(--danger);
-  color: var(--danger);
+  border-radius: 12px;
 }
 
 /* ---------- welcome back ---------- */
@@ -839,14 +1089,15 @@ button.danger {
 /* A native <dialog> opened with showModal(): the browser gives it the dialog role, aria-modal, the focus move and
    Escape, so none of that is hand-rolled here. */
 .wb {
-  width: min(100% - 24px, 460px);
+  width: min(100% - 24px, 480px);
   max-height: min(86vh, 700px);
   margin: auto;
-  padding: 16px;
+  padding: 20px;
   color: var(--text);
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
   overflow-y: auto;
 }
 
@@ -866,10 +1117,10 @@ button.danger {
 }
 
 .wb-capped {
-  padding: 8px 10px;
+  padding: 8px 12px;
   background: var(--panel-raised);
   border-left: 3px solid var(--danger);
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .wb-gains {
@@ -886,9 +1137,9 @@ button.danger {
   align-items: baseline;
   justify-content: space-between;
   gap: 8px;
-  padding: 6px 8px;
+  padding: 8px 10px;
   background: var(--panel-raised);
-  border-radius: 6px;
+  border-radius: 8px;
 }
 
 .wb-gains dt {
@@ -916,10 +1167,10 @@ button.danger {
 }
 
 .wb-skill {
-  padding: 8px 10px;
+  padding: 10px 12px;
   background: var(--panel-raised);
   border-left: 3px solid var(--accent);
-  border-radius: 6px;
+  border-radius: 8px;
   font-variant-numeric: tabular-nums;
 }
 

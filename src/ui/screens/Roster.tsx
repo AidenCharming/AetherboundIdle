@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { useGameStore } from '../../state/runtime'
 import { arrangeRoster, isFiltered, NO_FILTER, selectCreatureViews, type RosterFilter, type RosterSort } from '../../state/selectors'
 import { RosterCard } from '../components/RosterCard'
+import { PageTitle } from '../components/PageTitle'
 import { RosterFilters } from '../components/RosterFilters'
 
 interface RosterProps {
@@ -25,7 +26,8 @@ export function Roster({ filter, sort, onFilter, onSort }: RosterProps) {
   const toggle = useCallback((id: string) => setOpenId((cur) => (cur === id ? null : id)), [])
 
   return (
-    <section className="roster" aria-label="Roster">
+    <section className="page roster" aria-label="Roster">
+      <PageTitle>Roster</PageTitle>
       <RosterFilters filter={filter} sort={sort} onFilter={onFilter} onSort={onSort} />
 
       <p className="roster-count" aria-live="polite">

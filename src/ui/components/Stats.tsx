@@ -7,7 +7,7 @@ function ResourceChip({ resourceId }: { resourceId: string }) {
   const qty = useGameStore((s) => selectResourceQty(s, resourceId))
   const info = resourceInfo(resourceId)
   return (
-    <li className="resource">
+    <li className="chip">
       <ResourceIcon info={info} />
       <span>{info.name}</span>
       <strong>{formatCount(qty)}</strong>
@@ -15,29 +15,31 @@ function ResourceChip({ resourceId }: { resourceId: string }) {
   )
 }
 
-export function TopBar() {
+/** Gold, Aether with its per-minute rate, and a chip per resource held. Each part selects its own number. */
+export function Stats() {
   const gold = useGameStore(selectGold)
   const aether = useGameStore(selectAetherDisplay) // whole Aether for display; the stored value keeps its fraction
   const perMin = useGameStore(selectAetherPerMinute) // the sim's own bench emission; 0 when nobody is benched, and always shown
   const held = useGameStore(selectHeldResourceIds)
   return (
-    <header className="topbar">
-      <div className="topbar-row">
-        <h1>Aetherbound Idle</h1>
-        <dl className="currencies" style={{ margin: 0 }}>
-          <div>
-            <dt>Gold</dt>
-            <dd>{formatCount(gold)}</dd>
-          </div>
-          <div>
-            <dt>Aether</dt>
-            <dd>{formatCount(aether)}</dd>
-            <dd className="rate" aria-label={`${formatRate(perMin)} Aether per minute`}>
-              {formatRate(perMin)}/min
-            </dd>
-          </div>
-        </dl>
-      </div>
+    <div className="stats">
+      <dl className="currencies">
+        <div className="chip chip-gold">
+          <dt>
+            <span aria-hidden="true">🪙</span> Gold
+          </dt>
+          <dd>{formatCount(gold)}</dd>
+        </div>
+        <div className="chip chip-gold">
+          <dt>
+            <span aria-hidden="true">✨</span> Aether
+          </dt>
+          <dd>{formatCount(aether)}</dd>
+          <dd className="rate" aria-label={`${formatRate(perMin)} Aether per minute`}>
+            {formatRate(perMin)}/min
+          </dd>
+        </div>
+      </dl>
       {held.length === 0 ? (
         <p className="muted small">No resources yet.</p>
       ) : (
@@ -47,6 +49,6 @@ export function TopBar() {
           ))}
         </ul>
       )}
-    </header>
+    </div>
   )
 }

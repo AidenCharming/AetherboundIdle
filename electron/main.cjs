@@ -7,7 +7,7 @@ const path = require('node:path')
 const { app, BrowserWindow, dialog, Menu, shell } = require('electron')
 
 // The game's own background (`--bg` in src/ui/theme.css), shown before the first paint. test/electron.test.ts fails if they drift.
-const BACKGROUND = '#14171c'
+const BACKGROUND = '#0d1015'
 const INDEX = path.join(__dirname, '..', 'dist', 'index.html')
 
 // `--smoke[=load|progress|hold]` is the wrapper's own test hook (electron/smoke.cjs): hidden window, no player.

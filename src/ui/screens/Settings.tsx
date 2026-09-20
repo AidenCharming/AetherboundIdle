@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
 import { selectSetting, type SettingKey } from '../../state/selectors'
+import { PageTitle } from '../components/PageTitle'
 import { SaveFile } from '../components/SaveFile'
 
 function Toggle({ setting, label, children }: { setting: SettingKey; label: string; children: ReactNode }) {
@@ -20,15 +21,17 @@ function Toggle({ setting, label, children }: { setting: SettingKey; label: stri
 /** The player's own switches (both live in the save, so they survive a reload: plan.md section 5), and the save file export and import. */
 export function Settings() {
   return (
-    <section className="panel" aria-label="Settings">
-      <h2>Settings</h2>
-      <Toggle setting="offlineSummary" label="Show welcome-back summary">
-        Report what you earned while you were away. Turning this off does not change what you earn: the catch-up happens either way.
-      </Toggle>
-      <Toggle setting="devPanelEnabled" label="Dev panel">
-        Adds a Dev tab for testing the game. Off by default.
-      </Toggle>
-      <SaveFile />
+    <section className="page" aria-label="Settings">
+      <PageTitle>Settings</PageTitle>
+      <div className="panel">
+        <Toggle setting="offlineSummary" label="Show welcome-back summary">
+          Report what you earned while you were away. Turning this off does not change what you earn: the catch-up happens either way.
+        </Toggle>
+        <Toggle setting="devPanelEnabled" label="Dev panel">
+          Adds a Dev page under System for testing the game. Off by default.
+        </Toggle>
+        <SaveFile />
+      </div>
     </section>
   )
 }

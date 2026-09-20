@@ -3,6 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
+**Step 1.9b comes first (designer's request, 2026-09-20): the UI shell redesign and an exe rebuild.** See its checklist line below and `docs/design.md` section 11 ("UI direction"). It is presentation only and should not change the sim or the save format. After it, continue with Phase 2 planning as described in the next paragraph.
+
 **Step 1.9 is done (2026-09-20): Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait
 roll**, because nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is, or how much `typeAffinity` should tilt a trait's `rollWeight`. Reroll and
 trait inheritance need the same answer, and the dev panel's grant deliberately does not roll (see 1.8b checkpoint A). Then break Phase 2 into steps in this file and write the plan into `docs/plan.md`
@@ -31,6 +33,8 @@ Things a fresh session should know before starting:
 - [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
+
+- [ ] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications, C restyle of every screen and the exe rebuild.
 
 ### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
 The designer wants the game to run as an `.exe`, not as a browser link. `npm run dev` is only the development server; the game is
@@ -1173,8 +1177,52 @@ when run from a read-only or network location; a machine without the Visual C++ 
 5. The packaged smoke test checks the **effective** window flags and the DevTools behaviour, not the source text. (The first version asserted a property Electron does not report and failed; it now asks for DevTools to
    open and requires that they do not.)
 
+### 2026-09-20, step 1.9b checkpoint A: theme and shell
+
+New: `state/nav.ts`, `ui/navKeys.ts` (was `tabKeys.ts`), `ui/useMediaQuery.ts`, `ui/components/{Sidebar,Header,Stats,Brand,PageTitle}.tsx`, `ui/screens/SkillPage.tsx`, `test/nav.test.ts`, `test/navkeys.test.ts`.
+Gone: `TabBar`, `TopBar`, `screens/Skills.tsx`. Changed: `App.tsx`, `theme.css` (rebuilt), `skills.json` + `schema.ts` + `content.test.ts` + plan.md 3.2 (an optional `emoji` on every skill, 11 distinct), `selectors.ts` (`SkillInfo.emoji`,
+`selectNav`, re-exports `nav.ts`), `electron/main.cjs` (`BACKGROUND`). 680 tests pass (661 before) and `npm run build` is clean. Nothing in `src/sim` and nothing about the save changed.
+
+**Theme.** One `:root` block (still the only place a hex may live) with layered surfaces (`--bg` page, `--panel` sidebar and cards, `--panel-raised`, `--panel-high`), `--line` / `--line-strong`, one warm gold (`--gold`,
+`--gold-strong`, `--gold-ink`) for UI chrome only (selected page, the working badge, checkbox accent, later the primary buttons and activity bars), `--focus`, `--ok`, `--danger`, rounded radii (16 / 20 px), a shadow and
+`--sidebar-w`. `--accent` is unchanged in meaning: the per-skill / per-creature type color from the data, with a neutral fallback. `--bg` is now `#0d1015` and `BACKGROUND` in `electron/main.cjs` is the same value (the
+electron test compares them).
+
+**Shell.** A fixed 240 px sidebar from 768 px (brand, nav under small section headings, a pinned foot for checkpoint B), a header, and the page. Below 768 px the sidebar is a drawer.
+- **The breakpoint lives in script, once** (`DESKTOP` in `App.tsx`, read with `matchMedia` through `useMediaQuery`): it sets `data-drawer` on the shell and sidebar, and the layout CSS follows that attribute rather than a media
+  query, so CSS and the drawer's focus / inert logic cannot disagree about which mode the window is in.
+- **Drawer**: opens from the menu button in the header. While open it is `role="dialog" aria-modal`, focus moves onto the current page's entry, Escape and a click on the backdrop close it, the whole page column is `inert`,
+  the body does not scroll, and closing (also after choosing a page) puts focus back on the menu button. Closed, it is `inert` too, so nothing in it is tabbable or read out. It also has its own Close button. Widening the
+  window closes it. The slide is a 0.2 s transform, switched off under `prefers-reduced-motion`.
+- **Nav** (`state/nav.ts`, pure, node-tested): `buildNav({ devPanelEnabled }, content)` gives SKILLS (one page per skill with a raw resource, in skills.json order, with its emoji), CREATURES (Roster, Nexus), SYSTEM (Settings,
+  and Dev only while the setting is on); an empty section is left out. `resolvePage` keeps the choice, or falls back (Dev vanishing sends you to Settings; nothing chosen opens the first entry). `selectNav` caches the two
+  possible results, so it is stable by identity. Which page is open is `useState` in `App`, so it is not in the save; the roster's filter and sort stay in `App` too and survive a trip to another page (checked in the browser).
+- **Keys**: the nav is one Tab stop (roving tabindex); Down, Up (wrapping), Home and End move focus through the entries across the section headings; Enter or Space opens the page (native button). `nextNavIndex` replaces
+  `nextTabIndex`; Left and Right are now left to the browser. The old rule "arrows select" became "arrows move focus", because selecting on arrow would close the drawer at every step.
+- **Header**: on a wide screen one line, the stats (gold, Aether with its per-minute rate, one chip per resource) and the right end kept for the bell (empty until checkpoint B). On a phone the sticky header is only the menu
+  button, the name and the bell, and the stats sit under it in the page: pinning five rows of chips would have eaten a third of a phone screen (I built that first, looked at it, and changed it). From 768 to 1023 px the
+  header is not sticky either, for the same reason (three lines of chips). Gold and Aether got emoji (🪙 ✨), like the resource chips.
+- **Skill page**: `SkillPage` replaces the stacked Skills screen: the title, a header card (emoji tile, "Level N", XP bar with `xp / to next XP to level N+1`, slots `n / total` and where the next one comes), then the slots.
+  The slot cards themselves are unchanged apart from the new tokens; the option cards are checkpoint C. Every page now starts with one `h1` (`PageTitle`).
+
+**Deviations and decisions (all reversible):**
+1. **The hard-coded glyphs.** The nav glyphs for the fixed pages (🐾 Roster, 🌀 Nexus, ⚙️ Settings, 🧪 Dev), the brand glyph 🔮 and the gold / Aether glyphs are chrome, not data, so they are written in the UI / nav model.
+   A skill's own emoji is data (skills.json); a skill without one gets `◆`.
+2. **The Dev page's heading levels.** Dev components still use `h3` under the page's `h1` (the old `h2` became the page title). Fixed in checkpoint C with the restyle.
+3. **The `Sidebar` reads the pane through `returnFocus`**, a ref to the header's menu button, rather than owning that button, so the header stays a plain component.
+4. **The 1.9b line in the checklist and design.md's timing sentence** were already edited (uncommitted) by the designer's setup before this session; they ride along in this commit.
+
+**Verified in a real browser** (Vite dev server, Browser pane; a save with a 40-creature roster and 2 million Aether): at 1280, 1024, 768 and 375 px every page (Woodcutting, Roster, Nexus, Settings, Dev) has no horizontal
+overflow and no control under 43.5 px in height or width (checked by script, with the filter panel open; checkboxes are inside 44 px labels); at 375 px the drawer opens onto the current page with focus on it, Down, Up, Home
+and End move focus (roving tabindex confirmed), Escape closes and focus is on the menu button again, the page column is inert and the body scroll locked while open, and choosing Roster from it opens Roster and closes
+the drawer; the roster's filter and sort survive a visit to Woodcutting and back; toggling Dev on adds the Dev entry.
+
+**Not verified:** Enter and Space on a focused button. The Browser pane's key tool sends `keydown` and `keyup` without `keypress`, so a browser does not run the button's default action (I logged the events to confirm);
+I used `click()` on the focused element, which is exactly what those keys do on a native button. The Tab order inside the open drawer with a real keyboard (everything else is inert, so it should only cycle through the drawer).
+A screen reader. Firefox and Safari.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
-- **UI shell restyle** (designer's request, 2026-09-20). Sidebar navigation with section headings, a pinned current-activity panel, toast notifications and a bell, per-option cards. Reference image and the list of what to borrow (and what not to) are in `docs/design.md` section 11 ("UI direction") and `docs/reference/`. Presentation only, no game logic; needs `SimEvent`s kept in the store for toasts. Suggested as a small step at the start of Phase 2, before the new screens land. Not started.
+- **UI shell restyle** (designer's request, 2026-09-20). Sidebar navigation with section headings, a pinned current-activity panel, toast notifications and a bell, per-option cards. Reference image and the list of what to borrow (and what not to) are in `docs/design.md` section 11 ("UI direction") and `docs/reference/`. Presentation only, no game logic; needs `SimEvent`s kept in the store for toasts. Now scheduled as **step 1.9b**, before Phase 2 (see the checklist). Not started.
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
   (assigned, locked).

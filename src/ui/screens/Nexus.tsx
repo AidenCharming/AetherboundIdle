@@ -2,6 +2,7 @@ import { useGameStore } from '../../state/runtime'
 import { selectAetherPerHour, selectAetherPerMinute, selectBenchEntries } from '../../state/selectors'
 import { formatRate } from '../format'
 import { NexusCard } from '../components/NexusCard'
+import { PageTitle } from '../components/PageTitle'
 
 /**
  * The bench (plan.md 7, design.md section 11): every creature that is not working a slot, with the Aether each one
@@ -15,10 +16,9 @@ export function Nexus() {
   const perHour = useGameStore(selectAetherPerHour)
 
   return (
-    <section className="nexus" aria-label="Nexus">
+    <section className="page nexus" aria-label="Nexus">
+      <PageTitle lead="Creatures that are not working a slot rest here, and each one gathers Aether. Rarer creatures gather more.">Nexus</PageTitle>
       <div className="panel">
-        <h2>Nexus</h2>
-        <p className="small muted">Creatures that are not working a slot rest here, and each one gathers Aether. Rarer creatures gather more.</p>
         <dl className="nexus-totals">
           <div>
             <dt>Per minute</dt>

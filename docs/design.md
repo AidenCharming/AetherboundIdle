@@ -149,7 +149,7 @@ Roster, Skills (with slots), Nexus/Menagerie (bench, habitat), Genesis Pods (bre
 - A quiet dark theme with one warm accent for UI chrome, generous spacing and rounded cards. Type colors stay reserved for creatures and skill accents (CLAUDE.md rule 4).
 - A small "autosaves locally" status line.
 - **Not to copy:** its production *queue* (one shared, ordered queue where inputs are consumed when queued). Our design is parallel creature work slots. It is worth remembering as one candidate answer to the open offline slot-ordering question before Phase 3.
-- Suggested timing: a small presentation-only "UI shell" step (sidebar, activity panel, toasts) at the start of Phase 2, before the new Phase 2 screens (Genesis Pods, Aether-Log) are added to a tab bar that is already full.
+- Timing: a presentation-only "UI shell" step (sidebar, activity panel, toasts), scheduled as step 1.9b right after Phase 1, before the new Phase 2 screens (Genesis Pods, Aether-Log) are added to a tab bar that is already full.
 
 ## 12. Backlog (not in v1)
 - Fishing expansion: bait, deep-sea zones, a treasure system (sunken-treasure drops exist as traits already).
