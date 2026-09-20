@@ -3,6 +3,9 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
+**Step 1.9 is in progress (session 2026-09-20). Checkpoint A (the wrapper runs the built game, smoke test) is done and committed. Next: checkpoint B (Settings save export and
+import), then C (electron-builder: installer + portable exe, placeholder icon, packaged smoke test, manual checklist).** The paragraph below is the original brief.
+
 **Phase 1 is complete and playable (step 1.8b done, 2026-09-20). Next is step 1.9: the desktop wrapper, as written in "Desktop packaging"
 below. The designer confirmed Electron (2026-09-19).** Start there and follow that section: an Electron main process in `electron/` (never in
 `src/`), an `npm run` script that opens the built game in a window, an installer or portable `.exe` build script, an app name and a placeholder
@@ -1017,6 +1020,46 @@ these browser runs and the selector and action tests under them.
 **A tooling note for whoever tests by hand.** The Vite dev server on this machine (a path with a space, Windows) twice served a stale transform of a file I had just changed (once after several quick file swaps, once after a single edit): a fresh
 query string returned the new code while the page's HMR-stamped URL returned the old. Reloading does not help; `preview_stop` and `preview_start` does. And the browser tool's `form_input` on a React checkbox does not
 register (use a real click); its 45 s limit means a long wait has to be split into a watcher plus a later read.
+
+### 2026-09-20, step 1.9 checkpoint A: the wrapper runs the built game
+
+New: `electron/main.cjs`, `electron/smoke.cjs`, `electron/smoke-runner.mjs`, `test/electron.test.ts` (8 tests). Changed: `package.json` (`main`, two scripts, `electron` and
+`electron-builder` pinned exactly at 44.4.3 and 26.15.3 as devDependencies), `vite.config.ts` (`base: './'`), `.gitignore` (`release/`), `CLAUDE.md` (commands). Nothing else in
+`src/` changed. 623 tests pass (615 before) and `npm run build` is clean. The plain browser build still works: `npm run build` emits `./assets/...`, and the dev server (checked in the
+Browser pane on :5174) loads the game with a clean console.
+
+**The window.** One `BrowserWindow`, 1280x800 content size, resizable, minimum 375 x 560 (`useContentSize`, so the 375 px phone layout is reachable), background `#14171c` (the theme's
+`--bg`; a test fails if the two drift), no menu bar (`Menu.setApplicationMenu(null)`), `loadFile('dist/index.html')`. `contextIsolation` on, `nodeIntegration` off, `sandbox` on. **No IPC and
+no preload: nothing needed one.** Save export and import (checkpoint B) work inside the page (a download link and a file picker). DevTools exist only when `!app.isPackaged` (`devTools`
+option, plus F12 / Ctrl+Shift+I). New windows are denied, and an `http(s)` link opens in the default browser; the page may only navigate to itself (a reload, which the dev panel's reset save
+uses). Every permission request (camera, notifications and so on) is refused. **Background throttling is at its default (on)**, and a test fails if anyone turns it off.
+
+**Why `main.cjs`, not TypeScript.** Electron runs it as written, so there is no compile step, no second tsconfig and no `dist-electron` to keep in sync; it is about 100 lines, shares
+no types with `src/`, and the repo's `"type": "module"` is why the extension is `.cjs`.
+
+**Single instance.** `requestSingleInstanceLock()` before anything else; a second launch quits at once, and the first window is restored and focused on `second-instance`.
+
+**Save location, a decision to check.** `userData` is pinned to `%APPDATA%\Aetherbound Idle` (unless `--user-data-dir` is given), so the dev run (`npm run electron:start`), the installer and
+the portable exe all play the **same** save, in the wrapper's own localStorage. The alternative (each keeps its own) would mean the exe you play never sees the save from a test run. The
+smoke test never touches it: every launch gets a throw-away `--user-data-dir`.
+
+**The smoke test** (`npm run electron:smoke`, `electron/smoke-runner.mjs` launching `main.cjs --smoke=<mode>`; the page is driven from the main process with `executeJavaScript`, so it
+needs no IPC). It works from this path (the space is never given to a shell). Three launches, each hidden:
+- `load`: the page loads, its text contains "Woodcutting", and there was no console error, failed load or dead renderer. 0.8 s.
+- `progress`: the window is **minimized first** (a `show: false` window still reports itself visible and is not throttled: I measured 30 ticks of a 100 ms interval in 3 s; minimized it is
+  4 in 3 s). Then it assigns the Sproutlet to Woodcutting through the real Assign button, waits 9 s, and requires the XP to be a whole number of actions and to match the wall clock
+  (4 actions in 13.0 s at a 3.0 s cooldown), then reloads and requires the progress to survive. The worth of one action is read from the first completed action, so no balance number is
+  written in the test. **This is the verification of "throttled timers lose nothing".** I mutation-checked it: making the driver credit at most one tick (100 ms) per tick fails it
+  ("timed out waiting for the first action"), and restoring the driver passes.
+- `single`: launches a first instance, then a second on the same profile. The second must quit by itself (exit 0) and the first must report the `second-instance` event. Both pass.
+  The first instance is hidden in the test, so the focusing itself (`restore`, `show`, `focus`) is skipped there and is on the manual checklist.
+
+**Not verified in this checkpoint:** the window on screen (only ever hidden), the focus behaviour, Chromium's deeper throttling after 5 minutes hidden (once a minute; the driver's
+real-elapsed-time rule covers it and its node tests do, but it was not run for 5 minutes here), and the packaged app (checkpoint C). Electron Security Warnings (Chromium logs a
+warning, not an error, about the missing Content-Security-Policy in a dev run) are not counted as failures; no CSP was added, since `index.html` is not wrapper code.
+
+**A note for a fresh machine.** npm 11 skips dependency install scripts here, so Electron's 100 MB binary is downloaded the first time it is required (`npm run electron:*`), not by
+`npm install`.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:

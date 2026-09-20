@@ -46,4 +46,6 @@ I may hit usage limits or switch models mid-project. Always leave the repo in a 
 | Dev server | `npm run dev` | Vite on http://localhost:5173 |
 | Build | `npm run build` | Type-checks with `tsc --noEmit`, then `vite build` |
 | Test | `npm test` | `vitest run`, one pass (specs in `test/`); `npm run test:watch` for watch mode |
+| Desktop app (dev) | `npm run electron:start` | Builds, then opens the built game in the Electron window (`electron/main.cjs`). Shares the real save with the packaged app; DevTools with F12 |
+| Wrapper smoke test | `npm run electron:smoke` | Builds, then launches Electron hidden three times on a throw-away profile: load (page shows "Woodcutting", no console error), progress (a minimized, throttled window earns exactly the time that passed, and survives a reload), single instance. Exit 0 or 1. Never touches the real save. Add `-- --only=load` for one check |
 
