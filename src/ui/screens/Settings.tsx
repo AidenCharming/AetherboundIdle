@@ -4,6 +4,7 @@ import { selectSetting, type SettingKey } from '../../state/selectors'
 import { PageTitle } from '../components/PageTitle'
 import { PlayTime } from '../components/PlayTime'
 import { SaveFile } from '../components/SaveFile'
+import { SkillMilestones } from '../components/SkillMilestones'
 
 function Toggle({ setting, label, children }: { setting: SettingKey; label: string; children: ReactNode }) {
   const value = useGameStore((s) => selectSetting(s, setting))
@@ -33,6 +34,7 @@ export function Settings() {
         </Toggle>
         <SaveFile />
         <PlayTime />
+        <SkillMilestones />
       </div>
     </section>
   )

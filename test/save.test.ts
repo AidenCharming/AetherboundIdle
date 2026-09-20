@@ -350,7 +350,9 @@ describe('a save written before the 1.8t retune (old XP curve, old slot unlock l
 describe('content can change under an existing save (a save holds IDs, not copies)', () => {
   it('a skill added since the save is created at level 1 with its first slot', () => {
     const r = ok(parseSave(tampered(newGame(), (f) => { delete f.state.skills.mining })))
-    expect(r.state.skills.mining).toEqual({ level: 1, xp: 0, slots: [null] })
+    // No stamps: the save cannot say when this player got a skill that did not exist when it was written, and [0, 0]
+    // would claim they had it from the beginning.
+    expect(r.state.skills.mining).toEqual({ level: 1, xp: 0, slots: [null], reached: {} })
   })
 
   it('a stale cached level is re-derived from XP, and slots grow to match', () => {

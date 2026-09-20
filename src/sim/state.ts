@@ -1,6 +1,6 @@
 // A brand-new game. Phase 1 starts the player with one Sproutlet and nothing else (plan.md 7).
 import { content, type Content } from '../data'
-import type { GameState } from '../types/state'
+import type { GameState, LevelStamp } from '../types/state'
 import { makeCreature } from './creature'
 import { slotCount } from './skills'
 
@@ -20,7 +20,8 @@ export function createInitialState(seed: number, now: number, c: Content = conte
     creatures: [starter],
     nextCreatureSeq: 2,
     skills: Object.fromEntries(
-      c.skills.map((skill) => [skill.id, { level: 1, xp: 0, slots: Array.from({ length: slotCount(skill, 1) }, () => null) }]),
+      // Level 1 costs nothing, so a brand-new game reached it at zero play time. Every later level is stamped when it is earned.
+      c.skills.map((skill) => [skill.id, { level: 1, xp: 0, slots: Array.from({ length: slotCount(skill, 1) }, () => null), reached: { 1: [0, 0] as LevelStamp } }]),
     ),
     collection: {
       speciesSeen: [starter.speciesId],

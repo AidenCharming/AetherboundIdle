@@ -26,5 +26,13 @@
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
   "save": { "version": 2, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3, "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000 }
+  "ui": {
+    "tickMs": 100,
+    "shinyHueDeg": 150,
+    "activityPanelMax": 3,
+    "maxNotifications": 50,
+    "maxToasts": 3,
+    "toastMs": 5000,
+    "pacingMilestones": [10, 25, 50, 100, 150, 200]
+  }
 }

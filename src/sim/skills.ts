@@ -2,7 +2,7 @@
 // for both the online tick and offline catch-up: a 200 ms frame and a 12-hour window differ only in `dt`
 // (plan.md 4.4, 4.5), so they cannot drift apart.
 import { content, type Content, type Resource, type Skill } from '../data'
-import type { Creature, GameState, SkillState, SlotState } from '../types/state'
+import type { Creature, GameState, LevelStamp, SkillState, SlotState } from '../types/state'
 import { canWork, creatureCooldown } from './creature'
 import type { SimEvent, SimResult } from './events'
 import { completedActions, levelForXp, sanitizeDt, xpForLevel } from './formulas'
@@ -20,24 +20,68 @@ export function skillLevelFor(skill: Skill, xp: number, c: Content = content): n
   return levelForXp(c.tuning.xp.skillCurve, xp, skill.maxLevel)
 }
 
+// ---------- when a level was reached (step 1.9c) ----------
+
+/**
+ * The play-time counters at the two ends of the window being stepped, so a level crossed inside it can be placed in
+ * time. Built by `step` (sim/tick.ts), which is the only place that knows both the window and where its time is
+ * counted; nothing here reads a clock.
+ *
+ * ACCURACY. A level reached during an ordinary tick is stamped at that tick, so it is accurate to one tick
+ * (`tuning.ui.tickMs`, 100 ms). A level crossed inside ONE offline or fast-forward window (`interpolate`) is placed
+ * by linear interpolation across the window by XP, which is approximate: the XP rate is assumed constant for the
+ * whole window, and it is not when a slot unlocks part-way through (the levels after that unlock arrived sooner than
+ * the straight line says). A twelve-hour window that crosses a slot unlock can therefore misplace a level by hours.
+ * It is never wrong about the window a level fell in, only about where inside it.
+ */
+export interface StampWindow {
+  startPlayedMs: number
+  startDevMs: number
+  endPlayedMs: number
+  endDevMs: number
+  /** An offline or fast-forward window: place levels by XP inside it. An online tick stamps at the end of the tick. */
+  interpolate: boolean
+}
+
+/** Keeps an interpolated value inside its own window, whatever the float arithmetic does at the ends. */
+const between = (start: number, end: number, t: number): number => Math.min(Math.max(start + t * (end - start), start), end)
+
+function stampFor(w: StampWindow, level: number, skill: Skill, xpBefore: number, xpGained: number, c: Content): LevelStamp {
+  if (!w.interpolate || !(xpGained > 0)) return [w.endPlayedMs, w.endDevMs]
+  const threshold = xpForLevel(c.tuning.xp.skillCurve, level, skill.maxLevel)
+  const t = Math.min(1, Math.max(0, (threshold - xpBefore) / xpGained))
+  return [between(w.startPlayedMs, w.endPlayedMs, t), between(w.startDevMs, w.endDevMs, t)]
+}
+
 /**
  * The only place skill XP or level changes, so `level` can never disagree with `xp`. Emits one
  * `skill-level-up` per level crossed and a `slot-unlocked` at each slot threshold, in ascending order, and
  * grows `slots` to match (never shrinks it).
+ *
+ * `stamp` records when each level crossed here was reached. It is optional on purpose: the dev panel's "Set skill
+ * level" (`raiseSkillToLevel`) passes nothing, so the levels it hands out stay ABSENT, because no time passed for
+ * them. A level that already has a stamp keeps it: the first time a level is reached is the one that counts, so a
+ * retune that re-levels a save cannot rewrite its history.
  */
-export function addSkillXp(state: SkillState, skill: Skill, amount: number, c: Content = content): SimResult<SkillState> {
-  const xp = state.xp + Math.max(0, amount)
+export function addSkillXp(state: SkillState, skill: Skill, amount: number, c: Content = content, stamp?: StampWindow): SimResult<SkillState> {
+  const gained = Math.max(0, amount)
+  const xp = state.xp + gained
   const level = Math.max(state.level, skillLevelFor(skill, xp, c))
   const events: SimEvent[] = []
+  let reached = state.reached
   for (let l = state.level + 1; l <= level; l++) {
     events.push({ type: 'skill-level-up', skillId: skill.id, level: l })
     skill.slotUnlockLevels.forEach((unlock, slotIndex) => {
       if (unlock === l) events.push({ type: 'slot-unlocked', skillId: skill.id, slotIndex })
     })
+    if (stamp && reached[l] === undefined) {
+      if (reached === state.reached) reached = { ...state.reached }
+      reached[l] = stampFor(stamp, l, skill, state.xp, gained, c)
+    }
   }
   const slots = state.slots.slice()
   while (slots.length < slotCount(skill, level)) slots.push(null)
-  return { state: { level, xp, slots }, events }
+  return { state: { level, xp, slots, reached }, events }
 }
 
 export type RaiseResult = { ok: true; state: GameState; events: SimEvent[] } | { ok: false; reason: string }
@@ -184,6 +228,8 @@ export function runningSlot(
 export interface AdvanceOptions {
   /** True on the offline path: adds `offline_extra_output_chance` to the extra-output roll. */
   offline?: boolean
+  /** Where in play time this window sits, so a level crossed in it can be stamped. `step` builds it; absent means no stamping. */
+  stamp?: StampWindow
 }
 
 /**
@@ -246,7 +292,7 @@ export function advanceSkills(state: GameState, dtMs: number, opts: AdvanceOptio
       slotEvents.push({ type: 'action-complete', skillId: skill.id, slotIndex, creatureId: creature.id, resourceId: resource.id, count: n, outputs, skillXp })
     })
 
-    const leveled = addSkillXp({ ...skillState, slots }, skill, xpGained, c)
+    const leveled = addSkillXp({ ...skillState, slots }, skill, xpGained, c, opts.stamp)
     skills[skill.id] = leveled.state
     events.push(...slotEvents, ...leveled.events)
   }

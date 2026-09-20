@@ -205,8 +205,22 @@ describe('offline and online are the same maths', () => {
     let online = start
     for (let i = 0; i < elapsed / 250; i++) online = step(online, 250, {}, q).state
     expect(online.resources).toEqual(offline.resources)
-    expect(online.skills).toEqual(offline.skills)
+    // `reached` is compared separately: an online tick stamps a level at the end of the tick it was crossed in, while
+    // one offline window places it by interpolating XP across the whole window, and that is approximate whenever the
+    // XP rate changes inside the window (a slot unlock does exactly that). What the player EARNS is identical.
+    const strip = (skills: GameState['skills']) => Object.fromEntries(Object.entries(skills).map(([id, sk]) => [id, { level: sk.level, xp: sk.xp, slots: sk.slots }]))
+    expect(strip(online.skills)).toEqual(strip(offline.skills))
     expect(online.aether).toBeCloseTo(offline.aether, 6)
+
+    let worst = 0
+    for (const [id, sk] of Object.entries(online.skills)) {
+      for (const [level, stamp] of Object.entries(sk.reached)) {
+        const other = offline.skills[id]!.reached[level]
+        expect(other, `${id} level ${level} is stamped online but not offline`).toBeDefined()
+        worst = Math.max(worst, Math.abs(stamp[0] - other![0]))
+      }
+    }
+    expect(worst, `the two paths place a level up to ${(worst / 1000).toFixed(1)} s apart`).toBeLessThan(MIN)
   })
 })
 

@@ -492,6 +492,17 @@ describe('loadContent rejects bad data instead of loading it', () => {
     }
   })
 
+  it('requires tuning.ui.pacingMilestones to be ascending, distinct, whole levels no higher than a skill max level', () => {
+    const levels = content.tuning.ui.pacingMilestones
+    expect(levels.length).toBeGreaterThan(0)
+    expect(levels).toEqual([...levels].sort((a, b) => a - b))
+    expect(new Set(levels).size).toBe(levels.length)
+    for (const skill of content.skills) for (const level of levels) expect(level, `${skill.id} has no level ${level}`).toBeLessThanOrEqual(skill.maxLevel)
+    expect(problemsFor((r) => delete r.tuning.ui.pacingMilestones).join('; ')).toContain('tuning.json.ui.pacingMilestones')
+    expect(problemsFor((r) => (r.tuning.ui.pacingMilestones = [])).join('; ')).toContain('tuning.json.ui.pacingMilestones')
+    for (const bad of [[0], [-5], [2.5], ['ten']]) expect(problemsFor((r) => (r.tuning.ui.pacingMilestones = bad)).join('; '), JSON.stringify(bad)).toContain('tuning.json.ui.pacingMilestones')
+  })
+
   it('requires tuning.offline.awayThresholdMs to be a positive whole number below the cap', () => {
     const { awayThresholdMs, capHours } = content.tuning.offline
     expect(Number.isInteger(awayThresholdMs) && awayThresholdMs > 0).toBe(true)

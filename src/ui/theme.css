@@ -1376,6 +1376,58 @@ button.danger {
   white-space: nowrap;
 }
 
+.milestone-grid {
+  display: grid;
+  /* 260px is what the widest row ("250 max" and "3 d 4 h + dev 12 h") needs, so a phone gets one column. */
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.milestones {
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+
+.milestones h3 {
+  font-size: 1rem;
+  margin-bottom: 6px;
+}
+
+.milestones table {
+  width: 100%;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+
+.milestones th,
+.milestones td {
+  padding: 4px 0;
+  text-align: left;
+  font-weight: 400;
+  vertical-align: baseline;
+}
+
+.milestones thead th {
+  color: var(--faint);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--line);
+}
+
+.milestones tbody th {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.milestones td {
+  text-align: right;
+}
+
 .dev-row {
   display: flex;
   flex-wrap: wrap;

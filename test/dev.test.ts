@@ -288,7 +288,7 @@ describe('raiseSkillToLevel / setSkillLevel (sim)', () => {
   })
 
   it('a level the skill is already partway through refuses when the XP already covers it', () => {
-    const r = raiseSkillToLevel({ ...base, skills: { ...base.skills, woodcutting: { level: 50, xp: xpForLevel(content.tuning.xp.skillCurve, 50, 250) + 100, slots: [null, null] } } }, 'woodcutting', 50)
+    const r = raiseSkillToLevel({ ...base, skills: { ...base.skills, woodcutting: { level: 50, xp: xpForLevel(content.tuning.xp.skillCurve, 50, 250) + 100, slots: [null, null], reached: {} } } }, 'woodcutting', 50)
     expect(r.ok).toBe(false)
   })
 
@@ -301,7 +301,7 @@ describe('raiseSkillToLevel / setSkillLevel (sim)', () => {
           const xp = Math.floor(from) + frac
           if (xp >= need) continue
           const lvl = levelForXp(curve, xp, woodcutting.maxLevel)
-          const start = { ...base, skills: { ...base.skills, woodcutting: { level: lvl, xp, slots: base.skills.woodcutting!.slots } } }
+          const start = { ...base, skills: { ...base.skills, woodcutting: { level: lvl, xp, slots: base.skills.woodcutting!.slots, reached: {} } } }
           const r = raiseSkillToLevel(start, 'woodcutting', target)
           if (!r.ok) throw new Error(`${xp} -> ${target}: ${r.reason}`)
           expect(r.state.skills.woodcutting!.level, `${xp} -> ${target}`).toBe(target)

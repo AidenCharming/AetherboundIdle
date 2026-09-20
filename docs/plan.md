@@ -384,10 +384,24 @@ is a data change, not a code change.
     "voidDealt": 1.25, "voidTaken": 0.75, "voidHybridFraction": 0.5,
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
-  "save": { "version": 1, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3, "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000 }
+  "save": { "version": 2, "autosaveMs": 15000 },
+  "ui": {
+    "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3,
+    "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000,
+    "pacingMilestones": [10, 25, 50, 100, 150, 200]
+  }
 }
 ```
+
+`ui.pacingMilestones` (step 1.9c, PLACEHOLDER) are the extra skill levels the Settings "Skill milestones"
+table reports the time to, on top of the levels the data already makes interesting: each skill's
+`slotUnlockLevels` and its `maxLevel`. It changes nothing in the game, only which rows that table shows.
+Ascending, distinct, and no higher than a skill's `maxLevel` (checked by `test/content.test.ts`).
+
+`save.version` is **2** from step 1.9c. Version 2 added `GameState.stats` (the play-time counters) and
+`SkillState.reached` (when each level was reached); `MIGRATIONS[1]` fills both in for an older save, with
+no invented history. A build that only understands version 1 refuses a version-2 save as `too-new`,
+quarantines it and starts fresh.
 
 Numbers marked PLACEHOLDER in the design doc are all here: form multipliers, cooldown floor, trait
 strengths, mutation rates, shiny rates, attunement lock costs, breeding costs. Form bonuses (1.2 / 1.4)
@@ -612,6 +626,9 @@ type GameState = {
     xp: number              // cumulative
     slots: ({ creatureId: string; resourceId: string; progressMs: number } | null)[]
                             // progressMs is per SLOT: each slot's creature has its own cooldown
+    reached: Record<string, [playedMs: number, devMs: number]>
+                            // save v2 (1.9c). Sparse: level -> the play-time counters when it was
+                            // reached. ABSENT MEANS UNKNOWN, never zero. First stamp wins.
   }>
   collection: {
     speciesSeen: string[]
@@ -621,8 +638,21 @@ type GameState = {
     formsUnlocked: Record<string, number>
   }
   settings: { offlineSummary: boolean, devPanelEnabled: boolean }   // autoBind arrives in phase 3
+  stats: { onlineMs: number, awayMs: number, devMs: number }        // save v2 (1.9c); play time by source
 }
 ```
+
+**Play time (save v2, step 1.9c).** `stats` is game time in milliseconds, split by where it came from:
+`onlineMs` is the dt ordinary ticks granted, `awayMs` is the window `applyOffline` **granted** (capped,
+never the requested one), and `devMs` is what the dev panel's fast-forward granted. `creditPlayTime` in
+`sim/tick.ts` is the only writer; `step` takes a `credit` option and `applyOffline` a `{ dev }` option.
+"Played" means `onlineMs + awayMs`: fast-forward is shown apart and never added in.
+
+`SkillState.reached` records when each level was reached, from the same counters. A level reached during
+an ordinary tick is stamped at that tick (accurate to one `ui.tickMs`); a level crossed inside one
+offline or fast-forward window is placed by interpolating across the window by XP, which is approximate,
+because the XP rate is not constant inside a window that opens a slot part-way through. A level the dev
+panel's "Set skill level" granted is left absent, because no time passed for it.
 
 - One localStorage key: `aetherbound-idle:save`, holding `{ version, state }`.
 - Writes happen on the `autosaveMs` timer, on unload, and **immediately after any outcome-committing
@@ -659,7 +689,11 @@ Phase 1 coverage:
   elapsed time.
 - RNG: the saved state is the *current* state, so save -> reload -> roll continues the stream instead of
   replaying it. A round-trip through `save.ts` reproduces the same next value.
-- Save round-trip, a v1 -> v2 migration stub, and the broken-save quarantine path.
+- Save round-trip, the real v1 -> v2 migration against a checked-in v1 save
+  (`test/fixtures/save-v1.json`, written by the 0.1.0 build), and the broken-save quarantine path.
+- **Play time and level stamps** (`test/playtime.test.ts`, `test/milestones.test.ts`, added in 1.9c):
+  exact counters for ordinary ticks, the granted window rather than the requested one, dev time kept
+  apart, and the stamps staying inside the window that produced them.
 - Content: every species, hybrid, trait, ability and resource loads and cross-resolves.
 
 ---

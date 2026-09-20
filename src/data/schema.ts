@@ -303,7 +303,18 @@ export const TuningSchema = z.strictObject({
   // changes what a player earns (same rule as aether.benchEmissionTickMs).
   // shinyHueDeg is the runtime CSS hue rotation on a shiny's art (CLAUDE.md rule 4: never a separate asset). It must
   // sit strictly between 0 and 360, or a shiny would look exactly like a normal creature.
-  ui: z.strictObject({ tickMs: PosInt, shinyHueDeg: z.number().gt(0).lt(360), activityPanelMax: PosInt, maxNotifications: PosInt, maxToasts: PosInt, toastMs: PosInt }),
+  // pacingMilestones are the extra skill levels the Settings "Skill milestones" table reports the time to, on top of
+  // the levels the data already makes interesting (each skill's slot unlock levels and its max level). PLACEHOLDER,
+  // designer to adjust: they change nothing in the game, only which rows that table shows.
+  ui: z.strictObject({
+    tickMs: PosInt,
+    shinyHueDeg: z.number().gt(0).lt(360),
+    activityPanelMax: PosInt,
+    maxNotifications: PosInt,
+    maxToasts: PosInt,
+    toastMs: PosInt,
+    pacingMilestones: z.array(PosInt).min(1),
+  }),
 })
 
 // ---------- zones.json / vessels.json / collection-tracks.json (phase 3/4; shipped empty) ----------

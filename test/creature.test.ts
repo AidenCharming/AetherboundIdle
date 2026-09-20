@@ -159,7 +159,7 @@ describe('initial state', () => {
     expect(state.creatures[0]).toMatchObject({ speciesId: 'sproutlet', rarityTier: 1, level: 1, form: 1, shiny: false, assignment: null, poolTraits: [] })
     expect(state).toMatchObject({ aether: 0, gold: 0, resources: {}, lastSeen: 1000, rngState: 777, version: content.tuning.save.version })
   })
-  it('has every skill at level 1 with exactly one open slot', () => {
-    for (const skill of content.skills) expect(state.skills[skill.id]).toEqual({ level: 1, xp: 0, slots: [null] })
+  it('has every skill at level 1 with exactly one open slot, reached at zero play time', () => {
+    for (const skill of content.skills) expect(state.skills[skill.id]).toEqual({ level: 1, xp: 0, slots: [null], reached: { 1: [0, 0] } })
   })
 })

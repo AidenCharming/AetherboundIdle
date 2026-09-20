@@ -30,7 +30,7 @@ function expectedLevel(xp: number): number {
 const ofType = <T extends SimEvent['type']>(events: SimEvent[], type: T) => events.filter((e): e is Extract<SimEvent, { type: T }> => e.type === type)
 
 describe('addSkillXp and slot unlocks', () => {
-  const start = { level: 1, xp: 0, slots: [null] as null[] }
+  const start = { level: 1, xp: 0, slots: [null] as null[], reached: {} }
 
   it('grows the slot count at exactly each tuned unlock level and emits slot-unlocked for each', () => {
     const at = (level: number) => setSkillLevel(newGame(), 'woodcutting', level).skills.woodcutting!
@@ -54,10 +54,10 @@ describe('addSkillXp and slot unlocks', () => {
 
   it('never shrinks the slots and never lowers the level', () => {
     const xp40 = xpForLevel(curve, 40, woodcutting.maxLevel)
-    const roomy = { level: 40, xp: xp40, slots: [null, null, null, null, null] as null[] }
+    const roomy = { level: 40, xp: xp40, slots: [null, null, null, null, null] as null[], reached: {} }
     expect(addSkillXp(roomy, woodcutting, 0).state.slots).toHaveLength(5)
     expect(addSkillXp(roomy, woodcutting, -500).state).toEqual(roomy)
-    const lowClaim = { level: 40, xp: 0, slots: [null, null, null] as null[] } // xp says level 1; the higher level stands
+    const lowClaim = { level: 40, xp: 0, slots: [null, null, null] as null[], reached: {} } // xp says level 1; the higher level stands
     expect(addSkillXp(lowClaim, woodcutting, 10).state.level).toBe(40)
   })
 

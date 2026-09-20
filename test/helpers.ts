@@ -42,7 +42,7 @@ export function addCreature(state: GameState, speciesId: string, overrides: Part
 export function setSkillLevel(state: GameState, skillId: string, level: number, c: Content = content): GameState {
   const skill = c.skillById.get(skillId)!
   const xp = xpForLevel(c.tuning.xp.skillCurve, level, skill.maxLevel)
-  const next = addSkillXp({ level: 1, xp: 0, slots: [null] }, skill, xp, c).state
+  const next = addSkillXp({ level: 1, xp: 0, slots: [null], reached: {} }, skill, xp, c).state
   return { ...state, skills: { ...state.skills, [skillId]: { ...next, slots: next.slots.map((s, i) => state.skills[skillId]!.slots[i] ?? s) } } }
 }
 

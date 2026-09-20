@@ -15,13 +15,20 @@ import { slotCount } from './skills'
  * the chain from the file's version up to `tuning.save.version`, stamping the version after each step, so a
  * migration only changes the shape.
  *
- * 1 -> 2 (step 1.9c) adds the play-time counters. They start at zero: how long a version-1 save had been played
- * was never recorded, and there is nothing to derive it from, so the counters begin now rather than inventing a
- * history. `lastSeen` is when the save was last written, not when it was started.
+ * 1 -> 2 (step 1.9c) adds the play-time counters and the per-skill "when was this level reached" map. Both start
+ * empty: how long a version-1 save had been played, and when it reached each of its levels, were never recorded, and
+ * there is nothing to derive them from. `lastSeen` is when the save was last written, not when it was started. So the
+ * counters begin now and every level the save already had stays UNKNOWN rather than being given an invented time. The
+ * one exception is a skill with no XP at all: it is still at level 1, which costs nothing, so its level 1 is `[0, 0]`
+ * exactly as a new game's is.
  */
 export type Migration = (state: any) => any
 export const MIGRATIONS: Record<number, Migration> = {
-  1: (state) => ({ ...state, stats: { onlineMs: 0, awayMs: 0, devMs: 0 } }),
+  1: (state) => ({
+    ...state,
+    stats: { onlineMs: 0, awayMs: 0, devMs: 0 },
+    skills: Object.fromEntries(Object.entries(state.skills ?? {}).map(([id, sk]: [string, any]) => [id, { ...sk, reached: sk?.xp > 0 ? {} : { 1: [0, 0] } }])),
+  }),
 }
 
 // ---------- schema ----------
@@ -29,6 +36,7 @@ export const MIGRATIONS: Record<number, Migration> = {
 const Finite = z.number()
 const Count = z.number().min(0)
 const Id = z.string().min(1)
+const LevelKey = z.string().regex(/^[1-9]\d*$/, 'must be a whole level number')
 
 const CreatureSchema = z.strictObject({
   id: Id,
@@ -54,7 +62,17 @@ const GameStateSchema = z.strictObject({
   resources: z.record(Id, Count),
   creatures: z.array(CreatureSchema),
   nextCreatureSeq: z.number().int().min(1),
-  skills: z.record(Id, z.strictObject({ level: z.number().int().min(1), xp: Count, slots: z.array(SlotSchema.nullable()) })),
+  skills: z.record(
+    Id,
+    z.strictObject({
+      level: z.number().int().min(1),
+      xp: Count,
+      slots: z.array(SlotSchema.nullable()),
+      // Sparse "when was this level reached": a whole-number level as the key (JSON has no number keys), and
+      // [playedMs, devMs]. A level that is not in here was never stamped and is shown as unknown.
+      reached: z.record(LevelKey, z.tuple([Count, Count])),
+    }),
+  ),
   collection: z.strictObject({
     speciesSeen: z.array(Id),
     rarityTiersSeen: z.record(Id, z.array(z.number().int())),
@@ -136,7 +154,10 @@ export function reconcile(state: GameState, c: Content = content): GameState {
     const level = existing ? levelForXp(c.tuning.xp.skillCurve, existing.xp, skill.maxLevel) : 1
     const slots = existing ? existing.slots.slice() : []
     while (slots.length < slotCount(skill, level)) slots.push(null)
-    skills[skill.id] = { level, xp: existing?.xp ?? 0, slots }
+    // A skill added by a content update starts with no history at all: the save cannot say when this player got it,
+    // and `[0, 0]` would claim they had it from the beginning. An existing skill keeps every stamp it has, including
+    // ones for levels a retune has just taken back: the first time a level was reached is the one that counts.
+    skills[skill.id] = { level, xp: existing?.xp ?? 0, slots, reached: existing?.reached ?? {} }
   }
   return { ...state, skills }
 }

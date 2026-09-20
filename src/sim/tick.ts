@@ -2,11 +2,11 @@
 // catch-up calls it once with dt = the elapsed window, so the two paths cannot drift apart: there is no second
 // implementation of anything.
 import { content, type Content } from '../data'
-import type { GameState, PlayTimeCredit } from '../types/state'
+import type { GameState, PlayStats, PlayTimeCredit } from '../types/state'
 import { accrueAether } from './aether'
 import type { SimResult } from './events'
 import { sanitizeDt } from './formulas'
-import { advanceSkills, type AdvanceOptions } from './skills'
+import { advanceSkills, type AdvanceOptions, type StampWindow } from './skills'
 
 export interface StepOptions extends AdvanceOptions {
   /**
@@ -23,9 +23,24 @@ export interface StepOptions extends AdvanceOptions {
  * stamps it.
  */
 export function step(state: GameState, dtMs: number, opts: StepOptions = {}, c: Content = content): SimResult<GameState> {
-  const skills = advanceSkills(state, dtMs, opts, c)
+  const credit = opts.credit ?? 'onlineMs'
+  const stamp = stampWindow(state.stats, sanitizeDt(dtMs), credit, opts.offline === true)
+  const skills = advanceSkills(state, dtMs, { ...opts, stamp }, c)
   const next = accrueAether(skills.state, dtMs, c)
-  return { state: creditPlayTime(next, dtMs, opts.credit ?? 'onlineMs'), events: skills.events }
+  return { state: creditPlayTime(next, dtMs, credit), events: skills.events }
+}
+
+/**
+ * Where this window sits in play time, for `addSkillXp` to stamp the levels crossed in it. It is worked out BEFORE
+ * the step, because `state.stats` is still the window's start at that point and `creditPlayTime` moves it to the end
+ * afterwards; the two ends must agree with the counters exactly, or a level could be stamped later than the play
+ * time the save reports.
+ */
+function stampWindow(stats: PlayStats, dt: number, credit: PlayTimeCredit, offline: boolean): StampWindow {
+  const played = stats.onlineMs + stats.awayMs
+  const playedGain = credit === 'onlineMs' || credit === 'awayMs' ? dt : 0
+  const devGain = credit === 'devMs' ? dt : 0
+  return { startPlayedMs: played, startDevMs: stats.devMs, endPlayedMs: played + playedGain, endDevMs: stats.devMs + devGain, interpolate: offline }
 }
 
 /**

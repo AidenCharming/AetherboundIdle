@@ -325,6 +325,70 @@ export const selectDevMs = (s: GameStore): number => s.game.stats.devMs
 /** What the game has really been played for: online plus away. Fast-forward is deliberately not in it. */
 export const selectPlayedMs = (s: GameStore): number => s.game.stats.onlineMs + s.game.stats.awayMs
 
+// ---------- skill milestones (Settings, step 1.9c) ----------
+
+/** One row of the "Skill milestones" table. */
+export interface SkillMilestone {
+  level: number
+  /** Real play time when the level was reached, or null for a level that was never stamped (see `SkillState.reached`). */
+  playedMs: number | null
+  /** Dev fast-forward time that had been added by then. Above zero means the fast-forward did part of the work. */
+  devMs: number
+  /** This level opens a work slot. */
+  slot: boolean
+  /** This is the skill's last level. */
+  max: boolean
+}
+
+/**
+ * The levels the table reports, per skill: the slot unlock levels and the max level (both from the data, so they are
+ * whatever a retune makes them), plus `tuning.ui.pacingMilestones`. Sorted, de-duplicated, nothing above the max.
+ * Content only, so it is computed once per skill and is stable by reference for ever after.
+ */
+const milestoneLevels = new Map<string, readonly number[]>()
+function levelsFor(skillId: string): readonly number[] {
+  let levels = milestoneLevels.get(skillId)
+  if (!levels) {
+    const skill = content.skillById.get(skillId)
+    levels = skill
+      ? [...new Set([...skill.slotUnlockLevels, ...content.tuning.ui.pacingMilestones, skill.maxLevel])].filter((l) => l <= skill.maxLevel).sort((a, b) => a - b)
+      : []
+    milestoneLevels.set(skillId, levels)
+  }
+  return levels
+}
+
+// The rows only change when a milestone level is reached, but the skill state object is replaced on every tick, so
+// they are compared by value and the previous array handed back when nothing moved (see "stable references" above).
+const milestoneCache = new Map<string, readonly SkillMilestone[]>()
+const sameRows = (a: readonly SkillMilestone[], b: readonly SkillMilestone[]): boolean =>
+  a.length === b.length && a.every((row, i) => row.level === b[i]!.level && row.playedMs === b[i]!.playedMs && row.devMs === b[i]!.devMs)
+
+/** The "Skill milestones" rows for one skill. Empty for a skill the data no longer has. */
+export function selectSkillMilestones(s: GameStore, skillId: string): readonly SkillMilestone[] {
+  const skill = content.skillById.get(skillId)
+  const sk = s.game.skills[skillId]
+  const rows = levelsFor(skillId).map((level): SkillMilestone => {
+    const stamp = sk?.reached[level]
+    return {
+      level,
+      playedMs: stamp ? stamp[0] : null,
+      devMs: stamp ? stamp[1] : 0,
+      slot: skill ? skill.slotUnlockLevels.includes(level) : false,
+      max: skill ? level === skill.maxLevel : false,
+    }
+  })
+  const prev = milestoneCache.get(skillId)
+  if (prev && sameRows(prev, rows)) return prev
+  milestoneCache.set(skillId, rows)
+  return rows
+}
+
+/** The skills that have earned any XP, in the data's order. The milestone table shows one per entry. */
+export function selectSkillIdsWithXp(s: GameStore): readonly string[] {
+  return stable('skills-with-xp', content.skills.filter((skill) => (s.game.skills[skill.id]?.xp ?? 0) > 0).map((skill) => skill.id))
+}
+
 // ---------- welcome back ----------
 
 export interface WelcomeBackResource {

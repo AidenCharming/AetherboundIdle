@@ -3,8 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9c is in progress (2026-09-20). Checkpoint A is done; B, C, D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
-1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats — **done, checkpoint A**, plus **level-reached timestamps** per skill (checkpoint B). First real save migration (1 to 2). Shown in Settings.
+**Step 1.9c is in progress (2026-09-20). Checkpoints A and B are done; C, D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
+1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats and **level-reached timestamps** per skill — **done, checkpoints A and B**. Save version 2 with the first real migration. Both shown in Settings.
 2. **XP retune**: skill curve growth 1.04 to 1.045 (target: the fastest possible account needs about 2 weeks for level 250), with a floor test in test/pacing.test.ts.
 3. **Wire in the background image** (specs, prompt and wiring rules in docs/art-brief-background.md). Files: src/ui/assets/background/app-bg.png (2048x1144, really JPEG data: rename to app-bg.jpg) and app-bg-portrait.png (a plain crop; try CSS cover first). Originals and prompt in docs/reference/art/background/.
 4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
@@ -1363,6 +1363,38 @@ delete it. So after this step, do not run the old `Aetherbound-Idle-0.1.0-*.exe`
 2. **The granted window, not the requested one.** The counter measures what the game gave you, so it can never claim more time than it earned.
 3. **`credit: 'none'`** exists for a caller that counts a window itself. Nothing uses it in the game; it keeps the option total rather than implicit.
 4. Counters are plain milliseconds, not balance, so they are **not** in `tuning.json`.
+
+### 2026-09-20, step 1.9c checkpoint B: when each level was reached (the same migration, 1 -> 2)
+
+New: `src/ui/components/SkillMilestones.tsx`, `test/milestones.test.ts`. Changed: `types/state.ts`, `sim/skills.ts`, `sim/tick.ts`, `sim/state.ts`, `sim/save.ts`, `state/selectors.ts`,
+`ui/screens/Settings.tsx`, `ui/theme.css`, `data/tuning.json` + `data/schema.ts` + `test/content.test.ts` (a new `ui.pacingMilestones`), plan.md 3.10, 5 and 6, and the tests that build a `SkillState` by hand.
+
+- **`SkillState.reached`**: a sparse map, level -> `[playedMs, devMs]`, where `playedMs = stats.onlineMs + stats.awayMs` and `devMs = stats.devMs` at that moment. **Absent means unknown, never zero.** Reading
+  it: `playedMs` is the real time it took, and a `devMs` that has grown since the level before means the dev panel's fast-forward did part of the work. A new game has level 1 at `[0, 0]`.
+- **Accuracy (also in a comment on `StampWindow` in `sim/skills.ts`).** A level reached during an ordinary tick is stamped at that tick, so it is accurate to one `ui.tickMs` (100 ms). A level crossed inside ONE
+  offline or fast-forward window is placed by **linear interpolation across the window by XP**, which is approximate: the XP rate is taken as constant for the whole window, and it is not when a slot unlocks
+  part-way through, so a twelve-hour window can misplace a level by a good part of an hour. It is never wrong about *which window* a level fell in, only about where inside it. Levels the dev panel's "Set skill
+  level" hands out are left **absent**, because no time passed for them. Levels an old save already had are absent too; nothing is invented.
+- **Where it lives.** `addSkillXp` already knew every level crossed, so it stamps there, and takes an optional `StampWindow` built by `step` from the counters at the window's two ends. Pure, no clock.
+  `raiseSkillToLevel` (the dev panel) passes no window, which is what makes its levels unknown. **The first stamp for a level wins**, so a retune that re-levels a save cannot rewrite its history.
+- **Migration 1 -> 2** (the same one as checkpoint A) now also adds `reached` to every skill: `{}` for a skill that has XP, and `{ "1": [0, 0] }` for one that does not (it is still at its starting level, which
+  costs nothing). `reconcile` keeps whatever stamps a save has, and gives a skill added by a later content update `{}` — the save cannot say when that player got it, and `[0, 0]` would claim they had it from
+  the start. The schema stays strict: the key must be a whole level number and the value exactly two non-negative numbers.
+- **UI.** Settings has a "Skill milestones" card: one small table per skill that has earned XP, with a row for each of the skill's slot unlock levels, its max level, and the levels in the new
+  `tuning.ui.pacingMilestones`. Columns: level (marked "slot" / "max"), and the real play time when it was reached, with "+ dev 6 h" appended when dev time had been added by then, or "unknown" when there is no
+  stamp. `selectSkillMilestones` returns the same array while nothing has moved, so the table does not re-render on every tick.
+- **`tuning.ui.pacingMilestones` = [10, 25, 50, 100, 150, 200]** (PLACEHOLDER, designer to adjust). It is display only: it decides which extra rows that table shows and nothing else. Schema, content test
+  (ascending, distinct, whole, no higher than a skill's max level) and plan.md 3.10 all carry it, as CLAUDE.md requires for a new UI number.
+
+**Mutation-checked** (applied, `npm test`, reverted):
+- stamping every level at the window's end instead of interpolating: **3 tests fail** ("NOT all of them at the end", "the early levels take a small share of the window", and the offline-equals-online test).
+- overwriting an existing stamp instead of keeping the first: **1 test fails** ("re-earning a level after a harder curve keeps the original time"), which is the only case where it can happen at all.
+
+**Decisions.**
+1. **Interpolation, not segmentation.** Segmenting an offline window per level would make the stamps exact, but `advanceSkills` does its whole window in one bulk pass on purpose (plan 4.5), and cutting it up to
+   date a display-only number would slow the one path the whole game runs on. The approximation is written down instead, in the code and here.
+2. **Unknown rather than a guess.** Every case where the time is not known (an old save, a dev-granted level, a skill added later) stores nothing and shows "unknown".
+3. **`[playedMs, devMs]` as a two-element array**, not an object: it is repeated up to 250 times per skill in the save, and a save is one localStorage string.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 - ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.

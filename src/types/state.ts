@@ -36,6 +36,13 @@ export interface SlotState {
   progressMs: number
 }
 
+/**
+ * When a level was reached: `[playedMs, devMs]`, the play-time counters at that moment (step 1.9c).
+ * `playedMs` is `stats.onlineMs + stats.awayMs`, the real time it took; `devMs` is `stats.devMs`, so a level whose
+ * `devMs` has grown since the level before it was partly (or wholly) the work of the dev panel's fast-forward.
+ */
+export type LevelStamp = [playedMs: number, devMs: number]
+
 export interface SkillState {
   /** Cached from `xp`. Only `addSkillXp` may change either, so the two cannot disagree. */
   level: number
@@ -43,6 +50,13 @@ export interface SkillState {
   xp: number
   /** Always exactly `slotCount(skill, level)` long; `null` is an empty slot. */
   slots: (SlotState | null)[]
+  /**
+   * Sparse: level (as a string key, because JSON has no number keys) -> when it was reached. ABSENT MEANS UNKNOWN,
+   * never zero. Levels an old save already had, and levels the dev panel's "Set skill level" handed out, are absent,
+   * because no time passed for them and there is nothing to record. A new game starts with level 1 at `[0, 0]`.
+   * The first stamp for a level wins, so a retune that re-levels a save cannot rewrite its history.
+   */
+  reached: Record<string, LevelStamp>
 }
 
 export interface Collection {
