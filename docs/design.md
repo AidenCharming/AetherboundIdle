@@ -28,8 +28,24 @@ No real-money purchases. Everything is earned through play.
 - **Skill level** unlocks resource tiers and work slots. **Creature level, rarity, and form** improve speed.
 - **Max skill level: 250** (PLACEHOLDER, `skills.json` `maxLevel`, the same for every skill). Creature max level is separate and is **99**; see section 4.
 - **Work slots per skill:** 1 at skill level 1, then 2/3/4/5 at levels **50/100/165/225** (PLACEHOLDER, `skills.json` `slotUnlockLevels`). Extra slots beyond 5 are a shop item at a huge gold cost (endgame gold sink).
-- **Skill XP curve (PLACEHOLDER, `tuning.xp.skillCurve`): base 250, growth 1.04.** A level costs `round(250 * 1.04^(L-1))` XP; level 250 is 108.9 M XP in total. Growth is low *because* the cap is high: 1.1 over 250 levels would need about 20 trillion XP.
-- **Pacing targets for the curve** (one unupgraded starter creature, alone, on the shipped Woodcutting tiers): first level-up about **75 s**, level 30 about **46 min**, level 100 about **8 h**, level 250 about **4 months**. These are the feel the curve is tuned to, not a promise about a developed account; `test/pacing.test.ts` fails if a retune moves any of them by more than 15%.
+- **Skill XP curve (PLACEHOLDER, `tuning.xp.skillCurve`): base 250, growth 1.045** (was 1.04 until 2026-09-20, step 1.9c). A level costs `round(250 * 1.045^(L-1))` XP; level 250 is **319.7 M** XP in total (it was 108.9 M). Growth is low *because* the cap is high: 1.1 over 250 levels would need about 20 trillion XP.
+- **Pacing targets for the curve** (one unupgraded starter creature, alone, on the shipped Woodcutting tiers): first level-up about **75 s**, level 30 about **50 min**, level 100 about **12.5 h**, level 250 about **12 months**. These are the feel the curve is tuned to, not a promise about a developed account; `test/pacing.test.ts` fails if a retune moves any of them by more than 15%.
+
+  | Level | One lone starter | Change from growth 1.04 |
+  |---|---|---|
+  | 2 (first level-up) | 75 s | none: the first level costs `base` whatever the growth is |
+  | 30 | 49 min | +7% |
+  | 100 | 12.3 h | +42% |
+  | 150 | 4.6 d | +81% |
+  | 250 (the cap) | 12.2 months | +194% |
+
+  The early game barely moves, because the growth only compounds once there are many levels behind it. The late game is where the retune lands.
+- **The best-case floor: about two weeks to level 250.** The number that matters is not the lone starter but the **fastest account the game allows**: every one of the five work slots filled with a Zenith
+  (tier 9), Form 3, max-level creature carrying the full `cooldown_reduction` and `bonus_xp` caps, on the best tier open to it, with the slots joining at 50/100/165/225. That account reaches 250 in about
+  **13.3 days**, and `test/pacing.test.ts` asserts it can never be under **12 days**. On the old 1.04 curve the same account took 4.6 days, which is what made the retune necessary. A strong but ordinary
+  account is far slower: one maxed creature plus a plain starter is about **52 days**, and one maxed creature alone about **61 days**.
+- **Fast-forward inflates game time.** The dev panel's fast-forward grants real game time, so a fast-forwarded save looks like a played one. Since step 1.9c the save counts online, away and fast-forwarded
+  time separately, and Settings shows all three plus when each skill level was reached; that is how a pacing observation can be told apart from a testing shortcut.
 - **No hunger, rest, or upkeep.** Each creature has an **action cooldown** that shortens with level, rarity, and form, with a hard floor (PLACEHOLDER 20% of base) and diminishing returns.
 - Skill XP is per completed action. Creature quality changes how fast actions complete, not XP per action.
 - **Global cap:** all cooldown reduction from every source (signature, pool traits, auras) shares one cap.

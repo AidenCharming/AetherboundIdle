@@ -363,7 +363,7 @@ is a data change, not a code change.
     "formTerm": { "1": 0, "2": 0.08, "3": 0.16 }
   },
   "xp": {
-    "skillCurve": { "base": 250, "growth": 1.04 },
+    "skillCurve": { "base": 250, "growth": 1.045 },
     "creatureCurve": { "base": 80, "growth": 1.12 }
   },
   "skills": { "secondaryAptitudeBonus": 0.15, "hybridOffPrimaryEfficiency": 0.60 },
@@ -502,7 +502,7 @@ explicit that creature quality changes how fast actions complete, never XP per a
 the number of `slotUnlockLevels` entries less than or equal to the current level.
 
 The table is built per `(curve, maxLevel)` pair, so **skills and creatures do not share one**: skills run
-to 250 on `skillCurve` (base 250, growth 1.04), creatures to 99 on `creatureCurve` (base 80, growth 1.12).
+to 250 on `skillCurve` (base 250, growth 1.045; it was 1.04 until step 1.9c), creatures to 99 on `creatureCurve` (base 80, growth 1.12).
 The skill growth is low because the cap is high — 1.1 over 250 levels would need about 20 trillion XP.
 A save stores XP, never the level, so retuning either curve re-levels an existing save on load
 (`reconcile`, section 5) with no migration; slot counts grow to match and are **never** shrunk.
@@ -674,7 +674,9 @@ Phase 1 coverage:
 - xp curve round-trip (level -> xp -> level) and slot unlock thresholds, both read from the data rather
   than hardcoded, so a retune moves the tests with it.
 - **Pacing** (`test/pacing.test.ts`, added in 1.8t): the real tuning, one unupgraded starter creature on the
-  shipped Woodcutting tiers, asserting the milestone times from design section 3 within 15%.
+  shipped Woodcutting tiers, asserting the milestone times from design section 3 within 15%. Since 1.9c it also
+  asserts a **floor**: the fastest account the data allows (five slots, Zenith Form 3 max-level creatures at both
+  modifier caps) cannot reach level 250 in under 12 days.
 - Cooldown: the shared `cooldown_reduction` cap, and the floor taken from the **efficiency-adjusted**
   base. One test asserts the property that matters: a maxed off-primary hybrid is still strictly slower
   than a floored specialist on the same resource.
@@ -759,7 +761,7 @@ All six approved by the designer on 2026-09-19, with six amendments folded into 
 2. **Signature and pool traits share `traits.json`**, resolved by one effect engine. Signature traits
    carry `kind: "signature"` and a `species` back-reference.
 3. **Max level: skills 250, creatures 99.** Amended by the designer in step 1.8t; it was 99 for both at
-   approval. Skills also moved to a `250 / 1.04` XP curve and work-slot unlocks of `1 / 50 / 100 / 165 / 225`.
+   approval. Skills also moved to a `250 / 1.04` XP curve (growth raised to `1.045` in step 1.9c) and work-slot unlocks of `1 / 50 / 100 / 165 / 225`.
    Creature levels, `creatureCurve` and the Form 2 / 3 thresholds (30 / 60) were explicitly left alone.
    Affects section 3.2 (`skills.json`), section 3.10 (`tuning.json`), section 4.3 (XP and levels) and
    section 6 (testing), all updated.

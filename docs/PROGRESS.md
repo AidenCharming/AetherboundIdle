@@ -3,9 +3,9 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9c is in progress (2026-09-20). Checkpoints A and B are done; C, D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
+**Step 1.9c is in progress (2026-09-20). Checkpoints A, B and C are done; D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
 1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats and **level-reached timestamps** per skill — **done, checkpoints A and B**. Save version 2 with the first real migration. Both shown in Settings.
-2. **XP retune**: skill curve growth 1.04 to 1.045 (target: the fastest possible account needs about 2 weeks for level 250), with a floor test in test/pacing.test.ts.
+2. **XP retune**: skill curve growth 1.04 to 1.045 — **done, checkpoint C**. The fastest possible account now needs about 13.3 days for level 250, and `test/pacing.test.ts` holds a floor test at 12 days.
 3. **Wire in the background image** (specs, prompt and wiring rules in docs/art-brief-background.md). Files: src/ui/assets/background/app-bg.png (2048x1144, really JPEG data: rename to app-bg.jpg) and app-bg-portrait.png (a plain crop; try CSS cover first). Originals and prompt in docs/reference/art/background/.
 4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
 Note: an older build reads a version-2 save as too-new (it sets it aside and starts fresh), so after this step use only the 0.1.1 exe against %APPDATA%/Aetherbound Idle.
@@ -1396,6 +1396,57 @@ New: `src/ui/components/SkillMilestones.tsx`, `test/milestones.test.ts`. Changed
 2. **Unknown rather than a guess.** Every case where the time is not known (an old save, a dev-granted level, a skill added later) stores nothing and shows "unknown".
 3. **`[playedMs, devMs]` as a two-element array**, not an object: it is repeated up to 250 times per skill in the save, and a save is one localStorage string.
 
+### 2026-09-20, step 1.9c checkpoint C: the pacing retune, skill curve growth 1.04 -> 1.045 (designer's decision)
+
+Changed: `data/tuning.json` (`xp.skillCurve.growth` only), `test/pacing.test.ts` (new milestone targets, a new floor test, a new old-save table), design.md section 3, plan.md 3.10, 4.3, 6 and the approval note.
+**Nothing else moved**: XP per action, the Woodcutting tiers and their unlock levels, the slot unlock levels, the creature curve and the creature cap are all exactly as they were.
+
+**Why.** With the old growth the designer reached Woodcutting 217 in five days of wall-clock time using ten 12-hour fast-forwards, on a shiny Zenith Lumbercrown (Form 3, hand-picked traits) plus a plain
+Sproutlet. Level 217 is only 27% of the XP of level 250 — the last 33 levels cost about three times the first 217 — so that pace put level 250 about 18 days out for that setup, and much less than that for a
+fully built account. The target is that the **fastest account the game allows** needs about two weeks for level 250, and that a typical player is far slower.
+
+**What it does.** A level costs `round(250 * 1.045^(L-1))`. Level 250 now needs **319,651,156 XP** in total, up from 108,932,283.
+
+| Level | One lone starter, before | after | change |
+|---|---|---|---|
+| 2 (first level-up) | 75 s | 75 s | none (the first level always costs `base`) |
+| 30 | 46.0 min | 49.3 min | +7% |
+| 100 | 8.7 h | 12.3 h | +42% |
+| 150 | 2.5 d | 4.6 d | +81% |
+| 250 (the cap) | 4.1 months | 12.2 months | +194% |
+
+The early game is almost untouched, because the growth only compounds once there are many levels behind it.
+
+**The account times that matter** (computed from the real data and formulas):
+
+| Account | before (1.04) | after (1.045) |
+|---|---|---|
+| The fastest the game allows: five slots, Zenith / Form 3 / creature cap, both modifier caps | 4.6 days | **13.3 days** |
+| The designer's run: one maxed creature plus a plain Sproutlet | 17.8 days | **52.1 days** |
+| One maxed creature, one slot | 20.7 days | **60.7 days** |
+| One lone unupgraded starter | 4.1 months | **12.2 months** |
+
+The designer's setup reaching level 217 takes 4.9 days at the old growth, which is exactly the run that was observed, so the model matches what actually happened.
+
+**The floor test** (`test/pacing.test.ts`). It models the best achievable account from the shipped data and the real `cooldown` formula as a deliberately GENEROUS upper bound — every slot filled as
+`slotUnlockLevels` opens it, every creature at the top rarity tier, Form 3 and the creature cap, the full `cooldown_reduction` and `bonus_xp` caps from `modifiers.json` applied to every creature at once, always
+on the best tier unlocked — and asserts level 250 takes **at least 12 days**. Nothing in the game can beat that model, so the real best case takes at least as long. **It must be revisited when tiers 4 and 5 are
+authored, when new trait mechanics land, or when a faster creature is added**: each of those raises the best-case rate. That note is in the test file too.
+
+**Mutation-checked**: putting the growth back to 1.04 fails the floor test at 4.6 days (and five other pacing assertions).
+
+**Old saves.** XP is kept and the level is re-derived under the new curve on load, exactly as `reconcile` has always done; no migration is involved. A new test pins the table:
+
+| old level | 1 | 2 | 15 | 30 | 50 | 100 | 150 | 165 | 200 | 217 | 225 | 250 |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **new level** | 1 | 2 | 14 | 28 | 46 | 91 | 136 | 149 | 180 | 196 | 203 | 225 |
+
+Nothing is lost: no creature, no XP, and no slot. The 1.8t grandfathering still holds, so a save keeps every slot it had even where the lower level no longer earns it (a level-250 save becomes level 225 and
+keeps all five). Tested across the whole table through the real save path.
+
+**Open item for the designer.** Real pacing still depends on content that does not exist: **tiers 4 and 5** (today all three Woodcutting tiers are open within the first hour, so levels 30 to 250 add nothing new
+to cut), **faster creatures**, and whatever Phase 2 breeding and Phase 3 expeditions do to the rate. Re-run the pacing and floor tests, and revisit the growth, when those land.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 - ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.
 Listed so they are not forgotten. Not in step 1.7 and not started:
@@ -1424,6 +1475,10 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
   trait's `typeAffinity` should tilt its `rollWeight`. The dev panel's grant deliberately does not roll (see 1.8b checkpoint A); reroll and inheritance need the same
   answer. `traits.json` already carries `rollWeight`, `typeAffinity` and `minStrength`; there is no `tuning.poolTraits` block yet.
 - Whether a dev grant should count toward the collection (`Collection` is written by nothing in Phase 1).
+- **Re-check the pacing once there is more content** (open item recorded with the 1.9c retune). `xp.skillCurve.growth` is 1.045 and the floor test asserts the fastest possible account cannot reach level 250 in
+  under 12 days, but that floor is measured against content that does not exist yet: **Woodcutting tiers 4 and 5** (all three shipped tiers are open within the first hour, so levels 30 to 250 add nothing new to
+  cut), **faster creatures**, and whatever Phase 2 breeding and Phase 3 expeditions do to the rate. Each of those raises the best-case rate. Re-run `test/pacing.test.ts` and revisit the growth when they land.
+- **`tuning.ui.pacingMilestones` is a PLACEHOLDER** ([10, 25, 50, 100, 150, 200]). It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful.
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait

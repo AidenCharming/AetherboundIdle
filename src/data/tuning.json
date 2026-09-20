@@ -9,7 +9,7 @@
     "formMultiplier": { "1": 1, "2": 1.2, "3": 1.4 }
   },
   "cooldown": { "floorFraction": 0.2, "levelTermPerLevel": 0.004, "rarityTermPerTier": 0.06, "formTerm": { "1": 0, "2": 0.08, "3": 0.16 } },
-  "xp": { "skillCurve": { "base": 250, "growth": 1.04 }, "creatureCurve": { "base": 80, "growth": 1.12 } },
+  "xp": { "skillCurve": { "base": 250, "growth": 1.045 }, "creatureCurve": { "base": 80, "growth": 1.12 } },
   "skills": { "secondaryAptitudeBonus": 0.15, "hybridOffPrimaryEfficiency": 0.6 },
   "offline": { "capHours": 12, "maxSegmentsPerSlot": 200, "awayThresholdMs": 120000 },
   "aether": { "benchEmissionTickMs": 60000 },
