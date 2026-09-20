@@ -1,9 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 import { content } from '../src/data'
-import { applyOffline } from '../src/sim/offline'
+import { applyOffline, type OfflineSkillSummary, type OfflineSummary } from '../src/sim/offline'
 import { step } from '../src/sim/tick'
 import { createActions } from '../src/state/actions'
 import { createTickDriver } from '../src/state/driver'
+import { combineSummaries } from '../src/state/welcomeBack'
 import { flushSave, loadGame, SAVE_KEY } from '../src/state/persistence'
 import { createGameStore } from '../src/state/store'
 import { parseSave } from '../src/sim/save'
@@ -423,5 +424,52 @@ describe('fastForwardHours (the dev panel, plan 7.1)', () => {
     const reloaded = loadGame(env.storage, env.clock, env.seed, c)
     expect(reloaded.summary!.elapsedMs).toBe(0)
     expect(reloaded.state).toEqual(store.getState().game)
+  })
+})
+
+describe('combining two unread away summaries', () => {
+  const skill = (over: Partial<OfflineSkillSummary> & { skillId: string }): OfflineSkillSummary => ({
+    actions: 0, xpGained: 0, levelBefore: 1, levelAfter: 1, slotsUnlocked: [], ...over,
+  })
+  const summary = (over: Partial<OfflineSummary>): OfflineSummary => ({
+    requestedMs: 0, elapsedMs: 0, capMs: 12 * HOUR, capped: false, clockSkewed: false,
+    aetherGained: 0, resourcesGained: {}, skills: [], ...over,
+  })
+
+  it('adds the time, Aether and resources, and keeps a skill that only one window touched', () => {
+    const a = summary({ requestedMs: HOUR, elapsedMs: HOUR, aetherGained: 1.5, resourcesGained: { 'oak-log': 10 }, skills: [skill({ skillId: 'woodcutting', actions: 10 })] })
+    const b = summary({ requestedMs: 2 * HOUR, elapsedMs: 2 * HOUR, aetherGained: 2.25, resourcesGained: { 'oak-log': 4, 'yew-log': 1 }, skills: [skill({ skillId: 'mining', actions: 3 })] })
+    const both = combineSummaries(a, b)
+    expect(both.requestedMs).toBe(3 * HOUR)
+    expect(both.elapsedMs).toBe(3 * HOUR)
+    expect(both.aetherGained).toBe(3.75)
+    expect(both.resourcesGained).toEqual({ 'oak-log': 14, 'yew-log': 1 })
+    expect(both.skills.map((s) => [s.skillId, s.actions])).toEqual([['woodcutting', 10], ['mining', 3]])
+  })
+
+  it('spans a skill from the earliest level before to the latest level after, and unions its slots', () => {
+    const a = summary({ skills: [skill({ skillId: 'woodcutting', levelBefore: 1, levelAfter: 20, slotsUnlocked: [1], actions: 5, xpGained: 50 })] })
+    const b = summary({ skills: [skill({ skillId: 'woodcutting', levelBefore: 20, levelAfter: 42, slotsUnlocked: [2, 1], actions: 7, xpGained: 70 })] })
+    const wc = combineSummaries(a, b).skills[0]!
+    expect(wc).toMatchObject({ levelBefore: 1, levelAfter: 42, actions: 12, xpGained: 120 })
+    expect(wc.slotsUnlocked).toEqual([1, 2]) // union, sorted, no duplicate
+  })
+
+  it('keeps the flags if either window had them, and never subtracts a backwards clock', () => {
+    const skewed = summary({ requestedMs: -5 * HOUR, clockSkewed: true })
+    const real = summary({ requestedMs: 20 * HOUR, elapsedMs: 12 * HOUR, capped: true })
+    const both = combineSummaries(skewed, real)
+    expect(both.requestedMs).toBe(20 * HOUR) // not 15
+    expect(both.capped).toBe(true)
+    expect(both.clockSkewed).toBe(true)
+  })
+
+  it('does not mutate either input', () => {
+    const a = summary({ resourcesGained: { 'oak-log': 1 }, skills: [skill({ skillId: 'woodcutting', slotsUnlocked: [1] })] })
+    const b = summary({ resourcesGained: { 'oak-log': 2 }, skills: [skill({ skillId: 'woodcutting', slotsUnlocked: [2] })] })
+    combineSummaries(a, b)
+    expect(a.resourcesGained).toEqual({ 'oak-log': 1 })
+    expect(a.skills[0]!.slotsUnlocked).toEqual([1])
+    expect(b.skills[0]!.slotsUnlocked).toEqual([2])
   })
 })

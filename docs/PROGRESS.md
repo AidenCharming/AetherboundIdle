@@ -3,21 +3,21 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.8a checkpoint B: the welcome-back modal, the Settings tab, and the dev panel's fast-forward.** Checkpoint A
-(the state layer) is done and committed. Starting points:
-- `store.welcomeBack` is the pending `OfflineSummary`, set at boot and by the driver's away path;
-  `actions.dismissWelcomeBack()` clears it. Nothing renders it yet, and there is no selector for it yet.
-- `driver.fastForwardHours(n)` already exists and is tested (100 h under the 12 h cap grants 12 h). The Dev tab only
-  has to call it through an action; it must have no maths of its own.
-- `GameState.settings` already has `offlineSummary` and `devPanelEnabled` in the save schema, so no migration is
-  needed. An action to change a setting does not exist yet.
-- The tabs are in `App.tsx` (`TabBar`); the Dev tab shows only while `settings.devPanelEnabled` is true.
-- Same UI rules as 1.6/1.7: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
+**Step 1.8b: the rest of the dev panel, the bench and Aether-per-minute display, and the polish pass. Phase 1
+playable after it.** 1.8a is done and committed. Starting points:
+- **Dev panel** (`src/ui/screens/DevPanel.tsx`): fast-forward is built; plan 7.1 still wants **grant creature** (any
+  species or hybrid, any rarity tier, level and form, optional shiny, pool traits rolled normally unless
+  overridden), **add resources** (any amount of any resource id), **add Aether / gold**, and **reset save** behind a
+  confirmation. `makeCreature` in `sim/creature.ts` is what a grant should go through; every control needs an action
+  in `state/actions.ts`, and the grant and the reset both need a save flush. A grant replaces the hand-injected
+  40-creature saves used to test 1.7 (see "How to test the roster by hand" in the 1.7 checkpoint B notes).
+- **Bench and Aether per minute**: rarity's `benchEmissionPerMin` is in `rarities.json` and the sim accrues it
+  continuously (`sim/aether.ts`). A roster card could show it per benched creature and the top bar could show Aether
+  per minute; both need a selector, because the UI never imports `src/sim`. Note the top bar shows floored Aether, so
+  a small bench looks frozen until the first whole point — a per-minute rate is what makes it legible.
+- **Polish pass**: whatever 1.6/1.7/1.8a left rough. The known list is in the "Not verified" notes of each checkpoint.
+- Same UI rules throughout: read through `selectors.ts` and the two hooks, no hex colors or balance numbers in `ui/`,
   selectors keep identity (`test/architecture.test.ts` and the selector tests enforce these).
-
-After 1.8a, **1.8b** is the rest of step 1.8: the remaining dev-panel controls (grant creature at any
-species/rarity/level/form, add resources, add Aether and gold, reset the save), the bench and Aether-per-minute
-display (`benchEmissionPerMin` from `rarities.json`, needs a selector), and the polish pass. Phase 1 playable after it.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -27,7 +27,7 @@ display (`benchEmissionPerMin` from `rarities.json`, needs a selector), and the 
 - [x] 1.5 Offline progress calculation (time elapsed ÷ cooldown, bulk, capped window) plus save/load with versioning. Unit tests. *(2026-09-19)*
 - [x] 1.6 UI: skills screen with a Woodcutting slot and progress bars, top bar with resources. *(2026-09-19; state layer in checkpoint A, screen in checkpoint B)*
 - [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
-- [ ] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(step 1.8 was split at the designer's instruction, 2026-09-19)*
+- [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
 - [ ] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, reset save), bench and Aether-per-minute display, polish pass. Phase 1 playable.
 
 ## Phase 2: Breeding and hatching
@@ -621,6 +621,87 @@ caught: the `lastSeen` re-anchor skipped (4 tests fail), the cap dropped from `a
 replaced by a hardcoded 24 h (7), a second summary replacing the pending one instead of combining (1), the threshold
 gate removed from `queueWelcomeBack` (3), the loader's below-the-cap cross-check removed (1), and `awayThresholdMs`
 loosened from `PosInt` in the schema (1).
+
+### 2026-09-19, step 1.8a checkpoint B: welcome-back dialog, Settings tab, fast-forward
+
+New: `src/ui/components/WelcomeBack.tsx`, `src/ui/screens/{Settings,DevPanel}.tsx`, `test/format.test.ts`. Changed:
+`state/selectors.ts`, `state/actions.ts`, `ui/format.ts`, `ui/theme.css`, `App.tsx`. 516 tests pass (489 after
+checkpoint A) and `npm run build` is clean. No new dependency.
+
+**Four tabs.** Skills, Roster, Settings, and Dev while `settings.devPanelEnabled` is on. Which tab is chosen is still
+UI-local state; turning the Dev panel off while standing on the Dev tab falls back to Settings rather than leaving an
+empty panel (`App.tsx` derives the shown screen from the tabs that exist).
+
+**Settings.** Two checkboxes, both already in `GameState.settings` and the save schema, so **no migration was
+needed**. `actions.setSetting(key, value)` commits and flushes at once, so the choice survives however the tab ends.
+The whole row is the label, so tapping the text toggles the box (the box itself is 22 px, the row is 80 to 119 px).
+
+**The welcome-back dialog.** A native `<dialog>` opened with `showModal()`: focus moves inside and is trapped, the
+rest of the page goes inert, and the backdrop is the browser's. `role="dialog"` and `aria-modal="true"` are written
+out although they are implicit. It shows time away; "capped at 12 h, the rest earned nothing" when the cap bit (with
+both durations read from the summary, never written in the UI); Aether gained, floored for display only; each
+resource with its emoji; and per skill the actions, XP, `level before -> after` and any new slot numbers. Every number
+comes from `selectWelcomeBack`, a view cached per summary object so the dialog is not rebuilt on the tick;
+`ui/format.ts` gained `formatDuration` ("12 h 30 m", "4 d 4 h", always rounding down) and `formatGain`.
+
+**Two browser-only findings, both fixed** (neither is reachable from a node test: there is no DOM test environment):
+1. **React's `onClose` on a `<dialog>` never fires.** The first version cleared the summary from it, so Close left a
+   closed-but-mounted, invisible dialog over a summary the player had not read.
+2. **The dialog's own `close` event does not fire either** in the browser this was tested in — proven directly:
+   `d.addEventListener('close', ...); d.showModal(); d.close()` left the listener uncalled. So the rewrite listens
+   for neither. Escape is handled by an explicit `onKeyDown` (with `preventDefault`, so the browser's own close
+   watcher cannot act as well), and Escape and the Close button both call `dismissWelcomeBack`; React unmounting the
+   dialog is what takes it out of the top layer. An effect keyed on the summary restores focus to whatever opened it,
+   which the browser would otherwise have done itself.
+
+**The Dev tab, this step only: fast-forward.** An hours field plus 1 h / 12 h / 100 h presets. It has **no maths of
+its own**: `actions.fastForwardHours(n)` calls `driver.fastForwardHours(n)`, which steps to now and then runs the
+same `catchUp` a long open-tab gap runs, then flushes. The panel notes why it exists (the tab's own unload flush
+overwrites a hand-edited `lastSeen`).
+
+**Verified in a real browser** (Vite dev server on :5174, Chromium pane), each number checked against the maths:
+- **Fast-forward 1 h, Sproutlet on oak**: exactly **1,200 actions** (3600 s / 3.0 s) and **+12,000 XP** (1,200 x 10),
+  level 1 -> 27 crossing the level-20 slot unlock, which matches the 1.5 offline test exactly. Oak +1,332 and
+  seedcache +20 are the random Overgrowth extras and rare drops on top.
+- **Fast-forward 100 h**: "You were away for 4 d 4 h", the capped line, and exactly **14,400 actions / +144,000 XP**,
+  which is 12 h and not 100 h. Repeated from a fresh save: same 14,400.
+- **A long gap on an open tab**, by overriding `Date.now` in the page to jump 20 h forward and letting the 100 ms tick
+  land on it: the dialog says 20 h away, capped, **14,400 actions** again, `lastSeen` moved the full 20 h + the real
+  seconds that passed, and the XP gained was the 144,000 of the window plus exactly the ordinary ticks around it -
+  nothing double-counted.
+- **Boot path**: `lastSeen` rewound 3 h in localStorage and re-written from a late `pagehide` listener (the 1.6
+  trick), then reloaded: the dialog opens on load with 3,604 actions, which is 3 h plus the 12 s the edit took.
+- **Under the threshold**: fast-forwarding 0.01 h (36 s) grants 120 XP (12 actions) and shows **no** dialog.
+- **The setting**: with "Show welcome-back summary" off, a 1 h fast-forward grants the full 12,000 XP and shows no
+  dialog. Both toggles survive a reload, and the Dev tab appears and disappears with its toggle.
+- **Accessibility**: focus is inside the dialog while it is open and returns to the button that opened it; Escape
+  closes it and clears the summary; the Close button is exactly 44 px; the page behind is inert.
+- **375 px**: no horizontal overflow on Settings or Dev; the dialog is 337 px wide with no overflow and does not
+  scroll; the gains list is one column on a phone and two from about 420 px (`minmax(160px, 1fr)`, so "Verdant
+  Seedcache" no longer breaks mid-word); every control is at least 44 px except the two checkbox boxes, whose whole
+  row is the target. Console clean on a fresh load.
+
+**Not verified:** a real phone, Safari or Firefox (Chromium only) - and the two `<dialog>` findings above are exactly
+the kind of thing that differs per engine, so the dialog is worth re-checking there; keyboard-only tabbing inside the
+dialog and screen-reader output; and there is still no automated DOM test (no jsdom), so all three new components are
+covered by the browser run above and by the selector and action tests underneath them, not by the suite.
+
+**A trap for whoever tests by hand.** **Two tabs open on the same save fight over it.** Both drivers autosave to
+`aetherbound-idle:save` every 15 s from their own copy of the state, so readings jump around and progress is lost.
+This is not new in 1.8a and is not a bug this step introduced, but it wasted time here: close every other tab before
+measuring anything. (A real multi-tab rule - a lock, or a "this game is open elsewhere" notice - is not in the design;
+raise it with the designer if it matters.)
+
+**Decisions (all reversible):**
+1. **`selectWelcomeBack` returns a display view, not the raw summary**, so the dialog does no lookups of its own: it
+   carries resource names, emoji and colors, skill names and colors, 1-based slot numbers and floored Aether.
+2. **Slot numbers are shown 1-based** (`New slot: 2`), matching the Skills screen's "slot 1", while the summary keeps
+   the sim's 0-based index.
+3. **`formatDuration` shows two units and rounds down.** It must never claim more time than passed.
+4. **`SettingKey` is exported from `selectors.ts`** so the UI names a setting without importing `src/types/state`.
+5. **A skill with nothing to report is dropped from the dialog**, and an away window with nothing at all says so
+   rather than showing empty lists.
+6. **The fast-forward field is disabled rather than clamped** when it is empty or not a positive number.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:

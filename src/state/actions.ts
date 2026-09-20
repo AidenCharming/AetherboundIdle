@@ -5,7 +5,7 @@
 // Stepping to now first matters: the tick lands every `ui.tickMs`, so without it the last few dozen milliseconds
 // would be credited to whatever the slot looks like after the change instead of before it.
 import { assignCreature, setSlotResource, unassignCreature } from '../sim/skills'
-import type { GameState } from '../types/state'
+import type { GameState, Settings } from '../types/state'
 import type { TickDriver } from './driver'
 import { commitRoll, type StorageLike } from './persistence'
 import type { GameStoreApi } from './store'
@@ -23,6 +23,14 @@ export interface Actions {
   dismissNotice(): void
   /** Closes the welcome-back summary. It is gone for good: the progress it reported was already granted. */
   dismissWelcomeBack(): void
+  /** Flips one of the player's settings and saves at once, so it survives a reload however the tab ends. */
+  setSetting(key: keyof Settings, value: boolean): void
+  /**
+   * The dev panel (plan 7.1). Grants `hours` of the REAL offline path: the same `applyOffline`, the same cap, the
+   * same welcome-back summary as a long gap. It has no maths of its own, so 100 hours under a 12-hour cap grants 12.
+   * It saves straight afterwards, because this tab's own flush would otherwise be the only record of it.
+   */
+  fastForwardHours(hours: number): void
   /**
    * For breed, hatch and capture (plan 4.6): runs `roll`, then saves the result and the advanced RNG state in
    * the same write, so a reload cannot replay the roll. Nothing calls it before phase 2. `saved` is false when
@@ -31,7 +39,7 @@ export interface Actions {
   commitRoll<R>(roll: (state: GameState) => { state: GameState; result: R }): { result: R; saved: boolean }
 }
 
-export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'stepToNow'>, storage: StorageLike): Actions {
+export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'stepToNow' | 'flush' | 'fastForwardHours'>, storage: StorageLike): Actions {
   const game = (): GameState => store.getState().game
   const commit = (state: GameState): void => store.setState({ game: state })
 
@@ -63,6 +71,18 @@ export function createActions(store: GameStoreApi, driver: Pick<TickDriver, 'ste
 
     dismissWelcomeBack() {
       store.setState({ welcomeBack: null })
+    },
+
+    setSetting(key, value) {
+      const state = game()
+      if (state.settings[key] === value) return
+      commit({ ...state, settings: { ...state.settings, [key]: value } })
+      driver.flush()
+    },
+
+    fastForwardHours(hours) {
+      driver.fastForwardHours(hours)
+      driver.flush()
     },
 
     commitRoll(roll) {

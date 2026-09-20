@@ -652,7 +652,8 @@ Phase 1 coverage:
 | 1.5 | `offline`, `save`, `state/persistence` + tests |
 | 1.6 | Skills screen, top bar, tick driver |
 | 1.7 | Roster screen, placeholder art, filter and sort, assign to slot |
-| 1.8 | Nexus bench + emission display, welcome-back summary, **dev panel**, polish |
+| 1.8a | Away path for a long-open tab, welcome-back summary, Settings tab, dev-panel fast-forward |
+| 1.8b | Rest of the dev panel, Nexus bench + emission display, polish |
 
 Phase 1 ships one starter **Sproutlet**, Woodcutting with `oak-log` / `willow-log` / `yew-log`, and the
 bench. `zones.json`, `vessels.json` and `collection-tracks.json` are created empty in step 1.3 so their
@@ -664,13 +665,16 @@ schemas exist and phase 3/4 sessions have somewhere to put content.
 persisted). It exists to make phase 2-4 content testable without grinding, and it starts in phase 1
 because every later phase needs it.
 
-| Control | Behaviour |
-|---|---|
-| Grant creature | Pick any species or hybrid, any rarity tier, level and form; optional shiny. Rolls pool traits normally unless overridden. |
-| Add resources | Any amount of any resource ID. |
-| Add Aether / gold | Direct numeric grant. |
-| Fast-forward N hours | Rewinds `lastSeen` by N hours and re-runs the **real** offline path. |
-| Reset save | Wipes the save and reloads, behind a confirmation. |
+| Control | Behaviour | Built |
+|---|---|---|
+| Fast-forward N hours | Rewinds `lastSeen` by N hours and re-runs the **real** offline path. | 1.8a |
+| Grant creature | Pick any species or hybrid, any rarity tier, level and form; optional shiny. Rolls pool traits normally unless overridden. | 1.8b |
+| Add resources | Any amount of any resource ID. | 1.8b |
+| Add Aether / gold | Direct numeric grant. | 1.8b |
+| Reset save | Wipes the save and reloads, behind a confirmation. | 1.8b |
+
+Step 1.8 was split in two at the designer's instruction (2026-09-19): 1.8a is the away path, the summary, the
+Settings tab and the fast-forward; 1.8b is the rest.
 
 The fast-forward control is the important one, and it must not have its own maths. It sets
 `lastSeen = now - N hours` and calls the same `sim/offline.ts` entry point the app calls on load, so it

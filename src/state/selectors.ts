@@ -9,8 +9,9 @@
 import { content, type StatLean, type Strength } from '../data'
 import { canWork, creatureDef } from '../sim/creature'
 import { xpForLevel, xpToNext } from '../sim/formulas'
+import type { OfflineSummary } from '../sim/offline'
 import { activeEntries, runningSlot } from '../sim/skills'
-import type { Creature } from '../types/state'
+import type { Creature, Settings } from '../types/state'
 import type { LoadNotice } from './persistence'
 import type { GameStore } from './store'
 
@@ -159,6 +160,111 @@ export const selectResourceQty = (s: GameStore, resourceId: string): number => s
 export function selectQuarantineNotice(s: GameStore): LoadNotice | null {
   const notice = s.loadReport.notice
   return notice?.kind === 'quarantined' && !s.noticeDismissed ? notice : null
+}
+
+// ---------- settings ----------
+
+/** The settings the player can flip. Exported so the UI names one without importing the state types. */
+export type SettingKey = keyof Settings
+
+export const selectSetting = (s: GameStore, key: SettingKey): boolean => s.game.settings[key]
+
+/** Whether the Dev tab is offered at all. The panel ships in the production build behind this toggle (plan 7.1). */
+export const selectDevPanelEnabled = (s: GameStore): boolean => s.game.settings.devPanelEnabled
+
+// ---------- welcome back ----------
+
+export interface WelcomeBackResource {
+  id: string
+  name: string
+  emoji: string | null
+  color: string
+  qty: number
+}
+
+export interface WelcomeBackSkill {
+  id: string
+  name: string
+  /** The type color of the skill, or null for the open skills. */
+  color: string | null
+  actions: number
+  xpGained: number
+  levelBefore: number
+  levelAfter: number
+  /** Slot numbers as the player counts them (1-based), ascending. */
+  slotsUnlocked: readonly number[]
+}
+
+/** Everything the welcome-back dialog shows. Built from the summary the sim produced; it does no maths of its own. */
+export interface WelcomeBackView {
+  /** How long the player was actually away. */
+  awayMs: number
+  /** How much of that earned anything: the same as `awayMs` unless the cap bit. */
+  earnedMs: number
+  /** The cap, so the dialog can name it without a number of its own. */
+  capMs: number
+  capped: boolean
+  /** Floored for display; the stored float keeps its fraction. */
+  aetherGained: number
+  resources: readonly WelcomeBackResource[]
+  skills: readonly WelcomeBackSkill[]
+  /** Nothing happened while away (an empty bench and no slot working). */
+  empty: boolean
+}
+
+// Cached on the summary object, which only changes when a new one is queued, so the dialog is not rebuilt every tick.
+const welcomeBackViews = new WeakMap<OfflineSummary, WelcomeBackView>()
+
+function buildWelcomeBackView(summary: OfflineSummary): WelcomeBackView {
+  const resources = Object.entries(summary.resourcesGained)
+    .filter(([, qty]) => qty > 0)
+    .map(([id, qty]) => {
+      const info = resourceInfo(id)
+      return { id, name: info.name, emoji: info.emoji, color: info.color, qty }
+    })
+  // The data's order, so the dialog lists resources the way the top bar does, with anything unknown last.
+  const order = new Map(content.resources.map((r, i) => [r.id, i]))
+  resources.sort((a, b) => (order.get(a.id) ?? order.size) - (order.get(b.id) ?? order.size) || a.id.localeCompare(b.id))
+
+  const skills = summary.skills
+    .filter((sk) => sk.actions > 0 || sk.levelAfter > sk.levelBefore || sk.slotsUnlocked.length > 0)
+    .map((sk) => {
+      const info = skillInfo(sk.skillId)
+      return {
+        id: sk.skillId,
+        name: info.name,
+        color: info.color,
+        actions: sk.actions,
+        xpGained: sk.xpGained,
+        levelBefore: sk.levelBefore,
+        levelAfter: sk.levelAfter,
+        slotsUnlocked: sk.slotsUnlocked.map((i) => i + 1).sort((a, b) => a - b),
+      }
+    })
+
+  return {
+    // A clock-skewed window reports a negative request; the dialog never shows negative time away.
+    awayMs: Math.max(0, summary.requestedMs),
+    earnedMs: summary.elapsedMs,
+    capMs: summary.capMs,
+    capped: summary.capped,
+    aetherGained: Math.floor(summary.aetherGained),
+    resources,
+    skills,
+    empty: resources.length === 0 && skills.length === 0 && summary.aetherGained < 1,
+  }
+}
+
+/** The away summary waiting to be shown, ready for display; null when there is none. Stable while it is the same one. */
+export function selectWelcomeBack(s: GameStore): WelcomeBackView | null {
+  const summary = s.welcomeBack
+  if (!summary) return null
+  let view = welcomeBackViews.get(summary)
+  if (!view) {
+    view = buildWelcomeBackView(summary)
+    welcomeBackViews.set(summary, view)
+  }
+  return view
 }
 
 // ---------- skills ----------

@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from 'vitest'
 import { content } from '../src/data'
 import { createRng } from '../src/sim/rng'
+import { applyOffline } from '../src/sim/offline'
 import { parseSave } from '../src/sim/save'
 import { createActions } from '../src/state/actions'
 import { createTickDriver } from '../src/state/driver'
@@ -194,5 +195,88 @@ describe('actions.commitRoll (phase 2 plumbing)', () => {
     expect(saved).toBe(false)
     expect(game().resources['oak-log']).toBe(3)
     expect(game().lastSeen).toBe(env.clock)
+  })
+})
+
+// ---------- step 1.8a ----------
+
+describe('settings actions', () => {
+  /** A booted game with the driver built and the actions wired, as runtime.ts does. */
+  function wired() {
+    const env = new FakeEnv()
+    flushSave(env.storage, sproutletAtWork(), NOW)
+    const store = createGameStore(loadGame(env.storage, env.now(), env.seed))
+    const driver = createTickDriver(store, env)
+    return { env, store, driver, actions: createActions(store, driver, env.storage) }
+  }
+
+  const savedSettings = (env: FakeEnv) => {
+    const r = parseSave(env.storage.data.get(SAVE_KEY)!)
+    if (!r.ok) throw new Error(r.message)
+    return r.state.settings
+  }
+
+  it('flips a setting and saves it at once, so a reload keeps it', () => {
+    const { env, store, actions } = wired()
+    expect(store.getState().game.settings.devPanelEnabled).toBe(false)
+    actions.setSetting('devPanelEnabled', true)
+    expect(store.getState().game.settings.devPanelEnabled).toBe(true)
+    expect(savedSettings(env).devPanelEnabled).toBe(true)
+    expect(loadGame(env.storage, env.clock, 1).state.settings.devPanelEnabled).toBe(true)
+  })
+
+  it('leaves the other setting alone, and does nothing when the value is unchanged', () => {
+    const { env, store, actions } = wired()
+    actions.setSetting('offlineSummary', false)
+    expect(store.getState().game.settings).toEqual({ offlineSummary: false, devPanelEnabled: false })
+    const writes = env.storage.writes
+    const game = store.getState().game
+    actions.setSetting('offlineSummary', false)
+    expect(env.storage.writes).toBe(writes) // no second write
+    expect(store.getState().game).toBe(game)
+  })
+
+  it('credits the time since the last tick before saving, so nothing is lost', () => {
+    const { env, store, actions } = wired()
+    env.clock += 9000 // three oak actions, no tick has run
+    actions.setSetting('devPanelEnabled', true)
+    expect(store.getState().game.resources['oak-log']).toBe(3)
+    expect(savedSettings(env).devPanelEnabled).toBe(true)
+  })
+})
+
+describe('the fast-forward action', () => {
+  function wired() {
+    const env = new FakeEnv()
+    flushSave(env.storage, sproutletAtWork(), NOW)
+    const store = createGameStore(loadGame(env.storage, env.now(), env.seed))
+    const driver = createTickDriver(store, env)
+    return { env, store, driver, actions: createActions(store, driver, env.storage) }
+  }
+
+  it('runs the real offline path and saves, so the granted progress survives a reload', () => {
+    const { env, store, actions } = wired()
+    const initial = store.getState().game
+    actions.fastForwardHours(2)
+    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - 2 * HOUR }, NOW).state)
+    const reloaded = loadGame(env.storage, env.clock, 1)
+    expect(reloaded.state).toEqual(store.getState().game)
+    expect(reloaded.summary!.elapsedMs).toBe(0) // nothing left for the load to re-grant
+  })
+
+  it('is capped like any other absence, and reports it in the same summary', () => {
+    const { store, actions } = wired()
+    actions.fastForwardHours(100)
+    const cap = content.tuning.offline.capHours * HOUR
+    expect(store.getState().welcomeBack).toMatchObject({ capped: true, elapsedMs: cap, requestedMs: 100 * HOUR })
+    expect(store.getState().game.resources['oak-log']).toBeGreaterThanOrEqual(cap / 3000)
+  })
+
+  it('shows no summary when the player turned it off, but still grants the time', () => {
+    const { store, actions } = wired()
+    actions.setSetting('offlineSummary', false)
+    actions.fastForwardHours(2)
+    expect(store.getState().welcomeBack).toBeNull()
+    expect(store.getState().game.resources['oak-log']).toBeGreaterThanOrEqual((2 * HOUR) / 3000)
   })
 })

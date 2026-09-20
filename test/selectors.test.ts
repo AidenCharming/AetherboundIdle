@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { content } from '../src/data'
 import { creatureCooldown } from '../src/sim/creature'
+import { applyOffline } from '../src/sim/offline'
 import { step } from '../src/sim/tick'
 import * as sel from '../src/state/selectors'
 import { createGameStore, type GameStore } from '../src/state/store'
@@ -327,6 +328,9 @@ describe('selectors are safe for zustand v5 (stable references)', () => {
     ['creatures', sel.selectCreatureViews],
     ['assignResource', (s) => sel.selectSlotAssignResourceId(s, 'woodcutting', 0)],
     ['assignable', (s) => sel.selectAssignableCreatureIds(s, 'woodcutting', 0)],
+    ['setting', (s) => sel.selectSetting(s, 'offlineSummary')],
+    ['dev', sel.selectDevPanelEnabled],
+    ['welcomeBack', sel.selectWelcomeBack],
   ]
 
   it.each(calls)('%s returns the same value for the same state', (_name, select) => {
@@ -351,5 +355,101 @@ describe('selectors are safe for zustand v5 (stable references)', () => {
     const b = sel.selectHeldResourceIds(view({ ...newGame(), resources: { 'oak-log': 1, 'yew-log': 1 } }))
     expect(b).not.toBe(a)
     expect(b).toEqual(['oak-log', 'yew-log'])
+  })
+})
+
+// ---------- step 1.8a: settings and the welcome-back view ----------
+
+describe('settings', () => {
+  it('reads each setting, and the Dev tab follows devPanelEnabled', () => {
+    const game = newGame()
+    expect(sel.selectSetting(view(game), 'offlineSummary')).toBe(true)
+    expect(sel.selectSetting(view(game), 'devPanelEnabled')).toBe(false)
+    expect(sel.selectDevPanelEnabled(view(game))).toBe(false)
+    const on = { ...game, settings: { offlineSummary: false, devPanelEnabled: true } }
+    expect(sel.selectSetting(view(on), 'offlineSummary')).toBe(false)
+    expect(sel.selectDevPanelEnabled(view(on))).toBe(true)
+  })
+})
+
+describe('the welcome-back view', () => {
+  /** A real summary: `hours` away with the Sproutlet on oak, through the sim, not hand-built. */
+  const summaryFor = (hours: number, game = sproutletAtWork()) => applyOffline(game, NOW + hours * 3_600_000).summary
+  const wb = (hours: number, game?: GameState) => sel.selectWelcomeBack(view(game ?? sproutletAtWork(), { welcomeBack: summaryFor(hours, game) }))!
+
+  it('is null when nothing is pending', () => {
+    expect(sel.selectWelcomeBack(view(newGame()))).toBeNull()
+  })
+
+  it('reports the time away, the time earned and the cap as the sim measured them', () => {
+    const v = wb(3)
+    expect(v.awayMs).toBe(3 * 3_600_000)
+    expect(v.earnedMs).toBe(3 * 3_600_000)
+    expect(v.capped).toBe(false)
+    expect(v.capMs).toBe(content.tuning.offline.capHours * 3_600_000)
+  })
+
+  it('separates time away from time earned when the cap bit', () => {
+    const v = wb(100)
+    expect(v.awayMs).toBe(100 * 3_600_000)
+    expect(v.earnedMs).toBe(content.tuning.offline.capHours * 3_600_000)
+    expect(v.capped).toBe(true)
+  })
+
+  it('never shows negative time away for a backwards clock', () => {
+    const summary = applyOffline(sproutletAtWork(), NOW - 5 * 3_600_000).summary
+    const v = sel.selectWelcomeBack(view(sproutletAtWork(), { welcomeBack: summary }))!
+    expect(summary.requestedMs).toBeLessThan(0)
+    expect(v.awayMs).toBe(0)
+    expect(v.empty).toBe(true)
+  })
+
+  it('lists resources in the data order, with their name, emoji and color, and drops the empty ones', () => {
+    const v = wb(3)
+    expect(v.resources.map((r) => r.id)).toEqual(['oak-log', 'verdant-seedcache'])
+    expect(v.resources.every((r) => r.qty > 0)).toBe(true)
+    const oak = v.resources[0]!
+    expect(oak.name).toBe(content.resourceById.get('oak-log')!.name)
+    expect(oak.emoji).toBe(content.resourceById.get('oak-log')!.emoji)
+    expect(oak.color).toBe(content.typeById.get(content.resourceById.get('oak-log')!.elementType!)!.color)
+  })
+
+  it('carries the summary numbers per skill, with 1-based slot numbers and the display name', () => {
+    const summary = summaryFor(3)
+    const v = wb(3)
+    const raw = summary.skills.find((s) => s.skillId === 'woodcutting')!
+    const shown = v.skills.find((s) => s.id === 'woodcutting')!
+    expect(shown.name).toBe(content.skillById.get('woodcutting')!.name)
+    expect(shown.color).toBe(content.typeById.get(content.skillById.get('woodcutting')!.requiredType!)!.color)
+    expect(shown.actions).toBe(raw.actions)
+    expect(shown.xpGained).toBe(raw.xpGained)
+    expect(shown.levelBefore).toBe(raw.levelBefore)
+    expect(shown.levelAfter).toBe(raw.levelAfter)
+    expect(shown.levelAfter).toBeGreaterThan(shown.levelBefore)
+    expect(shown.slotsUnlocked).toEqual(raw.slotsUnlocked.map((i) => i + 1)) // the player counts slots from 1
+    expect(shown.slotsUnlocked).toContain(2)
+  })
+
+  it('floors the Aether gained for display only', () => {
+    const benched = newGame() // the starter Sproutlet is on the bench, so it emits
+    const summary = applyOffline(benched, NOW + 3 * 3_600_000 + 7_000).summary // a ragged window, so the total is fractional
+    const v = sel.selectWelcomeBack(view(benched, { welcomeBack: summary }))!
+    expect(summary.aetherGained % 1).not.toBe(0)
+    expect(v.aetherGained).toBe(Math.floor(summary.aetherGained))
+  })
+
+  it('says so when nothing happened', () => {
+    const idle: GameState = { ...newGame(), creatures: [] }
+    const v = sel.selectWelcomeBack(view(idle, { welcomeBack: applyOffline(idle, NOW + 3 * 3_600_000).summary }))!
+    expect(v.empty).toBe(true)
+    expect(v.resources).toEqual([])
+    expect(v.skills).toEqual([])
+  })
+
+  it('is the same object for the same summary, so the dialog is not rebuilt on every tick', () => {
+    const summary = summaryFor(3)
+    const s = view(sproutletAtWork(), { welcomeBack: summary })
+    expect(sel.selectWelcomeBack(s)).toBe(sel.selectWelcomeBack(s))
+    expect(sel.selectWelcomeBack({ ...s, game: at(s.game, 100) })).toBe(sel.selectWelcomeBack(s))
   })
 })

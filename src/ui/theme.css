@@ -645,3 +645,182 @@ select {
 .slot-option:disabled {
   opacity: 0.55;
 }
+
+/* ---------- settings and dev panel ---------- */
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  padding: 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.panel h2 {
+  font-size: 1.15rem;
+}
+
+.panel h3 {
+  font-size: 1rem;
+}
+
+.setting {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-height: 44px;
+  padding: 8px;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.setting input {
+  width: 22px;
+  height: 22px;
+  margin: 2px 0 0;
+  accent-color: var(--text);
+  flex: none;
+}
+
+.setting-label {
+  display: block;
+  font-weight: 600;
+}
+
+.dev-control {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.dev-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.dev-row .field {
+  flex: 1 1 120px;
+}
+
+.dev-hours {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px;
+  font: inherit;
+  color: inherit;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+/* ---------- welcome back ---------- */
+
+/* A native <dialog> opened with showModal(): the browser gives it the dialog role, aria-modal, the focus move and
+   Escape, so none of that is hand-rolled here. */
+.wb {
+  width: min(100% - 24px, 460px);
+  max-height: min(86vh, 700px);
+  margin: auto;
+  padding: 16px;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow-y: auto;
+}
+
+.wb::backdrop {
+  background: rgb(0 0 0 / 60%);
+}
+
+.wb h2 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+}
+
+.wb p + p,
+.wb p + dl,
+.wb dl + ul {
+  margin-top: 10px;
+}
+
+.wb-capped {
+  padding: 8px 10px;
+  background: var(--panel-raised);
+  border-left: 3px solid var(--danger);
+  border-radius: 6px;
+}
+
+.wb-gains {
+  display: grid;
+  /* 160px is what a resource name needs before it breaks mid-word, so a phone gets one column and a desktop two. */
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 8px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-gains div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--panel-raised);
+  border-radius: 6px;
+}
+
+.wb-gains dt {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  color: var(--muted);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.wb-gains dd {
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.wb-skills {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.wb-skill {
+  padding: 8px 10px;
+  background: var(--panel-raised);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-skill h3 {
+  font-size: 1rem;
+}
+
+.wb-close {
+  margin-top: 16px;
+  margin-bottom: 0;
+}
+
+.wb-close button {
+  width: 100%;
+}
