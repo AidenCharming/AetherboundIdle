@@ -14,6 +14,7 @@ A creature-collecting incremental (idle) game in the style of Melvor Idle. Playe
 * All content and balance numbers live in JSON under `src/data/`. **Never hardcode balance numbers in components or logic.**
 * Saves to localStorage (versioned, with a migration hook). Offline progress is computed on load from `lastSeen` timestamp.
 * Vitest for unit tests on the core sim (cooldowns, offline progress, breeding rolls, mutation odds, pity counters).
+* **Delivery: Windows `.exe`.** The designer wants the game to run as a desktop app, not a browser link. It is packaged in step 1.9 (after 1.8b) with a desktop wrapper (Electron recommended; see "Desktop packaging" in `docs/PROGRESS.md`). Until then, keep the app a plain static Vite build with no server dependency and no absolute-URL assumptions, and put no wrapper code in `src/`.
 
 ## Rules for working in this repo
 

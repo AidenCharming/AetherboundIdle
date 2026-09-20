@@ -29,6 +29,30 @@ playable after it.** 1.8a is done and committed. Starting points:
 - [x] 1.7 UI: roster screen with placeholder art cards (type colors, emoji, rarity frame), filter and sort, assign to slot. *(2026-09-19; data, selectors and pure logic in checkpoint A, screen in checkpoint B)*
 - [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
 - [ ] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, reset save), bench and Aether-per-minute display, polish pass. Phase 1 playable.
+- [ ] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). Do this right after 1.8b so the designer can double-click the game from the first playable version on.
+
+### Desktop packaging (planned step 1.9, designer's request)
+The designer wants the game to run as an `.exe`, not as a browser link. `npm run dev` is only the development server; the game is
+already a plain static Vite build, so a desktop wrapper opens that same build in its own window and needs **no change to the game
+code**. Not built yet. Do not add wrapper code before step 1.9, and until then keep the app a plain static build with no server
+dependency.
+- **Recommended wrapper: Electron** (bundles Chromium, installs as plain npm packages, works well with Steam, about 100 MB or more).
+  Alternative: Tauri (about 10 MB, but needs Rust and the Windows C++ build tools installed first). **Designer confirmed
+  Electron (2026-09-19).**
+- **Scope of 1.9:** an Electron main process (`electron/`), an `npm run` script that launches the built game in a window, an
+  installer/portable `.exe` build script, an app name and icon (placeholder icon is fine), and the commands added to CLAUDE.md.
+  Keep the wrapper code out of `src/`.
+- **Vite `base`:** set `base: './'` so the built files load from `file://` (the default `/` breaks in a packaged app). Check that the
+  browser build still works after the change.
+- **Saves:** localStorage keeps working in the wrapper, and offline progress keeps working because it only needs `lastSeen`. But the
+  wrapper's storage folder can be wiped or moved, so add **file-based save export and import** (a Settings button) so players can
+  back up. Whether to make the file the primary save is a separate decision for the designer.
+- **Single instance:** use Electron's single-instance lock so the game cannot be opened twice on one save. Two windows fight over
+  the same save (seen in 1.8a testing on two browser tabs). A browser build has no such guard; see "Deferred".
+- **Background throttling:** a minimized window may slow its timers. The tick driver already handles any gap (`step` for short
+  gaps, `applyOffline` above `awayThresholdMs`), so nothing is lost; verify it once in the packaged build.
+- **Verify in the packaged app:** launch, play a minute, close, reopen after a few minutes and confirm the welcome-back summary and
+  that progress and the save survived.
 
 ## Phase 2: Breeding and hatching
 Not started. Break into steps at the start of the phase.
@@ -710,6 +734,12 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Favorite / lock** flag on a creature. Needs a field in the save (`Creature.locked`) plus a **save migration** (`MIGRATIONS[1]`), and
   a decision on what a lock protects against (release, breeding, both).
 - **Auto-assign-best** (fill empty slots with the best creature). Needs the definition of "best" per skill and resource.
+- **Two tabs or windows on the same save** (found in 1.8a). Each copy autosaves from its own state and they overwrite each other,
+  so progress is lost. Not in the design. The `.exe` build (step 1.9) gets a single-instance lock; the browser build would need a
+  cross-tab lock or an "open elsewhere" notice. Designer to decide whether the browser build needs one.
+- **Native `<dialog>` cancel path** (found in the 1.8a review): the welcome-back dialog handles Escape itself, but a browser-level
+  cancel (for example the Android back button) fires a `cancel` event that nothing handles, which would close the dialog and leave the
+  summary pending. Handle `cancel` (preventDefault, then dismiss) in the 1.8b polish pass, and re-check the dialog in Firefox and Safari.
 
 ## Open questions for the designer
 
