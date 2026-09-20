@@ -3,6 +3,13 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
+**Step 1.9c is next, and it closes step 1.9 (designer's requests, 2026-09-20): one combined session, then on to Phase 2.** It bundles four things, each its own commit:
+1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats, plus **level-reached timestamps** per skill. First real save migration (1 to 2). Shown in Settings.
+2. **XP retune**: skill curve growth 1.04 to 1.045 (target: the fastest possible account needs about 2 weeks for level 250), with a floor test in test/pacing.test.ts.
+3. **Wire in the background image** (specs, prompt and wiring rules in docs/art-brief-background.md). Files: src/ui/assets/background/app-bg.png (2048x1144, really JPEG data: rename to app-bg.jpg) and app-bg-portrait.png (a plain crop; try CSS cover first). Originals and prompt in docs/reference/art/background/.
+4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
+Note: an older build reads a version-2 save as too-new (it sets it aside and starts fresh), so after this step use only the 0.1.1 exe against %APPDATA%/Aetherbound Idle.
+
 **Step 1.9b is done (2026-09-20): the UI shell redesign (dark gold theme, sidebar and phone drawer, per-skill pages, current activity, toasts and a bell, option cards) and the rebuilt exe, version 0.1.0.** Presentation only; the sim and the save are untouched.
 
 **Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait

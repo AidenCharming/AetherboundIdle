@@ -4,7 +4,8 @@ A creature-collecting incremental (idle) game in the style of Melvor Idle. Playe
 
 ## Read these first
 
-* `docs/design.md`: full design (systems, rules, formulas, scope, build phases)
+* `docs/design.md`: full design (systems, rules, formulas, scope, build phases). Section 11 has the UI direction.
+* `docs/art-brief-background.md`: the app background image (prompt, specs, where the files are, how to wire it in). Art lives in `src/ui/assets/`; originals and prompts in `docs/reference/art/`. AI-generated: keep the prompt and tool record.
 * `docs/content-data.md`: every species, hybrid, and trait as tables. Convert these into JSON under `src/data/`.
 
 ## Stack (change only if you have a strong reason, and tell me)
