@@ -798,6 +798,25 @@ content variant pinned inside the test: a clean load with three occupied slots, 
 unchanged at six different levels, a second load that changes nothing, the grandfathered slot still producing, and the
 idled tier. One more in `test/selectors.test.ts` covers the next-slot label.
 
+**`test/pacing.test.ts` guards the feel.** It reads the real `tuning.json` and `skills.json` (no fixture, no
+variant), builds the Woodcutting tier ladder from `resources.json`, puts one unupgraded starter Sproutlet on it and
+runs every action time through the real `creatureCooldown`, then asserts the four milestone times **within 15%**. The
+tolerance only has to absorb the designer's rounding (level 100 is "about 8 h" against a real 8.7 h, the widest gap at
+8%); it is far too tight to survive a retune. Checked by moving `growth` from 1.04 to 1.05, a change small enough to
+slip through review: three of the four milestones fail. It also pins that all 11 skills share the cap and the unlock
+levels, and that the second work slot is more than an hour out.
+
+**Open items this step deliberately did not decide:**
+- **Resource tier unlock levels are unchanged (Woodcutting 1 / 15 / 30), on the designer's instruction.** Against a
+  250-level skill this now means every tier the game has is open by level 30, in the first 46 minutes, and the
+  remaining 220 levels add no new resource. **Tiers 4 and 5 (and their unlock levels, times, XP and gold) still need
+  authoring** before the new cap means anything to a player.
+- **Per-tier XP for tiers 4 and 5** has to be authored with them: the pacing table above is built from the three
+  tiers that exist, so adding faster tiers will shorten every milestone past their unlock level and this test will
+  say so.
+- **Creature max level stays 99** with `creatureCurve` untouched, and the Form 2 / 3 thresholds stay at 30 / 60.
+  Whether creatures follow skills to a higher cap is a **Phase 3 decision** and is not open in Phase 1.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
