@@ -258,7 +258,7 @@ describe('the fast-forward action', () => {
     const { env, store, actions } = wired()
     const initial = store.getState().game
     actions.fastForwardHours(2)
-    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - 2 * HOUR }, NOW).state)
+    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - 2 * HOUR }, NOW, content, { dev: true }).state)
     const reloaded = loadGame(env.storage, env.clock, 1)
     expect(reloaded.state).toEqual(store.getState().game)
     expect(reloaded.summary!.elapsedMs).toBe(0) // nothing left for the load to re-grant

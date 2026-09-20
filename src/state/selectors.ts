@@ -308,6 +308,23 @@ export const selectSetting = (s: GameStore, key: SettingKey): boolean => s.game.
 /** Whether the Dev tab is offered at all. The panel ships in the production build behind this toggle (plan 7.1). */
 export const selectDevPanelEnabled = (s: GameStore): boolean => s.game.settings.devPanelEnabled
 
+// ---------- play time (Settings, step 1.9c) ----------
+
+/**
+ * Game time earned by ordinary ticks with the game open. Not wall-clock time: a tab sitting on a dialog still
+ * ticks, and a tab that was closed adds nothing here (that time arrives as away time on the next load).
+ */
+export const selectOnlineMs = (s: GameStore): number => s.game.stats.onlineMs
+
+/** Game time granted by offline catch-up: the capped window, so a night away adds the cap, not the whole night. */
+export const selectAwayMs = (s: GameStore): number => s.game.stats.awayMs
+
+/** Game time granted by the dev panel's fast-forward. Kept out of the total, because nobody played it. */
+export const selectDevMs = (s: GameStore): number => s.game.stats.devMs
+
+/** What the game has really been played for: online plus away. Fast-forward is deliberately not in it. */
+export const selectPlayedMs = (s: GameStore): number => s.game.stats.onlineMs + s.game.stats.awayMs
+
 // ---------- welcome back ----------
 
 export interface WelcomeBackResource {

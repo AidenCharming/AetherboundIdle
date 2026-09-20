@@ -13,10 +13,16 @@ import { slotCount } from './skills'
 /**
  * `MIGRATIONS[n]` upgrades a version-n state to version n + 1 and must return the new state. `parseSave` walks
  * the chain from the file's version up to `tuning.save.version`, stamping the version after each step, so a
- * migration only changes the shape. Empty until the first schema change.
+ * migration only changes the shape.
+ *
+ * 1 -> 2 (step 1.9c) adds the play-time counters. They start at zero: how long a version-1 save had been played
+ * was never recorded, and there is nothing to derive it from, so the counters begin now rather than inventing a
+ * history. `lastSeen` is when the save was last written, not when it was started.
  */
 export type Migration = (state: any) => any
-export const MIGRATIONS: Record<number, Migration> = {}
+export const MIGRATIONS: Record<number, Migration> = {
+  1: (state) => ({ ...state, stats: { onlineMs: 0, awayMs: 0, devMs: 0 } }),
+}
 
 // ---------- schema ----------
 
@@ -57,6 +63,7 @@ const GameStateSchema = z.strictObject({
     formsUnlocked: z.record(Id, z.number().int()),
   }),
   settings: z.strictObject({ offlineSummary: z.boolean(), devPanelEnabled: z.boolean() }),
+  stats: z.strictObject({ onlineMs: Count, awayMs: Count, devMs: Count }),
 })
 
 // ---------- serialize ----------

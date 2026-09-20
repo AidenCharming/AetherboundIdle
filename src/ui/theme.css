@@ -1343,6 +1343,39 @@ button.danger {
   border-radius: 12px;
 }
 
+/* ---------- play time (Settings) ---------- */
+
+.playtime {
+  display: grid;
+  /* 150px is what "Dev fast-forward" needs beside its value, so a phone gets one column and a desktop two or more. */
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.playtime div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+
+.playtime dt {
+  min-width: 0;
+  font-weight: 600;
+}
+
+.playtime dd {
+  margin: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .dev-row {
   display: flex;
   flex-wrap: wrap;

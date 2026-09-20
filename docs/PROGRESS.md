@@ -3,8 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9c is next, and it closes step 1.9 (designer's requests, 2026-09-20): one combined session, then on to Phase 2.** It bundles four things, each its own commit:
-1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats, plus **level-reached timestamps** per skill. First real save migration (1 to 2). Shown in Settings.
+**Step 1.9c is in progress (2026-09-20). Checkpoint A is done; B, C, D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
+1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats — **done, checkpoint A**, plus **level-reached timestamps** per skill (checkpoint B). First real save migration (1 to 2). Shown in Settings.
 2. **XP retune**: skill curve growth 1.04 to 1.045 (target: the fastest possible account needs about 2 weeks for level 250), with a floor test in test/pacing.test.ts.
 3. **Wire in the background image** (specs, prompt and wiring rules in docs/art-brief-background.md). Files: src/ui/assets/background/app-bg.png (2048x1144, really JPEG data: rename to app-bg.jpg) and app-bg-portrait.png (a plain crop; try CSS cover first). Originals and prompt in docs/reference/art/background/.
 4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
@@ -41,6 +41,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
 
+- [ ] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). It closes step 1.9. Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild.
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
 ### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
@@ -1327,6 +1328,41 @@ The installer was built and not run.
 - Placeholder art throughout: emoji on flat tiles, as CLAUDE.md rule 4 says.
 
 **Not verified:** the window on screen, the native Save and Open dialogs, the second launch bringing the first window to the front, and the installer (all on the manual checklist above); a slot-unlocked toast in a real browser (node-tested); a real pointer hover on a toast (I dispatched the events; focus was a real `focus()`); Enter and Space activating buttons (the Browser pane's key tool cannot send them, see checkpoint A); the live window-resize path while the Browser pane was hidden (a hidden pane delivers no resize or media-query events, which for a while looked like a bug; it worked while the pane was visible, and a fresh load at each width was measured); a real phone or touch device; Firefox and Safari; a screen reader.
+
+### 2026-09-20, step 1.9c checkpoint A: the play-time counter (save version 2)
+
+New: `src/ui/components/PlayTime.tsx`, `test/playtime.test.ts`, `test/fixtures/save-v1.json`. Changed: `types/state.ts`, `sim/state.ts`, `sim/tick.ts`, `sim/offline.ts`, `sim/save.ts`, `state/driver.ts`,
+`state/selectors.ts`, `ui/screens/Settings.tsx`, `ui/theme.css`, `data/tuning.json` (`save.version` 1 -> 2), and the migration, fast-forward and import tests that named version 1 by number.
+
+**Why it exists.** The designer pressed the dev panel's fast-forward ten times at 12 hours (120 game hours) and reached Woodcutting 217 in five real days. Nothing in the save could tell that apart from five
+days of real play, so neither the designer nor a later session could say what the game's pacing actually feels like. `stats` splits game time by where it came from.
+
+- **`GameState.stats = { onlineMs, awayMs, devMs }`**, milliseconds, persisted.
+  - `onlineMs`: the dt an ordinary tick handed to `step`, after the driver's clamping (a backwards clock adds nothing).
+  - `awayMs`: the window `applyOffline` **granted** — `summary.elapsedMs`, already capped. Twenty hours away under the 12-hour cap adds twelve, the same twelve it earned.
+  - `devMs`: the window the dev panel's fast-forward granted, kept apart so a testing shortcut never looks like play time. **It is not in "Total played".**
+- **The plumbing.** The sim still has no clock. `step` takes a `credit` option (`'onlineMs' | 'awayMs' | 'devMs' | 'none'`, default `'onlineMs'`) and `creditPlayTime` in `sim/tick.ts` is the **only** writer of
+  `stats`: it adds the same sanitized `dt` the rest of the step used. `applyOffline` calls `step` with the window it granted and `credit: 'awayMs'`, or `'devMs'` when its new `{ dev: true }` option is set;
+  only `driver.fastForwardHours` sets it. Nothing counts twice, because the driver's existing anchor rule already sends a long gap through `applyOffline` alone.
+- **Save version 1 -> 2**, and the first real migration. `MIGRATIONS[1]` adds `stats` with zeros. History cannot be backfilled: a v1 save never recorded how long it had been played, and `lastSeen` is when it
+  was last written, not when it was started. Inventing a number there would make the counter a lie on every old save. The strict schema takes `stats` as three non-negative numbers and nothing else.
+- **A real v1 fixture.** `test/fixtures/save-v1.json` was written by this project's own 0.1.0 code before the version was bumped (a mid-game save: two creatures, pool traits, a working slot, fractional Aether,
+  a moved RNG). The migration, the chain, and the 1.9 **import** path are all tested against that file rather than a hand-built object, so a later refactor cannot quietly keep the test in step with the code.
+- **UI.** Settings has a "Play time" card: Total played (online + away), Online, Away, and a "Dev fast-forward" line that appears only when it is above zero or the Dev panel is on. Values come from
+  `selectOnlineMs` / `selectAwayMs` / `selectDevMs` / `selectPlayedMs` and are formatted with the existing `formatDuration`. Reset save starts a new game, so it zeroes them.
+
+**A warning for the designer.** A build older than this one reads a version-2 save as **too-new**: it quarantines it (copies it to `aetherbound-idle:save-broken-<time>` and starts a fresh game) — it does not
+delete it. So after this step, do not run the old `Aetherbound-Idle-0.1.0-*.exe` against the same `%APPDATA%\Aetherbound Idle` save. Use the 0.1.1 exe built at the end of 1.9c.
+
+**Mutation-checked** (each mutant was applied, `npm test` run, then reverted):
+- counting `requestedMs` instead of the granted `elapsedMs`: **7 tests fail** (including "a 20-hour gap grants, and counts, exactly the 12-hour cap").
+- counting fast-forward as away time: **8 tests fail** (the whole "fast-forward is counted apart" group, plus the selector and round-trip tests).
+
+**Decisions.**
+1. **Fast-forward is not play time.** It is shown, but never added into "Total played", because the counter exists to answer "how long has this really taken".
+2. **The granted window, not the requested one.** The counter measures what the game gave you, so it can never claim more time than it earned.
+3. **`credit: 'none'`** exists for a caller that counts a window itself. Nothing uses it in the game; it keeps the option total rather than implicit.
+4. Counters are plain milliseconds, not balance, so they are **not** in `tuning.json`.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 - ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.

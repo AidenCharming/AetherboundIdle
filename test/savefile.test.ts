@@ -1,13 +1,14 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { content, type Content } from '../src/data'
 import { applyOffline } from '../src/sim/offline'
-import { MIGRATIONS, parseSave, serializeSave } from '../src/sim/save'
+import { parseSave, serializeSave } from '../src/sim/save'
 import { createActions } from '../src/state/actions'
 import { createTickDriver } from '../src/state/driver'
 import { brokenSaveKey, exportFileName, flushSave, loadGame, MAX_IMPORT_BYTES, SAVE_KEY, saveReplacedKey } from '../src/state/persistence'
 import { createGameStore } from '../src/state/store'
 import type { GameState } from '../src/types/state'
 import { addCreature, FakeEnv, HOUR, NOW, newGame, quietContent, sproutletAtWork, variant } from './helpers'
+import v1Fixture from './fixtures/save-v1.json?raw'
 
 // Save export and import (Settings, step 1.9). Import has no loader of its own: it validates, backs up, writes the file's
 // text as the save, retires the driver and reloads, so the page boots through the same loadGame as any stored save.
@@ -49,10 +50,6 @@ function otherGameFile(lastSeen = NOW, c: Content = content): { text: string; st
 }
 
 const keys = (env: FakeEnv) => [...env.storage.data.keys()].sort()
-
-afterEach(() => {
-  delete MIGRATIONS[1]
-})
 
 // ---------- export ----------
 
@@ -124,7 +121,11 @@ describe('import of a file that cannot be loaded', () => {
       JSON.stringify({ version: target, state: { ...parsedGood.state, creatures: [{ ...(parsedGood.state.creatures as object[])[0], speciesId: 'no-such-thing' }] } }),
       /not a valid.*no-such-thing/,
     ],
-    ['newer than this build', JSON.stringify({ version: target + 1, state: parsedGood.state }), /newer version of the game.*version 2 but this build only understands up to 1/],
+    [
+      'newer than this build',
+      JSON.stringify({ version: target + 1, state: parsedGood.state }),
+      new RegExp(`newer version of the game.*version ${target + 1} but this build only understands up to ${target}`),
+    ],
     ['too large', ' '.repeat(MAX_IMPORT_BYTES + 1), /too large/],
   ]
 
@@ -214,23 +215,25 @@ describe('import of a good file', () => {
     expect(boot(env).store.getState().game.gold).toBe(777)
   })
 
-  it('a v1 file goes through the migration chain on the way in', () => {
-    const c2 = variant((raw) => {
-      raw.tuning.save.version = 2
-    })
-    MIGRATIONS[1] = (state) => ({ ...state, gold: state.gold + 1000 }) // a stand-in v1 -> v2 upgrade
-    const v1 = serializeSave({ ...newGame(), gold: 5 }) // written by a v1 build
-    expect(JSON.parse(v1).version).toBe(1)
+  it('a real v1 file (test/fixtures/save-v1.json, written by the 0.1.0 build) imports and migrates', () => {
+    // Not a hand-built object: this is the text a shipped v1 build wrote, so the import path is exercised against
+    // the format players actually have on disk.
+    expect(JSON.parse(v1Fixture).version).toBe(1)
+    expect('stats' in JSON.parse(v1Fixture).state).toBe(false)
 
-    const { env, actions } = wired(newGame(), c2)
-    expect(actions.inspectSave(v1)).toMatchObject({ ok: true, migratedFrom: 1 })
-    expect(actions.importSave(v1)).toEqual({ ok: true })
-    expect(env.storage.data.get(SAVE_KEY)).toBe(v1)
+    const { env, actions } = wired()
+    expect(actions.inspectSave(v1Fixture)).toMatchObject({ ok: true, migratedFrom: 1, creatures: 2 })
+    expect(actions.importSave(v1Fixture)).toEqual({ ok: true })
+    expect(env.storage.data.get(SAVE_KEY)).toBe(v1Fixture) // the file's own bytes, migrated only on the way in
 
-    const { outcome, store } = boot(env, c2)
+    const { outcome, store } = boot(env)
+    const game = store.getState().game
     expect(outcome.migratedFrom).toBe(1)
-    expect(store.getState().game.version).toBe(2)
-    expect(store.getState().game.gold).toBe(1005)
+    expect(game.version).toBe(content.tuning.save.version)
+    expect(game.gold).toBe(17)
+    expect(game.creatures).toHaveLength(2)
+    // The migration cannot know how long the old save was played, so it starts the counters at zero rather than inventing a history.
+    expect(game.stats).toEqual({ onlineMs: 0, awayMs: 0, devMs: 0 })
   })
 
   it('a file from a newer build is refused, not migrated or quarantined', () => {

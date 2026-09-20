@@ -7,6 +7,7 @@ import type { GameState } from '../src/types/state'
 import { levelForXp } from '../src/sim/formulas'
 import { slotCount } from '../src/sim/skills'
 import { addCreature, HOUR, newGame, pool, setSkillLevel, sproutletAtWork, variant, work } from './helpers'
+import v1Fixture from './fixtures/save-v1.json?raw'
 
 /** A mid-game state with floats, pool traits, a working slot, a benched creature and a moved RNG. */
 function midGame(): GameState {
@@ -99,39 +100,22 @@ describe('the RNG state in a save is the current one, not the seed (plan 4.6)', 
 describe('migrations', () => {
   const SHIPPED = content.tuning.save.version
 
-  it('ships with no migrations yet, and the chain is empty for the current version', () => {
-    expect(Object.keys(MIGRATIONS)).toEqual([])
-    expect(SHIPPED).toBe(1)
-  })
-
-  // A "v1" save that stored gold under an old name; the v2 build expects `gold`.
-  const legacy = (): string => tampered(newGame(), (file) => {
-    file.state.legacyGold = 250
-    delete file.state.gold
-  })
-
-  it('a v1 -> v2 migration stub upgrades an old save, stamps the version, and reports where it came from', () => {
-    const migrations = {
-      1: (s: any) => {
-        const { legacyGold, ...rest } = s
-        return { ...rest, gold: legacyGold }
-      },
-    }
-    const r = ok(parseSave(legacy(), content, { targetVersion: 2, migrations }))
-    expect(r.state.gold).toBe(250)
-    expect(r.state.version).toBe(2)
-    expect(r.migratedFrom).toBe(1)
-    expect('legacyGold' in r.state).toBe(false)
+  it('ships the chain the current version needs, with no gaps', () => {
+    expect(SHIPPED).toBe(2)
+    for (let v = 1; v < SHIPPED; v++) expect(typeof MIGRATIONS[v], `migration ${v} -> ${v + 1}`).toBe('function')
+    // A migration out of the current version would upgrade a save to a version this build cannot read.
+    expect(MIGRATIONS[SHIPPED]).toBeUndefined()
   })
 
   it('chains several steps in order, each seeing the previous step\'s output', () => {
     const seen: number[] = []
     const migrations = {
-      1: (s: any) => (seen.push(1), { ...s, gold: 1 }),
+      // Step one is the real 1 -> 2 migration with a gold change bolted on, so the chain produces a shape the schema still accepts.
+      1: (s: any) => (seen.push(1), { ...MIGRATIONS[1]!(s), gold: 1 }),
       2: (s: any) => (seen.push(2), { ...s, gold: s.gold + 10 }),
       3: (s: any) => (seen.push(3), { ...s, gold: s.gold * 5 }),
     }
-    const r = ok(parseSave(serializeSave(newGame()), content, { targetVersion: 4, migrations }))
+    const r = ok(parseSave(v1Fixture, content, { targetVersion: 4, migrations }))
     expect(seen).toEqual([1, 2, 3])
     expect(r.state.gold).toBe(55)
     expect(r.migratedFrom).toBe(1)
@@ -148,15 +132,17 @@ describe('migrations', () => {
   })
 
   it('fails cleanly when a step is missing or throws', () => {
-    const missing = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 3, migrations: { 1: (s) => s } }))
+    const missing = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 4, migrations: { 2: (s) => s } }))
     expect(missing).toMatchObject({ reason: 'migration-failed' })
-    expect(missing.message).toMatch(/no migration from version 2 to 3/)
-    const boom = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 2, migrations: { 1: () => { throw new Error('boom') } } }))
+    expect(missing.message).toMatch(/no migration from version 3 to 4/)
+    const boom = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 3, migrations: { 2: () => { throw new Error('boom') } } }))
     expect(boom).toMatchObject({ reason: 'migration-failed' })
     expect(boom.message).toMatch(/boom/)
   })
 
   it('refuses a save from a newer build instead of mangling it', () => {
+    // The case the designer has to live with after step 1.9c: the 0.1.0 exe reads a version-2 save exactly like this,
+    // quarantines it and starts fresh. It does not delete it.
     const newer = tampered(newGame(), (file) => {
       file.version = SHIPPED + 1
     })
@@ -164,8 +150,57 @@ describe('migrations', () => {
   })
 
   it('a migration that returns a bad shape is caught by validation, not trusted', () => {
-    const r = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 2, migrations: { 1: (s) => ({ ...s, aether: 'lots' }) } }))
+    const r = failed(parseSave(serializeSave(newGame()), content, { targetVersion: 3, migrations: { 2: (s) => ({ ...s, aether: 'lots' }) } }))
     expect(r.reason).toBe('invalid')
+  })
+})
+
+describe('1 -> 2: the play-time counters (step 1.9c)', () => {
+  // test/fixtures/save-v1.json is a real save written by this project's 0.1.0 build, before `stats` existed. It is
+  // checked in so the migration keeps being tested against the format players actually have on disk, not against a
+  // hand-built object that a later refactor would quietly keep in step with the code.
+  const raw = JSON.parse(v1Fixture)
+
+  it('the fixture really is a version-1 save, and really has no stats', () => {
+    expect(raw.version).toBe(1)
+    expect(raw.state.version).toBe(1)
+    expect('stats' in raw.state).toBe(false)
+  })
+
+  it('migrates it, stamps version 2, and starts the counters at zero', () => {
+    const r = ok(parseSave(v1Fixture))
+    expect(r.migratedFrom).toBe(1)
+    expect(r.state.version).toBe(2)
+    // Zeros, not a guess. A v1 save never recorded how long it had been played and `lastSeen` is when it was last
+    // written, not when it was started, so there is nothing to derive a history from. Inventing one would make the
+    // counter a lie for every old save.
+    expect(r.state.stats).toEqual({ onlineMs: 0, awayMs: 0, devMs: 0 })
+  })
+
+  it('changes nothing else: XP, creatures, resources and the RNG all survive', () => {
+    const r = ok(parseSave(v1Fixture))
+    const { stats, version, skills, ...rest } = r.state
+    const { version: _oldVersion, skills: oldSkills, ...oldRest } = raw.state
+    expect(rest).toEqual(oldRest)
+    expect(skills.woodcutting!.xp).toBe(oldSkills.woodcutting.xp)
+    expect(skills.woodcutting!.slots).toEqual(oldSkills.woodcutting.slots)
+  })
+
+  it('the migrated save re-saves as version 2 and is not migrated a second time', () => {
+    const once = ok(parseSave(v1Fixture)).state
+    const twice = ok(parseSave(serializeSave(once)))
+    expect(twice.migratedFrom).toBeNull()
+    expect(twice.state).toEqual(once)
+  })
+
+  it('a broken v1 save is still refused, not migrated into a valid-looking one', () => {
+    const broken = JSON.stringify({ version: 1, state: { ...raw.state, aether: -1 } })
+    expect(failed(parseSave(broken)).reason).toBe('invalid')
+  })
+
+  it('counts play time from the migration onwards, so an old save starts measuring now', () => {
+    const migrated = ok(parseSave(v1Fixture)).state
+    expect(step(migrated, 90_000).state.stats).toEqual({ onlineMs: 90_000, awayMs: 0, devMs: 0 })
   })
 })
 

@@ -80,12 +80,13 @@ export function createTickDriver(
    * (every 15 s), while the driver has already stepped the sim past it — that time is spent, and measuring the
    * window from the stale lastSeen would grant up to one autosave period of progress twice.
    */
-  function catchUp(since: number, now: number): void {
+  function catchUp(since: number, now: number, dev = false): void {
     const { game, welcomeBack } = store.getState()
-    const caughtUp = applyOffline({ ...game, lastSeen: since }, now, c)
+    const caughtUp = applyOffline({ ...game, lastSeen: since }, now, c, { dev })
     store.setState({
       game: caughtUp.state,
-      welcomeBack: queueWelcomeBack(welcomeBack, caughtUp.summary, { isNewGame: false, settings: game.settings }, c),    })
+      welcomeBack: queueWelcomeBack(welcomeBack, caughtUp.summary, { isNewGame: false, settings: game.settings }, c),
+    })
   }
 
   function stepToNow(): number {
@@ -109,7 +110,8 @@ export function createTickDriver(
 
   function fastForwardHours(hours: number): void {
     const now = stepToNow()
-    catchUp(now - hours * MS_PER_HOUR, now)
+    // `dev`: the granted window is counted as dev time, so a testing shortcut never pollutes the real play-time measure.
+    catchUp(now - hours * MS_PER_HOUR, now, true)
   }
 
   let retired = false

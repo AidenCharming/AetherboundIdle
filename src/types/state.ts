@@ -59,6 +59,23 @@ export interface Settings {
   devPanelEnabled: boolean
 }
 
+/**
+ * How much GAME TIME this save has been advanced by, split by where it came from, in milliseconds. It is not
+ * wall-clock time: it only grows when the sim is stepped, so a closed tab adds nothing until the catch-up runs.
+ * Written in exactly one place (`creditPlayTime` in sim/tick.ts), from the dt each path actually granted.
+ */
+export interface PlayStats {
+  /** Ordinary ticks while the game is open, after the driver's clamping. */
+  onlineMs: number
+  /** Windows GRANTED by `applyOffline` for a closed-tab load or a long open-tab gap: the capped window, never the requested one. */
+  awayMs: number
+  /** Windows granted by the dev panel's fast-forward, kept apart so a testing shortcut never looks like real play time. */
+  devMs: number
+}
+
+/** The counter a step's dt belongs to, or 'none' for a dt that is nobody's play time. */
+export type PlayTimeCredit = keyof PlayStats | 'none'
+
 export interface GameState {
   version: number
   /** Epoch ms, written on autosave and unload. Offline progress is measured from it. */
@@ -75,6 +92,8 @@ export interface GameState {
   skills: Record<string, SkillState>
   collection: Collection
   settings: Settings
+  /** Play time so far, by source. Added in save version 2; migration 1 -> 2 starts an older save at zeros (history cannot be backfilled). */
+  stats: PlayStats
 }
 
 /** What is written to localStorage. */

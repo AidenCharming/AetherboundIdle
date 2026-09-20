@@ -39,6 +39,15 @@ export interface OfflineResult {
   summary: OfflineSummary
 }
 
+export interface OfflineOptions {
+  /**
+   * This catch-up is the dev panel's fast-forward, not real time away, so the window it grants is counted in
+   * `stats.devMs` instead of `stats.awayMs` (step 1.9c). Everything else about it is identical: same cap, same
+   * summary, same maths. Only the driver's `fastForwardHours` passes it.
+   */
+  dev?: boolean
+}
+
 /**
  * Catches the game up from `state.lastSeen` to `now`, and re-anchors `lastSeen` to `now`.
  *
@@ -49,14 +58,19 @@ export interface OfflineResult {
  *   real clock caught up, and running the sim backwards would be worse.
  * - A non-finite `now` or `lastSeen` is treated as a zero window too.
  *
- * The dev panel's fast-forward (plan 7.1) rewinds `lastSeen` and calls this same function.
+ * The dev panel's fast-forward (plan 7.1) rewinds `lastSeen` and calls this same function, with `dev: true` so its
+ * time lands in a counter of its own.
+ *
+ * Play time: the window this function GRANTS (`elapsedMs`, already capped) is what `step` counts, never the window
+ * that was requested. So twenty hours away under a twelve-hour cap adds twelve hours, exactly as much as it earns.
  */
-export function applyOffline(state: GameState, now: number, c: Content = content): OfflineResult {
+export function applyOffline(state: GameState, now: number, c: Content = content, opts: OfflineOptions = {}): OfflineResult {
   const capMs = c.tuning.offline.capHours * MS_PER_HOUR
   const requestedMs = now - state.lastSeen
   const elapsedMs = Number.isFinite(requestedMs) ? Math.min(Math.max(requestedMs, 0), capMs) : 0
 
-  const stepped = elapsedMs > 0 ? step(state, elapsedMs, { offline: true }, c) : { state, events: [] as SimEvent[] }
+  const credit = opts.dev ? 'devMs' : 'awayMs'
+  const stepped = elapsedMs > 0 ? step(state, elapsedMs, { offline: true, credit }, c) : { state, events: [] as SimEvent[] }
   const anchored = Number.isFinite(now) ? { ...stepped.state, lastSeen: now } : stepped.state
 
   return {

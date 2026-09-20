@@ -395,7 +395,7 @@ describe('fastForwardHours (the dev panel, plan 7.1)', () => {
     const initial = store.getState().game
     driver.fastForwardHours(100)
     expect(offline).toHaveBeenCalledTimes(1)
-    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - 100 * HOUR }, NOW, c).state)
+    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - 100 * HOUR }, NOW, c, { dev: true }).state)
     expect(oak(store)).toBe(CAP_MS / OAK_MS)
     expect(store.getState().welcomeBack).toMatchObject({ capped: true, elapsedMs: CAP_MS, requestedMs: 100 * HOUR })
     expect(env.clock).toBe(NOW) // it grants time, it does not move the clock
@@ -407,7 +407,7 @@ describe('fastForwardHours (the dev panel, plan 7.1)', () => {
     const initial = store.getState().game
     driver.fastForwardHours(1)
     expect(oak(store)).toBe(HOUR / OAK_MS)
-    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - HOUR }, NOW, c).state)
+    expect(store.getState().game).toEqual(applyOffline({ ...initial, lastSeen: NOW - HOUR }, NOW, c, { dev: true }).state)
   })
 
   it('credits the time since the last tick first, and does not count it twice', () => {

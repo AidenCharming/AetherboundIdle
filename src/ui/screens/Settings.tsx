@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
 import { selectSetting, type SettingKey } from '../../state/selectors'
 import { PageTitle } from '../components/PageTitle'
+import { PlayTime } from '../components/PlayTime'
 import { SaveFile } from '../components/SaveFile'
 
 function Toggle({ setting, label, children }: { setting: SettingKey; label: string; children: ReactNode }) {
@@ -31,6 +32,7 @@ export function Settings() {
           Adds a Dev page under System for testing the game. Off by default.
         </Toggle>
         <SaveFile />
+        <PlayTime />
       </div>
     </section>
   )

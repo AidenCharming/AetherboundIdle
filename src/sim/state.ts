@@ -30,5 +30,6 @@ export function createInitialState(seed: number, now: number, c: Content = conte
       formsUnlocked: { [starter.speciesId]: starter.form },
     },
     settings: { offlineSummary: true, devPanelEnabled: false },
+    stats: { onlineMs: 0, awayMs: 0, devMs: 0 },
   }
 }
