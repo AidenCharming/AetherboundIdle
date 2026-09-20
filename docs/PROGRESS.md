@@ -1174,6 +1174,7 @@ when run from a read-only or network location; a machine without the Visual C++ 
    open and requires that they do not.)
 
 ## Deferred (design.md section 10, needs decisions before it is built)
+- **UI shell restyle** (designer's request, 2026-09-20). Sidebar navigation with section headings, a pinned current-activity panel, toast notifications and a bell, per-option cards. Reference image and the list of what to borrow (and what not to) are in `docs/design.md` section 11 ("UI direction") and `docs/reference/`. Presentation only, no game logic; needs `SimEvent`s kept in the store for toasts. Suggested as a small step at the start of Phase 2, before the new screens land. Not started.
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
   (assigned, locked).

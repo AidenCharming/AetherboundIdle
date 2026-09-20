@@ -141,6 +141,16 @@ Roster bloat is a known risk. Requirements: filter and sort by type, rarity, lev
 ## 11. Screens
 Roster, Skills (with slots), Nexus/Menagerie (bench, habitat), Genesis Pods (breeding and incubators), Expeditions, Aether-Log (Creaturedex and collection tracks), Inventory, Shop, Settings. Working names: bench/habitat = The Nexus (or The Menagerie), incubators = Genesis Pods, Creaturedex = The Aether-Log, guide NPC = Overseer Vance, player title = The Architect (TBD).
 
+**UI direction (designer's reference, 2026-09-20; not started).** The designer wants the finished game to look and feel like `docs/reference/ui-reference-sidebar-layout.png`, a screenshot of another idle game used **only as a look-and-feel reference** (do not copy its name, wording or art, and keep the image out of any public repo or shipped build). What to take from it:
+- **Left sidebar navigation** instead of the top tab bar, grouped under small section headings (for us roughly: Skills / Creatures / Adventure / Collection / System), each entry an icon plus a label. The tab bar will not scale to the roughly ten screens listed above.
+- A **pinned "current activity" panel** at the bottom of the sidebar, with a progress bar and the latest activity. For us it would summarize what the working creatures are doing.
+- **Header card per skill** (icon, level, XP), then a **card per option** the player can pick (icon, name, what it needs, time, XP, "you have N" for inputs) with a clear primary button. This is also the pattern for the crafting recipe picker (Phase 3).
+- **Toast notifications** for events (level-up, slot unlocked) and a **notification bell with a count**. This needs the sim's `SimEvent`s kept in the store; they are dropped today.
+- A quiet dark theme with one warm accent for UI chrome, generous spacing and rounded cards. Type colors stay reserved for creatures and skill accents (CLAUDE.md rule 4).
+- A small "autosaves locally" status line.
+- **Not to copy:** its production *queue* (one shared, ordered queue where inputs are consumed when queued). Our design is parallel creature work slots. It is worth remembering as one candidate answer to the open offline slot-ordering question before Phase 3.
+- Suggested timing: a small presentation-only "UI shell" step (sidebar, activity panel, toasts) at the start of Phase 2, before the new Phase 2 screens (Genesis Pods, Aether-Log) are added to a tab bar that is already full.
+
 ## 12. Backlog (not in v1)
 - Fishing expansion: bait, deep-sea zones, a treasure system (sunken-treasure drops exist as traits already).
 - Special-recipe hybrids beyond the 15 defaults (data-driven, add later).
