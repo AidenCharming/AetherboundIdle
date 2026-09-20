@@ -138,6 +138,11 @@ button:disabled {
   flex: none;
 }
 
+.resource-emoji {
+  flex: none;
+  line-height: 1;
+}
+
 /* ---------- banner ---------- */
 
 .banner {

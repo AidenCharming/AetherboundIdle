@@ -145,7 +145,7 @@ A per-rarity override would have to be added deliberately, not inherited from an
 
 ```json
 [{
-  "id": "oak-log", "name": "Oak Log", "tier": 1, "skill": "woodcutting",
+  "id": "oak-log", "name": "Oak Log", "emoji": "🪵", "tier": 1, "skill": "woodcutting",
   "kind": "raw",
   "elementType": "verdant",
   "requiredSkillLevel": 1,
@@ -156,6 +156,8 @@ A per-rarity override would have to be added deliberately, not inherited from an
 }]
 ```
 
+`emoji` is optional (added in step 1.7): the top bar and the slot picker show it in place of the type-colored dot,
+and fall back to the dot when a resource has none. Every resource that ships has its own.
 `kind` is one of `raw | refined | crafted | rare`. `elementType` is what breeding costs and the
 partner-element-drop hybrid traits read. v1 authors tiers 1-5 (design section 3); phase 1 ships
 Woodcutting T1-T3 only: `oak-log`, `willow-log`, `yew-log` at required skill levels **1 / 15 / 30**
@@ -375,7 +377,7 @@ is a data change, not a code change.
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
   "save": { "version": 1, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100 }
+  "ui": { "tickMs": 100, "shinyHueDeg": 150 }
 }
 ```
 
@@ -392,6 +394,9 @@ Two knobs in this file are easy to misread, so they are pinned down here:
 - `ui.tickMs` (100) is how often the tick driver in `main.tsx` steps the sim. Presentation cadence only, for
   the same reason: the driver measures real elapsed time and hands it to `step`, so a slower or throttled
   tick loses nothing. Added at step 1.6.
+- `ui.shinyHueDeg` (150) is the CSS `hue-rotate` applied at runtime to a shiny creature's art. It is never a
+  separate asset (CLAUDE.md rule 4). Must be strictly between 0 and 360, or a shiny would look like a normal
+  creature. Presentation only. Added at step 1.7 (PLACEHOLDER value).
 
 ---
 

@@ -1,13 +1,14 @@
 import { useGameStore } from '../../state/runtime'
 import { resourceInfo, selectAetherDisplay, selectGold, selectHeldResourceIds, selectResourceQty } from '../../state/selectors'
-import { cssVars, formatCount } from '../format'
+import { formatCount } from '../format'
+import { ResourceIcon } from './ResourceIcon'
 
 function ResourceChip({ resourceId }: { resourceId: string }) {
   const qty = useGameStore((s) => selectResourceQty(s, resourceId))
   const info = resourceInfo(resourceId)
   return (
     <li className="resource">
-      <span className="dot" style={cssVars({ '--dot': info.color })} aria-hidden="true" />
+      <ResourceIcon info={info} />
       <span>{info.name}</span>
       <strong>{formatCount(qty)}</strong>
     </li>

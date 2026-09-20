@@ -264,6 +264,21 @@ describe('resources', () => {
     expect(xpPerSec[2]!).toBeGreaterThan(xpPerSec[1]!)
   })
 
+  it('gives every resource its own emoji, including the seedcache', () => {
+    const emojis = content.resources.map((r) => r.emoji)
+    expect(emojis.every((e) => typeof e === 'string' && e.length > 0), 'every resource has an emoji').toBe(true)
+    expect(new Set(emojis).size, 'no two resources share an emoji').toBe(content.resources.length)
+    expect(content.resourceById.get('verdant-seedcache')!.emoji).toBeTruthy()
+  })
+
+  it('treats the emoji as optional (the UI falls back to a dot) but rejects a non-emoji', () => {
+    const raw = structuredClone(rawContent) as Record<string, any>
+    delete raw.resources[0].emoji
+    expect(loadContent(raw).resources[0]!.emoji).toBeUndefined()
+    expect(problemsFor((r) => (r.resources[0].emoji = '(log)')).join('\n')).toContain('resources.json[0].emoji')
+    expect(problemsFor((r) => (r.resources[0].emoji = '')).join('\n')).toContain('resources.json[0].emoji')
+  })
+
   it('resolves every skill, element type and rare drop', () => {
     for (const r of content.resources) {
       expect(content.skillById.has(r.skill), `${r.id}: skill`).toBe(true)
@@ -439,6 +454,13 @@ describe('loadContent rejects bad data instead of loading it', () => {
     expect(problemsFor((r) => delete r.tuning.ui).join('\n')).toContain('tuning.json.ui')
     expect(problemsFor((r) => (r.tuning.ui.tickMs = 0)).join('\n')).toContain('tuning.json.ui.tickMs')
     expect(problemsFor((r) => (r.tuning.ui.tickMs = 12.5)).join('\n')).toContain('tuning.json.ui.tickMs')
+  })
+
+  it('requires tuning.ui.shinyHueDeg to sit strictly between 0 and 360, so a shiny always looks different', () => {
+    const deg = content.tuning.ui.shinyHueDeg
+    expect(deg > 0 && deg < 360).toBe(true)
+    expect(problemsFor((r) => delete r.tuning.ui.shinyHueDeg).join('\n')).toContain('tuning.json.ui.shinyHueDeg')
+    for (const bad of [0, 360, -30, 400]) expect(problemsFor((r) => (r.tuning.ui.shinyHueDeg = bad)).join('\n'), String(bad)).toContain('tuning.json.ui.shinyHueDeg')
   })
 
   it('lists every problem at once, not just the first', () => {

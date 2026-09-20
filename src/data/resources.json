@@ -2,6 +2,7 @@
   {
     "id": "oak-log",
     "name": "Oak Log",
+    "emoji": "🪵",
     "tier": 1,
     "skill": "woodcutting",
     "kind": "raw",
@@ -15,6 +16,7 @@
   {
     "id": "willow-log",
     "name": "Willow Log",
+    "emoji": "🧺",
     "tier": 2,
     "skill": "woodcutting",
     "kind": "raw",
@@ -28,6 +30,7 @@
   {
     "id": "yew-log",
     "name": "Yew Log",
+    "emoji": "🏹",
     "tier": 3,
     "skill": "woodcutting",
     "kind": "raw",
@@ -41,6 +44,7 @@
   {
     "id": "verdant-seedcache",
     "name": "Verdant Seedcache",
+    "emoji": "🌰",
     "tier": 1,
     "skill": "woodcutting",
     "kind": "rare",

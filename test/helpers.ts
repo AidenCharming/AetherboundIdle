@@ -1,7 +1,7 @@
 // Shared fixtures for the sim tests. Nothing here is production code.
 import { content, loadContent, rawContent, type Content, type Strength } from '../src/data'
-import { makeCreature } from '../src/sim/creature'
-import { xpForLevel } from '../src/sim/formulas'
+import { canWork, makeCreature } from '../src/sim/creature'
+import { formForLevel, xpForLevel } from '../src/sim/formulas'
 import { addSkillXp, assignCreature } from '../src/sim/skills'
 import { createInitialState } from '../src/sim/state'
 import type { Env } from '../src/state/driver'
@@ -140,3 +140,34 @@ export class FakeEnv implements Env {
   }
 }
 
+
+/**
+ * A roster of `count` creatures (plus the starter Sproutlet) built only from the real data, and deterministic: the
+ * same call always gives the same game. Every species and hybrid appears, cycling through all rarity tiers, levels
+ * 1 to 99 (with the form the level earns), some shinies, 0 to 3 real pool traits at all three strengths, and, once
+ * Woodcutting is opened to all its slots, everyone who can cut wood fills a slot until they run out.
+ */
+export function rosterGame(count = 120, c: Content = content): GameState {
+  const defs = [...c.creatureById.values()]
+  const poolTraits = c.traits.filter((t) => t.kind === 'pool')
+  const strengths: Strength[] = ['minor', 'moderate', 'major']
+  let state = setSkillLevel(newGame(c), 'woodcutting', c.skillById.get('woodcutting')!.maxLevel, c)
+  for (let i = 0; i < count; i++) {
+    const def = defs[i % defs.length]!
+    const level = 1 + ((i * 37) % 99)
+    const traits = Array.from({ length: i % 4 }, (_, j) => pool(poolTraits[(i * 7 + j * 5) % poolTraits.length]!.id, strengths[(i + j) % 3]))
+    state = addCreature(
+      state,
+      def.id,
+      { level, form: formForLevel(level, c.tuning), rarityTier: 1 + ((i * 5) % c.rarities.length), shiny: i % 9 === 0, poolTraits: traits },
+      c,
+    ).state
+  }
+  const slots = state.skills.woodcutting!.slots.length
+  let filled = 0
+  for (const cr of state.creatures) {
+    if (filled >= slots) break
+    if (canWork(cr, 'woodcutting', c)) state = work(state, cr.id, 'woodcutting', filled++, 'oak-log', c)
+  }
+  return state
+}

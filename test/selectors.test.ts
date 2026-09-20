@@ -6,7 +6,7 @@ import * as sel from '../src/state/selectors'
 import { createGameStore, type GameStore } from '../src/state/store'
 import { loadGame } from '../src/state/persistence'
 import type { GameState } from '../src/types/state'
-import { addCreature, MemoryStorage, newGame, NOW, setSkillLevel, sproutletAtWork, work } from './helpers'
+import { addCreature, MemoryStorage, newGame, NOW, pool, setSkillLevel, sproutletAtWork, work } from './helpers'
 
 /** A store snapshot around any GameState: selectors take a GameStore, and this is what the hook feeds them. */
 const view = (game: GameState, extra: Partial<GameStore> = {}): GameStore => {
@@ -100,6 +100,13 @@ describe('skills', () => {
     expect(sel.gatherableResourceIds('mining')).toEqual([])
   })
 
+  it('shows each resource with the emoji from the data, or null so the UI falls back to a dot', () => {
+    for (const r of content.resources) expect(sel.resourceInfo(r.id).emoji, r.id).toBe(r.emoji)
+    expect(sel.resourceInfo('oak-log').emoji).toBeTruthy()
+    expect(sel.resourceInfo('verdant-seedcache').emoji).toBeTruthy()
+    expect(sel.resourceInfo('no-such-thing').emoji).toBeNull()
+  })
+
   it('takes colors from the data, not from the components', () => {
     expect(sel.skillInfo('woodcutting').color).toBe(content.typeById.get('verdant')!.color)
     expect(sel.skillInfo('scavenging').color).toBeNull() // an open skill has no type
@@ -178,6 +185,102 @@ describe('creatures', () => {
     expect(sel.selectCreatureView(view(sproutletAtWork()), 'creature-1')!.workingAt).toBe('Woodcutting, slot 1')
   })
 
+  it('the view carries what a roster card needs: species, types, rarity frame, form, shiny, lean, skills, traits', () => {
+    const base = newGame()
+    const { state } = addCreature(base, 'sproutlet', {
+      rarityTier: 6,
+      level: 34,
+      form: 2,
+      shiny: true,
+      poolTraits: [pool('vitality', 'major'), pool('night-owl', 'minor')],
+    })
+    const v = sel.selectCreatureView(view(state), 'creature-2')!
+    const rarity = content.rarities[5]!
+    expect(v).toMatchObject({
+      id: 'creature-2',
+      seq: 2,
+      name: 'Timberhorn', // the form's name...
+      speciesName: 'Sproutlet', // ...and the species it belongs to
+      isHybrid: false,
+      emoji: '🦌',
+      form: 2,
+      level: 34,
+      shiny: true,
+      statLean: 'guard',
+      primarySkill: 'Woodcutting',
+      secondaryAptitude: 'Scavenging',
+      working: false,
+      workingAt: null,
+    })
+    expect(v.rarity).toEqual({ tier: 6, id: rarity.id, name: rarity.name, tint: rarity.frame.tint, glow: rarity.frame.glow })
+    expect(v.types.map((t) => t.id)).toEqual(['verdant'])
+    expect(v.types[0]!.color).toBe(content.typeById.get('verdant')!.color)
+    expect(v.signatureTrait).toMatchObject({ id: 'overgrowth', name: content.traitById.get('overgrowth')!.name, strength: 'moderate' })
+    expect(v.poolTraits.map((t) => [t.id, t.name, t.strength])).toEqual([
+      ['vitality', content.traitById.get('vitality')!.name, 'major'],
+      ['night-owl', content.traitById.get('night-owl')!.name, 'minor'],
+    ])
+    expect(v.poolTraits.every((t) => t.text.length > 0)).toBe(true)
+  })
+
+  it('a hybrid shows both of its types, in the data order, and its own species name', () => {
+    const hybrid = content.hybrids[0]!
+    const { state } = addCreature(newGame(), hybrid.id, { isHybrid: true })
+    const v = sel.selectCreatureView(view(state), 'creature-2')!
+    expect(v.isHybrid).toBe(true)
+    expect(v.speciesName).toBe(hybrid.name)
+    expect(v.types.map((t) => t.id)).toEqual([...hybrid.types])
+    expect(v.types).toHaveLength(2)
+    expect(v.types.map((t) => t.color)).toEqual(hybrid.types.map((t) => content.typeById.get(t)!.color))
+    expect(v.color).toBe(v.types[0]!.color) // the single "color" is still the first type's
+    expect(v.primarySkill).toBe(content.skillById.get(hybrid.primarySkill)!.name)
+  })
+
+  it('takes each rarity frame from rarities.json and shows an unknown tier plainly rather than breaking', () => {
+    content.rarities.forEach((r) => {
+      const { state } = addCreature(newGame(), 'sproutlet', { rarityTier: r.tier })
+      expect(sel.selectCreatureView(view(state), 'creature-2')!.rarity).toEqual({ tier: r.tier, id: r.id, name: r.name, tint: r.frame.tint, glow: r.frame.glow })
+    })
+    const { state } = addCreature(newGame(), 'sproutlet', { rarityTier: 99 })
+    expect(sel.selectCreatureView(view(state), 'creature-2')!.rarity).toMatchObject({ tier: 99, glow: 0 })
+  })
+
+  it('says which skills a creature can work (the sim rule) and which of those can be assigned now', () => {
+    const { state } = addCreature(addCreature(newGame(), 'cinderpup').state, content.hybrids.find((h) => h.coveredSkills.includes('woodcutting'))!.id, { isHybrid: true })
+    const [starter, pyric, hybrid] = state.creatures.map((cr) => sel.selectCreatureView(view(state), cr.id)!)
+    expect(starter!.workableSkillIds).toEqual(expect.arrayContaining(['woodcutting', 'herbalism', 'scavenging', 'fabrication']))
+    expect(starter!.workableSkillIds).not.toContain('mining')
+    expect(pyric!.workableSkillIds).not.toContain('woodcutting')
+    expect(hybrid!.workableSkillIds).toContain('woodcutting')
+    // Only Woodcutting has anything to gather in phase 1, so only that can be assigned.
+    expect(starter!.assignableSkillIds).toEqual(['woodcutting'])
+    expect(pyric!.assignableSkillIds).toEqual([])
+    expect(hybrid!.assignableSkillIds).toEqual(['woodcutting'])
+  })
+
+  it('says a working creature is working, and where', () => {
+    const v = sel.selectCreatureView(view(sproutletAtWork()), 'creature-1')!
+    expect(v.working).toBe(true)
+    expect(v.workingAt).toBe('Woodcutting, slot 1')
+  })
+
+  it('exposes the shiny hue and the roster vocabulary straight from the data', () => {
+    expect(sel.shinyHueDeg).toBe(content.tuning.ui.shinyHueDeg)
+    expect(sel.typeOptions.map((t) => t.id)).toEqual(content.types.map((t) => t.id))
+    expect(sel.typeOptions.map((t) => t.order)).toEqual(content.types.map((_, i) => i))
+    expect(sel.rarityOptions.map((r) => r.name)).toEqual(content.rarities.map((r) => r.name))
+    expect(sel.skillOptions.map((k) => k.id)).toEqual(content.skills.map((k) => k.id))
+    expect(sel.formNumbers).toEqual([1, 2, 3])
+  })
+
+  it('picks the resource a roster assignment gathers: the slot own resource, else the lowest unlocked tier', () => {
+    expect(sel.selectSlotAssignResourceId(view(newGame()), 'woodcutting', 0)).toBe('oak-log')
+    const onYew = work(setSkillLevel(newGame(), 'woodcutting', 30), 'creature-1', 'woodcutting', 0, 'yew-log')
+    expect(sel.selectSlotAssignResourceId(view(onYew), 'woodcutting', 0)).toBe('yew-log')
+    // Level 30 opens a second slot. It is empty, so it starts on the lowest tier, not on the yew of the first slot.
+    expect(sel.selectSlotAssignResourceId(view(onYew), 'woodcutting', 1)).toBe('oak-log')
+  })
+
   it('lists who can go in a slot: skill-capable creatures not already in it', () => {
     const empty = newGame()
     expect(sel.selectAssignableCreatureIds(view(empty), 'woodcutting', 0)).toEqual(['creature-1'])
@@ -221,6 +324,8 @@ describe('selectors are safe for zustand v5 (stable references)', () => {
     ['cooldown', (s) => sel.selectSlotCooldownMs(s, 'woodcutting', 0)],
     ['progress', (s) => sel.selectSlotProgress(s, 'woodcutting', 0)],
     ['creature', (s) => sel.selectCreatureView(s, 'creature-1')],
+    ['creatures', sel.selectCreatureViews],
+    ['assignResource', (s) => sel.selectSlotAssignResourceId(s, 'woodcutting', 0)],
     ['assignable', (s) => sel.selectAssignableCreatureIds(s, 'woodcutting', 0)],
   ]
 

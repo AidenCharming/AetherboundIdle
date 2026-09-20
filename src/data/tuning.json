@@ -25,5 +25,5 @@
     "tempo": { "quick": {}, "standard": {}, "heavy": {} }
   },
   "save": { "version": 1, "autosaveMs": 15000 },
-  "ui": { "tickMs": 100 }
+  "ui": { "tickMs": 100, "shinyHueDeg": 150 }
 }

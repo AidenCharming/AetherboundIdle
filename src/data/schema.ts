@@ -94,6 +94,8 @@ export const ResourceSchema = z
   .strictObject({
     id: Id,
     name: Name,
+    /** Optional: the UI falls back to a type-colored dot for a resource without one. */
+    emoji: Emoji.optional(),
     tier: PosInt,
     skill: Id,
     kind: z.enum(RESOURCE_KINDS),
@@ -291,7 +293,9 @@ export const TuningSchema = z.strictObject({
   save: z.strictObject({ version: PosInt, autosaveMs: PosInt }),
   // How often the UI's tick driver steps the sim. Presentation cadence only: the sim takes any dt, so it never
   // changes what a player earns (same rule as aether.benchEmissionTickMs).
-  ui: z.strictObject({ tickMs: PosInt }),
+  // shinyHueDeg is the runtime CSS hue rotation on a shiny's art (CLAUDE.md rule 4: never a separate asset). It must
+  // sit strictly between 0 and 360, or a shiny would look exactly like a normal creature.
+  ui: z.strictObject({ tickMs: PosInt, shinyHueDeg: z.number().gt(0).lt(360) }),
 })
 
 // ---------- zones.json / vessels.json / collection-tracks.json (phase 3/4; shipped empty) ----------

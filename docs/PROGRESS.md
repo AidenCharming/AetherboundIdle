@@ -3,7 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.7: roster screen** with placeholder art cards (type colors, emoji, rarity frame), filter and sort, and assign to
+**Step 1.7 in progress: checkpoint A (data, selectors, pure roster logic) is done; checkpoint B (roster screen, tabs, assign) is next.**
+Original brief: **Step 1.7: roster screen** with placeholder art cards (type colors, emoji, rarity frame), filter and sort, and assign to
 slot. Same rules as 1.6: the UI reads only through `src/state/selectors.ts` / `useGameStore` / `useActions` and never
 imports `src/sim`; anything derived (rarity name and frame, stats, shiny hue) becomes a selector. Starting points:
 - `selectCreatureView` (selectors.ts) is deliberately minimal (name, emoji, type color, level, where it works). The roster
@@ -416,6 +417,67 @@ the node test covers it); a real phone, Safari or Firefox (Chromium only); and t
 `C:\ClaudeProjects\.claude\launch.json` (workspace root, outside the repo, not committed) starts Vite through `node`
 directly. `npm run dev` is unchanged.
 
+### 2026-09-19, step 1.7 checkpoint A: data, selectors, pure roster logic
+
+New: `src/state/roster.ts`, `ui/components/ResourceIcon.tsx`, `test/roster.test.ts`, `rosterGame()` in `test/helpers.ts`. 466 tests pass
+(386 before this checkpoint) and `npm run build` is clean. No new dependency.
+
+**Resource emoji.** `resources.json` has an optional `emoji` (schema: same `Emoji` check as creatures; a non-emoji string is rejected).
+The four resources that exist got one each, all distinct: oak 🪵, willow 🧺, yew 🏹, Verdant Seedcache 🌰. **The brief said "all five
+resources"; there are four** (oak, willow, yew, seedcache). Gold and Aether are currencies, not entries in `resources.json`, so they
+stay plain labels. The content test requires every resource that ships to have a distinct emoji, so a fifth resource cannot be added
+without one; the field stays optional in the schema so a missing one falls back to the type-colored dot. `TopBar` chips and the
+`SlotCard` tier picker use the new `ResourceIcon` (emoji, else dot). plan.md 3.4 updated.
+
+**Shiny hue.** `tuning.ui.shinyHueDeg` = 150 (placeholder), schema `> 0 and < 360` (0 or 360 would make a shiny look normal), content
+test, plan.md 3.10. `selectors.shinyHueDeg` exposes it; checkpoint B applies it as a CSS `hue-rotate` on the art only.
+
+**Creature view (extended, not duplicated).** `selectCreatureView` is still the single view, still cached per creature object, and now
+carries: `seq`, `name` (form name, unchanged) and `speciesName`, `isHybrid`, `emoji`, `color` (first type, unchanged) and `types`
+(one or two `TypeChip`s with the color and its position in types.json), `rarity` (`tier, id, name, tint, glow` from `rarities.json`),
+`form` (number), `level`, `shiny`, `statLean`, `primarySkill` and `secondaryAptitude` (display names), `signatureTrait` and
+`poolTraits` (`id, name, text, strength`; a signature's strength is its `defaultStrength`), `workableSkillIds` (every skill the sim's
+`canWork` accepts), `assignableSkillIds` (those with something to gather), `working` and `workingAt`. An unknown rarity tier still
+renders (plain frame, no glow).
+- `selectCreatureViews` returns every view as one list. It is cached on the `game.creatures` array itself (the tick never replaces it),
+  so a tick costs one WeakMap lookup at any roster size, and a new array whose views are all unchanged returns the previous list.
+- Lookup lists for the filter bar are content constants: `typeOptions`, `rarityOptions`, `skillOptions` (all skills, in data order),
+  `formNumbers`. `selectSlotAssignResourceId` gives the resource a roster assignment gathers (the slot's own, else the lowest unlocked
+  tier) so the rule is not written in a component.
+
+**Filter and sort (`state/roster.ts`, pure, no React).** They work on anything shaped like a view (`RosterItem`), so `roster.ts` imports
+nothing. `selectors.ts` re-exports it, so the UI still reaches the state layer through `selectors.ts` alone and the architecture
+test's allowlist is unchanged.
+- Filter (`RosterFilter`, `null` = off, all set fields AND together): `type` (a hybrid matches either of its two types), `rarity`
+  (tier), `form`, `shiny` (true = only shinies, false = only the rest), `work` (`working` | `benched`), `canWork` (a skill id).
+- **"Can work skill X" is the sim's own `canWork`**, evaluated once per creature when its view is built and stored in
+  `workableSkillIds`; the filter only reads it. Nothing in `roster.ts` re-implements the rule, and a test checks the filter against
+  `canWork` directly for every skill and every creature in the roster.
+- Sort (`RosterSort` = key + direction): rarity, level, name, type, form. Name sorts by the **name shown** (the form name), case
+  insensitively. Type sorts by the type's position in `types.json`, then the second type, so a pure type comes before its hybrids.
+  Every sort ends with the creature sequence number **ascending regardless of direction** (then the id text), so it is a total order:
+  tested by shuffling the input four ways for all ten key/direction pairs. `defaultDirection`: rarity, level, form open best first;
+  name and type open A to Z.
+- Tested against `rosterGame(120)`: 121 creatures from the real data covering all 6 types, all 15 hybrids (45 hybrid creatures), 9 rarities, 3 forms, shinies,
+  0-3 pool traits at all strengths, and 5 in work slots. The expected results in the filter tests are computed from the game state
+  and the data, not from the views. I broke the code six ways (first-type-only filter, no tiebreak, tiebreak that flips with the
+  direction, everyone-can-work-everything, a shiny filter that ignores `false`, an off-by-one rarity) and each is caught.
+
+**Deviations and decisions:**
+1. `roster.ts` is re-exported from `selectors.ts` rather than added to the architecture test's allowlist (the brief: the UI reads
+   through `selectors.ts` and the two hooks).
+2. The filter offers **every** skill under "can work", not just gatherable ones (everyone can work the open skills, so those two
+   filters are simply "all"); only the *assign* menu is limited to skills with something to gather.
+3. The signature trait's `strength` in the view is its `defaultStrength` (signature traits have no roll).
+
+## Deferred (design.md section 10, needs decisions before it is built)
+Listed so they are not forgotten. Not in step 1.7 and not started:
+- **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
+  (assigned, locked).
+- **Favorite / lock** flag on a creature. Needs a field in the save (`Creature.locked`) plus a **save migration** (`MIGRATIONS[1]`), and
+  a decision on what a lock protects against (release, breeding, both).
+- **Auto-assign-best** (fill empty slots with the best creature). Needs the definition of "best" per skill and resource.
+
 ## Open questions for the designer
 
 ### Found in 1.6, not blocking
@@ -424,8 +486,7 @@ directly. `npm run dev` is unchanged.
   because the brief says to pass a large dt straight to `step`. So the same 20 h earns 12 h if the tab was closed and 20 h
   if it was left open. I followed the brief and changed nothing. If the cap should apply, the driver can clamp the dt (or
   route a gap over some threshold through `applyOffline`, which would also give 1.8's welcome-back summary for free).
-- **Resources have no emoji in the data**, only creatures do. 1.6 shows a type-colored dot plus the name. If you want an
-  emoji per resource it is one optional `emoji` field on `resources.json` (schema, five values, a content test).
+- ~~**Resources have no emoji in the data**~~ **Resolved in 1.7 checkpoint A**: optional `emoji` on `resources.json`.
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait

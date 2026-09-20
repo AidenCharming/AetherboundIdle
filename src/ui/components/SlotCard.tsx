@@ -14,6 +14,7 @@ import {
 } from '../../state/selectors'
 import { cssVars, formatSeconds } from '../format'
 import { ProgressBar } from './ProgressBar'
+import { ResourceIcon } from './ResourceIcon'
 
 interface Slot {
   skillId: string
@@ -56,7 +57,7 @@ function Tier({ skillId, resourceId, selected, onPick }: { skillId: string; reso
   return (
     <button type="button" className="tier" aria-pressed={selected} disabled={!unlocked} onClick={() => onPick(resourceId)}>
       <span className="tier-name">
-        <span className="dot" style={cssVars({ '--dot': info.color })} aria-hidden="true" />
+        <ResourceIcon info={info} />
         {info.name}
       </span>
       <span className="small muted">{unlocked ? `Level ${info.requiredLevel}` : `Needs level ${info.requiredLevel}`}</span>
