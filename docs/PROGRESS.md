@@ -1603,7 +1603,12 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Re-check the pacing once there is more content** (open item recorded with the 1.9c retune). `xp.skillCurve.growth` is 1.045 and the floor test asserts the fastest possible account cannot reach level 250 in
   under 12 days, but that floor is measured against content that does not exist yet: **Woodcutting tiers 4 and 5** (all three shipped tiers are open within the first hour, so levels 30 to 250 add nothing new to
   cut), **faster creatures**, and whatever Phase 2 breeding and Phase 3 expeditions do to the rate. Each of those raises the best-case rate. Re-run `test/pacing.test.ts` and revisit the growth when they land.
-- **`tuning.ui.pacingMilestones` is a PLACEHOLDER** ([10, 25, 50, 100, 150, 200]). It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful.
+- **`tuning.ui.pacingMilestones` is a PLACEHOLDER** ([10, 25, 50, 100, 150, 200]). It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful. Note that
+  with this list the **first level-up is not a row** (level 2 is stamped in the save, but the lowest listed level is 10), so a fresh save shows "1 slot - 0 s" and then nothing until level 10. Adding 2 would make
+  the opening minute visible.
+- **Should the card and button borders be lightened?** (found in 1.9c checkpoint D). `--line` reads 1.23:1 against a card and `--line-strong` 1.62:1, below the 3:1 WCAG asks for a control's visible boundary.
+  This predates the background image, which costs about 0.06 of it; reaching 3:1 means roughly doubling their lightness, a visible change to every button, input and card in the 1.9b look you signed off. Every
+  control also has its own fill and a focus ring, so nothing is unusable. Your call.
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait
