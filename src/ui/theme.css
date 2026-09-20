@@ -13,6 +13,9 @@
   --bg: #0d1015;
   --panel: rgb(20 25 32 / 90%);
   --panel-raised: rgb(26 33 42 / 92%);
+  /* The same colour as --panel, fully opaque. For a surface that covers CONTENT rather than the background image:
+     the phone drawer slides over the page, and at 90% the page ghosted through it. */
+  --panel-solid: #141920;
   --panel-high: #232b36;
   --line: #262e39;
   --line-strong: #37414f;
@@ -254,6 +257,13 @@ button.danger {
 
 .sidebar[data-drawer='true'][data-open='true'] {
   transform: none;
+}
+
+/* The drawer covers the page, not the background image, so it is opaque: at the sidebar's usual 90% the page's own
+   headings and cards showed through it. The docked sidebar keeps the translucency, because what is behind it is the
+   image. */
+.sidebar[data-drawer='true'] {
+  background: var(--panel-solid);
 }
 
 .backdrop {

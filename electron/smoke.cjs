@@ -70,6 +70,30 @@ function attach(win, mode, print) {
       say(`DevTools ${opened ? 'OPENED' : 'refused to open'} in this packaged build`)
       if (opened) fail('DevTools can be opened in a packaged build')
     }
+
+    // The background image (step 1.9c). It is a CSS background, so `did-fail-load` never fires for it and a broken
+    // path would just leave the app on its solid fallback colour, which looks deliberate. Fetching it says whether the
+    // bundled file really is reachable from file:// in a packaged build, and decoding it says the bytes are an image
+    // (the source file was JPEG data under a .png name until 1.9c renamed it).
+    // The url is read off the LAYER, not off the `--bg-image` token: a custom property keeps whatever text it was
+    // given, while the resolved `background-image` of the pseudo-element is the absolute url the browser will
+    // actually fetch. (The token's url is relative to the stylesheet, which is not where the document is.)
+    const image = await page(`(async () => {
+      const layer = getComputedStyle(document.querySelector('.shell'), '::before').backgroundImage
+      const url = /url\\("?([^")]+)"?\\)/.exec(layer)?.[1]
+      if (!url) return { ok: false, why: 'the background layer has no image: ' + layer }
+      const img = new Image()
+      img.src = url
+      try {
+        await img.decode()
+      } catch (e) {
+        return { ok: false, why: 'the image did not load or decode: ' + (e && e.message), url }
+      }
+      return { ok: true, url, width: img.naturalWidth, height: img.naturalHeight }
+    })()`)
+    if (!image.ok) fail(`the background image failed: ${image.why}`)
+    else say(`background image loaded from ${image.url.startsWith('file:') ? 'file://' : image.url.split(':')[0] + ':'} (${image.width}x${image.height})`)
+
     await sleep(500) // a late render error would land here
   }
 

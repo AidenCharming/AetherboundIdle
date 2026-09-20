@@ -3,30 +3,40 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9c is in progress (2026-09-20). Checkpoints A, B, C and D are done; E (verification and the 0.1.1 exe) is next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
-1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats and **level-reached timestamps** per skill — **done, checkpoints A and B**. Save version 2 with the first real migration. Both shown in Settings.
-2. **XP retune**: skill curve growth 1.04 to 1.045 — **done, checkpoint C**. The fastest possible account now needs about 13.3 days for level 250, and `test/pacing.test.ts` holds a floor test at 12 days.
-3. **Wire in the background image** — **done, checkpoint D**. `app-bg.jpg` behind the whole app through `:root` tokens and a fixed `.shell::before` layer, over a measured dark scrim. The portrait crop turned out not to be needed.
-4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
-Note: an older build reads a version-2 save as too-new (it sets it aside and starts fresh), so after this step use only the 0.1.1 exe against %APPDATA%/Aetherbound Idle.
+**Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.1).**
 
-**Step 1.9b is done (2026-09-20): the UI shell redesign (dark gold theme, sidebar and phone drawer, per-skill pages, current activity, toasts and a bell, option cards) and the rebuilt exe, version 0.1.0.** Presentation only; the sim and the save are untouched.
+**Phase 2 starts with a designer decision, not with code: the pool-trait roll.** Nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is ("Major is
+rare" has no number), or how much a trait's `typeAffinity` should tilt its `rollWeight`. Breeding, hatching, reroll and trait inheritance all need that same answer, and the dev panel's grant deliberately does
+not roll (see 1.8b checkpoint A). `traits.json` already carries `rollWeight`, `typeAffinity` and `minStrength`; there is no `tuning.poolTraits` block yet.
 
-**Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait
-roll**, because nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is, or how much `typeAffinity` should tilt a trait's `rollWeight`. Reroll and
-trait inheritance need the same answer, and the dev panel's grant deliberately does not roll (see 1.8b checkpoint A). Then break Phase 2 into steps in this file and write the plan into `docs/plan.md`
-(folder structure and JSON schemas for the new content, as the protocol asks), and wait for the designer's OK before building.
+Once the designer has answered, the next session should: break Phase 2 into steps in this file, write the plan (folder structure and the JSON schemas for the new content) into `docs/plan.md`, and **wait for the
+designer's OK** before building, as the protocol asks.
 
-**Before Phase 2, one thing for the designer: run the manual checklist for the new portable exe** (see "Manual checklist for 0.1.0" under 1.9b checkpoint C below; the older list under 1.9 checkpoint C is for the 0.0.0 build). The old `release\Aetherbound-Idle-0.0.0-*` files are still there and are the old UI. It is the one part of 1.9 nobody could see: the window
-on screen, the Save and Open dialogs, and the second launch bringing the first window forward.
+**Two UI sections are deliberately still missing and belong to later phases, not to Phase 2's first step:** the **Adventure** sidebar section (expeditions, Phase 3) and the **Collection** section (Phase 4). The
+shell was built in 1.9b with room for both; they appear with their screens.
+
+**Before that, one thing for the designer: run the manual checklist for 0.1.1** (see "Manual checklist for 0.1.1" under 1.9c checkpoint E below). It covers the background image, the new Play time and Skill
+milestones cards, and the two things no automated test can reach: a toast over the image, and the export/import round trip through the real Save and Open dialogs.
+
+**Also waiting on the designer** (all recorded under "Open questions"): whether the card and button **border contrast** should be raised to 3:1 (it is 1.2 to 1.7:1 in the 1.9b theme, which predates the
+background image and is barely changed by it); whether `tuning.ui.pacingMilestones` should show different levels; and that the **pacing floor must be re-checked** once Woodcutting tiers 4 and 5, faster
+creatures, or Phase 2 and 3 content land.
+
+**Step 1.9c is done (2026-09-20), and it closed step 1.9.** Five checkpoints, each its own commit: A the play-time counter and save version 2 with the first real migration, B the level-reached timestamps,
+C the pacing retune (skill curve growth 1.04 -> 1.045), D the background image, E verification and the exe rebuilt as 0.1.1.
 
 Things a fresh session should know before starting:
+- **Saves are version 2 now.** An older build (the 0.1.0 or 0.0.0 exe) reads a version-2 save as **too-new**: it copies it to `aetherbound-idle:save-broken-<time>` and starts a fresh game. It does not delete
+  anything, but do not run an old exe against `%APPDATA%\Aetherbound Idle`.
 - **The project path has a space** (`Aetherbound Idle`) and this machine is Windows. `npm` from a path with a space did not work under the preview launcher (see the 1.6 tooling note: `.claude/launch.json`
   starts Vite through `node` directly), and the dev server has twice served a stale module here (see the 1.8b checkpoint C tooling note). The Electron scripts and electron-builder work from this path.
 - **Saves live in the wrapper's own localStorage**, in `%APPDATA%\Aetherbound Idle` (the dev run, the installer and the portable exe share it). `SAVE_KEY` is `aetherbound-idle:save`; a reset wipes only that key.
   Export and import (Settings) are the backup. Whether the exported file should ever become the primary save is still a separate designer decision.
 - **Working-tree line endings are CRLF** (`core.autocrlf=true`). A script that patches source text must match `\r\n`, or it silently finds nothing.
-- **Open for the designer at the start of Phase 2**: the pool-trait roll, and whether a dev grant counts toward the collection (see "Open questions"). Also open, not blocking: code signing (see 1.9 checkpoint C).
+- **Screenshots from the Browser pane are unreliable while the page is scrolled** (a large black band appears above the content that is not in the DOM). Scroll to the top before photographing, and check layout
+  with `getBoundingClientRect` rather than by eye when in doubt. Found in 1.9c checkpoint E.
+- **Open for the designer at the start of Phase 2**: the pool-trait roll, and whether a dev grant counts toward the collection (see "Open questions"). Also open, not blocking: code signing (see 1.9 checkpoint C),
+  and the border-contrast question from 1.9c checkpoint D.
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -39,9 +49,9 @@ Things a fresh session should know before starting:
 - [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
 - [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
-- [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
+- [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [ ] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). It closes step 1.9. Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild.
+- [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
 ### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
@@ -68,7 +78,7 @@ dependency.
   that progress and the save survived.
 
 ## Phase 2: Breeding and hatching
-Not started. Break into steps at the start of the phase. **First the designer designs the pool-trait roll** (see "Open questions").
+Not started; it is next. Break into steps at the start of the phase and write the plan into `docs/plan.md`. **First the designer designs the pool-trait roll** (see "Open questions"), then the sidebar's Adventure and Collection sections follow with their own phases.
 
 ## Phase 3: Expeditions and capture
 Not started.
@@ -1493,6 +1503,74 @@ the guard for the trap this image fell into: `app-bg.png` held JPEG data, which 
 **Question for the designer (not decided here).** The 1.9b theme's borders sit at 1.2 to 1.7:1 against their own surface, below the 3:1 that WCAG 1.4.11 asks for a control's visible boundary. That predates the
 background image and the image barely moves it. Raising `--line` and `--line-strong` to 3:1 would make every button, input and card outline noticeably lighter — a real change to the look you signed off in
 1.9b. Do you want that, or are the borders decorative enough (every control also has its own fill and its focus ring) to leave alone?
+
+### 2026-09-20, step 1.9c checkpoint E: verified in the browser, and the exe rebuilt as 0.1.1 (step 1.9 complete)
+
+Changed: `package.json` (0.1.0 -> 0.1.1), `electron/smoke.cjs` (the load check now proves the background image loads), `ui/theme.css` (the phone drawer made opaque, see below), `docs/PROGRESS.md`.
+`npm run build` is clean and **800 tests pass**.
+
+**Verified in a real browser, on a save reset to zero.**
+
+| What | Result |
+|---|---|
+| Play time advances in real time | Online climbed tick by tick with the game open; it counts even with nothing assigned, because it is time in the game |
+| The first level-up | Stamped at **75.5 s** of work (level 2 at 126,513 ms online, the creature assigned at about 51,000 ms). The pacing test's "about 75 s" is what the app really does |
+| A 1 h fast-forward | Dev fast-forward **+3,600,000 ms exactly**; Away +0; Online grew only by the 19.8 s of real time that passed while clicking |
+| The Dev line | Hidden on a fresh save with the Dev panel off; appears the moment the Dev panel is switched on, even at 0 s |
+| "Total played" | Online + Away only. After the fast-forward it read 4 m 5 s while the Dev line read 1 h |
+| The milestone table | Level 10 read `3 m 26 s + dev 10 m 57 s`, level 25 `3 m 26 s + dev 49 m 33 s`: the real time stands still through the fast-forward and the dev column carries it, which is exactly the reading the designer asked for |
+| Levels crossed inside the fast-forward | 3 to 27 all stamped inside the one window, in order, distinct, `playedMs` frozen at 206,131 and `devMs` running 300 -> 3,414,900 |
+| Dev "Set skill level" to 120 | Levels 29 to 120 **absent**; the table shows 50, 100, 150, 165, 200, 225 and 250 as "unknown" |
+| Reset save | Zeroes all three counters, save back to version 2, `reached` back to `{1: [0, 0]}` |
+| Reload | Level, the whole `reached` map and `devMs` unchanged; `onlineMs` carried on. `awayMs` gained 94 ms, which is right: the reload gap really is time the tab was not ticking, and it goes through the offline path |
+| Export | The downloaded file is **byte for byte the stored save**, version 2, with the counters and all 28 stamps in it |
+
+**The background, at 1280, 1024, 768 and 375 px, on every page.** Honest description: it reads as a dim blue-indigo depth behind the app rather than a picture you look at, which is what the brief asked for. On the
+**Nexus** and **Roster** pages, which have the most empty space, it is at its best: the floating islands, the teal mist and the warm gold motes are all legible. On the **skill page** and the **Dev panel** the cards
+cover most of it and only the margins show. At **375 px** the crop is tight and the frame is mostly the right-hand ring island and haze; it is still clearly a scene, not a gradient. Nothing anywhere is too bright
+or too busy, and no text is harder to read than it was in 1.9b. If anything it errs **slightly flat** in the middle of a wide window, which is the composition doing its job (the painting's centre is deliberately
+empty and the content sits there).
+
+- **No horizontal overflow at 375 px** (`scrollWidth - clientWidth` is 0), and **no control under 44 px**, measured over every button, link, input and select on the page.
+- **One real problem found and fixed:** the phone **drawer** was translucent like the docked sidebar, and the page's own headings and cards ghosted through it. The drawer covers content, not the image, so it is
+  now opaque (`--panel-solid`); the docked sidebar keeps its translucency because what is behind it is the image.
+- Checked over the image: every page, the drawer, the notification bell panel, and the welcome-back dialog (it appears over the image with its own backdrop and reads cleanly).
+
+**The exe.** `npm run electron:pack` at **version 0.1.1**:
+
+| File | Size |
+|---|---|
+| `release/Aetherbound-Idle-0.1.1-setup.exe` | 98.4 MB (103,218,491 bytes) |
+| `release/Aetherbound-Idle-0.1.1-portable.exe` | 98.2 MB (102,935,158 bytes) |
+| `release/win-unpacked/` | rebuilt in place |
+
+The older `0.0.0` and `0.1.0` files are still in `release/`; nothing was deleted. The image is inside the package (`\dist\assets\app-bg-ClgoUiYD.jpg` in `app.asar`, 292 KB).
+
+**Packaged smoke tests pass on both**, `win-unpacked` and the portable exe, all three checks each. The `load` check now also proves the image: **`background image loaded from file:// (2048x1144)`**. That check
+earned its place immediately — the first version of it read the `--bg-image` token and built an `Image` from it, which failed, because a custom property keeps the text it was given (a path relative to the
+**stylesheet**) while `new Image()` resolves against the **document**. Reading the resolved `background-image` off `.shell::before` instead is what the browser actually fetches. The app was never broken; the
+check was. A CSS background never fires `did-fail-load`, so without this a wrong path would just leave the app on its fallback colour and look deliberate.
+
+**Could not verify, and why.**
+- **A toast over the image.** The toast fires and clears in `tuning.ui.toastMs` (5 s) and every Browser-pane round trip costs 2 to 5 s, so I never landed a screenshot inside the window; holding it open through
+  its `setTimeout` and through its focus-pause both failed. What I do know: the toast rendered with the right content in the live DOM ("LEVEL UP - Woodcutting reached level 2") while the image was behind it, and
+  `.toast` is painted on `--panel-high`, a **fully opaque** colour this step did not touch, so the image cannot reach it (text on it measures 12.0:1). The bell panel, which uses the same surface family, was
+  screenshotted. Worth a glance on the manual checklist.
+- **The import half of the export/import round trip.** Import needs the OS file picker and the Browser pane has no way to attach a file. Export was verified byte for byte; import of a v2 file (and of the real
+  v1 fixture) is covered by node tests. It is on the manual checklist.
+- The native Save and Open dialogs, the window on screen, the installer, and a real phone: all still manual, as in 1.9b.
+
+## Manual checklist for 0.1.1 (designer)
+
+Run `release\Aetherbound-Idle-0.1.1-portable.exe`. Everything from the 0.1.0 list below still applies; these are what is new.
+
+1. **The background image** is behind the whole app on every page, and no text anywhere is hard to read. Resize the window from full screen down to a narrow column and back.
+2. **Settings -> Play time**: Total played, Online, Away. Leave the game open for a minute and watch Online climb. Close the app for five minutes, reopen, and check that **Away** got those five minutes and Online did not.
+3. **Settings -> Skill milestones**: a row per interesting level. On a new save the first entry is "1 slot - 0 s". Anything you have not reached says "unknown".
+4. **The Dev fast-forward line** only appears once you have used fast-forward or switched the Dev panel on. Press fast-forward 1 h and check it goes up by exactly 1 h and that **Total played does not move**.
+5. **A toast** (any level-up) over the image: it should be solid, not see-through. (This is the one thing I could not photograph.)
+6. **Export a save, then import it back** through the real Save and Open dialogs, and check Settings still shows the same Play time and milestones afterwards.
+7. **Do not run the old 0.1.0 or 0.0.0 exe against this save.** They read a version-2 save as too-new, set it aside as `save-broken-<time>` and start a fresh game. Nothing is deleted, but you would be playing an empty save.
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 - ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.
