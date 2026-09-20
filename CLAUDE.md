@@ -14,7 +14,7 @@ A creature-collecting incremental (idle) game in the style of Melvor Idle. Playe
 * All content and balance numbers live in JSON under `src/data/`. **Never hardcode balance numbers in components or logic.**
 * Saves to localStorage (versioned, with a migration hook). Offline progress is computed on load from `lastSeen` timestamp.
 * Vitest for unit tests on the core sim (cooldowns, offline progress, breeding rolls, mutation odds, pity counters).
-* **Delivery: Windows `.exe`.** The designer wants the game to run as a desktop app, not a browser link. It is packaged in step 1.9 (after 1.8b) with a desktop wrapper (Electron recommended; see "Desktop packaging" in `docs/PROGRESS.md`). Until then, keep the app a plain static Vite build with no server dependency and no absolute-URL assumptions, and put no wrapper code in `src/`.
+* **Delivery: Windows `.exe`.** The designer wants the game to run as a desktop app, not a browser link. Done in step 1.9: an Electron wrapper in `electron/` (plain CommonJS, no IPC, no preload) opens the built `dist/`, and electron-builder makes an installer and a portable exe into `release/` (see "Desktop packaging" in `docs/PROGRESS.md`). Keep the app a plain static Vite build (`base: './'`) with no server dependency and no absolute-URL assumptions, and keep all wrapper code out of `src/`.
 
 ## Rules for working in this repo
 
@@ -48,4 +48,7 @@ I may hit usage limits or switch models mid-project. Always leave the repo in a 
 | Test | `npm test` | `vitest run`, one pass (specs in `test/`); `npm run test:watch` for watch mode |
 | Desktop app (dev) | `npm run electron:start` | Builds, then opens the built game in the Electron window (`electron/main.cjs`). Shares the real save with the packaged app; DevTools with F12 |
 | Wrapper smoke test | `npm run electron:smoke` | Builds, then launches Electron hidden three times on a throw-away profile: load (page shows "Woodcutting", no console error), progress (a minimized, throttled window earns exactly the time that passed, and survives a reload), single instance. Exit 0 or 1. Never touches the real save. Add `-- --only=load` for one check |
+| Package | `npm run electron:pack` | Builds, then electron-builder writes to `release/` (gitignored): `Aetherbound-Idle-<version>-setup.exe` (NSIS installer), `Aetherbound-Idle-<version>-portable.exe` (single exe) and `win-unpacked/`. Unsigned. About 100 MB each. Config: `electron-builder.yml` |
+| Packaged smoke test | `npm run electron:smoke:packaged` | The same three checks against `release/win-unpacked/Aetherbound Idle.exe`. For the portable or any other exe: `node electron/smoke-runner.mjs --exe="<path>"`. Run `electron:pack` first |
+| Placeholder icon | `node electron/make-icon.mjs` | Regenerates `electron/assets/icon.ico` and `icon.png` (generated shapes, not real art). Only needed if the icon script changes |
 

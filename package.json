@@ -1,6 +1,8 @@
 {
   "name": "aetherbound-idle",
   "private": true,
+  "description": "A creature-collecting idle game.",
+  "author": "Aetherbound Idle",
   "version": "0.0.0",
   "type": "module",
   "main": "electron/main.cjs",
@@ -11,7 +13,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "electron:start": "npm run build && electron .",
-    "electron:smoke": "npm run build && node electron/smoke-runner.mjs"
+    "electron:smoke": "npm run build && node electron/smoke-runner.mjs",
+    "electron:smoke:packaged": "node electron/smoke-runner.mjs --packaged",
+    "electron:pack": "npm run build && electron-builder --win"
   },
   "dependencies": {
     "react": "^19.3.0",

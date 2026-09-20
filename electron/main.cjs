@@ -2,6 +2,7 @@
 // The Windows desktop wrapper (step 1.9): one window around the built game, dist/index.html. It contains no game
 // code and no IPC, and there is no preload script: the game talks to nothing but its own page (saves stay in the
 // page's localStorage). Plain CommonJS so Electron runs it as written, with no compile step to keep in sync.
+const fs = require('node:fs')
 const path = require('node:path')
 const { app, BrowserWindow, dialog, Menu, shell } = require('electron')
 
@@ -12,6 +13,13 @@ const INDEX = path.join(__dirname, '..', 'dist', 'index.html')
 // `--smoke[=load|progress|hold]` is the wrapper's own test hook (electron/smoke.cjs): hidden window, no player.
 const smokeFlag = process.argv.find((a) => a === '--smoke' || a.startsWith('--smoke='))
 const smokeMode = smokeFlag ? smokeFlag.split('=')[1] || 'load' : null
+// `--smoke-out=<file>` also appends the test's output lines to a file: a portable exe is a launcher, and its child's stdout is not the caller's.
+const smokeOut = process.argv.find((a) => a.startsWith('--smoke-out='))?.slice('--smoke-out='.length)
+const say = (line) => {
+  console.log(line)
+  if (smokeOut) fs.appendFileSync(smokeOut, `${line}
+`)
+}
 
 // One save location for the dev run and the packaged app, so both play the same game. A test overrides it with
 // Chromium's own --user-data-dir, which must win (the smoke test never touches a real save). Set before the lock below.
@@ -33,7 +41,7 @@ function focusWindow() {
 }
 
 app.on('second-instance', () => {
-  console.log('[wrapper] second launch: focusing the first window')
+  say('[wrapper] second launch: focusing the first window')
   focusWindow()
 })
 
@@ -94,7 +102,7 @@ if (gotLock) {
   void app.whenReady().then(async () => {
     Menu.setApplicationMenu(null)
     win = createWindow()
-    const smoke = smokeMode ? require('./smoke.cjs').attach(win, smokeMode) : null
+    const smoke = smokeMode ? require('./smoke.cjs').attach(win, smokeMode, say) : null
     const loaded = win.loadFile(INDEX)
     if (smoke) return smoke.run(loaded)
     try {

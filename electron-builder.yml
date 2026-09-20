@@ -1,0 +1,33 @@
+# Packaging for the Windows desktop app (step 1.9). Run with: npm run electron:pack
+# Output goes to release/ (gitignored): an NSIS installer, a portable single .exe, and the unpacked app in win-unpacked/.
+appId: com.aetherbound.idle # PLACEHOLDER: a reverse-domain id; change it before any store or update channel uses it.
+productName: Aetherbound Idle
+directories:
+  output: release
+  buildResources: electron/assets
+# Only the built game and the wrapper's two runtime files. Vite has already bundled react, zustand and zod into dist/,
+# so no node_modules go in. The runner, the icon script and the sources stay out.
+files:
+  - dist/**
+  - electron/main.cjs
+  - electron/smoke.cjs
+  - package.json
+  - '!**/node_modules/**'
+asar: true
+npmRebuild: false # no native modules
+electronDist: node_modules/electron/dist # the pinned Electron that npm already installed, copied rather than downloaded and extracted
+electronLanguages: en-US # the game has no translations; drops about 40 MB of unused Chromium locale files
+win:
+  icon: electron/assets/icon.ico
+  target:
+    - target: nsis
+      arch: x64
+    - target: portable
+      arch: x64
+nsis:
+  artifactName: Aetherbound-Idle-${version}-setup.${ext}
+  oneClick: false # let the player pick the folder
+  allowToChangeInstallationDirectory: true
+  perMachine: false # installs for the current user only, so no administrator prompt
+portable:
+  artifactName: Aetherbound-Idle-${version}-portable.${ext}

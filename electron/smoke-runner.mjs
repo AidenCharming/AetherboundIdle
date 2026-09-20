@@ -54,8 +54,12 @@ function makeUserDataDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'aetherbound-smoke-'))
 }
 
+/** Where a launch's output lines also go (next to its profile), because a portable exe's launcher does not hand its child's stdout on. */
+const outFileFor = (userDataDir) => `${userDataDir}.out.txt`
+
 function removeDir(dir) {
   try {
+    fs.rmSync(outFileFor(dir), { force: true })
     fs.rmSync(dir, { recursive: true, force: true, maxRetries: 8, retryDelay: 500 })
   } catch {
     console.warn(`(could not delete ${dir}; it only holds a throw-away test profile)`)
@@ -70,15 +74,19 @@ function killTree(child) {
 
 /** Starts one launch and resolves with its output, exit code and a way to wait for a line of output. */
 function launch(mode, userDataDir) {
-  const child = spawn(command, [...baseArgs, `--smoke=${mode}`, `--user-data-dir=${userDataDir}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
-  let output = ''
-  const watchers = []
-  const onData = (chunk) => {
-    output += chunk.toString()
-    for (const w of [...watchers]) if (w.test()) w.done()
+  const outFile = outFileFor(userDataDir)
+  const child = spawn(command, [...baseArgs, `--smoke=${mode}`, `--user-data-dir=${userDataDir}`, `--smoke-out=${outFile}`], { cwd, stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true })
+  let streamed = ''
+  child.stdout.on('data', (chunk) => (streamed += chunk.toString()))
+  child.stderr.on('data', (chunk) => (streamed += chunk.toString()))
+  /** The lines the app wrote to its output file, or what it streamed if the file is not there. */
+  const read = () => {
+    try {
+      return fs.readFileSync(outFile, 'utf8')
+    } catch {
+      return streamed
+    }
   }
-  child.stdout.on('data', onData)
-  child.stderr.on('data', onData)
   const exited = new Promise((resolve) => child.on('exit', (code) => resolve(code)))
   const timer = setTimeout(() => killTree(child), timeoutMs)
   exited.then(() => clearTimeout(timer))
@@ -86,17 +94,16 @@ function launch(mode, userDataDir) {
     child,
     exited,
     get output() {
-      return output
+      return read()
     },
     /** Resolves true when `needle` appears in the output, false after `ms`. */
-    sees(needle, ms) {
-      return new Promise((resolve) => {
-        const test = () => output.includes(needle)
-        if (test()) return resolve(true)
-        const w = { test, done: () => { clearTimeout(t); watchers.splice(watchers.indexOf(w), 1); resolve(true) } }
-        const t = setTimeout(() => { watchers.splice(watchers.indexOf(w), 1); resolve(false) }, ms)
-        watchers.push(w)
-      })
+    async sees(needle, ms) {
+      const end = Date.now() + ms
+      while (Date.now() < end) {
+        if (read().includes(needle)) return true
+        await new Promise((resolve) => setTimeout(resolve, 100))
+      }
+      return read().includes(needle)
     },
   }
 }
@@ -113,7 +120,10 @@ async function runOne(mode) {
   try {
     const run = launch(mode, dir)
     const code = await run.exited
-    return { ok: code === 0, detail: smokeLines(run.output) || `    (no output; exit code ${code})\n${run.output}` }
+    // Both must hold: the app said PASS, and the process exit code agrees (a launcher that swallowed a failure would show here).
+    const said = run.output.includes(`[smoke] PASS (${mode})`)
+    return { ok: code === 0 && said, detail: `${smokeLines(run.output) || '    (no output)'}
+    exit code ${code}` }
   } finally {
     removeDir(dir)
   }

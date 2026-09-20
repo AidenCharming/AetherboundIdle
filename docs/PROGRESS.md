@@ -3,26 +3,21 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9 is in progress (session 2026-09-20). Checkpoints A (the wrapper runs the built game, smoke test) and B (Settings save export and
-import) are done and committed. Next: checkpoint C (electron-builder: installer + portable exe, placeholder icon, packaged smoke test, manual checklist).** The paragraph below is the original brief.
+**Step 1.9 is done (2026-09-20): Phase 1 is complete, playable, and ships as a Windows `.exe`. Next is Phase 2 planning (breeding and hatching). It starts with the designer designing the pool-trait
+roll**, because nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is, or how much `typeAffinity` should tilt a trait's `rollWeight`. Reroll and
+trait inheritance need the same answer, and the dev panel's grant deliberately does not roll (see 1.8b checkpoint A). Then break Phase 2 into steps in this file and write the plan into `docs/plan.md`
+(folder structure and JSON schemas for the new content, as the protocol asks), and wait for the designer's OK before building.
 
-**Phase 1 is complete and playable (step 1.8b done, 2026-09-20). Next is step 1.9: the desktop wrapper, as written in "Desktop packaging"
-below. The designer confirmed Electron (2026-09-19).** Start there and follow that section: an Electron main process in `electron/` (never in
-`src/`), an `npm run` script that opens the built game in a window, an installer or portable `.exe` build script, an app name and a placeholder
-icon, `base: './'` in `vite.config.ts` (and check the browser build still works), file-based save export and import as a Settings button, the
-single-instance lock, a check that a minimized window's throttled timers lose nothing, and the new commands in CLAUDE.md. Verify it in the
-packaged app: launch, play a minute, close, reopen after a few minutes, and confirm the welcome-back summary and that progress survived.
+**Before Phase 2, one thing for the designer: run the manual checklist for the portable exe** (see "Manual checklist" under 1.9 checkpoint C below). It is the one part of 1.9 nobody could see: the window
+on screen, the Save and Open dialogs, and the second launch bringing the first window forward.
 
 Things a fresh session should know before starting:
-- **Nothing in `src/` should change for the wrapper** except what the section already lists (`base`, and the Settings export/import that needs a
-  state-layer action). Keep the UI rules: it reads through `selectors.ts` and the two hooks; no hex colors or balance numbers in `ui/`.
-- **The project path has a space** (`Aetherbound Idle`) and this machine is Windows. `npm` from a path with a space did not work under the
-  preview launcher (see the 1.6 tooling note: `.claude/launch.json` starts Vite through `node` directly), and the dev server has twice served a stale
-  module here (see the 1.8b checkpoint C tooling note). Expect the same care with electron-builder paths.
-- **Saves live in the wrapper's own localStorage.** `SAVE_KEY` is `aetherbound-idle:save`; a reset wipes only that key. Whether the exported file
-  should ever become the primary save is a separate designer decision (see "Desktop packaging").
-- **Open for the designer at the start of Phase 2** (not 1.9): the pool-trait roll, and whether a dev grant counts toward the collection (see "Open
-  questions").
+- **The project path has a space** (`Aetherbound Idle`) and this machine is Windows. `npm` from a path with a space did not work under the preview launcher (see the 1.6 tooling note: `.claude/launch.json`
+  starts Vite through `node` directly), and the dev server has twice served a stale module here (see the 1.8b checkpoint C tooling note). The Electron scripts and electron-builder work from this path.
+- **Saves live in the wrapper's own localStorage**, in `%APPDATA%\Aetherbound Idle` (the dev run, the installer and the portable exe share it). `SAVE_KEY` is `aetherbound-idle:save`; a reset wipes only that key.
+  Export and import (Settings) are the backup. Whether the exported file should ever become the primary save is still a separate designer decision.
+- **Working-tree line endings are CRLF** (`core.autocrlf=true`). A script that patches source text must match `\r\n`, or it silently finds nothing.
+- **Open for the designer at the start of Phase 2**: the pool-trait roll, and whether a dev grant counts toward the collection (see "Open questions"). Also open, not blocking: code signing (see 1.9 checkpoint C).
 
 ## Phase 1: Economy core
 - [x] 1.1 Plan: folder structure and JSON schemas written to `docs/plan.md`. **Wait for designer's OK.** *(approved 2026-09-19 with six amendments)*
@@ -35,9 +30,9 @@ Things a fresh session should know before starting:
 - [x] 1.8a Offline path for a long-open tab, "welcome back" summary, Settings tab, dev-panel fast-forward. *(2026-09-19; step 1.8 was split at the designer's instruction. State layer in checkpoint A, screens in checkpoint B)*
 - [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
-- [ ] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). Do this right after 1.8b so the designer can double-click the game from the first playable version on.
+- [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)*
 
-### Desktop packaging (planned step 1.9, designer's request)
+### Desktop packaging (step 1.9, designer's request; built, see the three 1.9 checkpoints below)
 The designer wants the game to run as an `.exe`, not as a browser link. `npm run dev` is only the development server; the game is
 already a plain static Vite build, so a desktop wrapper opens that same build in its own window and needs **no change to the game
 code**. Not built yet. Do not add wrapper code before step 1.9, and until then keep the app a plain static build with no server
@@ -1105,6 +1100,79 @@ Safari; keyboard-only use of the two-step confirmation beyond Escape and the ini
 4. The section reuses the Dev tab's `.dev-control`, `.dev-row` and `.dev-confirm` styles rather than adding near-identical ones.
 5. Vite's hot reload logged one stale "bootGame() must run" error in a tab that was open while I edited; a clean load in a new tab logs nothing.
 
+### 2026-09-20, step 1.9 checkpoint C: packaging (Phase 1 ships as an `.exe`)
+
+New: `electron-builder.yml`, `electron/make-icon.mjs`, `electron/assets/icon.ico` and `icon.png`. Changed: `package.json` (`description`, `author`, two scripts), `electron/main.cjs` and `electron/smoke.cjs` (a
+`--smoke-out` file channel, the effective-flags checks), `electron/smoke-runner.mjs`, `test/electron.test.ts` (now 11), `CLAUDE.md`. 661 tests pass and `npm run build` is clean. Nothing in `src/` changed in this checkpoint.
+
+**Artifacts** (`npm run electron:pack`, about 20 s, in `release/`, gitignored; version is still `0.0.0`):
+
+| File | Size |
+|---|---|
+| `Aetherbound-Idle-0.0.0-setup.exe` (NSIS installer, per-user, pick the folder, no administrator prompt) | 102,944,381 bytes (98.2 MiB) |
+| `Aetherbound-Idle-0.0.0-portable.exe` (single exe, unpacks itself to a temp folder on each launch) | 102,661,076 bytes (97.9 MiB) |
+| `win-unpacked/` (the same app, unpacked; what the installer lays down) | 321 MB on disk |
+
+`app.asar` holds only `dist/`, `electron/main.cjs`, `electron/smoke.cjs` and `package.json` (9 entries, no `node_modules`: Vite already bundled react, zustand and zod). Only the `en-US` Chromium locale is kept.
+
+**Placeholder icon** (`electron/make-icon.mjs`, no dependency): a violet-to-teal rounded tile with a glowing white "aether" orb, a thin ring around it and three small motes on the ring, drawn from maths and
+written as a 6-size `.ico` (16 to 256) and a 512 px `.png`. Nothing traced, borrowed or branded. Replace both files when there is real art.
+
+**Placeholders in the config, all yours to change:** `appId: com.aetherbound.idle`, `author: "Aetherbound Idle"` (shows as the exe's Company name and the installer's publisher), version `0.0.0`, and the file names
+`Aetherbound-Idle-<version>-setup.exe` / `-portable.exe`.
+
+**Unsigned, and what SmartScreen will show.** No certificate is configured (all three exes report `NotSigned`; the "signing with signtool.exe" lines in electron-builder's log are a no-op without one). A file you built on
+this machine and run from here usually starts without a warning. A file that came through a browser download, a zip, a chat or a cloud drive carries the internet "mark of the web", and Windows shows **"Windows protected
+your PC: Microsoft Defender SmartScreen prevented an unrecognized app from starting", publisher "Unknown publisher"**. Click **More info**, then **Run anyway**. The installer looks the same, with "Unknown publisher" in
+its install prompt. Some antivirus programs also scan or briefly hold a fresh unsigned exe, which can make the first launch slow. **Code signing is not part of this step** and is not set up (it needs a
+certificate, an ongoing cost, and a decision on publisher name); a Steam release would not need one for the store itself. Say when you want it looked at.
+
+**How the build had to be adjusted on this machine** (both in `electron-builder.yml`, neither a game change):
+1. electron-builder's own Electron download-and-extract step failed twice with `EPERM ... rename 'release\win-unpacked.tmp'`, whatever is holding the freshly extracted files (antivirus or an indexer; not a process of ours).
+   `electronDist: node_modules/electron/dist` makes it copy the Electron that `npm install` already fetched (the pinned 44.4.3) instead, which is also faster and guarantees the packaged Electron is the tested one.
+   Side effect: an unused `resources/default_app.asar` (108 KB) rides along; Electron loads `app.asar` ahead of it.
+2. The `nsis` and `7zip` helper tools were downloaded on the first run and are cached.
+
+**Verified, on the packaged app** (`npm run electron:smoke:packaged`, and the same runner with `--exe=` on the portable exe): all three checks pass on **both `win-unpacked/Aetherbound Idle.exe` and
+`Aetherbound-Idle-0.0.0-portable.exe`** (`packaged=true` in the output): the page loads and says "Woodcutting" with no console error; the window has `sandbox`, `contextIsolation` and no `nodeIntegration`; **DevTools
+refuse to open** (the check asks for them and requires that they do not open; I forced `devTools: true` into an unpacked build and confirmed it fails with "DevTools OPENED", then restored it); a minimized, throttled
+window (4 ticks of a 100 ms timer in 3 s) earned exactly the time that passed (4 actions of 10 XP in 13.0 s at a 3.0 s cooldown) and kept it across a reload; and a second launch on the same profile quits by itself
+(exit 0) while the first is told about it. The portable launcher does propagate a failing exit code (a deliberate bad `--smoke=bogus` exits 1). The launcher does not pass the app's stdout on, so the test hook also
+writes its lines to a file (`--smoke-out=`) and the runner requires both the app's PASS line and exit code 0.
+
+**Not verified:** **the NSIS installer was built but never run**: installing writes to the machine (a per-user program folder, a Start-menu shortcut, an uninstall entry), so I left that to you; the checklist below
+has the steps, and `win-unpacked` is the same app the installer lays down, which did pass. Also not seen: the window on screen, the native Save and Open dialogs for export and import, and the first window
+coming to the front on a second launch (the smoke test's windows are hidden, so it proves the lock and the event, not the `focus()`); the taskbar and file icon rendering at every size; how the portable exe behaves
+when run from a read-only or network location; a machine without the Visual C++ runtime; and 5+ minutes minimized (see checkpoint A).
+
+**Manual checklist for the portable exe** (designer; about 15 minutes, mostly waiting). `release\Aetherbound-Idle-0.0.0-portable.exe`. The exe is the whole game; the save lives in
+`%APPDATA%\Aetherbound Idle` (paste that into the Explorer address bar to see it). Tick each line; write down anything that differs from what it says.
+1. **Launch.** Double-click it. Expect: a few seconds' pause (it unpacks itself first), maybe the SmartScreen prompt (More info, Run anyway), then one window about 1280 x 800 titled "Aetherbound Idle", dark
+   background, **no menu bar**, the Skills tab, one Sproutlet, 0 gold. Nothing opens a browser. F12 and Ctrl+Shift+I do nothing.
+2. **Play.** Skills, Woodcutting, under "Assign" click the Sproutlet. Expect: the progress bar fills in 3.0 s and wraps, Oak Log and XP rise in the top bar, and the Aether rate shows `0/min` while it works.
+   Drag the window narrower: it can shrink to a phone width (375 px) and the layout follows.
+3. **Close and reopen after a few minutes.** Note the time and close the window with the X. Wait **at least 3 minutes** (under 2 minutes no dialog opens, by design). Launch again. Expect: a **welcome-back
+   dialog** ("You were away for 3 m", about 20 actions per minute, the XP and Oak Log gained) and the Sproutlet still working in slot 1. Close it with Close or Escape. Progress (level, logs) kept, nothing doubled.
+4. **Minimize.** Leave it minimized for 3 minutes and restore it. Expect: the logs and XP jumped by about that much, with the welcome-back dialog if it was over 2 minutes. (This is the throttled-timer case.)
+5. **Second launch.** With the game open, double-click the exe again. Expect: **no second window**; the existing window comes to the front (try it with the first one minimized and behind another program). Check
+   Task Manager: one "Aetherbound Idle" group, not two.
+6. **Export.** Settings, "Export save". Expect: a native **Save dialog** suggesting `aetherbound-idle-save-<date>-<time>.json`. Save it somewhere you can find it (the Desktop). Open it in Notepad: one line of JSON
+   starting `{"version":1,"state":{`.
+7. **Reset.** Settings, tick "Dev panel", the Dev tab, "Reset save...", "Yes, wipe my save". Expect: a new game (one benched Sproutlet, 0 gold, Woodcutting level 1).
+8. **Import it back.** Settings, "Import save...". Expect: a native **Open dialog**. Pick the file from step 6. Expect a confirmation naming the file, its creature count and when it was saved. Click "Yes, replace
+   my game". Expect: the page reloads into the game from step 6, with a **welcome-back dialog** if more than 2 minutes have passed since you exported (it applies offline time, capped at 12 h).
+9. **A bad file.** Import any non-save file (a `.txt`). Expect: a red message with the reason, and nothing changes.
+10. **Optional, the installer.** Run `Aetherbound-Idle-0.0.0-setup.exe`, pick a folder, launch from the Start menu, and check it opens with the same save as the portable exe (they share `%APPDATA%\Aetherbound Idle`).
+    Uninstall from Windows Settings, Apps. Note what the icon looks like on the taskbar and in Explorer.
+
+**Decisions and deviations (all reversible):**
+1. **`electronDist`** instead of electron-builder's own download (see above).
+2. **The dev run, the installer and the portable exe share one save folder** (checkpoint A). If you would rather the portable exe kept its save beside itself, that is a change to `main.cjs`; say so.
+3. **Two Windows targets from one config**, x64 only. No auto-update, no code signing, no ARM build.
+4. **`author` is a placeholder** (`Aetherbound Idle`): electron-builder needs one for the installer and the exe's Company name.
+5. The packaged smoke test checks the **effective** window flags and the DevTools behaviour, not the source text. (The first version asserted a property Electron does not report and failed; it now asks for DevTools to
+   open and requires that they do not.)
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
@@ -1113,7 +1181,7 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
   a decision on what a lock protects against (release, breeding, both).
 - **Auto-assign-best** (fill empty slots with the best creature). Needs the definition of "best" per skill and resource.
 - **Two tabs or windows on the same save** (found in 1.8a). Each copy autosaves from its own state and they overwrite each other,
-  so progress is lost. Not in the design. The `.exe` build (step 1.9) gets a single-instance lock; the browser build would need a
+  so progress is lost. Not in the design. **The `.exe` has a single-instance lock (done in 1.9)**; the browser build would need a
   cross-tab lock or an "open elsewhere" notice. Designer to decide whether the browser build needs one.
 - ~~**Native `<dialog>` cancel path**~~ **Done in 1.8b checkpoint C** (`onCancel` refuses the browser's close and dismisses the summary). Still open: re-check the
   dialog in Firefox and Safari, and with a real Android back press (the event was only dispatched by hand).

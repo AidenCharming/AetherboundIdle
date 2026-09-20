@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest'
+import builderConfig from '../electron-builder.yml?raw'
+import gitignore from '../.gitignore?raw'
 import mainSource from '../electron/main.cjs?raw'
 import smokeSource from '../electron/smoke.cjs?raw'
 import themeCss from '../src/ui/theme.css?raw'
@@ -62,3 +64,26 @@ describe('desktop wrapper', () => {
     for (const [path, source] of Object.entries(sources)) expect(/electron/i.test(code(source)), path).toBe(false)
   })
 })
+
+describe('desktop packaging', () => {
+  it('builds both a Windows installer and a portable single exe, named Aetherbound Idle, into release/', () => {
+    expect(builderConfig).toMatch(/productName:\s*Aetherbound Idle/)
+    expect(builderConfig).toMatch(/target:\s*nsis/)
+    expect(builderConfig).toMatch(/target:\s*portable/)
+    expect(builderConfig).toMatch(/output:\s*release/)
+    expect(gitignore).toMatch(/^release\/$/m)
+  })
+
+  it('packs only the built game and the wrapper: no sources, no node_modules', () => {
+    expect(builderConfig).toMatch(/- dist\/\*\*/)
+    expect(builderConfig).toMatch(/- electron\/main\.cjs/)
+    expect(builderConfig).toMatch(/'!\*\*\/node_modules\/\*\*'/)
+    expect(builderConfig).not.toMatch(/- src\//)
+  })
+
+  it('runs the icon and the packaged main from the paths the wrapper ships', () => {
+    expect(builderConfig).toMatch(/icon:\s*electron\/assets\/icon\.ico/)
+    expect(builderConfig).toMatch(/buildResources:\s*electron\/assets/)
+  })
+})
+

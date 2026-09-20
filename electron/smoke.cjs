@@ -3,20 +3,20 @@
 // launched with --smoke=<mode>: the window stays hidden, the page is driven from here with executeJavaScript (which
 // needs no IPC and no preload), and the process exits 0 (pass) or 1 (fail) after printing what it found.
 //
-//   load      the page loads, shows "Woodcutting", and logged no console error
+//   load      the page loads, shows "Woodcutting", logged no console error, and the window has its security flags
 //   progress  a hidden (so throttled) window really plays: assign, wait, and the XP matches the time that passed; then
 //             a reload keeps the progress (this is the "throttled timers lose nothing" check)
 //   hold      loads, then stays open. Only the runner's single-instance check uses it.
 const { app } = require('electron')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
-const say = (line) => console.log(`[smoke] ${line}`)
 
 // Text of the progress line the Skills screen prints, and of the "next slot / level" line above it.
 const XP_LINE = /([\d,]+) \/ ([\d,]+) XP to level (\d+)/
 const PER_ACTION = /([\d.]+) s per action/
 
-function attach(win, mode) {
+function attach(win, mode, print) {
+  const say = (line) => print(`[smoke] ${line}`)
   const wc = win.webContents
   const problems = []
   const fail = (message) => problems.push(message)
@@ -49,6 +49,18 @@ function attach(win, mode) {
     await loaded
     await waitFor(async () => (await text()).includes('Woodcutting'), 15000, 'the page to show "Woodcutting"')
     say(`page text contains "Woodcutting" (electron ${process.versions.electron}, packaged=${app.isPackaged}, userData=${app.getPath('userData')})`)
+    // The flags the window really has, not the ones the source asks for.
+    const prefs = wc.getLastWebPreferences()
+    say(`window flags: sandbox=${prefs.sandbox} contextIsolation=${prefs.contextIsolation} nodeIntegration=${prefs.nodeIntegration}`)
+    if (!prefs.sandbox || !prefs.contextIsolation || prefs.nodeIntegration) fail('the window is not sandboxed with context isolation and no Node')
+    if (app.isPackaged) {
+      // getLastWebPreferences() does not report devTools, so ask for them and see whether they open.
+      wc.openDevTools({ mode: 'detach' })
+      await sleep(500)
+      const opened = wc.isDevToolsOpened()
+      say(`DevTools ${opened ? 'OPENED' : 'refused to open'} in this packaged build`)
+      if (opened) fail('DevTools can be opened in a packaged build')
+    }
     await sleep(500) // a late render error would land here
   }
 
@@ -103,6 +115,7 @@ function attach(win, mode) {
       app.exit(1)
     }, 90000)
     try {
+      if (!['load', 'progress', 'hold'].includes(mode)) throw new Error(`unknown smoke mode "${mode}" (use load, progress, hold)`)
       await loadCheck(loaded)
       if (mode === 'progress') await progressCheck()
       if (mode === 'hold') {
