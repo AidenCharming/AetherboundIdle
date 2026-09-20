@@ -114,10 +114,14 @@ in `tuning.json` under `combat`.
   "id": "woodcutting", "name": "Woodcutting",
   "requiredType": "verdant",
   "open": false,
-  "slotUnlockLevels": [1, 20, 40, 65, 90],
-  "maxLevel": 99
+  "slotUnlockLevels": [1, 50, 100, 165, 225],
+  "maxLevel": 250
 }]
 ```
+
+`maxLevel` and `slotUnlockLevels` are per skill in the file and identical across all 11 today. They were
+retuned in step 1.8t (was `[1, 20, 40, 65, 90]` / `99`); both are PLACEHOLDERS. Creature max level is a
+different knob, `tuning.creature.maxLevel`, and is still 99.
 
 Open skills (Scavenging, Fabrication) have `requiredType: null`. The secondary-aptitude bonus for them is
 a tuning knob, not a per-skill field.
@@ -355,7 +359,7 @@ is a data change, not a code change.
     "formTerm": { "1": 0, "2": 0.08, "3": 0.16 }
   },
   "xp": {
-    "skillCurve": { "base": 100, "growth": 1.10 },
+    "skillCurve": { "base": 250, "growth": 1.04 },
     "creatureCurve": { "base": 80, "growth": 1.12 }
   },
   "skills": { "secondaryAptitudeBonus": 0.15, "hybridOffPrimaryEfficiency": 0.60 },
@@ -473,6 +477,12 @@ creature *slower*. Both knobs read as "how well suited is this creature", where 
 Skill XP is awarded per completed action from `resources.json` -> `xpPerAction`; design section 3 is
 explicit that creature quality changes how fast actions complete, never XP per action. Slot count is
 the number of `slotUnlockLevels` entries less than or equal to the current level.
+
+The table is built per `(curve, maxLevel)` pair, so **skills and creatures do not share one**: skills run
+to 250 on `skillCurve` (base 250, growth 1.04), creatures to 99 on `creatureCurve` (base 80, growth 1.12).
+The skill growth is low because the cap is high — 1.1 over 250 levels would need about 20 trillion XP.
+A save stores XP, never the level, so retuning either curve re-levels an existing save on load
+(`reconcile`, section 5) with no migration; slot counts grow to match and are **never** shrunk.
 
 ### 4.4 Bench Aether
 
@@ -622,7 +632,10 @@ type GameState = {
 
 Phase 1 coverage:
 
-- xp curve round-trip (level -> xp -> level) and slot unlock thresholds at 1/20/40/65/90.
+- xp curve round-trip (level -> xp -> level) and slot unlock thresholds, both read from the data rather
+  than hardcoded, so a retune moves the tests with it.
+- **Pacing** (`test/pacing.test.ts`, added in 1.8t): the real tuning, one unupgraded starter creature on the
+  shipped Woodcutting tiers, asserting the milestone times from design section 3 within 15%.
 - Cooldown: the shared `cooldown_reduction` cap, and the floor taken from the **efficiency-adjusted**
   base. One test asserts the property that matters: a maxed off-primary hybrid is still strictly slower
   than a floored specialist on the same resource.
@@ -695,7 +708,11 @@ All six approved by the designer on 2026-09-19, with six amendments folded into 
 1. **`zod`** is the dependency for the type-checked loaders in step 1.3.
 2. **Signature and pool traits share `traits.json`**, resolved by one effect engine. Signature traits
    carry `kind: "signature"` and a `species` back-reference.
-3. **Max level 99** for both skills and creatures.
+3. **Max level: skills 250, creatures 99.** Amended by the designer in step 1.8t; it was 99 for both at
+   approval. Skills also moved to a `250 / 1.04` XP curve and work-slot unlocks of `1 / 50 / 100 / 165 / 225`.
+   Creature levels, `creatureCurve` and the Form 2 / 3 thresholds (30 / 60) were explicitly left alone.
+   Affects section 3.2 (`skills.json`), section 3.10 (`tuning.json`), section 4.3 (XP and levels) and
+   section 6 (testing), all updated.
 4. **Woodcutting tier unlocks at skill level 1 / 15 / 30**, 3s base action, 10 xp — placeholders.
 5. **Offline cap 12 hours** as the starting tunable value.
 6. **Seeded RNG**, persisted so a reload cannot reroll a pending breed or hatch.

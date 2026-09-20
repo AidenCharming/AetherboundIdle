@@ -26,17 +26,21 @@ No real-money purchases. Everything is earned through play.
 
 ## 3. Skills, slots, cooldowns
 - **Skill level** unlocks resource tiers and work slots. **Creature level, rarity, and form** improve speed.
-- **Work slots per skill:** 1 at skill level 1, then 2/3/4/5 at levels 20/40/65/90. Extra slots beyond 5 are a shop item at a huge gold cost (endgame gold sink).
+- **Max skill level: 250** (PLACEHOLDER, `skills.json` `maxLevel`, the same for every skill). Creature max level is separate and is **99**; see section 4.
+- **Work slots per skill:** 1 at skill level 1, then 2/3/4/5 at levels **50/100/165/225** (PLACEHOLDER, `skills.json` `slotUnlockLevels`). Extra slots beyond 5 are a shop item at a huge gold cost (endgame gold sink).
+- **Skill XP curve (PLACEHOLDER, `tuning.xp.skillCurve`): base 250, growth 1.04.** A level costs `round(250 * 1.04^(L-1))` XP; level 250 is 108.9 M XP in total. Growth is low *because* the cap is high: 1.1 over 250 levels would need about 20 trillion XP.
+- **Pacing targets for the curve** (one unupgraded starter creature, alone, on the shipped Woodcutting tiers): first level-up about **75 s**, level 30 about **46 min**, level 100 about **8 h**, level 250 about **4 months**. These are the feel the curve is tuned to, not a promise about a developed account; `test/pacing.test.ts` fails if a retune moves any of them by more than 15%.
 - **No hunger, rest, or upkeep.** Each creature has an **action cooldown** that shortens with level, rarity, and form, with a hard floor (PLACEHOLDER 20% of base) and diminishing returns.
 - Skill XP is per completed action. Creature quality changes how fast actions complete, not XP per action.
 - **Global cap:** all cooldown reduction from every source (signature, pool traits, auras) shares one cap.
 - **Benched creatures** (not in a slot, not on an expedition) passively emit Aether, scaled by rarity.
 - **Skills never fail and have no hazards.** Idle game: no bonuses for active clicking.
-- Resource tiers per skill map to the tier ladder (section 5). PLACEHOLDER example for Woodcutting: oak (T1), willow (T2), yew (T3), then higher tiers. Author content for tiers 1 to 5 only in v1, but build systems for 9.
+- Resource tiers per skill map to the tier ladder (section 5). PLACEHOLDER example for Woodcutting: oak (T1, level 1), willow (T2, level 15), yew (T3, level 30), then higher tiers. Author content for tiers 1 to 5 only in v1, but build systems for 9. **Tier unlock levels were deliberately left alone when the cap rose to 250**, so all three tiers that exist today are open within the first hour; tiers 4 and 5 and their unlock levels still need authoring before the upper levels have anything to reach for.
 
 ## 4. Creatures
 - Base species are captured. Hybrids are bred only.
 - Each creature has: species, type(s), rarity (9 tiers), level, form (1 to 3), stat lean (Health/Power/Guard), primary skill, secondary aptitude, one combat ability with a tempo tag, **one signature trait** (innate, not rerollable, not inherited), and **up to 3 pool traits**.
+- **Creature level caps at 99** (PLACEHOLDER, `tuning.creature.maxLevel`) on its own XP curve (`tuning.xp.creatureCurve`), which is **not** the skill curve and did not move when skills went to 250. Whether creatures follow skills to a higher cap is a Phase 3 decision.
 - **Forms:** Form 2 at creature level 30, Form 3 at level 60 (tunable). Same creature growing stronger, never a different species. Bonus per form: PLACEHOLDER +20% at Form 2, +40% at Form 3 to stats, and a smaller speed bonus (PLACEHOLDER about +8% / +16%, tunable in `tuning.json` under `cooldown.formTerm`). A full +20% / +40% speed bonus would nearly match the whole rarity ladder's speed contribution. Form bonuses must stay well below rarity bonuses. Evolution is automatic on reaching the level (v1). Offspring always hatch at Form 1, level 1.
 - **Rarity is a tier on the same species** (frame, tint, stat multiplier), not separate art.
 - **Creature rarity ladder (light intensity):** Dim, Faint, Steady, Gleaming, Luminous, Radiant, Brilliant, Resplendent, Zenith.

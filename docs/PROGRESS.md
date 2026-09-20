@@ -817,6 +817,11 @@ levels, and that the second work slot is more than an hour out.
 - **Creature max level stays 99** with `creatureCurve` untouched, and the Form 2 / 3 thresholds stay at 30 / 60.
   Whether creatures follow skills to a higher cap is a **Phase 3 decision** and is not open in Phase 1.
 
+**Docs updated.** `design.md` section 3 now states the max skill level, the slot unlock levels, the XP curve and the
+pacing targets, all marked PLACEHOLDER with the JSON key they live under, and section 4 says creature level is a
+separate knob that did not move. `plan.md` section 3.2, section 3.10, section 4.3 and section 6 carry the new numbers,
+and approved decision 3 now reads "skills 250, creatures 99" with a note that the designer amended it here.
+
 ## Deferred (design.md section 10, needs decisions before it is built)
 Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Bulk release** of creatures. Needs the Aether refund formula (what a release returns) and a rule about what may not be released
