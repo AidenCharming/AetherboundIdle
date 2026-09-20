@@ -1,21 +1,25 @@
 /* A quiet dark theme: layered surfaces, one warm gold accent for UI chrome, rounded cards, generous spacing.
-   Every hex color in the game's CSS lives in this one :root block (test/architecture.test.ts enforces it).
+   Every color in the game's CSS lives in this one :root block (test/architecture.test.ts enforces it for hex).
    Type colors, skill accents, rarity frames and resource dots come from the data JSON through the selectors and are
    handed to components as --accent / --dot / --rarity / --type-a, so no type color is written here.
    --bg is also the Electron window's own background (BACKGROUND in electron/main.cjs, checked by test/electron.test.ts):
-   change both together. */
+   change both together. It is what shows before the background image loads, and behind it for ever after.
+   The surfaces are SEMI-OPAQUE on purpose (step 1.9c): the background image sits behind the whole app, and the
+   readability of every piece of text depends on the alpha here plus --bg-scrim. Raising either alpha hides more of
+   the image; lowering it lowers text contrast. The numbers below were measured against the brightest parts of the
+   shipped image (see the 1.9c checkpoint D entry in docs/PROGRESS.md for the contrast ratios). */
 :root {
   /* surfaces, darkest to lightest: page, sidebar and cards, raised (inputs, nested cards), hover */
   --bg: #0d1015;
-  --panel: #141920;
-  --panel-raised: #1a212a;
+  --panel: rgb(20 25 32 / 90%);
+  --panel-raised: rgb(26 33 42 / 92%);
   --panel-high: #232b36;
   --line: #262e39;
   --line-strong: #37414f;
   /* text */
   --text: #eceff4;
   --muted: #9aa4b2;
-  --faint: #7d8794;
+  --faint: #869099;
   /* the one warm accent, for UI chrome only (selected page, primary buttons, the activity bars) */
   --gold: #e2b866;
   --gold-strong: #f3cf8a;
@@ -32,6 +36,15 @@
   --radius-sm: 10px;
   --shadow: 0 10px 30px rgb(0 0 0 / 40%);
   --sidebar-w: 240px;
+  /* The app background image (docs/art-brief-background.md) and the dark gradient laid over it. One token each, so
+     swapping the art or darkening it is a one-line change. The scrim is what guarantees readability whatever the
+     image is: it is never removed, only tuned. */
+  --bg-image: url('./assets/background/app-bg.jpg');
+  --bg-scrim: linear-gradient(180deg, rgb(13 16 21 / 45%) 0%, rgb(13 16 21 / 64%) 100%);
+  /* Off-centre on purpose. The image is 16:9 and the window can be 375 px wide, where `cover` keeps only a narrow
+     vertical slice; the calm middle of the painting has nothing in it, so centring would show an empty haze on a
+     phone. 74% keeps the large ring island on the right in frame at 375, 768, 1024 and 1280 px. */
+  --bg-position: 74% 50%;
   color-scheme: dark;
 }
 
@@ -167,6 +180,23 @@ button.danger {
    always agree about which mode the window is in. */
 .shell {
   min-height: 100vh;
+}
+
+/* The background image, as ONE fixed layer behind the whole app: sidebar, header, cards, dialogs and toasts all sit on
+   top of it. A fixed pseudo-element rather than `background-attachment: fixed`, which repaints the image on every
+   scroll frame and stutters. The scrim is painted in the same layer, above the image, so no extra element is needed.
+   Static by design: no animation, no filter, no backdrop blur. `--bg` stays behind it as the solid fallback, so there
+   is no flash before the image loads and nothing breaks if it fails to. */
+.shell::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: var(--bg-scrim), var(--bg-image);
+  background-position: var(--bg-position);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 .shell[data-drawer='false'] {

@@ -1,6 +1,7 @@
 # Art brief: app background image
 
-Status: image made (Gemini Pro / Nano Banana, 2026-09-20) and saved; not wired in yet. It is wired in by step 1.9c, checkpoint C (see "Wiring" below). This file is the source of truth for the prompt, the specs, and where the files go.
+Status: image made (Gemini Pro / Nano Banana, 2026-09-20), saved, and **wired in by step 1.9c checkpoint D**. This file stays the source of truth for the prompt, the specs, and where the files go; see
+"How it is wired, as built" at the end for what shipped.
 
 ## What it is for
 One large, atmospheric backdrop behind the whole game window (sidebar, cards, dialogs sit on top of it). It sets the mood (science-fantasy, twilight, Aether) and must **never fight the text**. It is UI chrome, not creature art, so it does not conflict with CLAUDE.md rule 4 (no per-rarity or per-shiny assets).
@@ -40,8 +41,8 @@ An abstract dark background: slow flowing ribbons of dim teal and violet light d
 ## Where the files go
 | File | Path | Shipped? |
 |---|---|---|
-| The finished image (this is what the game uses) | `src/ui/assets/background/app-bg.png` (2048 x 1144). **It is really JPEG data with a .png name: rename it to app-bg.jpg when wiring.** | Yes, bundled by Vite into the exe |
-| Optional portrait version for phone widths | `src/ui/assets/background/app-bg-portrait.png` (644 x 1144, a real PNG). It is a plain 9:16 crop of the landscape scene, not a separate painting: try CSS `cover` with a `background-position` first and use this file only if that crops badly. | Yes |
+| The finished image (this is what the game uses) | `src/ui/assets/background/app-bg.jpg` (2048 x 1144, 292 KB). Renamed from `.png` in 1.9c: it was always JPEG data. | Yes, bundled by Vite into the exe |
+| Optional portrait version for phone widths | `src/ui/assets/background/app-bg-portrait.png` (644 x 1144, a real PNG). **Not used**: `cover` with `--bg-position: 74% 50%` frames well at 375 px, so the landscape file serves every width. Kept in case the art is replaced by something that does crop badly. Unreferenced, so Vite does not bundle it. | No (kept in the repo only) |
 | Untouched original from Gemini | `docs/reference/art/background/background-original.png` (identical to app-bg.png) | No (docs are not packaged) |
 | The exact prompt used, the tool and model name, and the date | `docs/reference/art/background/background-prompt.txt` | No |
 
@@ -55,3 +56,22 @@ The image files above exist. Rename app-bg.png to app-bg.jpg first (it is JPEG d
 - Use the portrait file below a phone breakpoint if it exists; otherwise the single landscape image is cropped to the centre.
 - Keep the window's solid fallback color (`BACKGROUND` in `electron/main.cjs` and `--bg` in the theme, which `test/electron.test.ts` requires to match) so there is no flash before the image loads.
 - Add a test that the referenced file exists. Verify at 1280, 1024, 768 and 375 px, screenshot them. The exe rebuild (`npm run electron:pack`) is done by the next step that ships (1.9c), not here.
+
+## How it is wired, as built (step 1.9c checkpoint D)
+
+Four `:root` tokens in `src/ui/theme.css` carry the whole thing, so swapping the art is a one-line change:
+
+| Token | Value | What it does |
+|---|---|---|
+| `--bg-image` | `url('./assets/background/app-bg.jpg')` | the painting |
+| `--bg-scrim` | `linear-gradient(180deg, rgb(13 16 21 / 45%), rgb(13 16 21 / 64%))` | the dark overlay that guarantees readability whatever the image is |
+| `--bg-position` | `74% 50%` | off-centre, so a ring island stays in frame down to 375 px (the middle of the painting is deliberately empty) |
+| `--panel` / `--panel-raised` | `rgb(20 25 32 / 90%)` / `rgb(26 33 42 / 92%)` | semi-opaque surfaces, so the image shows through without touching text contrast |
+
+Both layers are painted by **one fixed pseudo-element**, `.shell::before` (`z-index: -1`, `pointer-events: none`,
+`background-size: cover`), so the sidebar, header, cards, dialogs and toasts all sit over it. Not
+`background-attachment: fixed`, which repaints on every scroll frame. Static: no animation, no filter, no backdrop
+blur added. `--bg` stays behind it as the solid fallback and still matches `BACKGROUND` in `electron/main.cjs`.
+
+`test/assets.test.ts` guards it: the referenced file exists, the wiring is through the tokens, the layer is static, and
+**every file under `src/ui/assets/` really is the format its extension claims** (the trap this image fell into).

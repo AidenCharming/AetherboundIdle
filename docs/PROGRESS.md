@@ -3,10 +3,10 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9c is in progress (2026-09-20). Checkpoints A, B and C are done; D and E are next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
+**Step 1.9c is in progress (2026-09-20). Checkpoints A, B, C and D are done; E (verification and the 0.1.1 exe) is next.** It closes step 1.9, and then Phase 2 planning starts. Five checkpoints, each its own commit:
 1. **Play-time counter** (online / away / dev-fast-forward time) on GameState.stats and **level-reached timestamps** per skill — **done, checkpoints A and B**. Save version 2 with the first real migration. Both shown in Settings.
 2. **XP retune**: skill curve growth 1.04 to 1.045 — **done, checkpoint C**. The fastest possible account now needs about 13.3 days for level 250, and `test/pacing.test.ts` holds a floor test at 12 days.
-3. **Wire in the background image** (specs, prompt and wiring rules in docs/art-brief-background.md). Files: src/ui/assets/background/app-bg.png (2048x1144, really JPEG data: rename to app-bg.jpg) and app-bg-portrait.png (a plain crop; try CSS cover first). Originals and prompt in docs/reference/art/background/.
+3. **Wire in the background image** — **done, checkpoint D**. `app-bg.jpg` behind the whole app through `:root` tokens and a fixed `.shell::before` layer, over a measured dark scrim. The portrait crop turned out not to be needed.
 4. **Rebuild the exe as 0.1.1** and run the packaged smoke tests (this rebuild carries the image).
 Note: an older build reads a version-2 save as too-new (it sets it aside and starts fresh), so after this step use only the 0.1.1 exe against %APPDATA%/Aetherbound Idle.
 
@@ -1446,6 +1446,53 @@ keeps all five). Tested across the whole table through the real save path.
 
 **Open item for the designer.** Real pacing still depends on content that does not exist: **tiers 4 and 5** (today all three Woodcutting tiers are open within the first hour, so levels 30 to 250 add nothing new
 to cut), **faster creatures**, and whatever Phase 2 breeding and Phase 3 expeditions do to the rate. Re-run the pacing and floor tests, and revisit the growth, when those land.
+
+### 2026-09-20, step 1.9c checkpoint D: the background image
+
+New: `test/assets.test.ts`. Renamed: `src/ui/assets/background/app-bg.png` -> `app-bg.jpg` (it was always JPEG data; the extension was lying). Changed: `ui/theme.css`, `docs/art-brief-background.md`.
+`src/state/driver.ts` had already been tidied in checkpoint A (the `})` jammed onto the end of the `queueWelcomeBack` line in `catchUp` is on its own line; no behaviour change).
+
+**How it is wired.** Four `:root` tokens carry it, so swapping the art is a one-line change: `--bg-image`, `--bg-scrim` (the dark gradient), `--bg-position`, plus the two surface alphas. One fixed
+pseudo-element, `.shell::before` (`z-index: -1`, `pointer-events: none`, `background-size: cover`), paints the scrim and the image together behind the sidebar, header, cards, dialogs and toasts. It is a fixed
+pseudo-element rather than `background-attachment: fixed`, which repaints on every scroll frame. Static: no animation, no filter, and no backdrop blur added (the only one in the theme is the 10 px on the
+header, from 1.9b; the new test caps any blur at 12 px). `--bg` (`#0d1015`) stays behind it as the solid fallback and still matches `BACKGROUND` in `electron/main.cjs`, so there is no flash before the image
+loads and nothing breaks if it never does.
+
+**`--bg-position: 74% 50%`, and why the portrait file is not used.** The painting's middle third is deliberately empty, and at 375 px `cover` keeps only a narrow vertical slice, so `center` would show nothing
+but haze on a phone. 74% keeps the large ring island on the right in frame at 375, 768, 1024 and 1280 px. `app-bg-portrait.png` is therefore **unused** (and, being unreferenced, not bundled by Vite); it stays
+in the repo in case the art is later replaced by something that does crop badly.
+
+**Readability, measured rather than guessed.** I composited the real stack in a canvas in the browser — image, then the scrim at its gradient alpha for that height, then the surface at its alpha — and computed
+WCAG contrast for the theme's actual text colours. The worst case is not the teal or violet mist (their brightest 64 px blocks are only luminance 0.075 and 0.070) but a **warm gold mote at 80% / 84% of the
+image**: its brightest 16 px patch is `rgb(179, 158, 136)`, luminance 0.358. Everything below is measured against that patch, at the scrim alpha that applies at that height (0.61).
+
+| Text | on the page | on a card (`--panel`) | on a raised surface | needs |
+|---|---|---|---|---|
+| body (`--text`) | **7.88** | **14.57** | **13.55** | 4.5 |
+| secondary (`--muted`) | — | **6.66** | **6.19** | 4.5 |
+| labels (`--faint`) | — | **5.17** | **4.80** | 4.5 |
+| accent (`--gold`) | **4.88** | **9.02** | — | 4.5 |
+
+Two things came out of the measurement:
+1. **`--faint` was raised from `#7d8794` to `#869099`.** At the old value it read 4.61 on a card and **4.29** on a raised surface over that gold mote — and it was already only 4.85 / 4.45 in the 1.9b theme with
+   no image at all, so it was under 4.5 before this checkpoint. The nudge fixes the existing shortfall and leaves room for the image. It is the eyebrow labels ("SKILLS", "SLOTS", "GATHERING") and the milestone
+   table's column headings; barely visible as a change.
+2. **The card and button border tokens do not reach 3:1, and the image is not why.** `--line` on a card is 1.23 with the image and was 1.29 without it; `--line-strong` (the button and input outline) is 1.62
+   with and was 1.71 without. The image costs about 0.06. Making them 3:1 means roughly doubling their lightness, which is a visible restyle of every button, input and card in the 1.9b theme, so I have not done
+   it — **see the question for the designer below.** Worth knowing: the image makes card EDGES easier to see, not harder (a card against the page behind it went from 1.08 to **1.85**), because the panel is now
+   darker than what surrounds it rather than nearly the same.
+
+**The scrim was tuned down, not up.** It started at 62% -> 80% and the art was almost invisible; since body text had 10x the contrast it needed, I lightened it to 45% -> 64% and raised the surface alphas from
+88/90% to 90/92% to buy the contrast back. The result shows the ring islands and the mist while every figure in the table above still clears its threshold.
+
+**Tests** (`test/assets.test.ts`): the file `theme.css` references exists; the wiring goes through the tokens, over the scrim, at `cover`, with no `background-attachment: fixed`; the layer is static and no
+backdrop blur exceeds 12 px; the shipped image is under 1.5 MB; and **every file under `src/ui/assets/` really is the format its extension claims** (PNG, JPEG, WebP or GIF by file signature). That last one is
+the guard for the trap this image fell into: `app-bg.png` held JPEG data, which Vite served as `image/png` and the browser sniffed its way past. It worked, but nothing promised it would keep working from
+`file://` in the packaged app.
+
+**Question for the designer (not decided here).** The 1.9b theme's borders sit at 1.2 to 1.7:1 against their own surface, below the 3:1 that WCAG 1.4.11 asks for a control's visible boundary. That predates the
+background image and the image barely moves it. Raising `--line` and `--line-strong` to 3:1 would make every button, input and card outline noticeably lighter — a real change to the look you signed off in
+1.9b. Do you want that, or are the borders decorative enough (every control also has its own fill and its focus ring) to leave alone?
 
 ## Deferred (design.md section 10, needs decisions before it is built)
 - ~~**UI shell restyle**~~ **Done as step 1.9b.** What the shell does not have yet, on purpose: the Adventure and Collection sidebar sections (they appear with their screens in Phases 2 to 4), a Skills Overview, Achievements, Inventory, Shop and any queue.
