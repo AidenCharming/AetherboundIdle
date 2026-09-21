@@ -3,7 +3,7 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.3). Step 1.9f is done (2026-09-21): the Brambletrundle and Riftsneak sprites are in the game (twelve in all), Brambletrundle's Form 2 is renamed Briarburl with its descriptions matched to the approved art, and every exe build now empties `release/` first. Step 1.9d (five small UI changes after 1.9c) is done: glass panels, the Roster and Nexus merged into one page called Nexus, the milestone table, a Delete save section, and the 0.1.2 rebuild.**
+**Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.4, which adds the dev-mode delete button on Nexus cards from step 1.9g). Step 1.9f is done (2026-09-21): the Brambletrundle and Riftsneak sprites are in the game (twelve in all), Brambletrundle's Form 2 is renamed Briarburl with its descriptions matched to the approved art, and every exe build now empties `release/` first. Step 1.9d (five small UI changes after 1.9c) is done: glass panels, the Roster and Nexus merged into one page called Nexus, the milestone table, a Delete save section, and the 0.1.2 rebuild.**
 
 **Phase 2 starts with a designer decision, not with code: the pool-trait roll.** Nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is ("Major is
 rare" has no number), or how much a trait's `typeAffinity` should tilt its `rollWeight`. Breeding, hatching, reroll and trait inheritance all need that same answer, and the dev panel's grant deliberately does
@@ -17,7 +17,7 @@ shell was built in 1.9b with room for both; they appear with their screens.
 
 **Step 1.9e is done (2026-09-21): the first six sprites are in the game as a test** (its entry below says how to look at it: `npm run electron:start`, the Nexus page, and the Dev panel to grant an Emberfang). No exe was packed for it, so the 0.1.2 exes did not show the sprites; the 0.1.3 exe (step 1.9f, which added Brambletrundle and Riftsneak) does. It waits for the designer's look; further sprites arrive by dropping files in `src/ui/assets/creatures/`.
 
-**Before that, one thing for the designer: run the manual checklist for 0.1.3** (see "Manual checklist for 0.1.3" below; the 0.1.2 list under it still applies, and so does the 0.1.1 list where not superseded). It starts with how to look at the twelve sprites, then the 0.1.2 items that no automated test can
+**Before that, one thing for the designer: run the manual checklist for 0.1.3, using the newer `release\Aetherbound-Idle-0.1.4-portable.exe`** (see "Manual checklist for 0.1.3" below; the 0.1.2 list under it still applies, and so does the 0.1.1 list where not superseded). It starts with how to look at the twelve sprites, then the 0.1.2 items that no automated test can
 reach: a toast over the glass, the real Save dialog from "Export a backup first", and the export/import round trip.
 
 **Someone else's uncommitted edits are in the working tree (checked 2026-09-21, after 1.9f).** `docs/art-prompts.md`, `docs/art-pipeline.md` (new batch-runner notes; 1.9f's own one-line change to it is committed) and the untracked `docs/art-window-start.md` belong to the art window, not to any build step. Do not commit them by accident (`git add -u` and `git add -A` both would): stage paths by name. The 0.1.3 exes were built from a clean worktree of the version-bump commit (`git worktree`, tree identical to HEAD's except for the PROGRESS.md record), so they contain none of it, and none of it touches `src/` or `dist/` anyway.
@@ -55,7 +55,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [x] 1.9g A trash-can button on every Nexus card while the Dev panel is on (two clicks: arm, then delete), designer's request 2026-09-21. Dev tooling only; no exe packed. See the 1.9g entry below.
+- [x] 1.9g A trash-can button on every Nexus card while the Dev panel is on (two clicks: arm, then delete), designer's request 2026-09-21. Dev tooling only; packed as 0.1.4. See the 1.9g entry below.
 - [x] 1.9f Brambletrundle and Riftsneak sprites (forms 1 to 3) in the game, the Brambletrundle Form 2 rename to Briarburl with its description lines reconciled, a clean `release/` on every exe build (`electron/clean-release.mjs`), and the exe rebuilt as 0.1.3 (designer's request, 2026-09-21). Presentation and tooling only: no sim change, no balance change, save version stays 2. See the 1.9f entry below.
 - [x] 1.9e The first six real sprites (Sproutlet and Emberfang, forms 1 to 3) shown in the game as a test, emoji kept as the fallback for everything else (designer's request, 2026-09-21). Presentation only: sprites found by file name, a dark art plate with a type-colour rim, a per-form scale (0.72 / 0.86 / 1.0) so growth shows, the shiny hue on the image. No exe packed, no version bump. *(2026-09-21; two commits: the art, then the code)*
 
@@ -1823,7 +1823,7 @@ Nothing else is in the folder (`builder-debug.yml` was not copied). **Packaged s
 
 ### 2026-09-21, step 1.9g: a delete button on the Nexus cards in dev mode (designer's request)
 
-A little trash can in the corner of every Nexus card while **Settings -> Dev panel** is on; with the Dev panel off there is none. Dev tooling only: no balance change, **save version stays 2**, and the saved file's shape is unchanged. **No exe was packed:** the 0.1.3 exes do not have the button (`npm run electron:start`, or the next pack, has it).
+A little trash can in the corner of every Nexus card while **Settings -> Dev panel** is on; with the Dev panel off there is none. Dev tooling only: no balance change, **save version stays 2**, and the saved file's shape is unchanged. **Packed as 0.1.4** (commit "Version 0.1.4"; the 0.1.3 exes did not have the button): `npm run electron:pack` ran the clean script on the real, populated `release/` for the first time (it removed the four 0.1.3 items) and then built. The tree was clean, so it was packed in the main tree with no worktree. `release/` holds `Aetherbound-Idle-0.1.4-setup.exe` (106,097,316 bytes), `Aetherbound-Idle-0.1.4-portable.exe` (105,813,986 bytes), `Aetherbound-Idle-0.1.4-setup.exe.blockmap` (112,069 bytes), electron-builder's `builder-debug.yml` and `win-unpacked/`. The button's code is inside the packaged `app.asar`. Packaged smoke tests (load, progress, single instance) pass on `win-unpacked` and on the portable exe.
 
 - **Two clicks, on purpose.** The first click arms it (the icon becomes a red "Delete?" pill); the second deletes. It disarms after 4 s, on Escape and when it loses focus, so one stray click cannot remove a creature. (Anything that clicks it twice slower than 4 s has to start again.)
 - **Sim:** `deleteCreature(state, id)` in `sim/dev.ts` (pure, returns a reason instead of throwing, like the grants). A creature at work is benched first through the sim's own `unassignCreature`, so its slot is emptied and nothing points at a creature that is gone (the save check refuses that). `nextCreatureSeq` and the RNG are untouched, so an id is never handed out twice. Anyone can be deleted, the last creature included (the Nexus then shows "You have no creatures yet."; Dev -> Reset save starts a new game).
@@ -1834,13 +1834,14 @@ A little trash can in the corner of every Nexus card while **Settings -> Dev pan
 
 ## Manual checklist for 0.1.3 (designer)
 
-Run `release\Aetherbound-Idle-0.1.3-portable.exe`. The 0.1.2 list below still applies (0.1.3 changed nothing it covers), and so does the 0.1.1 list where not superseded; these are what is new.
+Run `release\Aetherbound-Idle-0.1.4-portable.exe` (0.1.4 is 0.1.3 plus the dev-mode delete button; the 0.1.3 exes were deleted when it was built). The 0.1.2 list below still applies (0.1.3 and 0.1.4 changed nothing it covers), and so does the 0.1.1 list where not superseded; these are what is new.
 
 1. **The twelve sprites:** Settings -> Dev panel on, then Dev -> Grant creature: Brambletrundle and Riftsneak, each in Form 1, 2 and 3, with and without Shiny. Look at the Nexus page (cards, and an opened card) and, for one of them, a Woodcutting slot. Does each Form look bigger than the last? Does a shiny still look like the same creature?
 2. **Riftsneak on the dark plate** (see the 1.9f entry: Form 2 is the dimmest): is Form 3 readable at a glance, and Form 2? If not, the lighter Void plate is in the queue.
 3. **Brambletrundle Form 2 is called Briarburl** wherever a form name shows (the card, the opened card, the Dev panel's form list). It should not say Briartread anywhere.
-4. **The clean folder:** `release\` holds only the 0.1.3 setup exe, portable exe, blockmap and `win-unpacked`. Nothing is left of 0.1.2.
-5. Saves are still version 2; the 0.1.2 save carries over.
+4. **The clean folder:** `release\` holds only the 0.1.4 setup exe, portable exe, blockmap, `win-unpacked` and electron-builder's `builder-debug.yml`. Nothing is left of 0.1.3 or 0.1.2.
+5. **The delete button (1.9g):** with Settings -> Dev panel on, each Nexus card has a trash can in its corner; the first click turns it into a red "Delete?", the second deletes. With the Dev panel off there is no trash can.
+6. Saves are still version 2; the 0.1.2 save carries over.
 
 ## Manual checklist for 0.1.2 (designer)
 
