@@ -1205,6 +1205,7 @@ button.danger {
 /* A card. Its type colors, rarity frame and glow all arrive as custom properties from the data (RosterCard.tsx):
    --type-a / --type-b (the art panel; equal for a single type), --rarity (the frame tint) and --glow (0 to 1). */
 .rcard {
+  position: relative; /* the dev-mode trash can sits in the top right corner */
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -1217,6 +1218,36 @@ button.danger {
 
 .rcard[data-expanded='true'] {
   grid-column: 1 / -1;
+}
+
+/* Dev mode only (RosterCard.tsx): a small trash can over the corner of the card, which becomes a red "Delete?" once armed. */
+.rcard-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: inline-grid;
+  place-items: center;
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 8px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel-raised) 90%, transparent);
+}
+
+/* An opened card is a row, so its name runs to the right edge: keep it clear of the button. */
+.rcard[data-dev='true'][data-expanded='true'] .rcard-body {
+  padding-right: 56px;
+}
+
+.rcard-delete svg {
+  width: 18px;
+  height: 18px;
+}
+
+.rcard-delete[data-armed='true'] {
+  border-color: var(--danger);
+  color: var(--danger);
+  font-weight: 700;
 }
 
 .rcard-toggle,

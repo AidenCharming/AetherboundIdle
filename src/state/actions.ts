@@ -5,7 +5,7 @@
 // Stepping to now first matters: the tick lands every `ui.tickMs`, so without it the last few dozen milliseconds
 // would be credited to whatever the slot looks like after the change instead of before it.
 import { content, type Content } from '../data'
-import { addAether, addGold, addResource, grantCreature, setSkillLevel, type DevResult, type GrantSpec } from '../sim/dev'
+import { addAether, addGold, addResource, deleteCreature, grantCreature, setSkillLevel, type DevResult, type GrantSpec } from '../sim/dev'
 import { serializeSave } from '../sim/save'
 import { assignCreature, setSlotResource, unassignCreature } from '../sim/skills'
 import type { GameState, Settings } from '../types/state'
@@ -76,6 +76,8 @@ export interface Actions {
 
   /** Adds a benched creature exactly as specified (nothing is rolled). Any species, rarity, level, form and shiny flag. */
   grantCreature(spec: GrantSpec): DevActionResult
+  /** Removes a creature for good (the trash can on a Nexus card in dev mode). One at work is benched first, so its slot is emptied. Its id is not reused. */
+  deleteCreature(creatureId: string): DevActionResult
   /** Adds a whole number of any resource. `amount` is what the field holds: empty, negative, non-finite and huge are refused. */
   addResource(resourceId: string, amount: unknown): DevActionResult
   /** Adds Aether (a fraction is fine). */
@@ -209,6 +211,7 @@ export function createActions(
     },
 
     grantCreature: (spec) => dev((state) => grantCreature(state, spec)),
+    deleteCreature: (creatureId) => dev((state) => deleteCreature(state, creatureId)),
     addResource: (resourceId, amount) => dev((state) => addResource(state, resourceId, amount)),
     addAether: (amount) => dev((state) => addAether(state, amount)),
     addGold: (amount) => dev((state) => addGold(state, amount)),

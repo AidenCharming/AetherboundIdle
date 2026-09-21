@@ -1,7 +1,8 @@
-import { memo, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
 import {
   selectCreatureView,
+  selectDevPanelEnabled,
   selectSlotAssignResourceId,
   selectSlotCount,
   selectSlotCreatureId,
@@ -48,6 +49,40 @@ function SkillSlots({ creatureId, skillId, onOutcome }: { creatureId: string; sk
         <SlotOption key={i} creatureId={creatureId} skillId={skillId} slotIndex={i} onOutcome={onOutcome} />
       ))}
     </fieldset>
+  )
+}
+
+/**
+ * Dev mode only: a trash can in the card's corner. The first click arms it (it turns into "Delete?"), the second deletes; it
+ * disarms after 4 s, on Escape, and when it loses focus, so one stray click never removes a creature.
+ */
+function DeleteCreature({ id, name }: { id: string; name: string }) {
+  const actions = useActions()
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    if (!armed) return
+    const timer = window.setTimeout(() => setArmed(false), 4000)
+    return () => window.clearTimeout(timer)
+  }, [armed])
+
+  return (
+    <button
+      type="button"
+      className="rcard-delete"
+      data-armed={armed}
+      aria-label={armed ? `Delete? Click again to delete ${name} for good` : `Delete ${name} (dev)`}
+      onClick={() => (armed ? actions.deleteCreature(id) : setArmed(true))}
+      onBlur={() => setArmed(false)}
+      onKeyDown={(e) => e.key === 'Escape' && setArmed(false)}
+    >
+      {armed ? (
+        'Delete?'
+      ) : (
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+        </svg>
+      )}
+    </button>
   )
 }
 
@@ -168,10 +203,11 @@ export const RosterCard = memo(function RosterCard({
   aetherPerMin: number | null
 }) {
   const style = cardStyle(view)
+  const devMode = useGameStore(selectDevPanelEnabled)
   const detailsId = `details-${view.id}`
 
   return (
-    <li className="rcard" data-expanded={expanded} data-shiny={view.shiny} data-rarity={view.rarity.id} style={style}>
+    <li className="rcard" data-expanded={expanded} data-shiny={view.shiny} data-dev={devMode} data-rarity={view.rarity.id} style={style}>
       <button type="button" className="rcard-toggle" aria-expanded={expanded} aria-controls={detailsId} onClick={() => onToggle(view.id)}>
         <span className="rcard-art art-plate" aria-hidden="true">
           <CreatureArt view={view} />
@@ -195,6 +231,7 @@ export const RosterCard = memo(function RosterCard({
           )}
         </span>
       </button>
+      {devMode && <DeleteCreature id={view.id} name={view.name} />}
       {expanded && <Details view={view} id={detailsId} />}
     </li>
   )

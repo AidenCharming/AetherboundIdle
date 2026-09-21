@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { content } from '../src/data'
-import { addAether, addGold, addResource, DEV_MAX_AMOUNT, grantCreature, setSkillLevel, type GrantSpec } from '../src/sim/dev'
+import { addAether, addGold, addResource, deleteCreature, DEV_MAX_AMOUNT, grantCreature, setSkillLevel, type GrantSpec } from '../src/sim/dev'
 import { levelForXp, xpForLevel } from '../src/sim/formulas'
 import { integrityProblems, parseSave, serializeSave } from '../src/sim/save'
 import { raiseSkillToLevel } from '../src/sim/skills'
@@ -8,7 +8,7 @@ import { createActions } from '../src/state/actions'
 import { createTickDriver } from '../src/state/driver'
 import { brokenSaveKey, flushSave, loadGame, SAVE_KEY } from '../src/state/persistence'
 import { createGameStore } from '../src/state/store'
-import { assignmentProblems, FakeEnv, HOUR, NOW, newGame, sproutletAtWork } from './helpers'
+import { addCreature, assignmentProblems, FakeEnv, HOUR, NOW, newGame, sproutletAtWork, work } from './helpers'
 
 const woodcutting = content.skillById.get('woodcutting')!
 const spec = (over: Partial<GrantSpec> = {}): GrantSpec => ({ speciesId: 'sproutlet', rarityTier: 1, level: 1, form: 1, shiny: false, poolTraits: [], ...over })
@@ -478,6 +478,103 @@ describe('dev actions change the state, save at once, and refuse bad input witho
     expect(assignmentProblems(game())).toEqual([])
     actions.unassignCreature('creature-2')
     expect(game().creatures[1]!.assignment).toBeNull()
+  })
+})
+
+// ---------- delete creature (the trash can on a Nexus card in dev mode) ----------
+
+describe('deleteCreature (sim)', () => {
+  it('removes a benched creature and changes nothing else', () => {
+    const base = addCreature(newGame(), 'emberfang').state
+    const r = deleteCreature(base, 'creature-2')
+    if (!r.ok) throw new Error(r.reason)
+    expect(r.state.creatures.map((cr) => cr.id)).toEqual(['creature-1'])
+    expect(r.state).toEqual({ ...base, creatures: base.creatures.filter((cr) => cr.id !== 'creature-2') })
+    expect(r.message).toBe('Deleted Emberfang (creature-2).')
+    expect(base.creatures).toHaveLength(2) // the input state is never mutated
+  })
+
+  it('benches one that is at work first: its slot is emptied and the save stays valid', () => {
+    const working = sproutletAtWork()
+    expect(working.skills.woodcutting!.slots[0]).not.toBeNull()
+    const r = deleteCreature(working, 'creature-1')
+    if (!r.ok) throw new Error(r.reason)
+    expect(r.state.creatures).toEqual([])
+    expect(r.state.skills.woodcutting!.slots[0]).toBeNull()
+    expect(assignmentProblems(r.state)).toEqual([])
+    expect(integrityProblems(r.state)).toEqual([])
+    expect(parseSave(serializeSave(r.state)).ok).toBe(true)
+  })
+
+  it('leaves the other creatures, and their work, exactly as they were', () => {
+    const raised = raiseSkillToLevel(sproutletAtWork(), 'woodcutting', 50)
+    if (!raised.ok) throw new Error(raised.reason)
+    const two = work(addCreature(raised.state, 'sproutlet').state, 'creature-2', 'woodcutting', 1, 'oak-log')
+    expect(two.skills.woodcutting!.slots[1]).not.toBeNull()
+    const r = deleteCreature(two, 'creature-2')
+    if (!r.ok) throw new Error(r.reason)
+    expect(r.state.creatures).toEqual([two.creatures[0]])
+    expect(r.state.skills.woodcutting!.slots[0]).toEqual(two.skills.woodcutting!.slots[0])
+    expect(r.state.skills.woodcutting!.slots[1]).toBeNull()
+    expect(assignmentProblems(r.state)).toEqual([])
+  })
+
+  it('does not reuse the id, and does not touch the RNG', () => {
+    const base = addCreature(newGame(), 'emberfang').state
+    const r = deleteCreature(base, 'creature-2')
+    if (!r.ok) throw new Error(r.reason)
+    expect(r.state.nextCreatureSeq).toBe(base.nextCreatureSeq)
+    expect(r.state.rngState).toBe(base.rngState)
+    const granted = grantCreature(r.state, spec())
+    if (!granted.ok) throw new Error(granted.reason)
+    expect(granted.state.creatures.map((cr) => cr.id)).toEqual(['creature-1', 'creature-3'])
+  })
+
+  it('refuses an id that does not exist, with a reason, and never throws', () => {
+    const base = newGame()
+    for (const id of ['creature-99', '', 'nobody']) {
+      expect(deleteCreature(base, id), id).toEqual({ ok: false, reason: `Unknown creature "${id}".` })
+    }
+  })
+})
+
+describe('deleteCreature (action)', () => {
+  it('removes the creature, saves at once, and the save no longer holds it', () => {
+    const { actions, game, saved } = wired()
+    actions.grantCreature(spec({ speciesId: 'emberfang' }))
+    expect(game().creatures).toHaveLength(2)
+    expect(actions.deleteCreature('creature-2')).toEqual({ ok: true, message: 'Deleted Emberfang (creature-2).' })
+    expect(game().creatures.map((cr) => cr.id)).toEqual(['creature-1'])
+    expect(saved()!.creatures.map((cr) => cr.id)).toEqual(['creature-1'])
+    expect(saved()!.nextCreatureSeq).toBe(3)
+  })
+
+  it('a creature at work is benched and removed: the slot in the save is empty too', () => {
+    const { actions, game, saved } = wired()
+    expect(actions.deleteCreature('creature-1')).toMatchObject({ ok: true })
+    expect(game().creatures).toEqual([])
+    expect(game().skills.woodcutting!.slots[0]).toBeNull()
+    expect(assignmentProblems(game())).toEqual([])
+    expect(saved()!.skills.woodcutting!.slots[0]).toBeNull()
+  })
+
+  it('an unknown id is refused and leaves the store and the save exactly as they were', () => {
+    const { actions, game, saved } = wired()
+    const before = game()
+    const savedBefore = JSON.stringify(saved())
+    expect(actions.deleteCreature('creature-99')).toEqual({ ok: false, reason: 'Unknown creature "creature-99".' })
+    expect(game()).toBe(before)
+    expect(JSON.stringify(saved())).toBe(savedBefore)
+  })
+
+  it('the deletion survives a reload', () => {
+    const { actions, env } = wired()
+    actions.grantCreature(spec({ speciesId: 'emberfang' }))
+    actions.deleteCreature('creature-1')
+    const reloaded = loadGame(env.storage, env.now(), 1)
+    expect(reloaded.isNewGame).toBe(false)
+    expect(reloaded.state.creatures.map((cr) => cr.id)).toEqual(['creature-2'])
+    expect(assignmentProblems(reloaded.state)).toEqual([])
   })
 })
 

@@ -6,7 +6,7 @@ import { content, STRENGTHS, type Content } from '../data'
 import type { Creature, GameState, PoolTraitRoll } from '../types/state'
 import { makeCreature } from './creature'
 import { xpForLevel } from './formulas'
-import { raiseSkillToLevel } from './skills'
+import { raiseSkillToLevel, unassignCreature } from './skills'
 
 /**
  * Largest amount one grant may add. An input guard for the dev tool, not a balance number: it keeps a typo like
@@ -150,5 +150,23 @@ export function grantCreature(state: GameState, spec: GrantSpec, c: Content = co
     ok: true,
     state: { ...state, creatures: [...state.creatures, creature], nextCreatureSeq: state.nextCreatureSeq + 1 },
     message: `Granted ${formName} (${id}): ${rarity.name}, level ${level}, form ${spec.form}${creature.shiny ? ', shiny' : ''}.`,
+  }
+}
+
+/**
+ * Removes a creature from the game (the trash can on a Nexus card while the Dev panel is on). One that works a slot is
+ * benched first through the sim's own `unassignCreature`, so the slot is emptied and nothing is left pointing at a creature
+ * that no longer exists (the save check refuses that). `nextCreatureSeq` is left alone, so the id is never handed out again.
+ * Anyone can be deleted, the last creature included: the Nexus shows an empty state, and Reset save starts a new game.
+ */
+export function deleteCreature(state: GameState, creatureId: string, c: Content = content): DevResult {
+  const creature = state.creatures.find((cr) => cr.id === creatureId)
+  if (!creature) return fail(`Unknown creature "${creatureId}".`)
+  const benched = unassignCreature(state, creatureId)
+  const name = c.creatureById.get(creature.speciesId)?.forms[creature.form - 1]?.name ?? creature.speciesId
+  return {
+    ok: true,
+    state: { ...benched, creatures: benched.creatures.filter((cr) => cr.id !== creatureId) },
+    message: `Deleted ${name} (${creatureId}).`,
   }
 }
