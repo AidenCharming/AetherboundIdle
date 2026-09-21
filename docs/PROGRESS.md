@@ -1828,6 +1828,18 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - ~~**Native `<dialog>` cancel path**~~ **Done in 1.8b checkpoint C** (`onCancel` refuses the browser's close and dismisses the summary). Still open: re-check the
   dialog in Firefox and Safari, and with a real Android back press (the event was only dispatched by hand).
 
+### Art and content queue (designer decisions and ideas, 2026-09-21; not started)
+Sprites are made outside the repo (see `docs/art-pipeline.md`; ready-to-paste prompts in `docs/art-prompts.md`). Step 1.9e showed the first six sprites (Sproutlet and Emberfang, forms 1 to 3) with the emoji as the fallback.
+- **Darker accent per type: an idea, the designer is not sure yet, so produce COMPARISON IMAGES before deciding.** The designer wants the game to use a darker accent colour for each type. Today `types.json` has one `color` per type
+  (`#4CAF50` Verdant, `#8D6E63` Telluric, `#FB8C00` Pyric, `#2196F3` Aqueous, `#FDD835` Voltaic, `#7E57C2` Void), used as `--accent` in 12 places in `theme.css`: the selected and active borders, the creature tile rim, left borders, dots and 9 to 10 percent tinted fills.
+  **The catch:** a plain darkening fails contrast where the accent is a border or a selected state. Against the panel colour `#141920`: current 6.4 / 3.8 / 7.4 / 5.6 / 12.7 / 3.4; the candidate darker values `#2E7D32` / `#5D4037` / `#C25400` / `#1565C0` / `#B8860B` / `#4527A0` give 3.4 / **1.9** / 3.8 / 3.1 / 5.4 / **1.7** (Telluric and Void fall under the 3:1 non-text rule that step 1.9d holds the controls to).
+  **Proposed approach: two colours per type.** Keep `color` for borders, text and selected states; add a darker `accent` (schema and `types.json`) for card fills, tints and the plate behind a sprite.
+  **To decide:** build the two-token version (or just recolour the fills), then take screenshots of the Nexus page and a skill page at 1280 and 375 px with (a) the current look, (b) the darker accents from the table above, (c) a deeper or more muted variant if (b) is not right, and let the designer choose. The readability tests from 1.9d must keep passing.
+- **Sprite wiring for Brambletrundle:** its three approved cut-outs are in `D:\AI\sprites\cutouts\` (`brambletrundle-f1.png`, `-f2.png`, `-f3.png`) and are not in the repo yet. Drop them into `src/ui/assets/creatures/` (the 1.9e lookup needs no code change; check the filename test).
+- **Rename "Briartread" to "Briarburl" (designer decision).** The Brambletrundle Form 2 no longer has treads. Touches `docs/content-data.md`, `src/data/species.json` and anything else that names it; names are otherwise locked. Do it together with the description lines below.
+- **Reconcile the Brambletrundle description lines with the approved art** (doc line and JSON `art` text in one commit, because `test/content.test.ts` compares them). Form 1 stays "chaotic rolling ball of thorny vines and glowing bolts" (say painted bolts if the word "glowing" is a problem). Form 2 was "tank-like creature on tracks of thorns"; the approved Form 2 is a bigger, sturdier tumbleweed golem (vine ball around a wooden core, moss, small white flowers, bark-wood arms, clawed feet). Form 3 was "massive affectionate tumbleweed of vines"; the approved Form 3 is an upright, hulking, gentle wood-and-vine giant with tree-trunk arms and legs and a small face.
+- **Void sprites are dark on a dark plate.** The Void pilot (Riftsneak, green key colour) asks for a richer mid-violet with lighter highlights for that reason. If it works, apply the same wording to all Void creatures in `D:\AI\tools\build_prompts.py`, and consider a lighter plate for Void in the game.
+
 ## Open questions for the designer
 
 ### Found in 1.6, not blocking
