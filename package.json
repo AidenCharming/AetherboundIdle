@@ -3,7 +3,7 @@
   "private": true,
   "description": "A creature-collecting idle game.",
   "author": "Aetherbound Idle",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
