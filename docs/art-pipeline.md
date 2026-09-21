@@ -1,6 +1,6 @@
 # Art pipeline: creature sprites (local AI generation)
 
-Status (2026-09-21): pipeline proven end to end on ONE line (Sproutlet, forms 1 to 3). Nothing is wired into the game yet; the game still uses emoji placeholders. The tools and files live OUTSIDE the repo, under `D:\AI\`. This file is the record of what was decided and how to repeat it.
+Status (2026-09-21): pipeline proven end to end on ONE line (Sproutlet, forms 1 to 3). Wired into the game so far (files in `src/ui/assets/creatures/`, emoji kept as the fallback for everything else): Sproutlet and Emberfang (step 1.9e), Brambletrundle and Riftsneak (step 1.9f), forms 1 to 3 each. The tools and files live OUTSIDE the repo, under `D:\AI\`. This file is the record of what was decided and how to repeat it.
 
 ## Why local
 The designer ran out of Gemini quota and wanted unlimited free generation. The machine can do it: RTX 4060 Laptop (8 GB dedicated VRAM, 47.6 GB shared = system RAM), 64 GB RAM, D: is a 2 TB NVMe drive.

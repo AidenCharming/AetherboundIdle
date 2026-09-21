@@ -25,13 +25,13 @@ const parseName = (file: string): { id: string; form: number } | null => {
   return m ? { id: m[1]!, form: Number(m[2]) } : null
 }
 
-/** The first six real sprites (step 1.9e). More arrive by dropping files in the folder; these six must not go missing. */
-const SIX = ['sproutlet', 'emberfang'].flatMap((id) => [1, 2, 3].map((form) => ({ id, form })))
+/** The real sprites shipped so far: Sproutlet and Emberfang (step 1.9e), Brambletrundle and Riftsneak (1.9f). More arrive by dropping files in the folder; these must not go missing. */
+const SHIPPED = ['sproutlet', 'emberfang', 'brambletrundle', 'riftsneak'].flatMap((id) => [1, 2, 3].map((form) => ({ id, form })))
 
 describe('sprite files', () => {
-  it('finds the folder and the first six sprites', () => {
-    expect(files.length).toBeGreaterThanOrEqual(SIX.length)
-    for (const { id, form } of SIX) expect(files, `${id}-f${form}.png`).toContain(`${id}-f${form}.png`)
+  it('finds the folder and the twelve shipped sprites', () => {
+    expect(files.length).toBeGreaterThanOrEqual(SHIPPED.length)
+    for (const { id, form } of SHIPPED) expect(files, `${id}-f${form}.png`).toContain(`${id}-f${form}.png`)
   })
 
   it('every file is named <known species or hybrid id>-f<1 to 3>.png, so a typo fails here and not silently at run time', () => {
@@ -59,8 +59,8 @@ describe('sprite files', () => {
 })
 
 describe('spriteFor', () => {
-  it('returns a URL for each of the first six', () => {
-    for (const { id, form } of SIX) {
+  it('returns a URL for each of the twelve shipped sprites', () => {
+    for (const { id, form } of SHIPPED) {
       const url = spriteFor(id, form)
       expect(url, `${id} form ${form}`).toEqual(expect.any(String))
       expect(url!.length).toBeGreaterThan(0)
@@ -75,7 +75,7 @@ describe('spriteFor', () => {
   })
 
   it('returns null for anything without a sprite: no file yet, an unknown id, or a form out of range', () => {
-    expect(spriteFor('brambletrundle', 1)).toBeNull()
+    expect(spriteFor('mossgear', 1)).toBeNull()
     expect(spriteFor('ashwood', 2)).toBeNull()
     expect(spriteFor('no-such-creature', 1)).toBeNull()
     expect(spriteFor('', 1)).toBeNull()
@@ -133,7 +133,7 @@ describe('CreatureArt', () => {
   })
 
   it('draws the emoji, hidden from assistive tech, for a creature with no sprite', () => {
-    const view = viewOf('brambletrundle')
+    const view = viewOf('mossgear')
     const html = renderToStaticMarkup(createElement(CreatureArt, { view }))
     expect(html).not.toContain('<img')
     expect(html).toContain('aria-hidden="true"')
@@ -150,7 +150,7 @@ describe('CreatureArt', () => {
     expect(sprite).toContain(turn)
     expect(sprite).toContain('data-shiny="true"')
     expect(sprite).toContain(`src="${spriteFor('sproutlet', 1)}"`)
-    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('brambletrundle', { shiny: true }) }))
+    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('mossgear', { shiny: true }) }))
     expect(emoji).toContain(turn)
     expect(emoji).toContain('data-shiny="true"')
     const plain = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('sproutlet') }))
