@@ -144,7 +144,9 @@ button:hover:not(:disabled) {
   background: var(--panel-high);
 }
 
+/* A button that cannot be used yet looks it (OK in the Delete save dialog, Clear filters with nothing to clear). */
 button:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
@@ -1470,6 +1472,29 @@ button.danger {
   background: var(--panel-raised);
   border: 1px solid var(--edge);
   border-radius: 12px;
+}
+
+/* ---------- delete save (Settings) ---------- */
+
+/* The section in danger styling: a red-tinted card, and a red heading. */
+.danger-zone {
+  background: color-mix(in srgb, var(--danger) 7%, var(--panel-raised));
+  border-color: color-mix(in srgb, var(--danger) 55%, var(--edge));
+}
+
+.danger-zone h2 {
+  color: var(--danger);
+}
+
+/* The question is the welcome-back dialog's surface (.wb) with a form in it. */
+.delete-dialog form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.delete-dialog .dev-row button {
+  flex: 1 1 140px;
 }
 
 /* ---------- play time (Settings) ---------- */

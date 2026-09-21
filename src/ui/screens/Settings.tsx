@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { useActions, useGameStore } from '../../state/runtime'
 import { selectSetting, type SettingKey } from '../../state/selectors'
+import { DeleteSave } from '../components/DeleteSave'
 import { PageTitle } from '../components/PageTitle'
 import { PlayTime } from '../components/PlayTime'
 import { SaveFile } from '../components/SaveFile'
@@ -20,7 +21,7 @@ function Toggle({ setting, label, children }: { setting: SettingKey; label: stri
   )
 }
 
-/** The player's own switches (both live in the save, so they survive a reload: plan.md section 5), and the save file export and import. */
+/** The player's own switches (both live in the save, so they survive a reload: plan.md section 5), the save file export and import, the play time and milestone tables, and Delete save. */
 export function Settings() {
   return (
     <section className="page" aria-label="Settings">
@@ -35,6 +36,7 @@ export function Settings() {
         <SaveFile />
         <PlayTime />
         <SkillMilestones />
+        <DeleteSave />
       </div>
     </section>
   )

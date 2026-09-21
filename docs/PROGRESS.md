@@ -3,7 +3,7 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9d is in progress: items 1, 2 and 3 of 5 are done and committed (see the three "step 1.9d" entries below). Do items 4 and 5 next, in order, from the designer's brief in the 1.9d checklist line.**
+**Step 1.9d is in progress: items 1 to 4 of 5 are done and committed (see the four "step 1.9d" entries below). Do item 5 (the rebuild as 0.1.2) next, from the designer's brief in the 1.9d checklist line.**
 
 **Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.1).**
 
@@ -53,7 +53,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 3 of 5 done)*
+- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players (done, see below), (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 4 of 5 done)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
@@ -1680,6 +1680,35 @@ level 50 does, once it is), and `content.test.ts` (the shipped `pacingMilestones
 
 **Verified in the Browser pane on a fresh save** (reset from the Dev panel, then the Sproutlet assigned to Oak): the Woodcutting table read `2, 10, 25, 50 slot, 100 slot, 150, 165 slot, 200, 225 slot, 250 max`, all "unknown", and no row for level 1.
 About 78 s after the game booted, with the creature assigned about 14 s in, the first row filled in: level 2 read **1 m 32 s** (about 75 s of work plus the seconds before the assignment), which is what the 1.9c pacing test says the app does.
+
+### 2026-09-20, step 1.9d (4): Delete save, for players (Settings)
+
+Settings has a **Delete save** section in danger styling (a red-tinted card, a red heading, a red-outlined "Delete save..." button). The Dev panel's Reset save is separate and unchanged.
+
+New: `state/deleteConfirm.ts`, `ui/components/DeleteSave.tsx`, `ui/downloadFile.ts`, `test/deletesave.test.ts`. Changed: `state/selectors.ts` (re-exports the confirmation), `ui/screens/Settings.tsx`, `ui/components/SaveFile.tsx` (its private download helper moved to
+`ui/downloadFile.ts` so both places share it), `ui/theme.css`, `docs/plan.md`. **No sim change, no save change.**
+
+- **The dialog** is a native `<dialog>` opened with `showModal()`, the welcome-back dialog's pattern: modal, focus moves in (to the text box, so a stray Enter or Space cannot do anything), Escape and a browser-level `cancel` are both caught and
+  close it through one path, and focus goes back to the "Delete save..." button. Its text is the designer's, word for word: "Delete your save?" as the heading, then "This permanently deletes your game: creatures, levels, resources and play time.
+  Backup copies made by imports or by damaged saves are kept. Export a backup first if you might want this game back." Then **"Type yes or accept to confirm"** (the label is built from the same word list the rule uses), an **"Export a backup first"** button,
+  and **OK** and **Cancel**. It uses the welcome-back dialog's opaque surface, so the page does not ghost through it.
+- **OK is disabled until the trimmed, case-insensitive text is exactly "yes" or "accept"**, and Enter in the box submits only when it already is. The rule is a pure function in the state layer, `isDeleteConfirmed(text)`, tested in node:
+  accepts `yes`, `YES`, `Yes`, `accept`, `" Accept "`, tabs and non-breaking spaces around a word; rejects `y`, `yess`, `yes please`, `yes accept`, `accepted`, `y e s`, `yes.`, `no`, an empty box, a Cyrillic "yеs" and full-width "ｙｅｓ".
+- **OK calls the existing `resetSave`**: retire the tick driver first, remove only the main save key, reload. So the reset trap (this tab's own flush writing the old game back) is closed exactly as it is for the Dev panel, and the backup copies
+  (`save-broken-*` from damaged saves, `save-replaced-*` from imports) survive, which is what the dialog promises.
+- **"Export a backup first" is included** (the designer's addition) and did not complicate anything: it is the same `actions.exportSave()` and download as Settings' Export save, through the shared helper, and the dialog stays open and says "Backup started: <file>".
+- **Every control is at least 44 px** (measured: the three buttons, the text box and the trigger are all 44). A disabled button now looks disabled everywhere: `button:disabled` has `opacity: 0.55`. That also dims "Clear filters" and "Reset sort" on the Nexus page when there is nothing to
+  clear, which had looked enabled while doing nothing.
+
+**Tests** (`npm run build` clean, **821 tests pass**, 813 before this item): `test/deletesave.test.ts`: the matching table above; the label and the rule share one word list; the player flow with the same approach as the existing reset tests (a wrong text does
+nothing: the save is untouched, nothing reloads, the game keeps saving on pagehide; then " Yes " deletes it, the main key is gone, exactly one reload was asked for, and a fresh load is a **new game**: one unassigned Sproutlet, no gold, play time zero, level 1
+only); it **stays deleted** (pagehide, beforeunload, a visibility change, the autosave, the tick and a manual flush after OK cannot write the old game back, the timers are gone, and the page after the reload starts a new save that then persists normally); the
+`save-broken-*` and `save-replaced-*` backups survive; the export the dialog offers is the current save and deletes nothing. The reset-trap tests in `dev.test.ts` cover `resetSave` itself.
+
+**Verified in the Browser pane** (1280 px, and Electron renders at 1280 and 375): the section and button; the dialog is modal (`:modal`), has the dialog role, and puts focus in the text box; OK is disabled for empty, `y`, `yess`, `yes please` and `no` and enabled for `yes`, `YES`,
+` Accept ` and `accept`; a click on the disabled OK does nothing (the save is still there, the dialog still open); a real Escape key closes it and focus is back on the trigger; Cancel does the same; "Export a backup first" produced `aetherbound-idle-save-2026-09-20-205210.json`
+(captured, not saved to disk) and the status line; then **a wrong text first ("yes please"), then "yes" and OK**: the page reloaded into a new game (play time 0, no resources, nothing assigned, one creature), the main key held the new save, and a planted
+`save-broken-1` key was still there. Screenshots (the section, and the dialog empty, with a wrong text, and with yes, at 1280 and 375 px) read cleanly; at 375 px the dialog fits with the buttons stacked.
 
 ## Manual checklist for 0.1.1 (designer)
 

@@ -740,6 +740,10 @@ because every later phase needs it.
 | Set skill level | Raises a skill's XP to the cumulative XP of a target level (1 to the skill's `maxLevel`) through `addSkillXp`, so slots unlock as normal. Only raises. Added by the designer's approval in 1.8b: fast-forward is capped at 12 h a press, so levels above about 100 are otherwise unreachable. | 1.8b |
 | Reset save | Wipes the save and reloads, behind a two-step confirmation. Stops the tick driver first so this tab's own unload flush cannot rewrite the save. Only the main save key is wiped. | 1.8b |
 
+**Delete save for players (step 1.9d).** Settings has its own "Delete save" section (a modal dialog: the warning, an "Export a backup first" button, a box that must read "yes" or "accept", then OK) for players; the Dev panel's Reset above is
+separate and unchanged. OK calls the same `actions.resetSave`, so the trap above is closed the same way and the `save-broken-*` and `save-replaced-*` backup copies survive. The rule for the box is the pure `isDeleteConfirmed` in
+`state/deleteConfirm.ts`.
+
 **Pool traits in the grant (designer's decision, 2026-09-20).** No pool-trait roll exists yet (how many traits, how rare Major
 is and how much `typeAffinity` weighs are all undesigned; the designer will design them at the start of Phase 2). So the grant
 does not roll: it offers up to three trait dropdowns, each with a strength dropdown limited to what that trait allows (a trait

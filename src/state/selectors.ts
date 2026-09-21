@@ -23,6 +23,8 @@ import type { GameStore } from './store'
 export * from './roster'
 // The navigation model (nav.ts) is pure too, and reaches the UI the same way.
 export * from './nav'
+// So is the Delete save confirmation (deleteConfirm.ts): which typed words enable the button that deletes the game.
+export * from './deleteConfirm'
 export type { NotificationKind } from './notifications'
 export type { Notification }
 export { visibleToasts } from './notifications'

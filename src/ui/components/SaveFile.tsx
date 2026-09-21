@@ -1,21 +1,10 @@
 import { useEffect, useRef, useState, type ChangeEvent } from 'react'
 import { useActions } from '../../state/runtime'
 import { MAX_IMPORT_BYTES } from '../../state/selectors'
+import { downloadFile } from '../downloadFile'
 
 type Step = { kind: 'idle' } | { kind: 'asking'; fileName: string; text: string; creatures: number; savedAt: number } | { kind: 'done' }
 type Message = { ok: boolean; text: string } | null
-
-/** Hands `text` to the browser (or the desktop app's Save dialog) as a file download. */
-function download(fileName: string, text: string): void {
-  const url = URL.createObjectURL(new Blob([text], { type: 'application/json' }))
-  const link = document.createElement('a')
-  link.href = url
-  link.download = fileName
-  document.body.appendChild(link)
-  link.click()
-  link.remove()
-  window.setTimeout(() => URL.revokeObjectURL(url), 10_000)
-}
 
 /**
  * Save export and import (Settings). Export downloads the save as a .json file. Import reads a file the player picks,
@@ -36,7 +25,7 @@ export function SaveFile() {
 
   const exportSave = (): void => {
     const { fileName, text } = actions.exportSave()
-    download(fileName, text)
+    downloadFile(fileName, text)
     setMessage({ ok: true, text: `Export started: ${fileName}` })
   }
 
