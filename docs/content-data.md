@@ -35,7 +35,7 @@ Form 1 uses the species name. Every species has 3 forms.
 | Netherpod | Void | Chasmshell | Astralcarapace | Vessel Crafting | Starlight Infusion: increases bind rate of vessels it crafts [Moderate] | Guard | Nebula Shell (party shield) | Heavy | Fabrication |
 
 ### Base species form descriptions (for placeholder art prompts, later)
-- Sproutlet: tiny glowing leafy biped with a sapling on its head → sturdy bark-armored quadruped with wooden antler buds → majestic forest beast with a glowing canopy of antlers.
+- Sproutlet: tiny glowing leafy quadruped with a sapling on its head → sturdy bark-armored quadruped with wooden antler buds → majestic forest beast with a glowing canopy of antlers.
 - Brambletrundle: chaotic rolling ball of thorny vines and glowing bolts → tank-like creature on tracks of thorns → massive affectionate tumbleweed of vines.
 - Mossgear: fuzzy green cog-shaped sphere → bipedal mossy mechanism → gentle lumbering botanical machine with emerald aura.
 - Petalsprocket: hovering blossom with metal-trimmed petals → larger rotor-flower → intricate array of glowing petals and gears.

@@ -4,7 +4,7 @@
     "name": "Sproutlet",
     "types": ["verdant"],
     "forms": [
-      { "form": 1, "name": "Sproutlet", "emoji": "🌱", "art": "tiny glowing leafy biped with a sapling on its head" },
+      { "form": 1, "name": "Sproutlet", "emoji": "🌱", "art": "tiny glowing leafy quadruped with a sapling on its head" },
       { "form": 2, "name": "Timberhorn", "emoji": "🦌", "art": "sturdy bark-armored quadruped with wooden antler buds" },
       { "form": 3, "name": "Lumbercrown", "emoji": "🌳", "art": "majestic forest beast with a glowing canopy of antlers" }
     ],
