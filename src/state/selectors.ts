@@ -52,8 +52,16 @@ const typeColor = (typeId: string | null | undefined): string => (typeId ? (cont
 /** How often the tick driver steps the sim; the progress bar smooths over exactly this long. */
 export const uiTickMs: number = content.tuning.ui.tickMs
 
-/** The CSS hue rotation, in degrees, that makes a shiny's art differ from a normal one (tuning.ui.shinyHueDeg). */
+/** The CSS hue rotation, in degrees, that makes a shiny's art differ from a normal one (tuning.ui.shinyHueDeg): the fallback for a type with none of its own. */
 export const shinyHueDeg: number = content.tuning.ui.shinyHueDeg
+
+/**
+ * The hue rotation of a shiny with these types (its species' or hybrid's `types`): the first-listed type's own
+ * `shinyHueDeg` if it has one, else the tuning value. A hybrid therefore takes the hue of its first-listed type.
+ */
+export function shinyHueFor(typeIds: readonly string[]): number {
+  return (typeIds[0] ? content.typeById.get(typeIds[0])?.shinyHueDeg : undefined) ?? shinyHueDeg
+}
 
 /** How much of its art tile a creature's sprite fills in this form, 0 to 1 (tuning.ui.spriteFormScale). Growth shows because it rises with the form. */
 export function spriteScaleFor(form: number): number {
@@ -607,6 +615,8 @@ export interface CreatureView {
   emoji: string
   /** The color of its first type. */
   color: string
+  /** The hue rotation, in degrees, its art gets when it is a shiny (`shinyHueFor` its types). Set whether or not it is one. */
+  shinyHueDeg: number
   /** One type, or two for a hybrid. */
   types: readonly TypeChip[]
   rarity: RarityInfo
@@ -657,6 +667,7 @@ function buildCreatureView(creature: Creature): CreatureView {
     isHybrid: creature.isHybrid,
     emoji: form?.emoji ?? '❔',
     color: typeColor(def?.types[0]),
+    shinyHueDeg: shinyHueFor(def?.types ?? []),
     types: (def?.types ?? []).map(typeChip),
     rarity: rarityInfo(creature.rarityTier),
     form: creature.form,

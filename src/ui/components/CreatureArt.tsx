@@ -1,4 +1,4 @@
-import { shinyHueDeg, spriteScaleFor, type CreatureView } from '../../state/selectors'
+import { spriteScaleFor, type CreatureView } from '../../state/selectors'
 import { cssVars } from '../format'
 import { spriteFor } from '../sprites'
 
@@ -9,13 +9,14 @@ import { spriteFor } from '../sprites'
  *
  * The sprite is drawn at a per-form fraction of the plate (`tuning.ui.spriteFormScale`), since every sprite is cropped
  * to its own bounding box and a Form 1 would otherwise look as big as a Form 3. A shiny gets the same runtime hue turn
- * whichever of the two is drawn (`--shiny-hue`, from `tuning.ui.shinyHueDeg`): there is no separate shiny art.
+ * whichever of the two is drawn (`--shiny-hue`: the creature's first type's own `shinyHueDeg`, else `tuning.ui.shinyHueDeg`, see `shinyHueFor`): there is
+ * no separate shiny art.
  */
 export function CreatureArt({ view }: { view: CreatureView }) {
   const src = spriteFor(view.speciesId, view.form)
   const style = cssVars({
     '--sprite-scale': src ? String(spriteScaleFor(view.form)) : null,
-    '--shiny-hue': view.shiny ? `${shinyHueDeg}deg` : null,
+    '--shiny-hue': view.shiny ? `${view.shinyHueDeg}deg` : null,
   })
   return src ? (
     <img className="creature-art" src={src} alt="" draggable={false} decoding="async" data-shiny={view.shiny} style={style} />

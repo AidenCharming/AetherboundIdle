@@ -273,6 +273,45 @@ describe('creatures', () => {
     expect(hybrid!.assignableSkillIds).toEqual(['woodcutting'])
   })
 
+  describe('shiny hue per type', () => {
+    const hueOf = (speciesId: string, isHybrid = false): number => {
+      const { state, creature } = addCreature(newGame(), speciesId, { isHybrid })
+      return sel.selectCreatureView(view(state), creature.id)!.shinyHueDeg
+    }
+    const tuned = content.tuning.ui.shinyHueDeg
+
+    it('a Void species gets the Void type own 270, every other species the tuning value', () => {
+      expect(content.typeById.get('void')!.shinyHueDeg).toBe(270)
+      expect(hueOf('riftsneak')).toBe(270)
+      for (const sp of content.species) expect(hueOf(sp.id), sp.id).toBe(sp.types[0] === 'void' ? 270 : tuned)
+      expect(hueOf('sproutlet')).toBe(tuned)
+      expect(hueOf('emberfang')).toBe(tuned)
+    })
+
+    it('a hybrid takes the hue of its first-listed type, so a Void/other hybrid is teal', () => {
+      const voidFirst = content.hybrids.filter((h) => h.types[0] === 'void')
+      expect(voidFirst.length).toBeGreaterThan(0)
+      for (const h of voidFirst) expect(hueOf(h.id, true), h.id).toBe(270)
+      expect(hueOf('eclipseed', true)).toBe(270) // Void / Verdant
+    })
+
+    it('a hybrid whose first type is not Void keeps the tuning value, whatever its second type is', () => {
+      for (const h of content.hybrids.filter((h) => h.types[0] !== 'void')) expect(hueOf(h.id, true), h.id).toBe(tuned)
+      expect(hueOf('ashwood', true)).toBe(tuned) // Verdant / Pyric
+      // the order decides: Void second does not count (no such hybrid in the data, so the lookup is checked directly)
+      expect(sel.shinyHueFor(['verdant', 'void'])).toBe(tuned)
+      expect(sel.shinyHueFor(['void', 'verdant'])).toBe(270)
+      expect(sel.shinyHueFor(['nope'])).toBe(tuned)
+      expect(sel.shinyHueFor([])).toBe(tuned)
+    })
+
+    it('is the same for a shiny and a normal creature (the view only says which hue a shiny would get)', () => {
+      const a = addCreature(newGame(), 'riftsneak', { shiny: true })
+      const b = addCreature(a.state, 'riftsneak', { shiny: false })
+      expect(sel.selectCreatureView(view(b.state), a.creature.id)!.shinyHueDeg).toBe(sel.selectCreatureView(view(b.state), b.creature.id)!.shinyHueDeg)
+    })
+  })
+
   it('says a working creature is working, and where', () => {
     const v = sel.selectCreatureView(view(sproutletAtWork()), 'creature-1')!
     expect(v.working).toBe(true)

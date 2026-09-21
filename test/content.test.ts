@@ -483,6 +483,22 @@ describe('loadContent rejects bad data instead of loading it', () => {
     for (const bad of [0, 360, -30, 400]) expect(problemsFor((r) => (r.tuning.ui.shinyHueDeg = bad)).join('\n'), String(bad)).toContain('tuning.json.ui.shinyHueDeg')
   })
 
+  it('accepts an optional per-type shinyHueDeg strictly between 0 and 360, and Void has 270', () => {
+    expect(content.typeById.get('void')!.shinyHueDeg).toBe(270)
+    // every other type keeps the global tuning value, which is what "no value of its own" means
+    for (const t of content.types.filter((t) => t.id !== 'void')) expect(t.shinyHueDeg, t.id).toBeUndefined()
+    const loads = (mutate: (raw: Loose) => void) => {
+      const raw = structuredClone(rawContent) as Loose
+      mutate(raw)
+      return loadContent(raw)
+    }
+    expect(() => loads((r) => delete r.types.find((t: { id: string }) => t.id === 'void').shinyHueDeg), 'omitted').not.toThrow()
+    for (const good of [1, 90, 359.5]) expect(loads((r) => (r.types[0].shinyHueDeg = good)).types[0]!.shinyHueDeg, String(good)).toBe(good)
+    for (const bad of [0, 360, -30, 400, '270']) {
+      expect(problemsFor((r) => (r.types[0].shinyHueDeg = bad)).join(' '), String(bad)).toContain('types.json[0].shinyHueDeg')
+    }
+  })
+
   it('requires tuning.ui.spriteFormScale to be three fractions above 0 and at most 1 that never shrink, so growth shows and a sprite never overflows its tile', () => {
     const s = content.tuning.ui.spriteFormScale
     expect([s['1'], s['2'], s['3']]).toEqual([0.72, 0.86, 1])

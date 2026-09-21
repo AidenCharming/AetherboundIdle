@@ -51,6 +51,7 @@
     "color": "#7E57C2",
     "lockedSkills": ["aether-weaving", "vessel-crafting"],
     "wheel": null,
-    "outsideWheel": true
+    "outsideWheel": true,
+    "shinyHueDeg": 270
   }
 ]

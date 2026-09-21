@@ -144,19 +144,38 @@ describe('CreatureArt', () => {
     expect(hybrid).not.toContain('<img')
   })
 
-  it('a shiny gets the tuned hue turn on the sprite and on the emoji, and nothing else changes', () => {
-    const turn = `--shiny-hue:${sel.shinyHueDeg}deg`
-    const sprite = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('sproutlet', { shiny: true }) }))
+  it('a shiny gets the hue turn of its first type on the sprite and on the emoji, and nothing else changes', () => {
+    const sproutlet = viewOf('sproutlet', { shiny: true })
+    const turn = `--shiny-hue:${sproutlet.shinyHueDeg}deg`
+    expect(sproutlet.shinyHueDeg, 'Verdant has no hue of its own, so the tuned one').toBe(sel.shinyHueDeg)
+    const sprite = renderToStaticMarkup(createElement(CreatureArt, { view: sproutlet }))
     expect(sprite).toContain(turn)
     expect(sprite).toContain('data-shiny="true"')
     expect(sprite).toContain(`src="${spriteFor('sproutlet', 1)}"`)
-    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('mossgear', { shiny: true }) }))
-    expect(emoji).toContain(turn)
+    const mossgear = viewOf('mossgear', { shiny: true })
+    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: mossgear }))
+    expect(emoji).toContain(`--shiny-hue:${mossgear.shinyHueDeg}deg`)
     expect(emoji).toContain('data-shiny="true"')
     const plain = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('sproutlet') }))
     expect(plain).toContain('data-shiny="false"')
     // the same file either way: there is no shiny art
     expect(plain.match(/src="([^"]+)"/)![1]).toBe(sprite.match(/src="([^"]+)"/)![1])
+  })
+})
+
+describe('CreatureArt, shiny hue per type', () => {
+  it('a Void shiny is turned by the Void type 270 (sprite and emoji), the others by the tuned value', () => {
+    // Riftsneak has a sprite; Hushflutter has none, so it draws its emoji
+    expect(spriteFor('riftsneak', 1)).not.toBeNull()
+    expect(spriteFor('hushflutter', 1)).toBeNull()
+    for (const [id, want] of [['riftsneak', 270], ['hushflutter', 270], ['sproutlet', 150], ['emberfang', 150], ['eclipseed', 270], ['ashwood', 150]] as const) {
+      const html = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf(id, { shiny: true }) }))
+      expect(html, id).toContain(`--shiny-hue:${want}deg`)
+    }
+  })
+
+  it('a normal Void creature has no hue turn at all', () => {
+    expect(renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('riftsneak') }))).not.toContain('--shiny-hue')
   })
 })
 

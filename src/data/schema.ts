@@ -55,6 +55,13 @@ export const TypeSchema = z
     lockedSkills: z.array(Id).min(1),
     wheel: z.strictObject({ beats: Id, resists: Id }).nullable(),
     outsideWheel: z.boolean(),
+    /**
+     * Optional: the runtime hue rotation, in degrees, of a shiny of this type (a creature's first-listed type decides).
+     * Same rule as tuning.ui.shinyHueDeg, strictly between 0 and 360, or a shiny would look like a normal creature. A
+     * type without one falls back to tuning.ui.shinyHueDeg. Void has one because a violet turned by the global 150 lands
+     * on a muddy olive.
+     */
+    shinyHueDeg: z.number().gt(0).lt(360).optional(),
   })
   .refine((t) => t.outsideWheel === (t.wheel === null), 'outsideWheel must be true exactly when wheel is null')
 
