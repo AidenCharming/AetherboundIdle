@@ -3,9 +3,7 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9d is in progress: items 1 to 4 of 5 are done and committed (see the four "step 1.9d" entries below). Do item 5 (the rebuild as 0.1.2) next, from the designer's brief in the 1.9d checklist line.**
-
-**Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.1).**
+**Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.2). Step 1.9d (five small UI changes after 1.9c) is done: glass panels, the Roster and Nexus merged into one page called Nexus, the milestone table, a Delete save section, and the 0.1.2 rebuild.**
 
 **Phase 2 starts with a designer decision, not with code: the pool-trait roll.** Nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is ("Major is
 rare" has no number), or how much a trait's `typeAffinity` should tilt its `rollWeight`. Breeding, hatching, reroll and trait inheritance all need that same answer, and the dev panel's grant deliberately does
@@ -17,18 +15,21 @@ designer's OK** before building, as the protocol asks.
 **Two UI sections are deliberately still missing and belong to later phases, not to Phase 2's first step:** the **Adventure** sidebar section (expeditions, Phase 3) and the **Collection** section (Phase 4). The
 shell was built in 1.9b with room for both; they appear with their screens.
 
-**Before that, one thing for the designer: run the manual checklist for 0.1.1** (see "Manual checklist for 0.1.1" under 1.9c checkpoint E below). It covers the background image, the new Play time and Skill
-milestones cards, and the two things no automated test can reach: a toast over the image, and the export/import round trip through the real Save and Open dialogs.
+**Before that, one thing for the designer: run the manual checklist for 0.1.2** (see "Manual checklist for 0.1.2" below; the 0.1.1 list under it still applies where not superseded). It covers what is new in 1.9d and the things no automated test can
+reach: a toast over the glass, the real Save dialog from "Export a backup first", and the export/import round trip.
 
-**Also waiting on the designer** (all recorded under "Open questions"): whether the card and button **border contrast** should be raised to 3:1 (it is 1.2 to 1.7:1 in the 1.9b theme, which predates the
-background image and is barely changed by it); whether `tuning.ui.pacingMilestones` should show different levels; and that the **pacing floor must be re-checked** once Woodcutting tiers 4 and 5, faster
-creatures, or Phase 2 and 3 content land.
+**Someone else's uncommitted edit is in the working tree.** `src/data/species.json` (one word of the Sproutlet art description) and `docs/naming/` belong to the species-naming session, not to 1.9d. With that edit `npm test` has one failure (the art
+prompts must match `content-data.md` verbatim). Do not commit it by accident (`git add -u` and `git add -A` both would): stage paths by name. The 0.1.2 exes were built from a clean worktree of the version-bump commit (its tree is HEAD's, except that HEAD also has the PROGRESS.md edits), so they do not contain it (see 1.9d item 5).
+
+**Also waiting on the designer** (recorded under "Open questions" and in the 1.9d entries): **the art behind the glass panels is dim because of `--bg-scrim`, not the alphas** (1.9d item 1: a lighter scrim shows the art clearly but fails the readability rules unless the text tokens are lifted, so it is a designer call); and that the
+**pacing floor must be re-checked** once Woodcutting tiers 4 and 5, faster creatures, or Phase 2 and 3 content land. The border-contrast and `pacingMilestones` questions were answered in 1.9d and are closed.
 
 **Step 1.9c is done (2026-09-20), and it closed step 1.9.** Five checkpoints, each its own commit: A the play-time counter and save version 2 with the first real migration, B the level-reached timestamps,
 C the pacing retune (skill curve growth 1.04 -> 1.045), D the background image, E verification and the exe rebuilt as 0.1.1.
 
 Things a fresh session should know before starting:
-- **Saves are version 2 now.** An older build (the 0.1.0 or 0.0.0 exe) reads a version-2 save as **too-new**: it copies it to `aetherbound-idle:save-broken-<time>` and starts a fresh game. It does not delete
+- **Build from a clean tree.** `npm run electron:pack` builds whatever is in the working tree and does not run the tests; if the tree has anyone's uncommitted edits, make a `git worktree add ../<name> HEAD`, junction `node_modules` into it, test and pack there, and remove the junction (`cmd //c rmdir node_modules`) **before** removing the worktree. That is how 0.1.2 was built.
+- **Saves are version 2 now.** (0.1.2 did not change that.) An older build (the 0.1.0 or 0.0.0 exe) reads a version-2 save as **too-new**: it copies it to `aetherbound-idle:save-broken-<time>` and starts a fresh game. It does not delete
   anything, but do not run an old exe against `%APPDATA%\Aetherbound Idle`.
 - **The project path has a space** (`Aetherbound Idle`) and this machine is Windows. `npm` from a path with a space did not work under the preview launcher (see the 1.6 tooling note: `.claude/launch.json`
   starts Vite through `node` directly), and the dev server has twice served a stale module here (see the 1.8b checkpoint C tooling note). The Electron scripts and electron-builder work from this path.
@@ -53,7 +54,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players (done, see below), (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 4 of 5 done)*
+- [x] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players (done, see below), (5) rebuild the exe as 0.1.2 (done, see below). Each numbered item is its own commit. **Done 2026-09-21: 821 tests pass at the commit the 0.1.2 exes were built from, and step 1.9 stays complete.** *(2026-09-20 to 2026-09-21)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
@@ -1710,6 +1711,57 @@ only); it **stays deleted** (pagehide, beforeunload, a visibility change, the au
 (captured, not saved to disk) and the status line; then **a wrong text first ("yes please"), then "yes" and OK**: the page reloaded into a new game (play time 0, no resources, nothing assigned, one creature), the main key held the new save, and a planted
 `save-broken-1` key was still there. Screenshots (the section, and the dialog empty, with a wrong text, and with yes, at 1280 and 375 px) read cleanly; at 375 px the dialog fits with the buttons stacked.
 
+### 2026-09-21, step 1.9d (5): the exe rebuilt as 0.1.2, and the verification of the whole step (step 1.9d complete; step 1.9 stays complete)
+
+Changed: `package.json` (0.1.1 -> 0.1.2). No save change: **saves are still version 2**, so 0.1.2 reads a 0.1.1 save as it is.
+
+**How it was built, and one thing that went wrong on the way.** When I went to pack, `git status` showed `src/data/species.json` modified: one word in the Sproutlet form-1 art description ("biped" -> "quadruped"), **not by this session**
+(another session is doing the species-naming work; `docs/naming/` is also untracked and is theirs). With it in the tree `npm test` had **one failure**, `content.test.ts > names match content-data.md verbatim > base-species art prompts come straight
+from the form descriptions` (the JSON no longer matches `content-data.md`), and `npm run electron:pack` does not run the tests, so it had already packaged that tree. I did not commit, revert or touch their edit. Instead I committed the version bump,
+made a **clean git worktree of that commit**, ran the 821 tests there (all pass), packed there, ran the smoke tests there, and only then copied the four 0.1.2 outputs into this folder's `release/` (byte-identical, checked by SHA-256). So the 0.1.2 exes are built
+from the version-bump commit (before that commit was amended to add this PROGRESS.md text; no source file differs) and contain none of the other session's edit. The worktree was removed afterwards (its `node_modules` was a junction; I removed the junction before the worktree, so nothing shared was deleted). **The working tree here still has their
+uncommitted `species.json` edit, and `npm test` in it still fails that one test until they update `content-data.md` to match or revert the word.** Worth telling whoever is doing the naming.
+
+| File (in `release/`) | Size |
+|---|---|
+| `Aetherbound-Idle-0.1.2-setup.exe` | 103,219,562 bytes (98.4 MB) |
+| `Aetherbound-Idle-0.1.2-portable.exe` | 102,936,105 bytes (98.2 MB) |
+| `Aetherbound-Idle-0.1.2-setup.exe.blockmap` | 108,272 bytes |
+| `win-unpacked/` | rebuilt (321 MB on disk) |
+
+**Packaged smoke tests: all three checks pass on both `release/win-unpacked` and the portable exe** (load, including the background image loading from `file://` at 2048x1144; progress; single instance). The unpacked copy in this folder was smoke-tested again after the copy (load).
+
+**The `release/` folder is now 1.1 GB (1,160,297,758 bytes)**: four versions of the installer and portable exe (about 206 MB each) plus `win-unpacked` and the blockmaps. **Nothing old was deleted.** For the designer to delete by hand: the `0.0.0` and `0.1.0` files (`-setup.exe`, `-portable.exe` and `-setup.exe.blockmap` of each), which is about 411 MB. Remember those two exes read a version-2 save as too-new.
+
+**Verification of the whole step** (build clean and 821 tests pass at HEAD; the checks below on the dev server in the Browser pane, and with screenshots rendered from the built game by Electron, because the Browser pane's screenshot is unreliable once a page is scrolled and does not draw
+a modal dialog: it showed the page behind the open delete dialog, though the DOM said the dialog was open):
+| What | 1280 | 1024 | 768 | 375 |
+|---|---|---|---|---|
+| Woodcutting, Nexus, Settings, Dev: each page loads, one h1, no horizontal overflow (`scrollWidth - clientWidth`) | yes | yes | yes | yes |
+| No button, link, select or text input under 44 px (checkboxes sit in 44 px labels: 90 and 44 px) | yes | yes | yes | yes |
+| Layout | docked sidebar | docked | docked (from 768) | drawer |
+| The word "roster" in the page text | none | none | none | none |
+- **Drawer (375):** opens from the menu button, lists Woodcutting, one Nexus entry under CREATURES, Settings, Dev; it is opaque (`rgb(20, 25, 32)`), focus lands on the current page, and choosing a page closes it. The notification panel over the page is opaque too: the Nexus lead text does not show through it.
+- **The merged Nexus page** at every width, with the Bench strip (64 per minute, 3,840 per hour, 11 benched with the 12-creature demo save); clicking the strip filters to the 11 benched, and the Status select and the "1 filter on" summary follow. At 375 the three stats wrap to two rows and a lone third ("Benched 11"), which is fine.
+- **Delete save dialog, wrong text first, then yes** (1280 and 375): with "yes please" OK is dimmed and disabled; with " YES " it is enabled. At 375 the dialog fits with the buttons stacked. Behaviour (Escape, Cancel, focus return, export, the real delete and reload) was checked in the Browser pane as recorded under item 4.
+- **The milestone table on a fresh save:** after a reset the Woodcutting table read 2, 10, 25, 50 slot, 100 slot, 150, 165 slot, 200, 225 slot, 250 max (no level 1), and level 2 filled in at **1 m 32 s** once the first level-up happened (creature assigned about 14 s after boot).
+- **Honest description of the look:** the panels are see-through but the art behind them is dim, because the scrim sits under them (see item 1); the sidebar and header read as slightly frosted glass, the cards keep a hairline light edge, and the controls (selects, buttons, chips) now have visibly lighter outlines than in 0.1.1, which is the designer's control-edge decision.
+  Disabled buttons ("Clear filters" and "Reset sort" with nothing to clear) are now visibly dimmed.
+
+**Could not verify.** Toasts over the glass (they are opaque, unchanged; still on the manual checklist). The native Save dialog when "Export a backup first" is pressed in the packaged app (in the browser the download was captured and named, not saved). The installer itself, and the packaged window on a real screen. Blur cost on a weak GPU. A real phone.
+
+## Manual checklist for 0.1.2 (designer)
+
+Run `release\Aetherbound-Idle-0.1.2-portable.exe`. The 0.1.1 list below still applies where it is not superseded; these are what is new.
+
+1. **Glass panels:** cards, the sidebar and the header show a little of the background; text is easy to read everywhere. If you want the art to show through more, the lever is `--bg-scrim` (see "The honest reading of the screenshots" in 1.9d item 1), not the alphas.
+2. **Controls have visible outlines:** the filter selects, buttons, the "Replace with" chips, the Dev panel inputs and the Settings checkboxes. Decorative card outlines are meant to stay faint.
+3. **Nexus:** one entry under CREATURES, the page is called Nexus, nothing says Roster. The Bench strip shows Aether per minute, per hour and the number benched, and clicking it shows only benched creatures (click again to show everyone). Each benched creature's card shows its Aether per minute.
+4. **Settings -> Skill milestones:** there is no level 1 row, and the first row is level 2, which fills in after the first level-up (about 75 s).
+5. **Settings -> Delete save:** open it, type something wrong (the OK button stays dimmed), press Escape (nothing is deleted), open it again, press **Export a backup first** (the real Save dialog should appear), then type `yes` and press OK: the game reloads as a new game with one Sproutlet. **Only do this on a save you are happy to lose, or export first.**
+6. **A toast over the glass** (any level-up): it should be solid. Still the one thing I could not photograph.
+7. Saves are still version 2, so the 0.1.1 save carries over. Do not run the 0.1.0 or 0.0.0 exe against it.
+
 ## Manual checklist for 0.1.1 (designer)
 
 Run `release\Aetherbound-Idle-0.1.1-portable.exe`. Everything from the 0.1.0 list below still applies; these are what is new.
@@ -1759,6 +1811,12 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - ~~**Should the card and button borders be lightened?**~~ **Decided by the designer in 1.9d and built (see "step 1.9d (1)" below): decorative card outlines are NOT raised to 3:1; the boundaries of interactive controls ARE (3.6 to 3.9:1 now).** Kept for the record: (found in 1.9c checkpoint D). `--line` reads 1.23:1 against a card and `--line-strong` 1.62:1, below the 3:1 WCAG asks for a control's visible boundary.
   This predates the background image, which costs about 0.06 of it; reaching 3:1 means roughly doubling their lightness, a visible change to every button, input and card in the 1.9b look you signed off. Every
   control also has its own fill and a focus ring, so nothing is unusable. Your call.
+
+### Found in 1.9d, not blocking
+- **How much of the background art should show through the glass panels?** The alphas are at 64 / 68 / 68 (the lowest of 78, 64 and 50 % that keeps text readable), but the art behind a card is still dim because `--bg-scrim` (45 % to 64 % dark) is laid
+  over the image first. `docs/reference/1.9d-glass/glass-50-lighter-scrim-NOT-APPLIED-*.jpg` shows what a scrim of 25 % to 45 % looks like (the islands read clearly through the cards). It fails the readability rules as it stands (labels about 3.7:1), so it also needs
+  lighter `--muted`, `--faint` and `--muted-page` tokens. One line in `:root` to try; designer's call.
+- The Nexus page's Bench strip is a toggle (a second click clears the Benched filter). Say if you would rather it only ever set it.
 
 ### Needs an answer before Phase 3
 - **What does Overclocked's "resets on task completion" mean for an endless idle loop?** Coilchirp's trait
