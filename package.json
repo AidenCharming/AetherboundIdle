@@ -15,7 +15,7 @@
     "electron:start": "npm run build && electron .",
     "electron:smoke": "npm run build && node electron/smoke-runner.mjs",
     "electron:smoke:packaged": "node electron/smoke-runner.mjs --packaged",
-    "electron:pack": "npm run build && electron-builder --win"
+    "electron:pack": "npm run build && node electron/clean-release.mjs && electron-builder --win"
   },
   "dependencies": {
     "react": "^19.3.0",
