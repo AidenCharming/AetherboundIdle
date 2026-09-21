@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { content } from '../src/data'
-import { buildNav, flattenNav, resolvePage, selectNav, skillIdOfPage, skillPageId, type NavContent } from '../src/state/selectors'
+import { buildNav, flattenNav, resolvePage, selectNav, skillIdOfPage, skillPageId, type NavContent, type PageId } from '../src/state/selectors'
 import type { GameStore } from '../src/state/store'
 import { newGame, variant } from './helpers'
 
@@ -18,8 +18,17 @@ describe('buildNav', () => {
       ['creatures', 'Creatures'],
       ['system', 'System'],
     ])
-    expect(nav[1]!.entries.map((e) => e.id)).toEqual(['roster', 'nexus'])
+    expect(nav[1]!.entries.map((e) => e.id)).toEqual(['nexus'])
     expect(nav[2]!.entries.map((e) => e.id)).toEqual(['settings'])
+  })
+
+  it('has ONE creature page, and it is called Nexus (step 1.9d merged the Roster into it): the word Roster is nowhere in the nav', () => {
+    const nav = buildNav({ devPanelEnabled: true })
+    expect(nav[1]!.entries).toEqual([{ id: 'nexus', label: 'Nexus', icon: expect.any(String) }])
+    for (const section of nav) {
+      expect(section.heading).not.toMatch(/roster/i)
+      for (const entry of section.entries) expect(`${entry.id} ${entry.label}`).not.toMatch(/roster/i)
+    }
   })
 
   it('offers a page for every skill that has something to gather, and only those', () => {
@@ -90,7 +99,7 @@ describe('buildNav', () => {
 describe('page ids', () => {
   it('a skill page id round-trips, and the fixed pages belong to no skill', () => {
     expect(skillIdOfPage(skillPageId('aether-weaving'))).toBe('aether-weaving')
-    for (const page of ['roster', 'nexus', 'settings', 'dev'] as const) expect(skillIdOfPage(page)).toBeNull()
+    for (const page of ['nexus', 'settings', 'dev'] as const) expect(skillIdOfPage(page)).toBeNull()
   })
 })
 
@@ -99,7 +108,7 @@ describe('resolvePage', () => {
   const withDev = buildNav({ devPanelEnabled: true })
 
   it('keeps a choice the nav offers', () => {
-    expect(resolvePage(nav, 'roster')).toBe('roster')
+    expect(resolvePage(nav, 'nexus')).toBe('nexus')
     expect(resolvePage(nav, skillPageId('woodcutting'))).toBe('skill:woodcutting')
     expect(resolvePage(withDev, 'dev')).toBe('dev')
   })
@@ -115,6 +124,14 @@ describe('resolvePage', () => {
 
   it('falls back to the first entry for a page that no longer exists', () => {
     expect(resolvePage(nav, 'skill:no-such-skill')).toBe(flattenNav(nav)[0]!.id)
+    // the old Roster page id is gone, and nothing in the UI state or the save can hold it, but it must not white-screen
+    expect(resolvePage(nav, 'roster' as unknown as PageId)).toBe(flattenNav(nav)[0]!.id)
+  })
+
+  it('lands on the Nexus when the nav has no skill page at all', () => {
+    const noSkills = buildNav({ devPanelEnabled: false }, { skills: content.skills, resources: [] })
+    expect(resolvePage(noSkills, null)).toBe('nexus')
+    expect(resolvePage([], null)).toBe('nexus')
   })
 })
 

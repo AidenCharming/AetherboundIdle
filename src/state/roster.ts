@@ -54,6 +54,12 @@ export const DEFAULT_SORT: RosterSort = { key: 'rarity', dir: defaultDirection('
 
 export const isFiltered = (f: RosterFilter): boolean => Object.values(f).some((v) => v !== null)
 
+/**
+ * What a click on the Nexus page's bench strip does to the filter: show only the benched creatures, or, when that is
+ * already what is shown, take that one condition off again. Every other field of the filter is left as it is.
+ */
+export const toggleBenched = (f: RosterFilter): RosterFilter => ({ ...f, work: f.work === 'benched' ? null : 'benched' })
+
 export function matchesFilter(item: RosterItem, f: RosterFilter): boolean {
   if (f.type !== null && !item.types.some((t) => t.id === f.type)) return false
   if (f.rarity !== null && item.rarity.tier !== f.rarity) return false

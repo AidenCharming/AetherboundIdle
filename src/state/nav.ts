@@ -4,7 +4,7 @@
 import { content, type Content } from '../data'
 
 /** `skill:<id>` for a skill's page, or one of the fixed pages. */
-export type PageId = 'roster' | 'nexus' | 'settings' | 'dev' | `skill:${string}`
+export type PageId = 'nexus' | 'settings' | 'dev' | `skill:${string}`
 
 export interface NavEntry {
   id: PageId
@@ -38,7 +38,7 @@ export const skillIdOfPage = (page: PageId): string | null => (page.startsWith('
 
 /**
  * SKILLS: one page per skill that has something to gather (data-driven, so Mining appears the day it gets a raw
- * resource). CREATURES: Roster and Nexus. SYSTEM: Settings, and Dev only while the setting is on. A section with
+ * resource). CREATURES: the Nexus, the one creature page. SYSTEM: Settings, and Dev only while the setting is on. A section with
  * nothing in it is left out.
  */
 export function buildNav(input: NavInput, c: NavContent = content): readonly NavSection[] {
@@ -52,10 +52,7 @@ export function buildNav(input: NavInput, c: NavContent = content): readonly Nav
     {
       id: 'creatures',
       heading: 'Creatures',
-      entries: [
-        { id: 'roster', label: 'Roster', icon: '🐾' },
-        { id: 'nexus', label: 'Nexus', icon: '🌀' },
-      ],
+      entries: [{ id: 'nexus', label: 'Nexus', icon: '🌀' }],
     },
     { id: 'system', heading: 'System', entries: system },
   ]
@@ -74,5 +71,5 @@ export function resolvePage(nav: readonly NavSection[], chosen: PageId | null): 
   const entries = flattenNav(nav)
   if (chosen && entries.some((e) => e.id === chosen)) return chosen
   if (chosen === 'dev' && entries.some((e) => e.id === 'settings')) return 'settings'
-  return entries[0]?.id ?? 'roster'
+  return entries[0]?.id ?? 'nexus'
 }

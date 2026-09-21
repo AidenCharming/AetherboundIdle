@@ -59,7 +59,7 @@ Aetherbound Idle/
       selectors.ts          memoized reads for UI
       persistence.ts        localStorage read/write, lastSeen, autosave timer
     ui/
-      screens/              Roster.tsx, Skills.tsx, Nexus.tsx, DevPanel.tsx, ...
+      screens/              Roster.tsx (the Nexus page, see below), SkillPage.tsx, Settings.tsx, DevPanel.tsx, ...
       components/           CreatureCard.tsx, ProgressBar.tsx, ResourceBar.tsx, ...
       art/                  placeholder art helpers (type colors, rarity frames, hue shift)
       theme.css             CSS variables: type colors, rarity frames, spacing
@@ -68,6 +68,13 @@ Aetherbound Idle/
       state.ts              GameState, Creature, SkillState, SaveFile
   test/                     vitest specs mirroring src/sim/*
 ```
+
+**The Roster code is the Nexus screen in the UI.** Step 1.9d merged the old Roster page and the old Nexus page into one
+page called **Nexus** (the designer's decision). The internal names were kept on purpose: `state/roster.ts`, `RosterCard`,
+`RosterFilters`, `selectRoster*`, the `RosterFilter` and `RosterSort` types and the tests. Only what the player can read
+says Nexus, and `test/architecture.test.ts` fails if any text the player can read says "Roster". The page id in `nav.ts` is
+`nexus`; the old `Nexus.tsx` and `NexusCard.tsx` are gone (the bench selectors and their tests stayed, and feed the merged
+page's bench strip and its cards).
 
 Rules that follow from this layout:
 - `src/sim/**` may import from `src/data/**` and `src/types/**` only.
@@ -712,6 +719,7 @@ Phase 1 coverage:
 | 1.7 | Roster screen, placeholder art, filter and sort, assign to slot |
 | 1.8a | Away path for a long-open tab, welcome-back summary, Settings tab, dev-panel fast-forward |
 | 1.8b | Rest of the dev panel, Nexus bench + emission display, polish |
+| 1.9d | Presentation and small UI: glass panels, the Roster and the Nexus merged into one page called Nexus, the milestone table, a Delete save section (no sim or save change) |
 
 Phase 1 ships one starter **Sproutlet**, Woodcutting with `oak-log` / `willow-log` / `yew-log`, and the
 bench. `zones.json`, `vessels.json` and `collection-tracks.json` are created empty in step 1.3 so their

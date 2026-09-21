@@ -66,6 +66,24 @@ describe('layering', () => {
     }
   })
 
+  it('no text the player can read says "Roster": the Roster code is the Nexus screen in the UI (step 1.9d)', () => {
+    // The internal names (roster.ts, RosterCard, RosterFilters, selectRoster*, the Roster* types) stay; only what is
+    // shown may not. So: take the code without comments, imports and className values, and look at its string
+    // literals and its JSX text.
+    const shown = (source: string): string[] => {
+      const stripped = code(source)
+        .replace(/(?:import|export)\s[^;]*?\sfrom\s*['"][^'"]*['"]/g, '')
+        .replace(/import\s*['"][^'"]*['"]/g, '')
+        .replace(/className=(?:"[^"]*"|\{[^}]*\})/g, '')
+      const strings = [...stripped.matchAll(/(['"`])((?:\\.|(?!\1)[^\\\n])*)\1/g)].map((m) => m[2]!)
+      const jsxText = [...stripped.matchAll(/>([^<>{}]+)</g)].map((m) => m[1]!)
+      return [...strings, ...jsxText]
+    }
+    for (const f of all) {
+      for (const text of shown(f.source)) expect(/roster/i.test(text), `${f.path} shows "${text.trim().slice(0, 60)}"`).toBe(false)
+    }
+  })
+
   it('only runtime.ts touches the browser globals in the state layer', () => {
     for (const f of under('state/')) {
       if (f.path === 'state/runtime.ts') continue

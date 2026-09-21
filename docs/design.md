@@ -152,10 +152,12 @@ Milestone thresholds and rewards are JSON. Discovery rewards are one-time (relea
 - The Aether-Log shows undiscovered hybrids as silhouettes. One headline completion % (rarity-tier track is the long-tail chase).
 
 ## 10. Roster management
-Roster bloat is a known risk. Requirements: filter and sort by type, rarity, level, skill, traits, form, shiny; auto-assign best-for-skill; bulk release for Aether (with confirmation, and locking to protect favorites). The roster screen deserves the most UI polish.
+Roster bloat is a known risk. Requirements: filter and sort by type, rarity, level, skill, traits, form, shiny; auto-assign best-for-skill; bulk release for Aether (with confirmation, and locking to protect favorites). The creature screen (the Nexus, section 11) deserves the most UI polish.
 
 ## 11. Screens
-Roster, Skills (with slots), Nexus/Menagerie (bench, habitat), Genesis Pods (breeding and incubators), Expeditions, Aether-Log (Creaturedex and collection tracks), Inventory, Shop, Settings. Working names: bench/habitat = The Nexus (or The Menagerie), incubators = Genesis Pods, Creaturedex = The Aether-Log, guide NPC = Overseer Vance, player title = The Architect (TBD).
+Skills (with slots), the Nexus, Genesis Pods (breeding and incubators), Expeditions, Aether-Log (Creaturedex and collection tracks), Inventory, Shop, Settings. Working names: incubators = Genesis Pods, Creaturedex = The Aether-Log, guide NPC = Overseer Vance, player title = The Architect (TBD).
+
+**The creature page is the Nexus (designer's decision, 2026-09-20; built in step 1.9d).** There is one page for creatures, and it is called Nexus: every creature the player owns as a card, with the filter and sort of section 10, and a **bench strip** at the top (Aether per minute, Aether per hour, and how many creatures are benched; a click on it shows the benched ones, the same as the Status filter set to Benched). A benched creature's card shows the Aether it gathers per minute. There is no page called Roster, and the word does not appear anywhere the player can read it. Bench upgrades and the habitat, when they are designed, **extend this page** (more on the strip, more on the cards), not add a second creature page.
 
 **UI direction (designer's reference, 2026-09-20; built in step 1.9b, see PROGRESS.md; the Adventure and Collection sidebar sections appear when those screens exist).** The designer wants the finished game to look and feel like `docs/reference/ui-reference-sidebar-layout.png`, a screenshot of another idle game used **only as a look-and-feel reference** (do not copy its name, wording or art, and keep the image out of any public repo or shipped build). What to take from it:
 - **Left sidebar navigation** instead of the top tab bar, grouped under small section headings (for us roughly: Skills / Creatures / Adventure / Collection / System), each entry an icon plus a label. The tab bar will not scale to the roughly ten screens listed above.

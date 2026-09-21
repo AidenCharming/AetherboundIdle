@@ -3,6 +3,8 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
+**Step 1.9d is in progress: items 1 and 2 of 5 are done and committed (see the two "step 1.9d" entries below). Do items 3, 4 and 5 next, in order, from the designer's brief in the 1.9d checklist line.**
+
 **Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.1).**
 
 **Phase 2 starts with a designer decision, not with code: the pool-trait roll.** Nothing in any document says how many pool traits a new creature rolls (design says "up to 3"), how rare Major is ("Major is
@@ -51,7 +53,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus, (3) the milestone table skips level 1 and shows level 2, (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 1 of 5 done)*
+- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2, (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 2 of 5 done)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
@@ -1624,6 +1626,40 @@ and `--faint` tokens with it. One line in `:root` (`--bg-scrim`) either way.
 or less, that `backdrop-filter` is on exactly the docked sidebar and the header and nowhere else, that the drawer, the notification panel and the dialogs are opaque, and that `--edge` and `--control-edge` exist. `npm run build` is clean and **801 tests pass**.
 
 **Could not verify.** Blur cost on a weak GPU (8 px on two elements; the cap is what stands guard). The toast over the image (unchanged: still `--panel-high`, opaque).
+
+### 2026-09-20, step 1.9d (2): the Roster and the Nexus are one page, called Nexus (designer's decision)
+
+**The Roster code is the Nexus screen in the UI.** The old Nexus page duplicated the Roster (its list is what the Roster's Benched filter already shows), so there is one creature page and it is called **Nexus**. The word "Roster" appears
+nowhere the player can read it.
+
+Deleted: `ui/screens/Nexus.tsx`, `ui/components/NexusCard.tsx`, the second nav entry, the `.nexus-totals` CSS. Changed: `state/nav.ts` (the page id `nexus`, one entry under CREATURES labelled Nexus, icon 🌀; `'roster'` is no longer a
+`PageId`, and an empty nav now falls back to `'nexus'`), `App.tsx`, `ui/screens/Roster.tsx`, `ui/components/RosterCard.tsx`, `state/roster.ts`, `state/selectors.ts`, `ui/theme.css`, `docs/design.md` section 11, `docs/plan.md`, the tests. **Not
+renamed, on purpose:** `roster.ts`, `RosterCard`, `RosterFilters`, `selectRoster*`, the `RosterFilter` and `RosterSort` types, the component `Roster` and its test names. There is a comment at the top of `Roster.tsx` and a line in plan.md saying so.
+
+**What was unique to the old Nexus, moved into the merged page:**
+- **A "Bench" strip at the top** (Aether per minute, Aether per hour, how many are benched), from `selectAetherPerMinute`, `selectAetherPerHour` and the bench selectors, so it agrees with the top bar. **Clicking it sets the Benched filter**
+  (the Status select changes with it and the "1 filter on" summary counts it). One deliberate addition: it is a toggle (`aria-pressed`), so a second click takes the Benched filter off again instead of leaving the player to find the select. The rule
+  is a pure function in the state layer, `toggleBenched(filter)`: it keeps every other filter field, and turns a Working filter straight into Benched. The button is well over 44 px tall.
+- **Each benched creature's card shows its Aether per minute** ("16 Aether/min", the sim's own `creatureEmissionPerMin`) under its Benched badge; a creature that works a slot shows none. It comes from a new selector, `selectBenchRates`, a
+  `Map` of creature id to rate that keeps its identity while the bench does, so the cards still re-render only when their own creature changes. The bench selectors (`selectBenchEntries`, `selectAetherPerMinute`, `selectAetherPerHour`) and their
+  tests are untouched.
+- The old page's lead line ("Creatures that are not working a slot rest here...") became the merged page's lead, reworded; its empty-bench message ("Nobody is benched...") is shown when the Benched filter finds nobody because nobody is benched.
+
+**Text.** The h1, the section's aria-label and the sidebar entry say Nexus. The card text, the empty states and the dialogs never said Roster (the only visible mention was in the old Nexus empty state, "on Skills or Roster", now "on a skill page or
+here"). Grep for `roster` in string literals and JSX text over all of `src/`: none left. Grep for `NexusCard`, `screens/Nexus` and `Nexus.tsx` in `src/`, `test/`, `electron/`, `CLAUDE.md`, plan.md and design.md: only plan.md's own sentence saying they are gone.
+The old page's unique files are gone with no dead import (`tsc` is clean).
+
+**Docs.** design.md section 11: the creature page is the Nexus (all creatures, filter and sort, the bench strip; bench upgrades and the habitat, when designed, extend this page and do not add a second creature page). Section 10's last sentence points at
+it. plan.md: the folder listing, the "Roster code is the Nexus screen" note, and a 1.9d row in the build-order table. content-data.md still says "The Nexus (or The Menagerie)" for the bench name; I left the content file alone.
+
+**Tests** (`npm run build` clean, **811 tests pass**, 801 before this item):
+- `nav.test.ts`: the Creatures section is exactly one entry `{ id: 'nexus', label: 'Nexus' }`; no id, label or heading in the nav says roster; the fixed pages belong to no skill; a stale `'roster'` page id falls back to the first entry; an empty nav lands on `'nexus'`.
+- `architecture.test.ts`: **no string literal or JSX text in `src/` says "Roster"** (comments, imports and className values are ignored, because the internal names stay). I checked that it fails when a nav label or an `aria-label` is set back to "Roster".
+- `roster.test.ts`: `toggleBenched` (sets Benched, keeps other fields, second click clears it, Working becomes Benched, does not mutate) and that the list it produces is exactly the bench the strip counts.
+- `bench.test.ts`: `selectBenchRates` (exactly the benched creatures, each at the sim's `creatureEmissionPerMin`, none of the working ones, adds up to the strip's total, stable by identity through ticks, changes when somebody moves).
+
+**Verified in the Browser pane** (1280 px, a 12-creature demo save): one Nexus entry under CREATURES; the h1 reads Nexus; the strip read 64 per minute, 3,840 per hour, 11 benched (the top bar says 64/min); a click on it left 11 of 12 creatures, all with the Benched badge and
+an Aether/min line (16, 16, 8, 8, 4, 4...), the Status select read Benched and the hint under "Bench" changed; a second click restored 12 of 12; the working creature's card has no rate; `document.body.innerText` contains no "roster".
 
 ## Manual checklist for 0.1.1 (designer)
 

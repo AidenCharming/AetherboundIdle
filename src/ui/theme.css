@@ -1376,30 +1376,53 @@ button.danger {
 
 /* ---------- nexus ---------- */
 
-.nexus-totals {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-  gap: 12px;
-  margin: 0;
+/* The bench strip at the top of the Nexus page: one big button, so a click anywhere on it shows the benched creatures. */
+.bench-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  width: 100%;
+  padding: 14px 18px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--edge);
+  border-radius: var(--radius);
+}
+
+.bench-strip[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--gold) 8%, var(--panel));
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--control-edge));
+}
+
+.bench-strip-head {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.bench-strip-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.bench-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 28px;
   font-variant-numeric: tabular-nums;
 }
 
-.nexus-totals div {
-  padding: 12px 14px;
-  background: var(--panel-raised);
-  border: 1px solid var(--edge);
-  border-radius: 12px;
+.bench-stat {
+  display: flex;
+  flex-direction: column;
 }
 
-.nexus-totals dt {
-  color: var(--muted);
-  font-size: 0.8rem;
-}
-
-.nexus-totals dd {
-  margin: 0;
-  font-size: 1.5rem;
+.bench-stat strong {
+  font-size: 1.4rem;
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .nexus-rate {

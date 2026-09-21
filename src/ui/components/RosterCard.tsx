@@ -8,6 +8,7 @@ import {
   skillInfo,
   type CreatureView,
 } from '../../state/selectors'
+import { formatRate } from '../format'
 import { cardStyle } from './cardStyle'
 
 type Outcome = { ok: true } | { ok: false; reason: string }
@@ -150,10 +151,21 @@ function Details({ view, id }: { view: CreatureView; id: string }) {
 }
 
 /**
- * One creature. `memo` plus a view that is identity-stable (selectors.ts) means a card re-renders only when its own
- * creature changes or it is opened or closed: not on the 10 Hz tick, and not when a neighbour changes.
+ * One creature on the Nexus page. `memo` plus a view that is identity-stable (selectors.ts) means a card re-renders only
+ * when its own creature changes or it is opened or closed: not on the 10 Hz tick, and not when a neighbour changes.
+ * `aetherPerMin` is what a BENCHED creature gathers (null while it works a slot); a number, so it does not break `memo`.
  */
-export const RosterCard = memo(function RosterCard({ view, expanded, onToggle }: { view: CreatureView; expanded: boolean; onToggle: (id: string) => void }) {
+export const RosterCard = memo(function RosterCard({
+  view,
+  expanded,
+  onToggle,
+  aetherPerMin,
+}: {
+  view: CreatureView
+  expanded: boolean
+  onToggle: (id: string) => void
+  aetherPerMin: number | null
+}) {
   const style = cardStyle(view)
   const detailsId = `details-${view.id}`
 
@@ -175,6 +187,11 @@ export const RosterCard = memo(function RosterCard({ view, expanded, onToggle }:
           <span className="badge" data-state={view.working ? 'working' : 'benched'}>
             {view.workingAt ?? 'Benched'}
           </span>
+          {aetherPerMin !== null && (
+            <span className="nexus-rate">
+              <strong>{formatRate(aetherPerMin)}</strong> Aether/min
+            </span>
+          )}
         </span>
       </button>
       {expanded && <Details view={view} id={detailsId} />}

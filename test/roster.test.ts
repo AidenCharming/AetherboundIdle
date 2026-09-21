@@ -318,3 +318,32 @@ describe('the roster is identity-stable through ticks', () => {
     expect(end.filter((v) => v !== mid.get(v.id)).map((v) => v.id)).toEqual([benched.id])
   })
 })
+
+describe('toggleBenched (the Nexus page\'s bench strip)', () => {
+  it('sets the Benched filter, keeps every other field, and takes it off again on a second click', () => {
+    const on = sel.toggleBenched(sel.NO_FILTER)
+    expect(on).toEqual({ ...sel.NO_FILTER, work: 'benched' })
+    expect(sel.toggleBenched(on)).toEqual(sel.NO_FILTER)
+
+    const busy = { ...sel.NO_FILTER, type: 'verdant', shiny: true, canWork: 'woodcutting' }
+    expect(sel.toggleBenched(busy)).toEqual({ ...busy, work: 'benched' })
+    expect(sel.toggleBenched(sel.toggleBenched(busy))).toEqual(busy)
+  })
+
+  it('switches a Working filter straight to Benched instead of clearing it', () => {
+    expect(sel.toggleBenched({ ...sel.NO_FILTER, work: 'working' }).work).toBe('benched')
+  })
+
+  it('does not change the filter it was given', () => {
+    const f = { ...sel.NO_FILTER }
+    sel.toggleBenched(f)
+    expect(f).toEqual(sel.NO_FILTER)
+  })
+
+  it('lists exactly the creatures the strip counts as benched', () => {
+    const s = view(game)
+    const listed = sel.arrangeRoster(sel.selectCreatureViews(s), sel.toggleBenched(sel.NO_FILTER), sel.DEFAULT_SORT)
+    expect(listed.map((v) => v.id).sort()).toEqual(sel.selectBenchEntries(s).map((e) => e.view.id).sort())
+    expect(listed.length).toBe(sel.selectBenchRates(s).size)
+  })
+})

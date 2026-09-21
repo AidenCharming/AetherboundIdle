@@ -9,7 +9,6 @@ import { Sidebar } from './ui/components/Sidebar'
 import { ToastHost } from './ui/components/ToastHost'
 import { WelcomeBack } from './ui/components/WelcomeBack'
 import { DevPanel } from './ui/screens/DevPanel'
-import { Nexus } from './ui/screens/Nexus'
 import { Roster } from './ui/screens/Roster'
 import { Settings } from './ui/screens/Settings'
 import { SkillPage } from './ui/screens/SkillPage'
@@ -21,12 +20,12 @@ import './ui/theme.css'
 const DESKTOP = '(min-width: 768px)'
 
 // The layout shell and the page switch. Which page is open is plain UI state (no router, and not in the save). The tick
-// driver runs whichever page is showing, so nothing pauses while you look at the roster.
+// driver runs whichever page is showing, so nothing pauses while you look at the Nexus.
 export function App() {
   const nav = useGameStore(selectNav)
   const [chosen, setChosen] = useState<PageId | null>(null)
   const page = resolvePage(nav, chosen)
-  // The roster's filter and sort live here, not in the Roster, so a trip to another page and back keeps them.
+  // The Nexus page's filter and sort live here, not in the page, so a trip to another page and back keeps them.
   // Still UI-local: none of it is in the game state or the save.
   const [filter, setFilter] = useState<RosterFilter>(NO_FILTER)
   const [sort, setSort] = useState<RosterSort>(DEFAULT_SORT)
@@ -55,8 +54,7 @@ export function App() {
         <NoticeBanner />
         <main id="main" className="content">
           {skillId && <SkillPage key={skillId} skillId={skillId} />}
-          {page === 'roster' && <Roster filter={filter} sort={sort} onFilter={setFilter} onSort={setSort} />}
-          {page === 'nexus' && <Nexus />}
+          {page === 'nexus' && <Roster filter={filter} sort={sort} onFilter={setFilter} onSort={setSort} />}
           {page === 'settings' && <Settings />}
           {page === 'dev' && <DevPanel />}
         </main>

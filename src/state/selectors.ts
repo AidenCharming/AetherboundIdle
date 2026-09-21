@@ -745,6 +745,22 @@ export function selectBenchEntries(s: GameStore): readonly BenchEntry[] {
   return list
 }
 
+const benchRateMaps = new WeakMap<readonly BenchEntry[], ReadonlyMap<string, number>>()
+
+/**
+ * What each benched creature gathers, by creature id: the Nexus page's cards read their Aether per minute from here. A
+ * creature that works a slot is not in it. Stable by identity while the bench list is.
+ */
+export function selectBenchRates(s: GameStore): ReadonlyMap<string, number> {
+  const list = selectBenchEntries(s)
+  let rates = benchRateMaps.get(list)
+  if (!rates) {
+    rates = new Map(list.map((entry) => [entry.view.id, entry.perMin]))
+    benchRateMaps.set(list, rates)
+  }
+  return rates
+}
+
 /** The sim's own total (`emissionPerMin`): exactly what `accrueAether` adds, online and offline. */
 export function selectAetherPerMinute(s: GameStore): number {
   const creatures = s.game.creatures

@@ -180,3 +180,32 @@ describe('formatRate', () => {
     expect(formatRate(1234567.6)).toBe('1,234,568')
   })
 })
+
+describe('selectBenchRates (what each card on the Nexus page shows)', () => {
+  it("has exactly the benched creatures, each at the sim's own creatureEmissionPerMin, and none of the working ones", () => {
+    const game = rosterGame(60) // 61 creatures, all rarities and traits, some working
+    const rates = sel.selectBenchRates(view(game))
+    const benched = game.creatures.filter((cr) => cr.assignment === null)
+    expect(rates.size).toBe(benched.length)
+    for (const cr of game.creatures) {
+      if (cr.assignment === null) expect(rates.get(cr.id), cr.id).toBe(creatureEmissionPerMin(cr))
+      else expect(rates.has(cr.id), `${cr.id} works a slot`).toBe(false)
+    }
+    // ...and it adds up to the strip's total, which is the sim's own number
+    expect([...rates.values()].reduce((a, b) => a + b, 0)).toBeCloseTo(sel.selectAetherPerMinute(view(game)), 9)
+  })
+
+  it('is empty when nothing is benched, and follows a creature onto and off the bench', () => {
+    const working = work(newGame(), 'creature-1', 'woodcutting', 0, 'oak-log')
+    expect(sel.selectBenchRates(view(working)).size).toBe(0)
+    expect(sel.selectBenchRates(view(newGame())).get('creature-1')).toBe(rate(1))
+  })
+
+  it('keeps its identity while the bench does, through ticks', () => {
+    const game = benchOf(4, 7)
+    const a = sel.selectBenchRates(view(game))
+    expect(sel.selectBenchRates(view(game))).toBe(a)
+    expect(sel.selectBenchRates(view(step(game, 100).state))).toBe(a)
+    expect(sel.selectBenchRates(view(work(game, 'creature-2', 'woodcutting', 0, 'oak-log')))).not.toBe(a)
+  })
+})
