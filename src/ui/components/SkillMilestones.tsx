@@ -45,7 +45,9 @@ function SkillTable({ skillId }: { skillId: string }) {
 
 /**
  * How long each skill took to reach the levels worth knowing about (step 1.9c): its slot unlock levels, its last
- * level, and the extra levels in `tuning.ui.pacingMilestones`. One table per skill that has earned any XP.
+ * level, and the extra levels in `tuning.ui.pacingMilestones`. One table per skill that has earned any XP. There is no
+ * row for level 1 (everyone starts there and the first slot is open at once): the table opens at level 2, the first
+ * level-up.
  *
  * Reading it: the time shown is real play time (online plus away). "+ dev" means the dev panel's fast-forward had
  * already added that much game time by then, so some of the work was not played. "unknown" means the level was

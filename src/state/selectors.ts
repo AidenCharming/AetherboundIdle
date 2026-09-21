@@ -341,18 +341,22 @@ export interface SkillMilestone {
 }
 
 /**
- * The levels the table reports, per skill: the slot unlock levels and the max level (both from the data, so they are
- * whatever a retune makes them), plus `tuning.ui.pacingMilestones`. Sorted, de-duplicated, nothing above the max.
- * Content only, so it is computed once per skill and is stable by reference for ever after.
+ * The levels the table has a row for: a skill's slot unlock levels and its max level (both from the data, so they are
+ * whatever a retune makes them), plus `tuning.ui.pacingMilestones`. Sorted, de-duplicated, nothing above the max, and
+ * **never level 1**: every skill starts there and its first slot is open from the start, so a row for it would only say
+ * "0 s" (step 1.9d). Pure, so the rule is tested with any numbers.
  */
+export function milestoneLevelsFor(skill: { slotUnlockLevels: readonly number[]; maxLevel: number }, pacingMilestones: readonly number[]): number[] {
+  return [...new Set([...skill.slotUnlockLevels, ...pacingMilestones, skill.maxLevel])].filter((l) => l > 1 && l <= skill.maxLevel).sort((a, b) => a - b)
+}
+
+// Content only, so it is computed once per skill and is stable by reference for ever after.
 const milestoneLevels = new Map<string, readonly number[]>()
 function levelsFor(skillId: string): readonly number[] {
   let levels = milestoneLevels.get(skillId)
   if (!levels) {
     const skill = content.skillById.get(skillId)
-    levels = skill
-      ? [...new Set([...skill.slotUnlockLevels, ...content.tuning.ui.pacingMilestones, skill.maxLevel])].filter((l) => l <= skill.maxLevel).sort((a, b) => a - b)
-      : []
+    levels = skill ? milestoneLevelsFor(skill, content.tuning.ui.pacingMilestones) : []
     milestoneLevels.set(skillId, levels)
   }
   return levels

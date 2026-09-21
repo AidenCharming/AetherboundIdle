@@ -305,7 +305,8 @@ export const TuningSchema = z.strictObject({
   // sit strictly between 0 and 360, or a shiny would look exactly like a normal creature.
   // pacingMilestones are the extra skill levels the Settings "Skill milestones" table reports the time to, on top of
   // the levels the data already makes interesting (each skill's slot unlock levels and its max level). PLACEHOLDER,
-  // designer to adjust: they change nothing in the game, only which rows that table shows.
+  // designer to adjust: they change nothing in the game, only which rows that table shows. The table never has a row
+  // for level 1 (the first slot is unlocked at the start), so 2 is what makes the first level-up visible.
   ui: z.strictObject({
     tickMs: PosInt,
     shinyHueDeg: z.number().gt(0).lt(360),

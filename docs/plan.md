@@ -395,7 +395,7 @@ is a data change, not a code change.
   "ui": {
     "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3,
     "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000,
-    "pacingMilestones": [10, 25, 50, 100, 150, 200]
+    "pacingMilestones": [2, 10, 25, 50, 100, 150, 200]
   }
 }
 ```

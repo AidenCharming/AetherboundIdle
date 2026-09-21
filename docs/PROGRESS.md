@@ -3,7 +3,7 @@
 Read this at the start of every session. Update it after every checkpoint (see Session protocol in CLAUDE.md).
 
 ## Next up
-**Step 1.9d is in progress: items 1 and 2 of 5 are done and committed (see the two "step 1.9d" entries below). Do items 3, 4 and 5 next, in order, from the designer's brief in the 1.9d checklist line.**
+**Step 1.9d is in progress: items 1, 2 and 3 of 5 are done and committed (see the three "step 1.9d" entries below). Do items 4 and 5 next, in order, from the designer's brief in the 1.9d checklist line.**
 
 **Phase 2 planning (breeding and hatching). Phase 1 is finished: it is complete, playable, retuned, and ships as a Windows `.exe` (version 0.1.1).**
 
@@ -53,7 +53,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
-- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2, (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 2 of 5 done)*
+- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 3 of 5 done)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
@@ -1661,6 +1661,26 @@ it. plan.md: the folder listing, the "Roster code is the Nexus screen" note, and
 **Verified in the Browser pane** (1280 px, a 12-creature demo save): one Nexus entry under CREATURES; the h1 reads Nexus; the strip read 64 per minute, 3,840 per hour, 11 benched (the top bar says 64/min); a click on it left 11 of 12 creatures, all with the Benched badge and
 an Aether/min line (16, 16, 8, 8, 4, 4...), the Status select read Benched and the hint under "Bench" changed; a second click restored 12 of 12; the working creature's card has no rate; `document.body.innerText` contains no "roster".
 
+### 2026-09-20, step 1.9d (3): the milestone table skips level 1 and shows level 2
+
+The Settings "Skill milestones" table no longer has a row for level 1 (every skill starts there and the first slot is open from the start, so the row could only ever say "0 s"), and `tuning.ui.pacingMilestones` gained a 2, so the first
+level-up (about 75 s of work) is the table's first row: **`[2, 10, 25, 50, 100, 150, 200]`**. That closes the pacingMilestones open question (the designer's answer was to add the 2; the rest of the list is unchanged and still a placeholder for the
+designer to adjust).
+
+Changed: `state/selectors.ts`, `data/tuning.json`, `data/schema.ts` (comment only), `ui/components/SkillMilestones.tsx` (comment only), `docs/plan.md` (the tuning example), the tests. **No save change**: level 1 is still stamped in `reached` (`{ 1: [0, 0] }`
+on a new game, and the tests that say so still pass); only the table's list of rows changed.
+
+- The rule is a pure function, `milestoneLevelsFor(skill, pacingMilestones)`: the slot unlock levels, the pacing milestones and the max level, de-duplicated and sorted, **keeping only levels above 1 and no higher than the max**. It filters the
+  slot levels and the pacing list alike, so it holds however the data is retuned (a 1 in the pacing list, a slot that unlocks at 1, a skill whose max is 1 has no rows). `levelsFor` calls it once per skill, as before, so the rows stay stable by reference.
+- The schema still allows a 1 in `pacingMilestones` (it would simply be skipped), so a designer's edit cannot break the load.
+
+**Tests** (`npm run build` clean, **813 tests pass**, 811 before this item): `milestones.test.ts` (the rows are the slot levels, the pacing levels and the max, sorted and distinct, without level 1, and the slot rows are the slot levels above 1; the table
+opens at level 2 with the shipped data; `milestoneLevelsFor` on hand-made numbers, including a 1 and a 0 in every list, a max of 1, and levels above the max; level 1 has no row while level 2 reads "unknown" before it is reached, and fills in, before
+level 50 does, once it is), and `content.test.ts` (the shipped `pacingMilestones` contains 2, plus its existing ascending, distinct and within-max checks).
+
+**Verified in the Browser pane on a fresh save** (reset from the Dev panel, then the Sproutlet assigned to Oak): the Woodcutting table read `2, 10, 25, 50 slot, 100 slot, 150, 165 slot, 200, 225 slot, 250 max`, all "unknown", and no row for level 1.
+About 78 s after the game booted, with the creature assigned about 14 s in, the first row filled in: level 2 read **1 m 32 s** (about 75 s of work plus the seconds before the assignment), which is what the 1.9c pacing test says the app does.
+
 ## Manual checklist for 0.1.1 (designer)
 
 Run `release\Aetherbound-Idle-0.1.1-portable.exe`. Everything from the 0.1.0 list below still applies; these are what is new.
@@ -1704,7 +1724,7 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - **Re-check the pacing once there is more content** (open item recorded with the 1.9c retune). `xp.skillCurve.growth` is 1.045 and the floor test asserts the fastest possible account cannot reach level 250 in
   under 12 days, but that floor is measured against content that does not exist yet: **Woodcutting tiers 4 and 5** (all three shipped tiers are open within the first hour, so levels 30 to 250 add nothing new to
   cut), **faster creatures**, and whatever Phase 2 breeding and Phase 3 expeditions do to the rate. Each of those raises the best-case rate. Re-run `test/pacing.test.ts` and revisit the growth when they land.
-- **`tuning.ui.pacingMilestones` is a PLACEHOLDER** ([10, 25, 50, 100, 150, 200]). It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful. Note that
+- ~~**`tuning.ui.pacingMilestones`**~~ **Answered by the designer in 1.9d and built (item 3 below): add level 2, so the table shows the first level-up; the table also never lists level 1 now. It is `[2, 10, 25, 50, 100, 150, 200]`, still a PLACEHOLDER for the other levels.** Kept for the record: it was [10, 25, 50, 100, 150, 200]. It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful. Note that
   with this list the **first level-up is not a row** (level 2 is stamped in the save, but the lowest listed level is 10), so a fresh save shows "1 slot - 0 s" and then nothing until level 10. Adding 2 would make
   the opening minute visible.
 - ~~**Should the card and button borders be lightened?**~~ **Decided by the designer in 1.9d and built (see "step 1.9d (1)" below): decorative card outlines are NOT raised to 3:1; the boundaries of interactive controls ARE (3.6 to 3.9:1 now).** Kept for the record: (found in 1.9c checkpoint D). `--line` reads 1.23:1 against a card and `--line-strong` 1.62:1, below the 3:1 WCAG asks for a control's visible boundary.

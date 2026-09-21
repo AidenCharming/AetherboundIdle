@@ -495,6 +495,7 @@ describe('loadContent rejects bad data instead of loading it', () => {
   it('requires tuning.ui.pacingMilestones to be ascending, distinct, whole levels no higher than a skill max level', () => {
     const levels = content.tuning.ui.pacingMilestones
     expect(levels.length).toBeGreaterThan(0)
+    expect(levels, 'level 2 is what makes the first level-up (about 75 s) a row of the Settings table, which never lists level 1').toContain(2)
     expect(levels).toEqual([...levels].sort((a, b) => a - b))
     expect(new Set(levels).size).toBe(levels.length)
     for (const skill of content.skills) for (const level of levels) expect(level, `${skill.id} has no level ${level}`).toBeLessThanOrEqual(skill.maxLevel)

@@ -9,7 +9,7 @@ import { step } from '../src/sim/tick'
 import { createActions } from '../src/state/actions'
 import { createTickDriver } from '../src/state/driver'
 import { flushSave, loadGame } from '../src/state/persistence'
-import { selectSkillIdsWithXp, selectSkillMilestones } from '../src/state/selectors'
+import { milestoneLevelsFor, selectSkillIdsWithXp, selectSkillMilestones } from '../src/state/selectors'
 import { createGameStore } from '../src/state/store'
 import type { GameState, LevelStamp } from '../src/types/state'
 import { FakeEnv, HOUR, NOW, newGame, quietContent, sproutletAtWork } from './helpers'
@@ -318,20 +318,41 @@ describe('the selectors the Settings table reads', () => {
     expect(selectSkillIdsWithXp(store.getState())).toEqual(['woodcutting'])
   })
 
-  it('reports the slot unlock levels, the max level and the pacing milestones, sorted and distinct', () => {
+  it('reports the slot unlock levels, the max level and the pacing milestones, sorted and distinct, and never level 1', () => {
     const { store } = setup()
     const rows = selectSkillMilestones(store.getState(), 'woodcutting')
     const shown = rows.map((r) => r.level)
-    expect(shown).toEqual([...new Set([...woodcutting.slotUnlockLevels, ...content.tuning.ui.pacingMilestones, woodcutting.maxLevel])].sort((a, b) => a - b))
+    expect(shown).toEqual([...new Set([...woodcutting.slotUnlockLevels, ...content.tuning.ui.pacingMilestones, woodcutting.maxLevel])].filter((l) => l > 1).sort((a, b) => a - b))
     expect(shown).toEqual([...shown].sort((a, b) => a - b))
-    expect(rows.filter((r) => r.slot).map((r) => r.level)).toEqual([...woodcutting.slotUnlockLevels])
+    expect(shown).not.toContain(1)
+    // the first slot unlocks at level 1, so it has no row; every other slot does
+    expect(woodcutting.slotUnlockLevels[0]).toBe(1)
+    expect(rows.filter((r) => r.slot).map((r) => r.level)).toEqual(woodcutting.slotUnlockLevels.filter((l) => l > 1))
     expect(rows.filter((r) => r.max).map((r) => r.level)).toEqual([woodcutting.maxLevel])
+  })
+
+  it('opens at level 2, the first level-up, with the shipped pacing milestones', () => {
+    const { store } = setup()
+    const rows = selectSkillMilestones(store.getState(), 'woodcutting')
+    expect(rows[0]!.level).toBe(2)
+    expect(content.tuning.ui.pacingMilestones).toContain(2)
+    expect(rows[0]).toMatchObject({ playedMs: null, devMs: 0, slot: false, max: false })
+  })
+
+  it('milestoneLevelsFor skips every level of 1 or less, wherever it comes from, and keeps the rest', () => {
+    const skill = { slotUnlockLevels: [1, 50, 100], maxLevel: 250 }
+    expect(milestoneLevelsFor(skill, [2, 10, 50])).toEqual([2, 10, 50, 100, 250])
+    expect(milestoneLevelsFor(skill, [1, 2])).toEqual([2, 50, 100, 250]) // a 1 in the pacing list is skipped too
+    expect(milestoneLevelsFor({ slotUnlockLevels: [1], maxLevel: 1 }, [1])).toEqual([]) // a skill with no level above 1 has no rows
+    expect(milestoneLevelsFor({ slotUnlockLevels: [0, 1, 30], maxLevel: 40 }, [])).toEqual([30, 40])
+    expect(milestoneLevelsFor({ slotUnlockLevels: [1, 30], maxLevel: 40 }, [10, 999])).toEqual([10, 30, 40]) // nothing above the max
   })
 
   it('says unknown (null) for a level that was never stamped, and a time for one that was', () => {
     const { env, driver, store } = setup()
     const before = selectSkillMilestones(store.getState(), 'woodcutting')
-    expect(before.find((r) => r.level === 1)).toMatchObject({ playedMs: 0, devMs: 0 })
+    expect(before.find((r) => r.level === 1)).toBeUndefined() // level 1 is stamped in the save, but the table has no row for it
+    expect(before.find((r) => r.level === 2)).toMatchObject({ playedMs: null, devMs: 0 })
     expect(before.find((r) => r.level === 50)).toMatchObject({ playedMs: null, devMs: 0 })
 
     env.clock += 4 * HOUR
@@ -340,6 +361,10 @@ describe('the selectors the Settings table reads', () => {
     const fifty = after.find((r) => r.level === 50)!
     expect(fifty.playedMs).not.toBeNull()
     expect(fifty.playedMs!).toBeLessThanOrEqual(4 * HOUR)
+    // the first level-up is the first row that fills in, and it comes before the later ones
+    const two = after.find((r) => r.level === 2)!
+    expect(two.playedMs).not.toBeNull()
+    expect(two.playedMs!).toBeLessThan(fifty.playedMs!)
   })
 
   it('carries the dev time, so the table can say "+ dev"', () => {
