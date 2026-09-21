@@ -51,6 +51,7 @@ Things a fresh session should know before starting:
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
 
+- [ ] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus, (3) the milestone table skips level 1 and shows level 2, (4) a Delete save section for players, (5) rebuild the exe as 0.1.2. Each numbered item is its own commit. *(in progress: 1 of 5 done)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
 - [x] 1.9b UI shell redesign, then rebuild the exe (designer's request, 2026-09-20). Presentation only, no new game systems. Sidebar navigation with section headings (drawer on a phone), pinned current-activity panel, per-option cards, toast notifications and a bell (the store keeps `SimEvent`s), a warm-accent dark theme, an optional `emoji` on each skill; then `npm run electron:pack` (version 0.1.0) and the packaged smoke tests. Reference: `docs/design.md` section 11 "UI direction" and `docs/reference/`. Three checkpoints: A shell and theme (done, see below), B activity panel and notifications (done, see below), C restyle of every screen and the exe rebuild (done, version 0.1.0; see below). *(2026-09-20; each checkpoint its own commit)*
 
@@ -1560,6 +1561,70 @@ check was. A CSS background never fires `did-fail-load`, so without this a wrong
   v1 fixture) is covered by node tests. It is on the manual checklist.
 - The native Save and Open dialogs, the window on screen, the installer, and a real phone: all still manual, as in 1.9b.
 
+### 2026-09-20, step 1.9d (1): glass panels, and the control-edge decision (designer's request)
+
+Changed: `ui/theme.css`, `test/assets.test.ts`, `docs/PROGRESS.md`. New: `docs/reference/1.9d-glass/` (the eight screenshots). No sim, state or save change.
+
+**The chosen numbers: `--glass-panel: 64%`, `--glass-raised: 68%`, `--glass-chrome: 68%`** (they were 90 / 92 / 92). Panel is cards and panels, raised is inputs, buttons and nested cards, chrome is the sidebar and the header. They are
+three custom properties at the top of `:root`, and `--panel`, `--panel-raised`, `--sidebar-surface` and `--header-surface` are built from them, so the designer retunes the whole look by editing those three numbers. The measured
+table for all four levels is in the comment above them in `theme.css`, so the alternatives are one edit away. The phone drawer and the toasts stay opaque, and so (see below) do the notification panel and the dialogs.
+
+**Method.** I screenshotted 78, 64 and 50 % at 1280 px on the Woodcutting page and the Roster (`docs/reference/1.9d-glass/glass-<level>-woodcutting.jpg` and `-roster.jpg`, rendered from the built game in a throw-away
+Electron profile with a 12-creature demo save). Then I re-measured with the 1.9c canvas method, but at element level: for every text node and every control on Woodcutting, Roster, Nexus, Settings and the Dev panel, I composited the
+element's real background stack (each ancestor's colour and alpha, the skill card's gradient averaged) over the **worst patch** of the shipped image (the brightest 16 px block after the scrim: the gold mote at 81 % across, 85 % down, which
+reads `rgb(78, 71, 66)` once scrimmed) and computed WCAG contrast. The method reproduces the 1.9c table at the old 90 % (14.57 / 6.66 / 5.17 on a card), so the numbers are comparable. (One trap for whoever repeats it: the
+opaque `body` background is painted behind the image layer, so it must not be counted as a layer, or every number comes out too kind.)
+
+| level | panel / raised / chrome | body text | muted and label text | control edge | verdict |
+|---|---|---|---|---|---|
+| 90 % (1.9c) | 90 / 92 / 92 | 7.9 | 4.7 | 4.1 | passes |
+| 78 % | 78 / 80 / 80 | 7.9 | 4.7 | 3.9 | passes |
+| **64 %** | **64 / 68 / 68** | **7.9** | **4.6** | **3.6** | **passes: the lowest that does** |
+| 50 % | 50 / 56 / 56 | 7.9 | 4.2 | 3.3 | fails: the "Skill progress" and "Slots" labels read 4.2, card sub-lines ("Lv 13 · Form 2", the Benched badge) 4.4 |
+
+"Body text" is the smallest of any text in the app's own body colour, which is the page title straight on the image (7.9 does not depend on the alpha); on any glass surface body text is 10 or more. The other columns are the
+smallest over every page. Needs: 7, 4.5, 3.
+
+**What the measurement found besides the alphas** (each fixed with a token or a two-line rule, none needed a design decision):
+- **The tinted rarity cards were the binding constraint, and were already under 4.5 in 0.1.1.** A card is `color-mix(rarity 12%, panel-raised)`, and the pale rarities (Luminous, Zenith) lift the surface. Their muted sub-line read
+  **4.31** at the shipped 90 %, and 3.7 at 64 %. The tint is now 6 %, which reads 4.58 at 64 %. The frame around the card still carries the pure rarity colour.
+- **The "Dim" rarity name** (a mid grey, `#8a8a8a`) read 3.7 on a glass card. `.rcard-rarity` now mixes 30 % of the text colour into the rarity colour; nothing else that shows a rarity colour changed.
+- **Muted text straight on the image** (the "12 of 12 creatures" count and a page's lead line, such as the old Nexus intro) read **3.6** on the worst patch, independent of the alphas and so already true in 0.1.1. New token
+  `--muted-page: #b3bccb` (4.8) for exactly those two places. `.empty` (the "no creatures" box) gets a panel behind it so its text and its button are never on the bare image.
+- **`--faint` `#869099` -> `#8f99a2`**, because at 64 % the old value read 4.2 on a raised surface.
+
+**Edges.** `--edge: rgb(255 255 255 / 11%)` (a :root token) is now the 1 px border of every panel, card, chip, the sidebar's and header's edge and every inner divider, replacing the dark `--line`. `--line` and
+`--line-strong` stay for the coloured (gold, accent, danger) borders that mix into them and for the dashed empty box. **Blur:** `--glass-blur: blur(8px)` on the docked sidebar and on the header only (the header had 10 px since 1.9b;
+it is 8 now). The many cards get none. **Notification panel and dialogs** (the welcome-back dialog, and so the delete dialog that comes in item 4) were `--panel`, and would now let the page ghost through them; they use `--panel-solid`.
+
+**The designer's border decision (recorded, and the open question closed).** Decorative card outlines are **not** raised to 3:1. Controls that rely on a border to be recognised **are**, and I measured every one: before, the border of
+**every bordered control was 1.57 to 1.78 : 1** against what is behind it (35 instances over four pages), so all of them needed changing. They now use one token, `--control-edge: #75808f`:
+
+| control | before | after (worst case) |
+|---|---|---|
+| buttons (Unassign, filter and sort buttons, Export and Import, fast-forward, Reset) | 1.57 to 1.62 | 3.6 to 3.9 |
+| assign chips ("Replace with", the slot options) | 1.62 | 3.6 |
+| selects (the filter bar, the Dev panel) | 1.57 to 1.62 | 3.6 to 3.9 |
+| text and number inputs (Dev panel) | 1.57 | 3.9 |
+| the notification bell | 1.78 | 3.6 |
+| checkboxes (Settings, Dev panel) | the browser's own grey, unmeasurable | drawn by the theme now: a 2 px `--control-edge` box, gold and ticked when on; 3.9 |
+| resource option cards | 1.6 | 5.2 (the same token over a raised fill) |
+| primary (gold) buttons | fill 8.4 | unchanged: the fill is the boundary |
+
+Not treated as controls that need a border: the sidebar's nav entries (transparent, identified by their text and by the highlight of the current page) and the roster card (its frame is a 3 px rarity-coloured border). Disabled controls
+are exempt. I softened the token from a first try of `#7d8899` (measured 4.0 to 5.3) to `#75808f`, to keep the buttons from looking heavier than they have to.
+
+**The honest reading of the screenshots.** The three levels look **very close to each other**: the difference between 78 and 50 % is easy to miss side by side. The reason is not the alpha. `--bg-scrim` (a dark gradient, 45 % to 64 %) is
+laid over the image before any surface, so the art is already dim where a card covers it, and a see-through card can only show a dim thing. Through the cards the islands and the mist are faint at every level; between the cards, where there is
+no surface, the art shows as it did in 1.9c. **If the goal is art you can clearly see through the cards, the alpha is not the lever, the scrim is.** `glass-50-lighter-scrim-NOT-APPLIED-*.jpg` shows 50 % with the scrim at 25 % to 45 %: the islands read clearly
+through the Woodcutting card and the sidebar. It is **not applied**, because it fails the readability rules (at that scrim the labels read about 3.7 and the "12 of 12" style text 2.3), so it needs a designer decision and probably lighter `--muted`
+and `--faint` tokens with it. One line in `:root` (`--bg-scrim`) either way.
+
+**Tests.** `test/assets.test.ts`: the blur cap now reads the `--glass-blur` token, and a new test checks that the three glass opacities are percentages strictly between 0 and 100, that the surface tokens are built from them, that the blur is 8 px
+or less, that `backdrop-filter` is on exactly the docked sidebar and the header and nowhere else, that the drawer, the notification panel and the dialogs are opaque, and that `--edge` and `--control-edge` exist. `npm run build` is clean and **801 tests pass**.
+
+**Could not verify.** Blur cost on a weak GPU (8 px on two elements; the cap is what stands guard). The toast over the image (unchanged: still `--panel-high`, opaque).
+
 ## Manual checklist for 0.1.1 (designer)
 
 Run `release\Aetherbound-Idle-0.1.1-portable.exe`. Everything from the 0.1.0 list below still applies; these are what is new.
@@ -1606,7 +1671,7 @@ Listed so they are not forgotten. Not in step 1.7 and not started:
 - **`tuning.ui.pacingMilestones` is a PLACEHOLDER** ([10, 25, 50, 100, 150, 200]). It only picks which extra rows the Settings "Skill milestones" table shows; say if other levels would be more useful. Note that
   with this list the **first level-up is not a row** (level 2 is stamped in the save, but the lowest listed level is 10), so a fresh save shows "1 slot - 0 s" and then nothing until level 10. Adding 2 would make
   the opening minute visible.
-- **Should the card and button borders be lightened?** (found in 1.9c checkpoint D). `--line` reads 1.23:1 against a card and `--line-strong` 1.62:1, below the 3:1 WCAG asks for a control's visible boundary.
+- ~~**Should the card and button borders be lightened?**~~ **Decided by the designer in 1.9d and built (see "step 1.9d (1)" below): decorative card outlines are NOT raised to 3:1; the boundaries of interactive controls ARE (3.6 to 3.9:1 now).** Kept for the record: (found in 1.9c checkpoint D). `--line` reads 1.23:1 against a card and `--line-strong` 1.62:1, below the 3:1 WCAG asks for a control's visible boundary.
   This predates the background image, which costs about 0.06 of it; reaching 3:1 means roughly doubling their lightness, a visible change to every button, input and card in the 1.9b look you signed off. Every
   control also has its own fill and a focus ring, so nothing is unusable. Your call.
 

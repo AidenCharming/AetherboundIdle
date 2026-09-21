@@ -75,7 +75,37 @@ describe('shipped art assets', () => {
     const layer = /\.shell::before\s*\{([^}]*)\}/.exec(themeCode)?.[1] ?? ''
     expect(layer.length, '.shell::before is the background layer and must exist').toBeGreaterThan(0)
     expect(layer).not.toMatch(/animation|transition|filter/)
-    for (const [, px] of themeCode.matchAll(/backdrop-filter:\s*blur\((\d+)px\)/g)) expect(Number(px), 'a large backdrop blur is slow on weak GPUs').toBeLessThanOrEqual(12)
+    // The blur is a token (--glass-blur) so the designer retunes it in one place; every value in the file is capped.
+    const blurs = [...themeCode.matchAll(/blur\((\d+)px\)/g)].map((m) => Number(m[1]))
+    expect(blurs.length, 'no blur found: the glass token is gone').toBeGreaterThan(0)
+    for (const px of blurs) expect(px, 'a large backdrop blur is slow on weak GPUs').toBeLessThanOrEqual(12)
+  })
+
+  it('glass: the surfaces are see-through by tokens, the blur is on the sidebar and the header only, and what covers content is opaque', () => {
+    const token = (name: string): string => new RegExp(`${name}:\\s*([^;]+);`).exec(themeCode)?.[1]?.trim() ?? ''
+    // the three opacities the designer retunes, each a percentage strictly between 0 and 100
+    for (const name of ['--glass-panel', '--glass-raised', '--glass-chrome']) {
+      const pct = Number(/^(\d+)%$/.exec(token(name))?.[1])
+      expect(pct, `${name} must be a whole percentage`).toBeGreaterThan(0)
+      expect(pct, `${name} must be see-through, or it is not glass`).toBeLessThan(100)
+    }
+    expect(token('--panel'), 'the card surface reads the glass token').toContain('var(--glass-panel)')
+    expect(token('--panel-raised')).toContain('var(--glass-raised)')
+    expect(token('--sidebar-surface')).toContain('var(--glass-chrome)')
+    expect(token('--header-surface')).toContain('var(--glass-chrome)')
+    // the designer's limit for the blur is 8 px (the general cap above is 12)
+    expect(Number(/blur\((\d+)px\)/.exec(token('--glass-blur'))?.[1])).toBeLessThanOrEqual(8)
+    // backdrop-filter appears exactly twice, once for the docked sidebar and once for the header, and never on the many cards
+    const rules = [...themeCode.matchAll(/([^{}]+)\{[^{}]*backdrop-filter:\s*var\(--glass-blur\)[^{}]*\}/g)].map((m) => m[1]!.trim())
+    expect(rules).toEqual([".sidebar[data-drawer='false']", '.header'])
+    expect((themeCode.match(/backdrop-filter:/g) ?? []).length).toBe(2)
+    // what slides over the page (the phone drawer, the notification panel, the dialogs) is opaque, so the page does not ghost through it
+    for (const selector of [/\.sidebar\[data-drawer='true'\]\s*\{\s*background:\s*var\(--panel-solid\)/, /\.notif-panel\s*\{[^}]*background:\s*var\(--panel-solid\)/, /\.wb\s*\{[^}]*background:\s*var\(--panel-solid\)/, /\.toast\s*\{[^}]*background:\s*var\(--panel-high\)/]) {
+      expect(themeCode).toMatch(selector)
+    }
+    // the light edge and the control edge are tokens, so a card's outline and a control's boundary are each one edit
+    expect(token('--edge')).toMatch(/^rgb\(255 255 255 \/ \d+%\)$/)
+    expect(token('--control-edge')).toMatch(/^#[0-9a-f]{6}$/i)
   })
 
   it('keeps the shipped image small enough to bundle without thought', () => {

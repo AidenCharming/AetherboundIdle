@@ -4,25 +4,57 @@
    handed to components as --accent / --dot / --rarity / --type-a, so no type color is written here.
    --bg is also the Electron window's own background (BACKGROUND in electron/main.cjs, checked by test/electron.test.ts):
    change both together. It is what shows before the background image loads, and behind it for ever after.
-   The surfaces are SEMI-OPAQUE on purpose (step 1.9c): the background image sits behind the whole app, and the
-   readability of every piece of text depends on the alpha here plus --bg-scrim. Raising either alpha hides more of
-   the image; lowering it lowers text contrast. The numbers below were measured against the brightest parts of the
-   shipped image (see the 1.9c checkpoint D entry in docs/PROGRESS.md for the contrast ratios). */
+   The surfaces are GLASS on purpose (steps 1.9c and 1.9d): the background image sits behind the whole app, and the
+   readability of every piece of text depends on the three --glass-* alphas below plus --bg-scrim. Raising an alpha
+   hides more of the image; lowering it lowers text contrast. The alphas were measured against the brightest patch of
+   the shipped image (see the 1.9d entry in docs/PROGRESS.md for the contrast ratios). */
 :root {
+  /* GLASS: how much of the background image shows through, as the opacity of each surface. THE knob for the look.
+     Chosen: the 64 % row. To retune, change the three numbers below and nothing else. Every row was measured in 1.9d,
+     on every page, against the WORST patch of the shipped image (the brightest 16 px block after the scrim), by
+     compositing each element's real background stack in a canvas:
+        opacity  panel/raised/chrome  body text  muted+label text  control edge   verdict
+          90 %     90 / 92 / 92 (1.9c)    7.9         4.7              4.1          passes
+          78 %     78 / 80 / 80           7.9         4.7              3.9          passes
+          64 %     64 / 68 / 68           7.9         4.6              3.6          passes  <- the lowest that does
+          50 %     50 / 56 / 56           7.9         4.2              3.3          FAILS (labels 4.2, card sub-lines 4.4)
+     Needs: body text 7 or more, muted and label text 4.5 or more, a control's edge 3 or more. The body figure is the
+     page title straight on the image (on a glass surface it is 10 or more). panel = cards and panels; raised = inputs,
+     buttons and nested cards; chrome = the sidebar and the header. The art also shows less than these numbers suggest
+     because --bg-scrim darkens it first: see the 1.9d entry in docs/PROGRESS.md before lowering an alpha further. */
+  --glass-panel: 64%;
+  --glass-raised: 68%;
+  --glass-chrome: 68%;
+  /* backdrop blur behind the sidebar and the header ONLY (the many cards get none: it is slow on weak GPUs).
+     test/assets.test.ts caps any blur at 12px. */
+  --glass-blur: blur(8px);
+
   /* surfaces, darkest to lightest: page, sidebar and cards, raised (inputs, nested cards), hover */
   --bg: #0d1015;
-  --panel: rgb(20 25 32 / 90%);
-  --panel-raised: rgb(26 33 42 / 92%);
-  /* The same colour as --panel, fully opaque. For a surface that covers CONTENT rather than the background image:
-     the phone drawer slides over the page, and at 90% the page ghosted through it. */
+  --panel: rgb(20 25 32 / var(--glass-panel));
+  --panel-raised: rgb(26 33 42 / var(--glass-raised));
+  --sidebar-surface: rgb(20 25 32 / var(--glass-chrome));
+  --header-surface: rgb(13 16 21 / var(--glass-chrome));
+  /* The same colour as --panel, fully opaque. For a surface that covers CONTENT rather than the background image: the
+     phone drawer, the notification panel and the dialogs sit over the page, and a see-through one ghosted the page
+     through it. */
   --panel-solid: #141920;
   --panel-high: #232b36;
   --line: #262e39;
   --line-strong: #37414f;
+  /* The edge of a glass surface: a hairline of light, so a card is bounded by an edge and not by a dark fill. Purely
+     decorative (the designer's decision in 1.9d: card outlines are not raised to 3:1). */
+  --edge: rgb(255 255 255 / 11%);
+  /* The boundary of an INTERACTIVE control (button, select, text input, checkbox, assign chip) whose shape is what
+     tells the player it is a control. Measured at 3:1 or better against the surface behind it (WCAG 1.4.11). */
+  --control-edge: #75808f;
   /* text */
   --text: #eceff4;
   --muted: #9aa4b2;
-  --faint: #869099;
+  --faint: #8f99a2;
+  /* Secondary text that sits directly on the background image with no surface under it (a page's lead line, the
+     "12 of 12 creatures" count). --muted reads only 3.6:1 there on the brightest patch of the image; this is 4.8:1. */
+  --muted-page: #b3bccb;
   /* the one warm accent, for UI chrome only (selected page, primary buttons, the activity bars) */
   --gold: #e2b866;
   --gold-strong: #f3cf8a;
@@ -100,7 +132,7 @@ button {
   font: inherit;
   color: inherit;
   background: var(--panel-raised);
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-edge);
   border-radius: 12px;
   padding: 8px 16px;
   min-height: 44px; /* a comfortable touch target at phone width */
@@ -108,7 +140,7 @@ button {
 }
 
 button:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--gold) 55%, var(--line-strong));
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--control-edge));
   background: var(--panel-high);
 }
 
@@ -146,6 +178,32 @@ button.primary:disabled {
   outline-offset: -3px;
 }
 
+/* A checkbox drawn by us: the native box in a dark scheme is a fixed grey we cannot measure, and its edge is what
+   tells the player it is a control. Unchecked: an edge at --control-edge. Checked: a gold fill (7:1 on a card). */
+input[type='checkbox'] {
+  appearance: none;
+  display: inline-grid;
+  place-content: center;
+  margin: 0;
+  color: var(--gold-ink);
+  background: var(--panel-raised);
+  border: 2px solid var(--control-edge);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+input[type='checkbox']:checked {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+
+input[type='checkbox']:checked::after {
+  content: '\2713';
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1;
+}
+
 select {
   width: 100%;
   min-height: 44px;
@@ -153,7 +211,7 @@ select {
   font: inherit;
   color: inherit;
   background: var(--panel-raised);
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-edge);
   border-radius: 12px;
 }
 
@@ -231,11 +289,12 @@ button.danger {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  background: var(--panel);
-  border-right: 1px solid var(--line);
+  background: var(--sidebar-surface);
+  border-right: 1px solid var(--edge);
 }
 
 .sidebar[data-drawer='false'] {
+  backdrop-filter: var(--glass-blur);
   position: sticky;
   top: 0;
   height: 100vh;
@@ -279,7 +338,7 @@ button.danger {
   justify-content: space-between;
   gap: 8px;
   padding: 18px 16px 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--edge);
 }
 
 .brand {
@@ -372,7 +431,7 @@ button.danger {
   flex-direction: column;
   gap: 10px;
   padding: 12px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--edge);
 }
 
 /* ---------- current activity (the sidebar's foot) ---------- */
@@ -489,7 +548,7 @@ button.danger {
   max-height: min(70vh, 480px);
   padding: 16px;
   overflow-y: auto;
-  background: var(--panel);
+  background: var(--panel-solid);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
@@ -527,7 +586,7 @@ button.danger {
   gap: 12px;
   padding: 10px 12px;
   background: var(--panel-raised);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
 }
 
@@ -624,9 +683,9 @@ button.danger {
   align-items: center;
   gap: 12px;
   padding: 10px 16px;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid var(--line);
+  background: var(--header-surface);
+  backdrop-filter: var(--glass-blur);
+  border-bottom: 1px solid var(--edge);
 }
 
 .shell[data-drawer='false'] .header {
@@ -685,7 +744,7 @@ button.danger {
   padding: 4px 10px;
   font-size: 0.9rem;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 999px;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
@@ -769,6 +828,7 @@ button.danger {
 .page-title p {
   margin-top: 8px;
   max-width: 60ch;
+  color: var(--muted-page);
 }
 
 .panel {
@@ -777,7 +837,7 @@ button.danger {
   gap: var(--gap);
   padding: 20px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: var(--radius-lg);
 }
 
@@ -869,7 +929,7 @@ button.danger {
   min-width: 0;
   padding: 18px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: var(--radius);
 }
 
@@ -918,7 +978,7 @@ button.danger {
 .bar {
   height: 12px;
   background: var(--bg);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -998,7 +1058,7 @@ button.danger {
   font-size: 1.4rem;
   line-height: 1;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
 }
 
@@ -1065,7 +1125,7 @@ button.danger {
 .filters {
   padding: 0 16px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: var(--radius);
 }
 
@@ -1080,7 +1140,7 @@ button.danger {
 
 .filters[open] summary {
   margin-bottom: 12px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--edge);
 }
 
 .filters-grid {
@@ -1117,6 +1177,10 @@ button.danger {
   font-variant-numeric: tabular-nums;
 }
 
+.roster-count .muted {
+  color: var(--muted-page);
+}
+
 .roster-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -1133,6 +1197,7 @@ button.danger {
   gap: 12px;
   padding: 28px 16px;
   text-align: center;
+  background: var(--panel);
   border: 1px dashed var(--line-strong);
   border-radius: var(--radius);
 }
@@ -1144,7 +1209,7 @@ button.danger {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  background: color-mix(in srgb, var(--rarity) 12%, var(--panel-raised));
+  background: color-mix(in srgb, var(--rarity) 6%, var(--panel-raised));
   border: 3px solid var(--rarity);
   border-radius: var(--radius);
   box-shadow: 0 0 calc(var(--glow) * 14px) calc(var(--glow) * 2px) color-mix(in srgb, var(--rarity) 80%, transparent);
@@ -1214,8 +1279,10 @@ button.danger {
   white-space: nowrap;
 }
 
+/* The rarity name in the rarity colour, lifted a little toward the text colour so the darkest tier (Dim, a mid grey)
+   stays readable on a glass card. The frame around the card keeps the pure colour. */
 .rcard-rarity {
-  color: var(--rarity);
+  color: color-mix(in srgb, var(--rarity) 70%, var(--text));
   font-weight: 600;
 }
 
@@ -1242,7 +1309,7 @@ button.danger {
   gap: 12px;
   padding: 14px;
   background: var(--panel-raised);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--edge);
 }
 
 .facts {
@@ -1320,7 +1387,7 @@ button.danger {
 .nexus-totals div {
   padding: 12px 14px;
   background: var(--panel-raised);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
 }
 
@@ -1350,7 +1417,7 @@ button.danger {
   min-height: 44px;
   padding: 12px;
   background: var(--panel-raised);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
   cursor: pointer;
 }
@@ -1364,7 +1431,6 @@ button.danger {
   width: 22px;
   height: 22px;
   margin: 2px 0 0;
-  accent-color: var(--gold);
   flex: none;
 }
 
@@ -1379,7 +1445,7 @@ button.danger {
   gap: 8px;
   padding: 14px;
   background: var(--panel-raised);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
 }
 
@@ -1401,7 +1467,7 @@ button.danger {
   gap: 8px;
   padding: 10px 12px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 8px;
 }
 
@@ -1426,7 +1492,7 @@ button.danger {
 .milestones {
   padding: 12px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-left: 3px solid var(--accent);
   border-radius: 8px;
 }
@@ -1456,7 +1522,7 @@ button.danger {
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid var(--edge);
 }
 
 .milestones tbody th {
@@ -1492,7 +1558,7 @@ button.danger {
   font: inherit;
   color: inherit;
   background: var(--panel);
-  border: 1px solid var(--line-strong);
+  border: 1px solid var(--control-edge);
   border-radius: 12px;
 }
 
@@ -1513,7 +1579,7 @@ button.danger {
   gap: 8px;
   margin: 0;
   padding: 10px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: 12px;
 }
 
@@ -1528,7 +1594,6 @@ button.danger {
 .check input {
   width: 22px;
   height: 22px;
-  accent-color: var(--gold);
 }
 
 .dev-confirm {
@@ -1550,7 +1615,7 @@ button.danger {
   margin: auto;
   padding: 20px;
   color: var(--text);
-  background: var(--panel);
+  background: var(--panel-solid);
   border: 1px solid var(--line-strong);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
