@@ -110,6 +110,9 @@ Shown as annotated examples. `schema.ts` holds the authoritative zod version of 
 }]
 ```
 
+Optional per type: `"shinyHueDeg": 270` (a number strictly between 0 and 360), the hue turn of a shiny of that type; a type without it
+uses `tuning.ui.shinyHueDeg`. Only Void has one (step 1.9h).
+
 Wheel from design section 8: Aqueous beats Pyric beats Verdant beats Telluric beats Voltaic beats Aqueous,
 each resisting the previous. Void sets `outsideWheel: true` with `wheel: null`; its flat multipliers live
 in `tuning.json` under `combat`.
@@ -426,6 +429,10 @@ Two knobs in this file are easy to misread, so they are pinned down here:
 - `ui.shinyHueDeg` (150) is the CSS `hue-rotate` applied at runtime to a shiny creature's art. It is never a
   separate asset (CLAUDE.md rule 4). Must be strictly between 0 and 360, or a shiny would look like a normal
   creature. Presentation only. Added at step 1.7 (PLACEHOLDER value).
+  **Since step 1.9h it is the default, not the only value:** a type in `types.json` may carry its own optional `shinyHueDeg`
+  (same rule, strictly between 0 and 360), and a creature's shiny uses its first-listed type's value if it has one, else this
+  one (`selectors.shinyHueFor`). Only Void has one, 270 (teal: the global 150 turns Void violet to a muddy olive). A hybrid
+  uses its first-listed type.
 - `ui.spriteFormScale` (0.72 / 0.86 / 1.0, by form) is how much of its art plate a creature's sprite fills, so growth shows although every sprite is
   cropped to its own bounding box. Each factor is above 0 and at most 1 and a later form is never smaller than an earlier one. Presentation
   only. Added at step 1.9e (PLACEHOLDER values). Sprites themselves are found by file name, `src/ui/assets/creatures/<species or hybrid id>-f<form>.png`,
