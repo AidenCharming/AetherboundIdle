@@ -10,7 +10,7 @@ Form 1 uses the species name. Every species has 3 forms.
 | Species | Type | Form 2 | Form 3 | Primary skill | Signature trait [strength] | Stat lean | Ability (effect, damage type) | Tempo | Secondary aptitude |
 |---|---|---|---|---|---|---|---|---|---|
 | Sproutlet | Verdant | Timberhorn | Lumbercrown | Woodcutting | Overgrowth: chance for extra output [Moderate] | Guard | Leaf Shield (party shield) | Standard | Scavenging |
-| Brambletrundle | Verdant | Briartread | Thicketroll | Woodcutting | Briar Patch: rare-drop chance within tier [Moderate] | Guard | Thorn Roll (thorns shield) | Standard | Fabrication |
+| Brambletrundle | Verdant | Briarburl | Thicketroll | Woodcutting | Briar Patch: rare-drop chance within tier [Moderate] | Guard | Thorn Roll (thorns shield) | Standard | Fabrication |
 | Mossgear | Verdant | Mosscrank | Mossbastion | Herbalism | Lubricated Joints: cooldown reduction [Minor] | Health | Soothing Spores (instant party heal) | Quick | Fabrication |
 | Petalsprocket | Verdant | Bloomwheel | Blossomcrank | Herbalism | Pollinator: rare-drop chance within tier [Moderate] | Power | Rotor Gust (single-target, Verdant) | Standard | Scavenging |
 | Quakemaw | Telluric | Faultjaw | Craterchomp | Mining | Deep Excavator: rare-drop chance within tier [Moderate] | Power | Stone Crunch (single-target, Telluric) | Heavy | Scavenging |
@@ -36,7 +36,7 @@ Form 1 uses the species name. Every species has 3 forms.
 
 ### Base species form descriptions (for placeholder art prompts, later)
 - Sproutlet: tiny glowing leafy quadruped with a sapling on its head → sturdy bark-armored quadruped with wooden antler buds → majestic forest beast with a glowing canopy of antlers.
-- Brambletrundle: chaotic rolling ball of thorny vines and glowing bolts → tank-like creature on tracks of thorns → massive affectionate tumbleweed of vines.
+- Brambletrundle: chaotic rolling ball of thorny vines and glowing bolts → bigger, sturdier mossy tumbleweed golem: a vine ball around a wooden core, with moss, small white flowers, bark arms and clawed feet → ancient, hulking, gentle wood-and-vine giant with tree-trunk arms and legs and a small kind face.
 - Mossgear: fuzzy green cog-shaped sphere → bipedal mossy mechanism → gentle lumbering botanical machine with emerald aura.
 - Petalsprocket: hovering blossom with metal-trimmed petals → larger rotor-flower → intricate array of glowing petals and gears.
 - Quakemaw: stout jaw-heavy lizard with a glowing throat → armored reptile with shovel underbite → friendly earth-dragon with crystal teeth.

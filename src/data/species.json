@@ -21,8 +21,8 @@
     "types": ["verdant"],
     "forms": [
       { "form": 1, "name": "Brambletrundle", "emoji": "🌿", "art": "chaotic rolling ball of thorny vines and glowing bolts" },
-      { "form": 2, "name": "Briartread", "emoji": "🚜", "art": "tank-like creature on tracks of thorns" },
-      { "form": 3, "name": "Thicketroll", "emoji": "🌾", "art": "massive affectionate tumbleweed of vines" }
+      { "form": 2, "name": "Briarburl", "emoji": "🪵", "art": "bigger, sturdier mossy tumbleweed golem: a vine ball around a wooden core, with moss, small white flowers, bark arms and clawed feet" },
+      { "form": 3, "name": "Thicketroll", "emoji": "🌾", "art": "ancient, hulking, gentle wood-and-vine giant with tree-trunk arms and legs and a small kind face" }
     ],
     "primarySkill": "woodcutting",
     "secondaryAptitude": "fabrication",
