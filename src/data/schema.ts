@@ -245,6 +245,8 @@ export const ModifierSchema = z.strictObject({
 // ---------- tuning.json ----------
 
 const ByForm = z.strictObject({ '1': z.number(), '2': z.number(), '3': z.number() })
+const SpriteFraction = z.number().gt(0).lte(1)
+const SpriteScale = z.strictObject({ '1': SpriteFraction, '2': SpriteFraction, '3': SpriteFraction })
 const Curve = z.strictObject({ base: Positive, growth: z.number().min(1) })
 // combat.tempo is empty until phase 3 authors the combat numbers (plan.md 3.10 ships them as `{}`).
 const TempoSchema = z.strictObject({ effectMultiplier: Positive.optional(), cooldownMs: PosInt.optional() })
@@ -303,6 +305,10 @@ export const TuningSchema = z.strictObject({
   // changes what a player earns (same rule as aether.benchEmissionTickMs).
   // shinyHueDeg is the runtime CSS hue rotation on a shiny's art (CLAUDE.md rule 4: never a separate asset). It must
   // sit strictly between 0 and 360, or a shiny would look exactly like a normal creature.
+  // spriteFormScale is how big a creature's sprite is drawn in its art tile, per form, as a fraction of the tile (1 fills it).
+  // The sprites are all cropped to their own bounding box, so without it a Form 1 chibi would fill the tile as much as a
+  // Form 3 and growth would not show. PLACEHOLDER, designer to adjust. Each factor is above 0 and at most 1 (a sprite
+  // never overflows its tile), and a later form is never smaller than an earlier one, so growth never runs backwards.
   // pacingMilestones are the extra skill levels the Settings "Skill milestones" table reports the time to, on top of
   // the levels the data already makes interesting (each skill's slot unlock levels and its max level). PLACEHOLDER,
   // designer to adjust: they change nothing in the game, only which rows that table shows. The table never has a row
@@ -310,6 +316,7 @@ export const TuningSchema = z.strictObject({
   ui: z.strictObject({
     tickMs: PosInt,
     shinyHueDeg: z.number().gt(0).lt(360),
+    spriteFormScale: SpriteScale.refine((s) => s['1'] <= s['2'] && s['2'] <= s['3'], 'a later form must not be drawn smaller than an earlier one'),
     activityPanelMax: PosInt,
     maxNotifications: PosInt,
     maxToasts: PosInt,

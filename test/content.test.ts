@@ -483,6 +483,24 @@ describe('loadContent rejects bad data instead of loading it', () => {
     for (const bad of [0, 360, -30, 400]) expect(problemsFor((r) => (r.tuning.ui.shinyHueDeg = bad)).join('\n'), String(bad)).toContain('tuning.json.ui.shinyHueDeg')
   })
 
+  it('requires tuning.ui.spriteFormScale to be three fractions above 0 and at most 1 that never shrink, so growth shows and a sprite never overflows its tile', () => {
+    const s = content.tuning.ui.spriteFormScale
+    expect([s['1'], s['2'], s['3']]).toEqual([0.72, 0.86, 1])
+    expect(problemsFor((r) => delete r.tuning.ui.spriteFormScale).join('\n')).toContain('tuning.json.ui.spriteFormScale')
+    for (const bad of [0, -0.5, 1.01, 2]) {
+      for (const form of ['1', '2', '3']) expect(problemsFor((r) => (r.tuning.ui.spriteFormScale[form] = bad)).join('\n'), `${form}: ${bad}`).toContain('tuning.json.ui.spriteFormScale')
+    }
+    // a later form drawn smaller than an earlier one would make growth run backwards
+    expect(problemsFor((r) => (r.tuning.ui.spriteFormScale = { '1': 0.9, '2': 0.8, '3': 1 })).join('\n')).toContain('tuning.json.ui.spriteFormScale')
+    expect(problemsFor((r) => (r.tuning.ui.spriteFormScale = { '1': 0.5, '2': 1, '3': 0.9 })).join('\n')).toContain('tuning.json.ui.spriteFormScale')
+    // equal is allowed (a designer may want two forms the same size), and so is a form key that is missing or extra: no
+    const raw = structuredClone(rawContent) as Loose
+    raw.tuning.ui.spriteFormScale = { '1': 0.8, '2': 0.8, '3': 0.8 }
+    expect(() => loadContent(raw)).not.toThrow()
+    expect(problemsFor((r) => delete r.tuning.ui.spriteFormScale['2']).join('\n')).toContain('tuning.json.ui.spriteFormScale')
+    expect(problemsFor((r) => (r.tuning.ui.spriteFormScale['4'] = 1)).join('\n')).toContain('tuning.json.ui.spriteFormScale')
+  })
+
   it('requires the notification numbers (activityPanelMax, maxNotifications, maxToasts, toastMs) to be positive whole numbers', () => {
     for (const key of ['activityPanelMax', 'maxNotifications', 'maxToasts', 'toastMs'] as const) {
       const value = content.tuning.ui[key]

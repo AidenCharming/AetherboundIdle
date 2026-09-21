@@ -15,6 +15,8 @@ designer's OK** before building, as the protocol asks.
 **Two UI sections are deliberately still missing and belong to later phases, not to Phase 2's first step:** the **Adventure** sidebar section (expeditions, Phase 3) and the **Collection** section (Phase 4). The
 shell was built in 1.9b with room for both; they appear with their screens.
 
+**Step 1.9e is done (2026-09-21): the first six sprites are in the game as a test** (its entry below says how to look at it: `npm run electron:start`, the Nexus page, and the Dev panel to grant an Emberfang). No exe was packed for it, so the 0.1.2 exes do not show the sprites. It waits for the designer's look; further sprites arrive by dropping files in `src/ui/assets/creatures/`.
+
 **Before that, one thing for the designer: run the manual checklist for 0.1.2** (see "Manual checklist for 0.1.2" below; the 0.1.1 list under it still applies where not superseded). It covers what is new in 1.9d and the things no automated test can
 reach: a toast over the glass, the real Save dialog from "Export a backup first", and the export/import round trip.
 
@@ -53,6 +55,8 @@ Things a fresh session should know before starting:
 - [x] 1.8t Tuning pass (designer's decision): skill max level 99 -> 250, skill XP curve 250 / 1.04, work-slot unlock levels 1/50/100/165/225. Data only; no new systems. *(2026-09-19)*
 - [x] 1.8b Rest of the dev panel (grant creature, add resources / Aether / gold, set skill level, reset save), bench and Aether-per-minute display with a Nexus tab, polish pass. **Phase 1 complete and playable.** *(2026-09-20; checkpoints A, B and C, each its own commit)*
 - [x] 1.9 Desktop wrapper: package the game as a Windows `.exe` (see "Desktop packaging" below). *(2026-09-20; checkpoint A the wrapper and its smoke test, B save export and import, C packaging; each its own commit)* **Step 1.9 is complete: 1.9b restyled the shell and 1.9c closed it with the play-time counter, the pacing retune, the background image and the 0.1.1 exe.**
+
+- [x] 1.9e The first six real sprites (Sproutlet and Emberfang, forms 1 to 3) shown in the game as a test, emoji kept as the fallback for everything else (designer's request, 2026-09-21). Presentation only: sprites found by file name, a dark art plate with a type-colour rim, a per-form scale (0.72 / 0.86 / 1.0) so growth shows, the shiny hue on the image. No exe packed, no version bump. *(2026-09-21; two commits: the art, then the code)*
 
 - [x] 1.9d Five small UI changes the designer asked for after trying 1.9c (2026-09-20). Presentation and small UI actions only: no sim change, no save-format change. (1) Glassy panels and the control-edge decision (done, see below), (2) merge the Roster and Nexus pages into one page called Nexus (done, see below), (3) the milestone table skips level 1 and shows level 2 (done, see below), (4) a Delete save section for players (done, see below), (5) rebuild the exe as 0.1.2 (done, see below). Each numbered item is its own commit. **Done 2026-09-21: 821 tests pass at the commit the 0.1.2 exes were built from, and step 1.9 stays complete.** *(2026-09-20 to 2026-09-21)*
 - [x] 1.9c Play-time counter and level-reached timestamps (save version 2, the first real migration), the pacing retune (skill curve growth 1.04 -> 1.045), the background image, and the exe rebuilt as 0.1.1 (designer's requests, 2026-09-20). **It closes step 1.9, and with it Phase 1.** Five checkpoints, each its own commit: A the play-time counter, B the level-reached timestamps, C the pacing retune, D the background image, E verification and the exe rebuild. *(2026-09-20)*
@@ -1749,6 +1753,42 @@ a modal dialog: it showed the page behind the open delete dialog, though the DOM
   Disabled buttons ("Clear filters" and "Reset sort" with nothing to clear) are now visibly dimmed.
 
 **Could not verify.** Toasts over the glass (they are opaque, unchanged; still on the manual checklist). The native Save dialog when "Export a backup first" is pressed in the packaged app (in the browser the download was captured and named, not saved). The installer itself, and the packaged window on a real screen. Blur cost on a weak GPU. A real phone.
+
+### 2026-09-21, step 1.9e: the first six real sprites in the game, as a test (designer's request; emoji stays the fallback)
+
+The designer dropped six transparent 512 px PNGs in `src/ui/assets/creatures/` (`sproutlet-f1/f2/f3.png`, `emberfang-f1/f2/f3.png`, AI-generated, record in `docs/art-pipeline.md`) and asked to see them in the game. Presentation only: no sim change, no save change, no version bump, **no exe packed** (the 0.1.2 exes do not contain the sprites; test with `npm run electron:start`). Two commits: the art alone, then the code.
+
+**Adding a sprite needs no code and no data.** `ui/sprites.ts` globs `assets/creatures/*.png` (eager, `?url`) and `spriteFor(speciesId, form)` returns the URL of `<id>-f<form>.png`, or `null`. The 45 later sprites are dropped in the folder and appear. The built JS resolves each file with `new URL(name, import.meta.url)`, i.e. relative to the script, so it loads from `file://` like the background image (checked in real Electron, see below).
+
+**The three growth factors** (`tuning.ui.spriteFormScale`, zod schema in `data/schema.ts`, PLACEHOLDERS): **Form 1 = 0.72, Form 2 = 0.86, Form 3 = 1.0** of the art plate (its inner box, inside the rim and a 4 px inset). The schema requires each to be above 0 and at most 1 and never to shrink from one form to the next. Measured in the browser: the sprites are drawn at exactly 0.72, 0.86 and 1.0 of the plate, and all sit inside it.
+
+What changed:
+- `CreatureView` (selectors) carries `speciesId` (the species or hybrid id, whatever the form); `spriteScaleFor(form)` is the one selector for the factor.
+- `ui/components/CreatureArt.tsx`: an `<img>` (`alt=""`, `draggable=false`, `object-fit: contain`, `decoding="async"`) when a sprite exists, else the emoji (`aria-hidden`). Used for the Nexus card's art tile and the slot's creature. **Left alone, as asked:** emoji inside running text (the "replaces 🌳 Name" line, the Assign and Replace-with buttons) and the small emoji on the sidebar's Current activity panel.
+- **The plate** (`.art-plate` in `theme.css`, token `--art-plate`): an opaque near-black tile, with the type colour as a 3 px rim (a hybrid's rim is split in two colours, as its old tile was). The card's rarity frame, tint and glow are unchanged. The plate is used for the **emoji fallback too**, so every art tile looks the same whether or not its creature has a sprite.
+- **Shiny:** the same `filter: hue-rotate(var(--shiny-hue))` with the same tuned `tuning.ui.shinyHueDeg` (150), on the `<img>` or the emoji. `CreatureArt` sets `--shiny-hue` itself, so it is no longer in `cardStyle`. No separate shiny art.
+
+Decisions of mine (all presentation, all reversible; say if you want any of them different):
+1. **Bigger tiles so the sprites read:** the card's art tile went 84 px -> 112 px tall (an opened card's 96 px -> 120 px wide), and the slot's creature tile from a 44 px circle to a **64 px rounded square** (a circle would clip a sprite's corners).
+2. **At 375 px the slot's Unassign button now wraps under the creature's name** for a name as long as "Lumbercrown" (needs 315 px, 305 available; the 20 px bigger tile caused it). It wraps by design and stays 44 px tall.
+3. **A shiny in a slot is now hue-shifted too**; the slot's emoji was never shifted before (only the Nexus card's). One component draws both now.
+4. The emoji is one size for every form (0.6 of the plate); only sprites scale with the form.
+
+**Dev panel:** it already grants any species (Emberfang included), any form 1 to 3, any rarity and a shiny flag, so **no dev-only control was added**.
+
+**Tests** (`npm run build` clean; **835 tests pass**, 821 before; `test/sprites.test.ts` is new, plus one case in `content.test.ts`): every file in the folder is named `<known species or hybrid id>-f<1..3>.png` (checked by breaking it: a misspelt id `emberfnag-f2.png` and a wrong-case `Sproutlet-f3.png` each fail the build), the name check itself rejects 12 kinds of typo, `spriteFor` returns a URL for the six and `null` for anything else (a species with no file, an unknown id, forms 0, 4, 1.5, NaN, a wrong case or a prefix), the glob misses no file, `CreatureView.speciesId` for a species and a hybrid, `CreatureArt` rendered to a string in node (the sprite at each form's scale, the emoji fallback, the shiny turn on both, the same file for a shiny), and the schema for `spriteFormScale` (out of range, shrinking, missing or extra form). The PNG-signature test in `assets.test.ts` still passes on the new folder.
+
+**Verified in the Browser pane** (dev server, a throw-away save in the pane's own storage; the Dev panel granted 6 sprite creatures, one of each other type, a hybrid, and 3 shinies, 15 in all), at 1280 and 375 px:
+- Nexus page: every sprite loaded at 512 px; growth shows from Form 1 to 3 in both species; the plate reads on the Verdant green and Pyric orange sprites; the four types with no sprite yet (Telluric, Aqueous, Voltaic, Void) and the hybrid (Emberbark, with its split rim) show their emoji on the same plate; the name, level, form, rarity, badge and Aether lines are unchanged and read cleanly at both widths (two columns at 375, no horizontal overflow, `scrollWidth` 375). An opened card at 375: the plate is 120 x 100 with the sprite inside it.
+- Skill page (Woodcutting) with a shiny Lumbercrown in the slot, at 1280 and 375. Shiny sprites and a shiny emoji are hue-shifted (`hue-rotate(150deg)`, measured).
+- No console error and no server error.
+- **From `file://` in real Electron** (the built `dist/`, a throw-away profile, nothing touching the real save): the sprite URL is `file:///.../dist/assets/sproutlet-f1-<hash>.png`, it decodes at 512 x 512 and paints, no console error. `npm run electron:smoke` passes (load, progress, single instance, and the background image still loads from `file://`).
+
+**Could not verify.** (1) **The plate on the four types with no sprite yet**: only Verdant and Pyric sprites exist, so the Telluric, Aqueous, Voltaic and Void plates were checked with their emoji, not with art. The plate is neutral and only the rim colour differs, but the first sprite of each of those types is worth a look. (2) **Some placeholder emoji are dark and low-contrast on the dark plate**, for example Penumbrum's black hole (Eclipsa Form 3): visible, but dim; they go away as sprites arrive. (3) `decoding="async"` means a card can show an empty plate for a frame or two the first time the Nexus opens (a hidden Electron window photographed straight after load showed exactly that; a real window paints it). (4) A **one-off failure** of `npm run electron:smoke`'s progress check (the second XP read after the reload came back empty) was seen once and **did not reproduce in 4 later runs** (3 solo, 1 full); nothing in it touches art, but I did not run it against the previous commit to prove it is old. (5) A real screen, the installer, other browsers, a real phone. (6) Memory and load time with all 45 more sprites: each is a 512 px PNG (150 to 290 KB) bundled as its own file; about 12 MB of art in `dist/` once all 51 are in.
+
+**For the designer.** Look at it with `npm run electron:start`: open **Nexus** (the CREATURES section) for the cards, and **Woodcutting** for a slot. Your real save has one Sproutlet, so: **Settings -> turn on Dev panel**, then **Dev -> Grant creature** (Emberfang, any rarity, Form 1 / 2 / 3, tick Shiny for a shiny) and look at the Nexus. The Dev panel is dev-only (off by default); the granted creatures stay in your real save, so use Dev -> Reset save if you want them gone.
+
+**Next session name:** `Aetherbound P2 · 2.0 Phase 2 plan (Opus)` (Phase 2 planning, per "Next up"). If the sprites need changes first: `Aetherbound P1 · 1.9f Sprite feedback (Sonnet)`.
 
 ## Manual checklist for 0.1.2 (designer)
 

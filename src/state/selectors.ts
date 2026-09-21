@@ -55,6 +55,12 @@ export const uiTickMs: number = content.tuning.ui.tickMs
 /** The CSS hue rotation, in degrees, that makes a shiny's art differ from a normal one (tuning.ui.shinyHueDeg). */
 export const shinyHueDeg: number = content.tuning.ui.shinyHueDeg
 
+/** How much of its art tile a creature's sprite fills in this form, 0 to 1 (tuning.ui.spriteFormScale). Growth shows because it rises with the form. */
+export function spriteScaleFor(form: number): number {
+  const scale = content.tuning.ui.spriteFormScale
+  return form >= 3 ? scale['3'] : form === 2 ? scale['2'] : scale['1']
+}
+
 /** How many running slots the sidebar's activity panel lists before it says "+N more" (tuning.ui.activityPanelMax). */
 export const activityPanelMax: number = content.tuning.ui.activityPanelMax
 
@@ -591,6 +597,8 @@ export interface CreatureView {
   id: string
   /** The number in `creature-<n>`: the roster's sort tiebreak. */
   seq: number
+  /** The id of the species or hybrid it belongs to, whatever form it is in (`sproutlet`, `ashwood`): what its sprite is looked up by. */
+  speciesId: string
   /** The name of its current form (Sproutlet, later Timberhorn). */
   name: string
   /** The species or hybrid it belongs to, whatever form it is in. */
@@ -643,6 +651,7 @@ function buildCreatureView(creature: Creature): CreatureView {
   return {
     id: creature.id,
     seq: creatureSeq(creature.id),
+    speciesId: creature.speciesId,
     name: form?.name ?? creature.speciesId,
     speciesName: def?.name ?? creature.speciesId,
     isHybrid: creature.isHybrid,

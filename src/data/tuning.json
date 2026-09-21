@@ -29,6 +29,7 @@
   "ui": {
     "tickMs": 100,
     "shinyHueDeg": 150,
+    "spriteFormScale": { "1": 0.72, "2": 0.86, "3": 1.0 },
     "activityPanelMax": 3,
     "maxNotifications": 50,
     "maxToasts": 3,

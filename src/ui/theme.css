@@ -40,6 +40,9 @@
      through it. */
   --panel-solid: #141920;
   --panel-high: #232b36;
+  /* The plate behind a creature's art (.art-plate): OPAQUE and darker than every surface above, so a sprite of any colour
+     reads on it. A green creature on a Verdant-green tile vanished, so the type colour is the plate's rim, not its fill. */
+  --art-plate: #090c10;
   --line: #262e39;
   --line-strong: #37414f;
   /* The edge of a glass surface: a hairline of light, so a card is bounded by an edge and not by a dark fill. Purely
@@ -950,16 +953,11 @@ button.danger {
   min-width: 0;
 }
 
-.creature-emoji {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  font-size: 1.6rem;
-  border-radius: 50%;
-  border: 2px solid var(--accent);
-  background: var(--panel-raised);
+/* The creature in a slot: the art plate (below) at a fixed size, so the sprite is big enough to read. */
+.creature-plate {
   flex: none;
+  width: 64px;
+  height: 64px;
 }
 
 .slot-progress {
@@ -1238,27 +1236,54 @@ button.danger {
   flex-direction: row;
 }
 
-.rcard-art {
+/* The ART PLATE (CreatureArt.tsx draws inside it): an opaque dark tile, not the see-through glass, with the creature's type
+   colour as its rim (--type-a / --type-b, from cardStyle.ts: a hybrid's rim is split, a single type's is whole). Sprites are
+   transparent PNGs of any colour, so the fill has to be neutral; the rim is what says the type. It is a size container so the
+   art can be sized against the plate (`cqmin`) whether the plate's size is fixed (a slot) or stretched (an open card), and so
+   the art's own size never decides the plate's. */
+.art-plate {
+  container-type: size;
   display: grid;
   place-items: center;
-  height: 84px;
-  background: linear-gradient(135deg, var(--type-a) 50%, var(--type-b) 50%);
+  padding: 4px;
+  overflow: hidden;
+  border: 3px solid transparent;
+  border-radius: var(--radius-sm);
+  background:
+    linear-gradient(var(--art-plate), var(--art-plate)) padding-box,
+    linear-gradient(135deg, var(--type-a) 50%, var(--type-b) 50%) border-box;
+}
+
+/* A sprite is drawn at a fraction of the plate that grows with the form (--sprite-scale, tuning.ui.spriteFormScale), so a
+   Form 1 does not fill the tile as much as a Form 3. The emoji fallback is one fixed size for every form. */
+img.creature-art {
+  display: block;
+  width: calc(100cqmin * var(--sprite-scale));
+  height: calc(100cqmin * var(--sprite-scale));
+  object-fit: contain;
+  user-select: none;
+}
+
+.creature-art-emoji {
+  font-size: calc(100cqmin * 0.6);
+  line-height: 1;
+}
+
+/* A shiny is the same art with its hue turned by the tuned amount (--shiny-hue), sprite or emoji: no separate asset. */
+.creature-art[data-shiny='true'] {
+  filter: hue-rotate(var(--shiny-hue));
+}
+
+.rcard-art {
+  height: 112px;
+  margin: 8px 8px 0;
 }
 
 .rcard[data-expanded='true'] .rcard-art {
   flex: none;
-  width: 96px;
+  width: 120px;
   height: auto;
-}
-
-.rcard-emoji {
-  font-size: 3rem;
-  line-height: 1;
-}
-
-/* A shiny is the same art with its hue turned by the tuned amount: no separate asset. */
-.rcard[data-shiny='true'] .rcard-emoji {
-  filter: hue-rotate(var(--shiny-hue));
+  margin: 8px 0 8px 8px;
 }
 
 .rcard-body {

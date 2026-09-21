@@ -14,9 +14,11 @@ import {
   selectSlotResourceId,
   skillInfo,
 } from '../../state/selectors'
-import { cssVars, formatCount, formatSeconds } from '../format'
+import { formatCount, formatSeconds } from '../format'
+import { CreatureArt } from './CreatureArt'
 import { ProgressBar } from './ProgressBar'
 import { ResourceIcon } from './ResourceIcon'
+import { cardStyle } from './cardStyle'
 
 interface Slot {
   skillId: string
@@ -27,9 +29,9 @@ function Creature({ creatureId }: { creatureId: string }) {
   const view = useGameStore((s) => selectCreatureView(s, creatureId))
   if (!view) return null
   return (
-    <span className="creature" style={cssVars({ '--accent': view.color })}>
-      <span className="creature-emoji" aria-hidden="true">
-        {view.emoji}
+    <span className="creature" style={cardStyle(view)}>
+      <span className="creature-plate art-plate" aria-hidden="true">
+        <CreatureArt view={view} />
       </span>
       <span>
         <strong>{view.name}</strong> <span className="muted">Lv {view.level}</span>

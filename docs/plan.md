@@ -393,7 +393,7 @@ is a data change, not a code change.
   },
   "save": { "version": 2, "autosaveMs": 15000 },
   "ui": {
-    "tickMs": 100, "shinyHueDeg": 150, "activityPanelMax": 3,
+    "tickMs": 100, "shinyHueDeg": 150, "spriteFormScale": { "1": 0.72, "2": 0.86, "3": 1.0 }, "activityPanelMax": 3,
     "maxNotifications": 50, "maxToasts": 3, "toastMs": 5000,
     "pacingMilestones": [2, 10, 25, 50, 100, 150, 200]
   }
@@ -426,6 +426,10 @@ Two knobs in this file are easy to misread, so they are pinned down here:
 - `ui.shinyHueDeg` (150) is the CSS `hue-rotate` applied at runtime to a shiny creature's art. It is never a
   separate asset (CLAUDE.md rule 4). Must be strictly between 0 and 360, or a shiny would look like a normal
   creature. Presentation only. Added at step 1.7 (PLACEHOLDER value).
+- `ui.spriteFormScale` (0.72 / 0.86 / 1.0, by form) is how much of its art plate a creature's sprite fills, so growth shows although every sprite is
+  cropped to its own bounding box. Each factor is above 0 and at most 1 and a later form is never smaller than an earlier one. Presentation
+  only. Added at step 1.9e (PLACEHOLDER values). Sprites themselves are found by file name, `src/ui/assets/creatures/<species or hybrid id>-f<form>.png`,
+  not by data (`ui/sprites.ts`); a creature with no file keeps its emoji.
 - `ui.activityPanelMax` (3), `ui.maxNotifications` (50), `ui.maxToasts` (3) and `ui.toastMs` (5000) are the notification UI's
   numbers (step 1.9b, all PLACEHOLDERS, all positive whole numbers, none of them read by the sim). `activityPanelMax` is how many
   running slots the sidebar's "Current activity" panel lists before it says "+N more". `maxNotifications` bounds the bell's list

@@ -9,6 +9,7 @@ import {
   type CreatureView,
 } from '../../state/selectors'
 import { formatRate } from '../format'
+import { CreatureArt } from './CreatureArt'
 import { cardStyle } from './cardStyle'
 
 type Outcome = { ok: true } | { ok: false; reason: string }
@@ -172,8 +173,8 @@ export const RosterCard = memo(function RosterCard({
   return (
     <li className="rcard" data-expanded={expanded} data-shiny={view.shiny} data-rarity={view.rarity.id} style={style}>
       <button type="button" className="rcard-toggle" aria-expanded={expanded} aria-controls={detailsId} onClick={() => onToggle(view.id)}>
-        <span className="rcard-art" aria-hidden="true">
-          <span className="rcard-emoji">{view.emoji}</span>
+        <span className="rcard-art art-plate" aria-hidden="true">
+          <CreatureArt view={view} />
         </span>
         <span className="rcard-body">
           <span className="rcard-name">
