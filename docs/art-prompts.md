@@ -13,7 +13,7 @@ Generated 2026-09-21 from `D:\AI\tools\build_prompts.py` (edit the table there, 
 ## How to use these
 
 Two graphs in ComfyUI, both with **klein 4B distilled**:
-1. **Form 1**: the *Flux.2 [Klein] 4B Text to Image* graph, **4 steps, CFG 1.0**, 1024x1024, run **5**. Paste the Form 1 prompt, pick the best, save it as `D:\AI\sprites\approved\<id>-f1.png`.
+1. **Form 1**: the *Flux.2 [Klein] 4B Text to Image* graph, **8 steps, CFG 1.0**, 1024x1024, run **5**. Paste the Form 1 prompt, pick the best, save it as `D:\AI\sprites\approved\<id>-f1.png`.
 2. **Form 2**: the *edit* graph (4B files swapped in), **8 steps, CFG 1.0**, reference = the approved Form 1, run **5**, paste the Form 2 prompt. Approve as `<id>-f2.png`.
 3. **Form 3**: the same edit graph, reference = the approved Form 2. Approve as `<id>-f3.png`.
 
@@ -116,7 +116,7 @@ Redraw the same character as the reference image as its final form, an ancient, 
 
 `id: mossgear` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-green | note: Mechanical: a candidate to retest with the base model (see art-pipeline.md).
 
-**Form 1, Mossgear** (text to image, 4 steps, CFG 1.0, file `mossgear-f1.png`)
+**Form 1, Mossgear** (text to image, 8 steps, CFG 1.0, file `mossgear-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-green outlines and vibrant saturated colours. A small round fuzzy sphere covered in soft bright-green moss, shaped like a cog with short rounded gear teeth around its rim, a small brass gear set into the middle of its forehead, two big round friendly amber eyes, a tiny smile and two tiny stubby feet. Three-quarter view facing left, sitting on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -133,7 +133,7 @@ Redraw the same character as the reference image as its final form, a gentle lum
 
 `id: petalsprocket` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-green | note: Keep the petals cream, yellow and orange, never pink (pink is near the magenta key).
 
-**Form 1, Petalsprocket** (text to image, 4 steps, CFG 1.0, file `petalsprocket-f1.png`)
+**Form 1, Petalsprocket** (text to image, 8 steps, CFG 1.0, file `petalsprocket-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-green outlines and vibrant saturated colours. A small flower creature hovering in the air: a round soft-yellow face at the centre with two big round dark-green eyes and a tiny smile, ringed by six pale-yellow and white petals each trimmed with a thin silver metal edge, a short green stem body with two small leaf hands, and a small brass sprocket gear on its back. Three-quarter view facing left, hovering in mid-air, floating upright, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -150,7 +150,7 @@ Redraw the same character as the reference image as its final form, an intricate
 
 `id: quakemaw` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-brown
 
-**Form 1, Quakemaw** (text to image, 4 steps, CFG 1.0, file `quakemaw-f1.png`)
+**Form 1, Quakemaw** (text to image, 8 steps, CFG 1.0, file `quakemaw-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A stout little lizard with a big square jaw and a wide friendly grin, grey-brown rocky-textured skin with small pebble-like bumps, big round golden-yellow eyes, a bright amber-orange throat pouch, short thick legs with stubby claws and a short thick tail. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -167,7 +167,7 @@ Redraw the same character as the reference image as its final form, a friendly e
 
 `id: geodecore` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-brown
 
-**Form 1, Geodecore** (text to image, 4 steps, CFG 1.0, file `geodecore-f1.png`)
+**Form 1, Geodecore** (text to image, 8 steps, CFG 1.0, file `geodecore-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A round hollow grey-brown stone orb with a rough surface, two big round dark eyes on the upper front of the stone, and a single small pale-blue crystal held in a round opening in the front centre, like a stone shell cradling a gem. Three-quarter view facing left, floating in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -184,7 +184,7 @@ Redraw the same character as the reference image as its final form, a bright cry
 
 `id: pebblescoot` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-brown | note: Many legs and long body: needs a wide frame, and may need the fit-to-frame margin raised.
 
-**Form 1, Pebblescoot** (text to image, 4 steps, CFG 1.0, file `pebblescoot-f1.png`)
+**Form 1, Pebblescoot** (text to image, 8 steps, CFG 1.0, file `pebblescoot-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small skittish round beetle with a slate-grey shell made of layered shale plates, six small stubby legs, two big round dark eyes, two short antennae and a nervous little smile. Three-quarter view facing left, standing on six legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -201,7 +201,7 @@ Redraw the same character as the reference image as its final form, a gentle pla
 
 `id: tuskcub` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-brown
 
-**Form 1, Tuskcub** (text to image, 4 steps, CFG 1.0, file `tuskcub-f1.png`)
+**Form 1, Tuskcub** (text to image, 8 steps, CFG 1.0, file `tuskcub-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A playful chubby young boar piglet with tan-brown bristly fur, a cream belly, big round friendly dark eyes, a round brown snout, two tiny pale-blue crystal tusks, small hooves and a short curly tail. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -222,7 +222,7 @@ Redraw the same character as the reference image as its final form, a proud wool
 
 `id: cinderpup` | key: **magenta #FF00FF** | ratio: **cute** | outline: dark red-brown | note: Design says "stays cute": milder ratio ladder.
 
-**Form 1, Cinderpup** (text to image, 4 steps, CFG 1.0, file `cinderpup-f1.png`)
+**Form 1, Cinderpup** (text to image, 8 steps, CFG 1.0, file `cinderpup-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small hyperactive round puppy with charcoal-grey fur, an orange belly and paws, big round dark eyes, floppy ears, a happy open mouth with its tongue out, and a short tail ending in a tiny orange flame-shaped tuft drawn as a crisp flat shape. Three-quarter view facing left, standing on all four legs with its tail up, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -239,7 +239,7 @@ Redraw the same character as the reference image as its final form, a majestic h
 
 `id: roastbelly` | key: **magenta #FF00FF** | ratio: **cute** | outline: dark red-brown | note: Chubby species: milder ratio ladder.
 
-**Form 1, Roastbelly** (text to image, 4 steps, CFG 1.0, file `roastbelly-f1.png`)
+**Form 1, Roastbelly** (text to image, 8 steps, CFG 1.0, file `roastbelly-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A round, sleepy little salamander with plump orange-red skin, half-closed sleepy eyes with a contented smile, a warm cream-orange belly, four stubby legs and a short thick tail. Three-quarter view facing left, sitting on its belly on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -256,7 +256,7 @@ Redraw the same character as the reference image as its final form, a massive af
 
 `id: charwhisk` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Charwhisk** (text to image, 4 steps, CFG 1.0, file `charwhisk-f1.png`)
+**Form 1, Charwhisk** (text to image, 8 steps, CFG 1.0, file `charwhisk-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round bird with charcoal-black and orange feathers, a small red crest tuft, big round amber eyes, a small orange beak, thin legs, and a tail shaped like a wire kitchen whisk with a few small orange embers caught in its loops. Three-quarter view facing left, standing on two thin legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -273,7 +273,7 @@ Redraw the same character as the reference image as its final form, a fire-peaco
 
 `id: dewdrop` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark navy-blue | note: Keep it opaque. Anything see-through lets the key colour bleed in and ruins the cut-out.
 
-**Form 1, Dewdrop** (text to image, 4 steps, CFG 1.0, file `dewdrop-f1.png`)
+**Form 1, Dewdrop** (text to image, 8 steps, CFG 1.0, file `dewdrop-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A round bead-shaped blob of glossy light-blue jelly, drawn as a solid opaque body with a few white highlight shapes painted on it, two big round dark-blue eyes and a tiny smile. Three-quarter view facing left, resting on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -290,7 +290,7 @@ Redraw the same character as the reference image as its final form, a serene loo
 
 `id: puddlescoop` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark navy-blue
 
-**Form 1, Puddlescoop** (text to image, 4 steps, CFG 1.0, file `puddlescoop-f1.png`)
+**Form 1, Puddlescoop** (text to image, 8 steps, CFG 1.0, file `puddlescoop-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small round blue-green amphibian with big round yellow eyes and a wide mouth, wearing a small wooden bucket on its head with a little water inside, short stubby legs with webbed feet. Three-quarter view facing left, sitting like a frog, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -307,7 +307,7 @@ Redraw the same character as the reference image as its final form, a gentle gia
 
 `id: frothsprite` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark navy-blue | note: Foam is pale and near-white: check the cut-out edges.
 
-**Form 1, Frothsprite** (text to image, 4 steps, CFG 1.0, file `frothsprite-f1.png`)
+**Form 1, Frothsprite** (text to image, 8 steps, CFG 1.0, file `frothsprite-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small bubbly seafoam spirit, a cloud of round white and pale-aqua bubbles each with its own outline, a small round face with two big round aqua eyes and a giggling open mouth, and two tiny foam hands. Three-quarter view facing left, floating in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -324,7 +324,7 @@ Redraw the same character as the reference image as its final form, a serene, ai
 
 `id: splashfin` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark navy-blue | note: Mechanical: a candidate to retest with the base model (see art-pipeline.md).
 
-**Form 1, Splashfin** (text to image, 4 steps, CFG 1.0, file `splashfin-f1.png`)
+**Form 1, Splashfin** (text to image, 8 steps, CFG 1.0, file `splashfin-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small round robotic fish with a blue-and-silver metal body held together with small rivets, two big round curious eyes, a wide friendly mouth, a small fan-shaped tail fin and two little side fins. Three-quarter view facing left, swimming pose, floating in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -341,7 +341,7 @@ Redraw the same character as the reference image as its final form, a mechanical
 
 `id: voltfluff` | key: **magenta #FF00FF** | ratio: **cute** | outline: dark brown | note: Design says "stays cute": milder ratio ladder. Lightning is painted on the wool, never floating around it.
 
-**Form 1, Voltfluff** (text to image, 4 steps, CFG 1.0, file `voltfluff-f1.png`)
+**Form 1, Voltfluff** (text to image, 8 steps, CFG 1.0, file `voltfluff-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A small Pomeranian-like ball of fluffy cream and yellow fur in spiky tufts, big round dark eyes, a small black nose, small pointed ears, a curled fluffy tail and a few small yellow zigzag lightning marks painted in the fur. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -358,7 +358,7 @@ Redraw the same character as the reference image as its final form, a majestic f
 
 `id: joulebug` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark brown
 
-**Form 1, Joulebug** (text to image, 4 steps, CFG 1.0, file `joulebug-f1.png`)
+**Form 1, Joulebug** (text to image, 8 steps, CFG 1.0, file `joulebug-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A tiny round bug with a glossy yellow-and-black striped shell, two long thin antennae, big round friendly eyes, six tiny legs, and a small round bright-yellow bulb at the tip of its tail. Three-quarter view facing left, standing on six legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -375,7 +375,7 @@ Redraw the same character as the reference image as its final form, a friendly s
 
 `id: plasmaplug` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark brown | note: Mechanical: a candidate to retest with the base model (see art-pipeline.md).
 
-**Form 1, Plasmaplug** (text to image, 4 steps, CFG 1.0, file `plasmaplug-f1.png`)
+**Form 1, Plasmaplug** (text to image, 8 steps, CFG 1.0, file `plasmaplug-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A small snake with a bright-yellow body marked with dark stripes, big round curious eyes, and a two-pronged electric plug at the tip of its tail, which it is looking back at. Three-quarter view facing left, coiled up with its head turned back toward its own tail, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -392,7 +392,7 @@ Redraw the same character as the reference image as its final form, a gentle cob
 
 `id: coilchirp` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark brown
 
-**Form 1, Coilchirp** (text to image, 4 steps, CFG 1.0, file `coilchirp-f1.png`)
+**Form 1, Coilchirp** (text to image, 8 steps, CFG 1.0, file `coilchirp-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A small round songbird with a body wrapped in coppery wire coils, a yellow chest, big round dark eyes, a small dark beak open mid-chirp, and a coiled wire tail. Three-quarter view facing left, perched on two thin legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -409,7 +409,7 @@ Redraw the same character as the reference image as its final form, an electric 
 
 `id: eclipsa` | key: **green #00FF00** | ratio: **structure** | outline: dark indigo | note: Void: green key, mid-violet body (reads on the dark plate). Keep the rim and rings crisp, not soft.
 
-**Form 1, Eclipsa** (text to image, 4 steps, CFG 1.0, file `eclipsa-f1.png`)
+**Form 1, Eclipsa** (text to image, 8 steps, CFG 1.0, file `eclipsa-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A silent floating flat round disc in rich mid-violet with lighter lavender highlights, seen at a three-quarter angle, with a thin crisp pale-lavender rim, two calm round pale-lavender eyes on its face and a small gentle mouth. Three-quarter view facing left, floating in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -441,7 +441,7 @@ Redraw the same character as the reference image as its final form, an elegant s
 
 `id: hushflutter` | key: **green #00FF00** | ratio: **structure** | outline: dark indigo | note: Void: green key, mid-violet body.
 
-**Form 1, Hushflutter** (text to image, 4 steps, CFG 1.0, file `hushflutter-f1.png`)
+**Form 1, Hushflutter** (text to image, 8 steps, CFG 1.0, file `hushflutter-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small round fuzzy moth in rich mid-violet with lighter lavender highlights, with two feathery antennae, big round pale-lavender eyes, small rounded wings marked with pale star spots at the tips, and tiny dangling legs. Three-quarter view facing left, hovering in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -458,7 +458,7 @@ Redraw the same character as the reference image as its final form, a four-winge
 
 `id: netherpod` | key: **green #00FF00** | ratio: **structure** | outline: dark indigo | note: Void: green key, mid-violet body.
 
-**Form 1, Netherpod** (text to image, 4 steps, CFG 1.0, file `netherpod-f1.png`)
+**Form 1, Netherpod** (text to image, 8 steps, CFG 1.0, file `netherpod-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small oval chrysalis pod made of rich mid-violet metallic plates with lighter lavender highlights, with two big round pale-lavender eyes on its front, a narrow strip of tiny pale stars painted across the plate below them, and two tiny feet. Three-quarter view facing left, standing upright on two tiny feet, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -477,7 +477,7 @@ Redraw the same character as the reference image as its final form, a slow void-
 
 `id: ashwood` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark brown
 
-**Form 1, Ashwood** (text to image, 4 steps, CFG 1.0, file `ashwood-f1.png`)
+**Form 1, Ashwood** (text to image, 8 steps, CFG 1.0, file `ashwood-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A small round bear cub with ash-grey and cream bark-textured fur, big round warm-brown eyes, small round ears, a tiny leafy green sprig on top of its head, thin orange ember cracks painted between its bark plates, and a short tail ending in a tiny flame-shaped leaf tuft drawn as a crisp flat shape. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -494,7 +494,7 @@ Redraw the same character as the reference image as its final form, a huge tree-
 
 `id: brambletide` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-green
 
-**Form 1, Brambletide** (text to image, 4 steps, CFG 1.0, file `brambletide-f1.png`)
+**Form 1, Brambletide** (text to image, 8 steps, CFG 1.0, file `brambletide-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-green outlines and vibrant saturated colours. A small round otter pup with teal-blue fur, a cream belly, big round dark-teal eyes, tiny round ears, a collar of small thorny green vines and leaves around its neck, and a flat tail with a leaf-shaped tip. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -511,7 +511,7 @@ Redraw the same character as the reference image as its final form, a huge wave-
 
 `id: sproutfault` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-brown
 
-**Form 1, Sproutfault** (text to image, 4 steps, CFG 1.0, file `sproutfault-f1.png`)
+**Form 1, Sproutfault** (text to image, 8 steps, CFG 1.0, file `sproutfault-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small round mountain goat kid with a grey-brown coat, a cream chin tuft, big round golden eyes, two tiny stone horns, a small green sapling sprouting between the horns, and small hooves. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -528,7 +528,7 @@ Redraw the same character as the reference image as its final form, a majestic c
 
 `id: mosscoil` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-green
 
-**Form 1, Mosscoil** (text to image, 4 steps, CFG 1.0, file `mosscoil-f1.png`)
+**Form 1, Mosscoil** (text to image, 8 steps, CFG 1.0, file `mosscoil-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-green outlines and vibrant saturated colours. A small round baby sloth with mossy bright-green fur, a cream face patch, big round dark eyes with a sleepy smile, long arms with small claws, and a small copper wire coil wound around one arm with a tiny yellow zigzag mark on it. Three-quarter view facing left, sitting on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -545,7 +545,7 @@ Redraw the same character as the reference image as its final form, a huge sloth
 
 `id: mudskulker` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark navy-blue
 
-**Form 1, Mudskulker** (text to image, 4 steps, CFG 1.0, file `mudskulker-f1.png`)
+**Form 1, Mudskulker** (text to image, 8 steps, CFG 1.0, file `mudskulker-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small round mudskipper, a fish with mottled brown-blue skin, big round bulging eyes on top of its head, a wide friendly mouth, two small front fins that work like stubby legs, and a small tail fin. Three-quarter view facing left, propped up on its front fins on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -562,7 +562,7 @@ Redraw the same character as the reference image as its final form, a huge bedro
 
 `id: quakeforge` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Quakeforge** (text to image, 4 steps, CFG 1.0, file `quakeforge-f1.png`)
+**Form 1, Quakeforge** (text to image, 8 steps, CFG 1.0, file `quakeforge-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round ape cub with a body of stone-grey rocky skin, orange ember cracks painted on its belly, big round amber eyes, a small flat nose, stubby arms with round fists, and a tiny smile. Three-quarter view facing left, sitting on the ground, leaning on its knuckles, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -579,7 +579,7 @@ Redraw the same character as the reference image as its final form, a huge crate
 
 `id: geodegrid` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-brown | note: Keep the crystals pale blue and amber, never pink.
 
-**Form 1, Geodegrid** (text to image, 4 steps, CFG 1.0, file `geodegrid-f1.png`)
+**Form 1, Geodegrid** (text to image, 8 steps, CFG 1.0, file `geodegrid-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small round hedgehog with a grey-brown body, a cream face and belly, big round dark eyes, a small dark nose, and a back covered in short pale-blue crystal quills with a thin copper wire wrapped around a few of them. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -596,7 +596,7 @@ Redraw the same character as the reference image as its final form, a huge prism
 
 `id: cinderbasin` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Cinderbasin** (text to image, 4 steps, CFG 1.0, file `cinderbasin-f1.png`)
+**Form 1, Cinderbasin** (text to image, 8 steps, CFG 1.0, file `cinderbasin-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round hippo calf with soft blue-grey skin, an orange-red belly, big round dark eyes, a wide round snout, tiny round ears, stubby legs, and a small shallow basin-shaped dip on its back holding a tiny puddle of water. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -613,7 +613,7 @@ Redraw the same character as the reference image as its final form, a huge hippo
 
 `id: embersurge` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Embersurge** (text to image, 4 steps, CFG 1.0, file `embersurge-f1.png`)
+**Form 1, Embersurge** (text to image, 8 steps, CFG 1.0, file `embersurge-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round foal with a warm orange-red coat, a bright-yellow lightning-shaped blaze down its face, big round amber eyes, and a small flame-shaped mane tuft and tail tuft drawn as crisp flat shapes. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -630,7 +630,7 @@ Redraw the same character as the reference image as its final form, a massive wa
 
 `id: brinecore` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark navy-blue
 
-**Form 1, Brinecore** (text to image, 4 steps, CFG 1.0, file `brinecore-f1.png`)
+**Form 1, Brinecore** (text to image, 8 steps, CFG 1.0, file `brinecore-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small round seal pup with a smooth blue-grey pelt, a cream belly, big round dark eyes, tiny whiskers, small flippers, a yellow lightning-shaped stripe along its flank, and a small round copper-and-blue core gem set in its chest. Three-quarter view facing left, resting on its belly with its head raised, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -647,7 +647,7 @@ Redraw the same character as the reference image as its final form, a huge bull 
 
 `id: eclipseed` | key: **green #00FF00** | ratio: **animal** | outline: dark indigo | note: Void: green key, mid-violet body. No green foliage, or it will fight the green key: leaves are deep violet.
 
-**Form 1, Eclipseed** (text to image, 4 steps, CFG 1.0, file `eclipseed-f1.png`)
+**Form 1, Eclipseed** (text to image, 8 steps, CFG 1.0, file `eclipseed-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small round owlet with rich mid-violet with lighter lavender highlights feathers, big round pale-lavender eyes, a small pale beak, tiny talons, and a small sprout on top of its head with one pale-gold bud on it, the sprout leaves deep violet. Three-quarter view facing left, perched on two legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -664,7 +664,7 @@ Redraw the same character as the reference image as its final form, a night-bloo
 
 `id: nullshale` | key: **green #00FF00** | ratio: **animal** | outline: dark indigo | note: Void: green key, mid-violet body.
 
-**Form 1, Nullshale** (text to image, 4 steps, CFG 1.0, file `nullshale-f1.png`)
+**Form 1, Nullshale** (text to image, 8 steps, CFG 1.0, file `nullshale-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small round pangolin with rich mid-violet with lighter lavender highlights skin covered in overlapping slate-grey shale scales, big round pale-lavender eyes, a small pointed snout, small claws and a short thick tail. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -681,7 +681,7 @@ Redraw the same character as the reference image as its final form, a huge cragg
 
 `id: gloamforge` | key: **green #00FF00** | ratio: **animal** | outline: dark indigo | note: Void: green key, mid-violet body (not black: black vanishes on the dark plate).
 
-**Form 1, Gloamforge** (text to image, 4 steps, CFG 1.0, file `gloamforge-f1.png`)
+**Form 1, Gloamforge** (text to image, 8 steps, CFG 1.0, file `gloamforge-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small round bull calf with glossy obsidian-like skin in rich mid-violet with lighter lavender highlights, thin dull orange ember cracks painted on its shoulders, big round pale-lavender eyes, small blunt horns and small hooves. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -698,7 +698,7 @@ Redraw the same character as the reference image as its final form, a huge furna
 
 `id: hushflow` | key: **green #00FF00** | ratio: **structure** | outline: dark indigo | note: Void: green key, mid-violet body.
 
-**Form 1, Hushflow** (text to image, 4 steps, CFG 1.0, file `hushflow-f1.png`)
+**Form 1, Hushflow** (text to image, 8 steps, CFG 1.0, file `hushflow-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small round octopus with a smooth body in rich mid-violet with lighter lavender highlights, marked with pale-blue stripes, big round pale-lavender eyes, a tiny smile and eight short stubby tentacles. Three-quarter view facing left, sitting on the ground, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -715,7 +715,7 @@ Redraw the same character as the reference image as its final form, a giant eleg
 
 `id: gridrift` | key: **green #00FF00** | ratio: **structure** | outline: dark indigo | note: Void: green key, mid-violet body. The endgame Aether-infrastructure creature.
 
-**Form 1, Gridrift** (text to image, 4 steps, CFG 1.0, file `gridrift-f1.png`)
+**Form 1, Gridrift** (text to image, 8 steps, CFG 1.0, file `gridrift-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark indigo outlines and vibrant saturated colours. A small floating cube of rich mid-violet with lighter lavender highlights metal with copper wire running along its edges, two big round pale-lavender eyes on its front face, a small yellow lightning mark, and no legs. Three-quarter view facing left, floating in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -734,7 +734,7 @@ Redraw the same character as the reference image as its final form, the great la
 
 `id: gravelnip` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-brown
 
-**Form 1, Gravelnip** (text to image, 4 steps, CFG 1.0, file `gravelnip-f1.png`)
+**Form 1, Gravelnip** (text to image, 8 steps, CFG 1.0, file `gravelnip-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small round crab with a slate-grey shell veined in teal, big round dark eyes on short stalks, one oversized claw and one small claw, six stubby legs, and a tiny blue puddle painted in a hollow of its shell. Three-quarter view facing left, standing on its legs, claws forward, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -751,7 +751,7 @@ Redraw the same character as the reference image as its final form, a huge bould
 
 `id: ripplesnap` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark olive-green
 
-**Form 1, Ripplesnap** (text to image, 4 steps, CFG 1.0, file `ripplesnap-f1.png`)
+**Form 1, Ripplesnap** (text to image, 8 steps, CFG 1.0, file `ripplesnap-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark olive-green outlines and vibrant saturated colours. A small round baby crocodile with a broad snout, mottled stone-grey and marsh-green skin, a short ridged back, big round golden eyes, a friendly closed-mouth smile with one tiny quartz-coloured tooth showing, and short stubby legs. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -768,7 +768,7 @@ Redraw the same character as the reference image as its final form, a huge ridge
 
 `id: cairnflit` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark-brown
 
-**Form 1, Cairnflit** (text to image, 4 steps, CFG 1.0, file `cairnflit-f1.png`)
+**Form 1, Cairnflit** (text to image, 8 steps, CFG 1.0, file `cairnflit-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small round bat with dusky brown fur, big round ears, big round dark eyes, small wings edged in thin copper thread, and a small quartz chime hanging at its throat. Three-quarter view facing left, hovering in mid-air with its wings half open, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -785,7 +785,7 @@ Redraw the same character as the reference image as its final form, a huge flux-
 
 `id: flintlamb` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark-brown
 
-**Form 1, Flintlamb** (text to image, 4 steps, CFG 1.0, file `flintlamb-f1.png`)
+**Form 1, Flintlamb** (text to image, 8 steps, CFG 1.0, file `flintlamb-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark-brown outlines and vibrant saturated colours. A small round lamb with a curly cream fleece, big round dark eyes, tiny spiral horns of banded stone, small hooves, and a few tiny yellow zigzag marks at the tips of its fleece. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -802,7 +802,7 @@ Redraw the same character as the reference image as its final form, a huge mesa-
 
 `id: coralpeep` | key: **green #00FF00** | ratio: **animal** | outline: dark red-brown | note: Pink creature: GREEN key (magenta would eat the feathers). Cut out with --bg #00FF00 and without --halo-strict.
 
-**Form 1, Coralpeep** (text to image, 4 steps, CFG 1.0, file `coralpeep-f1.png`)
+**Form 1, Coralpeep** (text to image, 8 steps, CFG 1.0, file `coralpeep-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round flamingo chick with fluffy rosy-pink feathers shading to orange at the tips, big round dark eyes, a short bent orange beak, thin legs, and a small ruffle of orange feathers on its tail. Three-quarter view facing left, standing on two thin legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure green background (#00FF00), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -819,7 +819,7 @@ Redraw the same character as the reference image as its final form, a majestic f
 
 `id: drizzlenub` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Drizzlenub** (text to image, 4 steps, CFG 1.0, file `drizzlenub-f1.png`)
+**Form 1, Drizzlenub** (text to image, 8 steps, CFG 1.0, file `drizzlenub-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round capybara pup with damp chestnut-brown fur, big round unbothered dark eyes, a blunt round snout, tiny round ears, short stubby legs, an orange-red patch on its belly, and a tiny white steam curl above its head drawn as a crisp outlined shape. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -836,7 +836,7 @@ Redraw the same character as the reference image as its final form, a huge baski
 
 `id: coalgrub` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark brown
 
-**Form 1, Coalgrub** (text to image, 4 steps, CFG 1.0, file `coalgrub-f1.png`)
+**Form 1, Coalgrub** (text to image, 8 steps, CFG 1.0, file `coalgrub-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark brown outlines and vibrant saturated colours. A small round firefly with a dark glossy shell, big round friendly dark eyes, two short antennae, six tiny legs, small folded wings, and a round amber-orange lamp-shaped patch on its belly with a thin blue line across it. Three-quarter view facing left, hovering in mid-air, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -853,7 +853,7 @@ Redraw the same character as the reference image as its final form, a huge blaze
 
 `id: boltkit` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark red-brown
 
-**Form 1, Boltkit** (text to image, 4 steps, CFG 1.0, file `boltkit-f1.png`)
+**Form 1, Boltkit** (text to image, 8 steps, CFG 1.0, file `boltkit-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark red-brown outlines and vibrant saturated colours. A small round fox kit with russet fur, a cream chest, big round dark eyes, pointed ears, a bushy tail tipped in bright orange, and a thick puffy ruff around its neck. Three-quarter view facing left, standing on all four legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -870,7 +870,7 @@ Redraw the same character as the reference image as its final form, a majestic f
 
 `id: eddyelver` | key: **magenta #FF00FF** | ratio: **structure** | outline: dark navy-blue
 
-**Form 1, Eddyelver** (text to image, 4 steps, CFG 1.0, file `eddyelver-f1.png`)
+**Form 1, Eddyelver** (text to image, 8 steps, CFG 1.0, file `eddyelver-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small eel with a smooth silver body, a rust-orange underside and pale-blue bands along it, big round friendly dark eyes, a small round face and a tiny tail fin. Three-quarter view facing left, curled in a loose S-shape with its head raised, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
@@ -887,7 +887,7 @@ Redraw the same character as the reference image as its final form, a huge elect
 
 `id: sprayfledge` | key: **magenta #FF00FF** | ratio: **animal** | outline: dark navy-blue
 
-**Form 1, Sprayfledge** (text to image, 4 steps, CFG 1.0, file `sprayfledge-f1.png`)
+**Form 1, Sprayfledge** (text to image, 8 steps, CFG 1.0, file `sprayfledge-f1.png`)
 ```
 A cute creature design for a mobile idle game, in a soft painterly digital illustration style with clean dark navy-blue outlines and vibrant saturated colours. A small round kingfisher chick with a cobalt-blue back, an amber chest, big round dark eyes, a long dark beak, and thin copper pinstripes on its wings. Three-quarter view facing left, perched on two thin legs, full body visible and centred, filling about 70 percent of the frame with clear margin. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no watermark.
 ```
