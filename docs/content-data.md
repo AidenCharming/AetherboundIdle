@@ -12,7 +12,7 @@ Form 1 uses the species name. Every species has 3 forms.
 | Sproutlet | Verdant | Timberhorn | Lumbercrown | Woodcutting | Overgrowth: chance for extra output [Moderate] | Guard | Leaf Shield (party shield) | Standard | Scavenging |
 | Brambletrundle | Verdant | Briarburl | Thicketroll | Woodcutting | Briar Patch: rare-drop chance within tier [Moderate] | Guard | Thorn Roll (thorns shield) | Standard | Fabrication |
 | Mossgear | Verdant | Mosscrank | Mossbastion | Herbalism | Lubricated Joints: cooldown reduction [Minor] | Health | Soothing Spores (instant party heal) | Quick | Fabrication |
-| Petalsprocket | Verdant | Bloomwheel | Blossomcrank | Herbalism | Pollinator: rare-drop chance within tier [Moderate] | Power | Rotor Gust (single-target, Verdant) | Standard | Scavenging |
+| Buzzbud | Verdant | Pollenwing | Bloomqueen | Herbalism | Pollinator: rare-drop chance within tier [Moderate] | Power | Rotor Gust (single-target, Verdant) | Standard | Scavenging |
 | Quakemaw | Telluric | Faultjaw | Craterchomp | Mining | Deep Excavator: rare-drop chance within tier [Moderate] | Power | Stone Crunch (single-target, Telluric) | Heavy | Scavenging |
 | Geodecore | Telluric | Crystalheart | Prismpulse | Mining | Resonant Frequency: aura, cooldown reduction for other active miners, strongest aura only [Minor] | Guard | Crystal Barrier (party Guard buff) | Standard | Fabrication |
 | Pebblescoot | Telluric | Shalestride | Bedrockbound | Mining | Rhythmic Tunnels: cooldown reduction [Minor] | Health | Shell Bash (single-target, Telluric) | Quick | Scavenging |
@@ -38,7 +38,7 @@ Form 1 uses the species name. Every species has 3 forms.
 - Sproutlet: tiny glowing leafy quadruped with a sapling on its head → sturdy bark-armored quadruped with wooden antler buds → majestic forest beast with a glowing canopy of antlers.
 - Brambletrundle: chaotic rolling ball of thorny vines and glowing bolts → bigger, sturdier mossy tumbleweed golem: a vine ball around a wooden core, with moss, small white flowers, bark arms and clawed feet → ancient, hulking, gentle wood-and-vine giant with tree-trunk arms and legs and a small kind face.
 - Mossgear: fuzzy green cog-shaped sphere → bipedal mossy mechanism → gentle lumbering botanical machine with emerald aura.
-- Petalsprocket: hovering blossom with metal-trimmed petals → larger rotor-flower → intricate array of glowing petals and gears.
+- Buzzbud: small fuzzy pollinator bee holding a closed flower bud → bigger bee with two pairs of wings and the bud now in bloom → grand flower-crowned queen bee with four ornate wings. (Replaces Petalsprocket, scrapped 2026-09-22 in the art window: the flower-rotor concept never generated a visible evolution across several batches. See `docs/art-pipeline.md` for the art-side record.)
 - Quakemaw: stout jaw-heavy lizard with a glowing throat → armored reptile with shovel underbite → friendly earth-dragon with crystal teeth.
 - Geodecore: floating hollow stone orb with humming crystal → faceted floating crystal creature, amber light → orbiting stones around a bright crystal nucleus.
 - Pebblescoot: skittish shale-carapace beetle → multi-legged excavator → gentle plated centipede giant.
