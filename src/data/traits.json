@@ -30,7 +30,7 @@
     "id": "pollinator",
     "name": "Pollinator",
     "kind": "signature",
-    "species": "petalsprocket",
+    "species": "buzzbud",
     "defaultStrength": "moderate",
     "text": "Rare-drop chance within tier.",
     "effects": [{ "key": "rare_drop_chance", "scope": { "target": "self" } }]

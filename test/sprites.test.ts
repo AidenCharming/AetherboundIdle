@@ -75,7 +75,7 @@ describe('spriteFor', () => {
   })
 
   it('returns null for anything without a sprite: no file yet, an unknown id, or a form out of range', () => {
-    expect(spriteFor('mossgear', 1)).toBeNull()
+    expect(spriteFor('brambletide', 1)).toBeNull()
     expect(spriteFor('ashwood', 2)).toBeNull()
     expect(spriteFor('no-such-creature', 1)).toBeNull()
     expect(spriteFor('', 1)).toBeNull()
@@ -133,7 +133,7 @@ describe('CreatureArt', () => {
   })
 
   it('draws the emoji, hidden from assistive tech, for a creature with no sprite', () => {
-    const view = viewOf('mossgear')
+    const view = viewOf('brambletide')
     const html = renderToStaticMarkup(createElement(CreatureArt, { view }))
     expect(html).not.toContain('<img')
     expect(html).toContain('aria-hidden="true"')
@@ -152,9 +152,9 @@ describe('CreatureArt', () => {
     expect(sprite).toContain(turn)
     expect(sprite).toContain('data-shiny="true"')
     expect(sprite).toContain(`src="${spriteFor('sproutlet', 1)}"`)
-    const mossgear = viewOf('mossgear', { shiny: true })
-    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: mossgear }))
-    expect(emoji).toContain(`--shiny-hue:${mossgear.shinyHueDeg}deg`)
+    const brambletide = viewOf('brambletide', { shiny: true })
+    const emoji = renderToStaticMarkup(createElement(CreatureArt, { view: brambletide }))
+    expect(emoji).toContain(`--shiny-hue:${brambletide.shinyHueDeg}deg`)
     expect(emoji).toContain('data-shiny="true"')
     const plain = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf('sproutlet') }))
     expect(plain).toContain('data-shiny="false"')
@@ -165,9 +165,9 @@ describe('CreatureArt', () => {
 
 describe('CreatureArt, shiny hue per type', () => {
   it('a Void shiny is turned by the Void type 270 (sprite and emoji), the others by the tuned value', () => {
-    // Riftsneak has a sprite; Hushflutter has none, so it draws its emoji
+    // Riftsneak has a sprite; Eclipseed (a hybrid) has none, so it draws its emoji
     expect(spriteFor('riftsneak', 1)).not.toBeNull()
-    expect(spriteFor('hushflutter', 1)).toBeNull()
+    expect(spriteFor('eclipseed', 1)).toBeNull()
     for (const [id, want] of [['riftsneak', 270], ['hushflutter', 270], ['sproutlet', 150], ['emberfang', 150], ['eclipseed', 270], ['ashwood', 150]] as const) {
       const html = renderToStaticMarkup(createElement(CreatureArt, { view: viewOf(id, { shiny: true }) }))
       expect(html, id).toContain(`--shiny-hue:${want}deg`)

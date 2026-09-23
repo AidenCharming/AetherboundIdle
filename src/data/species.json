@@ -48,13 +48,13 @@
     "origin": "wild"
   },
   {
-    "id": "petalsprocket",
-    "name": "Petalsprocket",
+    "id": "buzzbud",
+    "name": "Buzzbud",
     "types": ["verdant"],
     "forms": [
-      { "form": 1, "name": "Petalsprocket", "emoji": "🌸", "art": "hovering blossom with metal-trimmed petals" },
-      { "form": 2, "name": "Bloomwheel", "emoji": "🌼", "art": "larger rotor-flower" },
-      { "form": 3, "name": "Blossomcrank", "emoji": "🌺", "art": "intricate array of glowing petals and gears" }
+      { "form": 1, "name": "Buzzbud", "emoji": "🐝", "art": "small fuzzy pollinator bee holding a closed flower bud" },
+      { "form": 2, "name": "Pollenwing", "emoji": "🌼", "art": "bigger bee with two pairs of wings and the bud now in bloom" },
+      { "form": 3, "name": "Bloomqueen", "emoji": "👑", "art": "grand flower-crowned queen bee with four ornate wings" }
     ],
     "primarySkill": "herbalism",
     "secondaryAptitude": "scavenging",
