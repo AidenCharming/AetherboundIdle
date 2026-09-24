@@ -261,6 +261,16 @@ func _fill_right() -> void:
 	rb.item_selected.connect(func(i): Game.state.expedition.autobind.minRarity = i + 1)
 	rrow.add_child(rb)
 	bv.add_child(rrow)
+	var crow := UI.hbox(8, [UI.label("Keep at most", "Dim")])
+	var cb := OptionButton.new()
+	var caps := [1, 3, 5, 10, 25, 999]
+	for i in caps.size():
+		cb.add_item("All of them" if caps[i] == 999 else "%d per species" % caps[i], i)
+	cb.selected = maxi(0, caps.find(int(ab.get("maxCopies", 5))))
+	cb.item_selected.connect(func(i): Game.state.expedition.autobind.maxCopies = caps[i])
+	crow.add_child(cb)
+	bv.add_child(crow)
+	bv.add_child(UI.label("A copy rarer than your best one is always tried.", "Faint"))
 	var vrow := UI.hbox(8, [UI.label("Vessel", "Dim")])
 	var vb := OptionButton.new()
 	var vessel_ids := ["best", "cheapest"]

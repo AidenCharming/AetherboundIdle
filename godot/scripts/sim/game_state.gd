@@ -28,7 +28,7 @@ static func new_game(seed_value: int = 0) -> Dictionary:
 			"running": false,
 			"autoRepeat": true,
 			"meal": "",
-			"autobind": {"vessel": "best", "minRarity": 1, "newSpecies": true, "enabled": true},
+			"autobind": {"vessel": "best", "minRarity": 2, "newSpecies": true, "enabled": true, "maxCopies": 5},
 			"battle": {},
 			"exhaustedUntil": 0,
 			"zones": {},

@@ -245,7 +245,23 @@ static func bind_chance(s: Dictionary, vessel_id: String, rarity: int, party: Ar
 	return clampf(float(v.base) * pow(float(v.falloff), rarity - 1) * (1.0 + bonus), 0.0, 0.98)
 
 
-static func wants_bind(s: Dictionary, w: Dictionary) -> bool:
+## How many of a species the player owns and the best rarity among them: [count, best rarity].
+static func owned_copies(s: Dictionary, species_id: String, cache: Dictionary = {}) -> Array:
+	if cache.has(species_id):
+		return cache[species_id]
+	var n := 0
+	var best := 0
+	for c in s.creatures.values():
+		if c.species == species_id:
+			n += 1
+			best = maxi(best, int(c.rarity))
+	cache[species_id] = [n, best]
+	return cache[species_id]
+
+
+## The auto-bind rules: shinies always; new species if that box is ticked; otherwise the minimum rarity,
+## and no more than `maxCopies` of a species unless the new one is rarer than the best one owned.
+static func wants_bind(s: Dictionary, w: Dictionary, cache: Dictionary = {}) -> bool:
 	var ab: Dictionary = s.expedition.autobind
 	if w.get("shiny", false):
 		return true
@@ -253,7 +269,10 @@ static func wants_bind(s: Dictionary, w: Dictionary) -> bool:
 		return false
 	if ab.get("newSpecies", true) and not Collection.is_owned(s, w.species):
 		return true
-	return int(w.rarity) >= int(ab.get("minRarity", 1))
+	if int(w.rarity) < int(ab.get("minRarity", 1)):
+		return false
+	var owned := owned_copies(s, w.species, cache)
+	return owned[0] < int(ab.get("maxCopies", 5)) or int(w.rarity) > int(owned[1])
 
 
 static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomNumberGenerator, events: Array, b: Dictionary) -> void:
@@ -432,13 +451,42 @@ static func offline(s: Dictionary, ms: float, rng: RandomNumberGenerator) -> Arr
 	var z: Dictionary = Data.zones[s.expedition.zone]
 	var party := GameState.party(s)
 	var extra_kills := Rng.poisson(rng, kill_rate * remaining) if kill_rate * remaining < 12.0 else roundi(kill_rate * remaining)
-	var fake_battle := {"freeBinds": 0}
-	for i in extra_kills:
-		var w := roll_wild(s, z, rng)
-		defeated_wild(s, z, w, party, rng, events, fake_battle)
+	extrapolate_kills(s, z, party, extra_kills, rng, events)
 	var extra_bosses := int(floor(boss_rate * remaining))
 	for i in extra_bosses:
 		_on_boss_defeated(s, z, rng, events)
 		zone_state(s, z.id).runs = int(zone_state(s, z.id).runs) + 1
 	# keep only the events a summary needs
 	return events.filter(func(e): return e.type != "loot")
+
+
+## `n` wild defeats resolved in bulk: every encounter is still rolled (species, rarity, shiny pity, the
+## capture decision), but XP is added once per party member and loot is rolled as totals.
+static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int, rng: RandomNumberGenerator, events: Array) -> void:
+	if n <= 0:
+		return
+	var xp := 0.0
+	var fake_battle := {"freeBinds": 0}
+	var cache := {}
+	for i in n:
+		var w := roll_wild(s, z, rng)
+		xp += kill_xp(int(w.level), int(w.rarity))
+		if w.shiny or wants_bind(s, w, cache) or not Collection.owned_type(s, Data.species[w.species].types[0]):
+			var before: int = s.creatures.size()
+			try_capture(s, w, party, rng, events, fake_battle)
+			if s.creatures.size() != before:
+				cache.erase(w.species)
+	s.counters.kills = int(s.counters.kills) + n
+	var zs := zone_state(s, z.id)
+	zs.kills = int(zs.kills) + n
+	for c in party:
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp")))
+		for e in cev:
+			if e.type == "evolved":
+				Collection.on_evolved(s, c)
+		events.append_array(cev)
+	GameState.add_item(s, "gold", roundi(n * (float(z.gold[0]) + float(z.gold[1])) / 2.0))
+	for l in z.loot:
+		var k := Rng.binomial(rng, n, float(l.chance))
+		if k > 0:
+			GameState.add_item(s, l.item, roundi(k * (float(l.qty[0]) + float(l.qty[1])) / 2.0))

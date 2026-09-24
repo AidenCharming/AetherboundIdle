@@ -33,6 +33,7 @@ func _ready() -> void:
 	head.add_child(UI.spacer())
 	_count = UI.label("", "Dim")
 	head.add_child(_count)
+	head.add_child(UI.button("Bulk release", "", _bulk_release))
 	left.add_child(head)
 	var filters := UI.panel("CardFlat")
 	var fv := UI.vbox(8)
@@ -291,6 +292,35 @@ func _rename(c: Dictionary) -> void:
 		m.close())
 	m = Modal.open(v, "Nickname", 420)
 	le.grab_focus.call_deferred()
+
+
+func _bulk_release() -> void:
+	var v := UI.vbox(12)
+	v.add_child(UI.wrap_label("Release many duplicates at once for Aether. Only resting Aetherlings go: working ones, the party, locked ones and shinies are always kept, and so is the best one of every species.", "Dim", 520))
+	var row := UI.hbox(8, [UI.label("Release up to", "Dim")])
+	var ob := OptionButton.new()
+	for i in 4:
+		ob.add_item(Data.rarities[i].name, i)
+	row.add_child(ob)
+	v.add_child(row)
+	var preview := UI.label("", "H3")
+	v.add_child(preview)
+	var m: Modal
+	var go := UI.button("Release", "Danger")
+	var upd := func(_i := 0):
+		var list := Economy.bulk_release_candidates(Game.state, ob.selected + 1)
+		var total := 0
+		for c in list:
+			total += Creatures.release_value(c)
+		preview.text = "%d Aetherlings · +%s Aether" % [list.size(), F.format_num(total)]
+		go.disabled = list.is_empty()
+	ob.item_selected.connect(upd)
+	upd.call()
+	go.pressed.connect(func():
+		Game.bulk_release(ob.selected + 1)
+		m.close())
+	v.add_child(go)
+	m = Modal.open(v, "Bulk release", 580)
 
 
 func _release(c: Dictionary) -> void:

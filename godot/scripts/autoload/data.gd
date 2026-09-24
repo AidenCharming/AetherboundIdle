@@ -140,9 +140,12 @@ func ui_icon(name: String) -> Texture2D:
 	return texture("res://assets/icons/ui/%s.svg" % name)
 
 
-## The approved sprite for a species and form, or null when the species has no art yet (hybrids).
+## The sprite for a species and form: res://assets/creatures/<id>-f<form>.png (or the file named by the
+## species' "sprite" field). Null when there is no art yet, which shows the aether-blob placeholder, so new
+## art only needs dropping into the folder.
 func creature_texture(species_id: String, form: int) -> Texture2D:
 	var sp: Dictionary = species.get(species_id, {})
-	if sp.is_empty() or sp.get("sprite") == null:
+	if sp.is_empty():
 		return null
-	return texture("res://assets/creatures/%s-f%d.png" % [sp.sprite, clampi(form, 1, 3)])
+	var file: String = sp.sprite if sp.get("sprite") != null else species_id
+	return texture("res://assets/creatures/%s-f%d.png" % [file, clampi(form, 1, 3)])

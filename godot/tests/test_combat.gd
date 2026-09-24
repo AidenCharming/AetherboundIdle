@@ -149,3 +149,31 @@ func test_wipe_rests_then_retries() -> void:
 			break
 	t.ok(wiped, "a level-1 solo wipes at the last island")
 	t.ok(restarted, "and tries again after resting")
+
+
+func test_bulk_release_keeps_the_best_of_each_species() -> void:
+	var s := GameState.new_game()
+	var keep := Creatures.make(s, "brambletrundle", 2, 10, false, [], "test")
+	s.creatures[keep.id] = keep
+	for i in 5:
+		var c := Creatures.make(s, "brambletrundle", 1, 3, false, [], "test")
+		s.creatures[c.id] = c
+	var shiny := Creatures.make(s, "brambletrundle", 1, 3, true, [], "test")
+	s.creatures[shiny.id] = shiny
+	var res := Economy.bulk_release(s, 2)
+	t.eq(res.count, 5)
+	t.ok(s.creatures.has(keep.id), "best kept")
+	t.ok(s.creatures.has(shiny.id), "shiny kept")
+	t.eq(s.creatures.size(), 3, "starter, best and shiny remain")
+
+
+func test_autobind_stops_at_max_copies_unless_rarer() -> void:
+	var s := GameState.new_game()
+	s.expedition.autobind.minRarity = 1
+	s.expedition.autobind.maxCopies = 2
+	for i in 2:
+		var c := Creatures.make(s, "buzzbud", 2, 3, false, [], "test")
+		s.creatures[c.id] = c
+		Collection.on_owned(s, c)
+	t.ok(not Expedition.wants_bind(s, {"species": "buzzbud", "rarity": 2, "shiny": false}), "two already")
+	t.ok(Expedition.wants_bind(s, {"species": "buzzbud", "rarity": 3, "shiny": false}), "rarer than the best")

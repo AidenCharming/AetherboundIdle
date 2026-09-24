@@ -93,3 +93,31 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	GameState.add_item(s, "aether", value)
 	s.counters.released = int(s.counters.released) + 1
 	return value
+
+
+## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, and never the
+## best (highest rarity, then level) of each species, so a species is never lost from the Nexus.
+static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
+	var best := {}
+	for c in s.creatures.values():
+		var b: Dictionary = best.get(c.species, {})
+		if b.is_empty() or [int(c.rarity), int(c.level)] > [int(b.rarity), int(b.level)]:
+			best[c.species] = c
+	var out := []
+	for c in s.creatures.values():
+		if not Creatures.is_benched(c) or c.get("locked", false) or c.shiny or int(c.rarity) > max_rarity:
+			continue
+		if best[c.species].id == c.id:
+			continue
+		out.append(c)
+	return out
+
+
+static func bulk_release(s: Dictionary, max_rarity: int) -> Dictionary:
+	var list := bulk_release_candidates(s, max_rarity)
+	var total := 0
+	for c in list:
+		var v := release(s, c)
+		if v > 0:
+			total += v
+	return {"count": list.size(), "aether": total}

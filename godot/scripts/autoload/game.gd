@@ -508,6 +508,14 @@ func release(cid: String) -> void:
 	changed.emit()
 
 
+func bulk_release(max_rarity: int) -> void:
+	var res := Economy.bulk_release(state, max_rarity)
+	if res.count > 0:
+		info("Released %d Aetherlings. +%s Aether" % [res.count, F.format_num(res.aether)], Data.ui_icon("aether"))
+	save_game()
+	changed.emit()
+
+
 func toggle_lock(cid: String) -> void:
 	var c := creature(cid)
 	if not c.is_empty():
