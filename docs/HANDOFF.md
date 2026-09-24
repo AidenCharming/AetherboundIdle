@@ -5,13 +5,16 @@ decided and why) and `README.md` (how to run things).
 
 ## Ground rules
 
-- Work in `godot/` on branch `godot-rebuild`. The web build on `main` (`src/`, `electron/`, top-level files) is
-  never touched.
+- The Godot project is at the repo root (`project.godot`); `CLAUDE.md` is the short version of these rules. The
+  old web build is archived on the `web-archive` branch and is never touched. `docs/PROGRESS.md` and
+  `docs/plan.md` describe that web build and are history only.
+- Work on the branch you were given (this session: `claude/new-session-18lsuu`); don't switch to the old
+  `godot-rebuild` branch. Fetch and **merge** before pushing, never rebase or force-push: the designer pushes art
+  to the same branch.
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
-  Game. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and balance are JSON
-  in `data/`. Never hardcode balance numbers.
-- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 108), and
-  push to `godot-rebuild`.
+  Game, TestBridge. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and
+  balance are JSON in `data/`. Never hardcode balance numbers.
+- Commit as you go with clear messages, and keep `docs/DECISIONS.md` current (it states the test count).
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
   what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the
@@ -24,12 +27,17 @@ decided and why) and `README.md` (how to run things).
 
 ## Running things
 
-- Tests: `godot --headless --debug --path godot res://tests/test_runner.tscn < /dev/null` (close stdin: with
-  `--debug` a script error waits at a debugger prompt). Add `--verbose` to see warnings; keep it at zero warnings.
+All commands run from the repo root.
+
+- Import once after cloning: `godot --headless --path . --import`.
+- Tests: `godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null` (close stdin: with
+  `--debug` a script error waits at a debugger prompt), or `tools/check.sh [godot]`. Add `--verbose` to see
+  warnings; keep it at zero warnings. Tests that touch save files use slot 99 only, never the player's slots 1–3.
 - Driving the running game (real clicks, errors, screenshots): `docs/TEST_BRIDGE.md`.
-- Screenshots: `godot --path godot res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display).
-- Pacing probe (about 40 s): `res://tests/month_probe.tscn -- --days=35 [--skills|--rates|--calibrate]`. Its
-  `_combat` rounds party levels down to multiples of 3.
+- Screenshots: `godot --path . res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display;
+  overwrites save slot 3).
+- Pacing probe (about 40 s): `godot --headless --path . res://tests/month_probe.tscn -- --days=35
+  [--skills|--rates|--calibrate]`. Its `_combat` rounds party levels down to multiples of 3.
 
 ## GDScript traps that bit this project
 
@@ -40,6 +48,21 @@ decided and why) and `README.md` (how to run things).
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
 
 ## Recently done (this session)
+
+**Code review fixes (2026-09-24),** one commit each, see `DECISIONS.md` ("Code review fixes"):
+- Saves are written atomically (`.tmp`, then rename); the backup is only ever a readable save, and a leftover
+  `.tmp` is loaded before the backup. The slot-rename test no longer writes the player's slot 3 (slot 99 now).
+- The Market and Egg Market refuse a buy made from a stock window that has since changed, and refresh once when
+  the stock changes. `Market.buy()` refuses 0 or fewer.
+- Trait inheritance shuffles with the game's rng (reproducible from a seed). The pause menu's time-away cap counts
+  the Pearl Hourglass. Pearls found while away show in Welcome Back. Thorns that knock out an attacker stop its
+  multi-target ability. Bulk release reports Pearls.
+- Worker bubbles skip frames during the fade to the title; Genesis Pods forget picked parents when the save
+  changes; options.cfg is written once a change settles; a broken data file is reported with its line; the
+  test bridge's `new` only wipes slot 2 unless forced, and only slot 2 is renamed; the Expeditions log's "ago"
+  times tick; three misplaced comments moved; `tools/check.sh` runs the tests like `CLAUDE.md` does.
+
+**Earlier:**
 
 The fixes, all pushed: the Options panel going blank after going fullscreen, the Nexus panel pushed off screen,
 music dropping out, blurry text, the Sanctum expedition card not updating, fighters facing the wrong way. The
