@@ -107,7 +107,9 @@ func _fill_bench() -> void:
 	for i in odds.size():
 		if odds[i] > 0.00005:
 			legend.add_child(UI.label("%s %s" % [Data.rarities[i].name, F.pct(odds[i]) if odds[i] >= 0.001 else "<0.1%"], "Small", Data.rarity_color(i + 1)))
-	legend.add_child(UI.label("Shiny %s" % F.pct(Breeding.hatch_chance_shiny(s)), "Small", Palette.GOLD))
+	var shiny_parents := int(bool(a.shiny)) + int(bool(b.shiny))
+	var sl := UI.label("Shiny %s%s" % [F.pct(Breeding.hatch_chance_shiny(s, a, b)), " (shiny parent bonus)" if shiny_parents > 0 else ""], "Small", Palette.GOLD)
+	legend.add_child(sl)
 	var mb := Breeding.mutation_bonus(a, b)
 	if mb > 0:
 		legend.add_child(UI.label("Geneticist +%s mutation" % F.pct(mb), "Small", Palette.AETHER))

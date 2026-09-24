@@ -172,6 +172,7 @@
 		"hatchRate": 0.005,
 		"hatchPityStart": 150,
 		"hatchPityFull": 300,
+		"shinyParentBonus": 0.5,
 		"statBonus": 0.02
 	},
 	"attunement": {

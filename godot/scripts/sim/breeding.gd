@@ -93,13 +93,17 @@ static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
 	return out
 
 
-static func hatch_chance_shiny(s: Dictionary) -> float:
+## Shiny chance for the next egg. Each shiny parent adds `shiny.shinyParentBonus` of the chance (0.5: one
+## shiny parent makes 0.5% into 0.75%, two make it 1%), on top of the pity that builds after many hatches.
+static func hatch_chance_shiny(s: Dictionary, a: Dictionary = {}, b: Dictionary = {}) -> float:
 	var sh: Dictionary = Data.tuning.shiny
 	var since := int(s.counters.hatchesSinceShiny)
-	if since <= int(sh.hatchPityStart):
-		return float(sh.hatchRate)
-	var t := clampf(float(since - int(sh.hatchPityStart)) / float(int(sh.hatchPityFull) - int(sh.hatchPityStart)), 0.0, 1.0)
-	return lerpf(float(sh.hatchRate), 0.2, t)
+	var p := float(sh.hatchRate)
+	if since > int(sh.hatchPityStart):
+		var t := clampf(float(since - int(sh.hatchPityStart)) / float(int(sh.hatchPityFull) - int(sh.hatchPityStart)), 0.0, 1.0)
+		p = lerpf(float(sh.hatchRate), 0.2, t)
+	var shiny_parents := int(bool(a.get("shiny", false))) + int(bool(b.get("shiny", false)))
+	return minf(0.25, p * (1.0 + float(sh.get("shinyParentBonus", 0.0)) * shiny_parents))
 
 
 static func hatch_seconds(a: Dictionary, b: Dictionary, tier: int) -> float:
@@ -142,7 +146,7 @@ static func breed(s: Dictionary, a: Dictionary, b: Dictionary, tier: int, rng: R
 		weights[o.species] = o.weight
 	var sp_id: String = Rng.weighted_key(rng, weights)
 	var rarity := Rng.weighted_index(rng, rarity_odds(a, b, tier)) + 1
-	var shiny := Rng.chance(rng, hatch_chance_shiny(s))
+	var shiny := Rng.chance(rng, hatch_chance_shiny(s, a, b))
 	s.counters.hatchesSinceShiny = 0 if shiny else int(s.counters.hatchesSinceShiny) + 1
 	var traits := inherit(rng, a, b, Data.species[sp_id].types)
 	var shell := rarity

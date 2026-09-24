@@ -200,3 +200,18 @@ func test_better_materials_lift_the_odds_and_zenith_needs_the_top_tier() -> void
 	var r8b := _c(s, "sproutlet", 8)
 	var z: float = Breeding.rarity_odds(r8a, r8b, Breeding.tier_count())[Data.max_rarity() - 1]
 	t.ok(z > 0.35 and z < 0.7, "two top-but-one parents on the top tier: about a coin flip (%.2f)" % z)
+
+
+## Shiny parents lift the egg's shiny chance a little: one shiny parent by half, two by double.
+func test_shiny_parents_raise_shiny_chance_slightly() -> void:
+	var s := GameState.new_game()
+	var a := _c(s, "sproutlet", 1, [])
+	var b := _c(s, "sproutlet", 1, [])
+	var base := Breeding.hatch_chance_shiny(s, a, b)
+	a.shiny = true
+	var one := Breeding.hatch_chance_shiny(s, a, b)
+	b.shiny = true
+	var two := Breeding.hatch_chance_shiny(s, a, b)
+	t.near(one, base * 1.5, 0.00001, "one shiny parent: x1.5")
+	t.near(two, base * 2.0, 0.00001, "two shiny parents: x2")
+	t.ok(two < 0.02, "still rare (%.2f%%)" % (two * 100.0))
