@@ -29,7 +29,7 @@ Commands
 Every generated image is logged to D:\\AI\\logs\\icon_generation_log.jsonl (prompt, seed, model, workflow), for the
 AI-art disclosure. Candidates: ComfyUI output\\cand_icons\\<group>\\<id>-c<N>_00001_.png.
 
-Folders can be overridden with AETHERBOUND_AI (default D:\\AI) and AETHERBOUND_GODOT (the repo's godot folder).
+Folders can be overridden with AETHERBOUND_AI (default D:\\AI) and AETHERBOUND_GODOT (the repo's root folder).
 """
 import argparse
 import json
@@ -42,10 +42,8 @@ from pathlib import Path
 
 ROOT = Path(os.environ.get("AETHERBOUND_AI", r"D:\AI"))
 TOOLS = ROOT / "tools"
-GODOT = Path(os.environ.get("AETHERBOUND_GODOT", r"C:\ClaudeProjects\Aetherbound Idle\godot"))
 HERE = Path(__file__).resolve().parent
-if not GODOT.exists() and (HERE.parents[1] / "project.godot").exists():
-    GODOT = HERE.parents[1]  # running from godot/tools/art inside the repo
+GODOT = Path(os.environ["AETHERBOUND_GODOT"]) if os.environ.get("AETHERBOUND_GODOT") else HERE.parents[1]  # running from tools/art inside the repo
 ICONS_JSON = TOOLS / "icons.json" if (TOOLS / "icons.json").exists() else HERE / "icons.json"
 LOG = ROOT / "logs" / "icon_generation_log.jsonl"
 COMFY_OUT = ROOT / "ComfyUI" / "ComfyUI" / "output"

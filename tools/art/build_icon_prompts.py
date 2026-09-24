@@ -7,7 +7,7 @@ The icon counterpart of build_prompts.py (the creature sprites). Run with any Py
 Edit the ICONS table below, rerun, and both outputs are regenerated. icon_runner.py reads icons.json.
 
 Where things go (override with environment variables if your folders differ):
-    AETHERBOUND_GODOT  the repo's godot folder   (default C:\\ClaudeProjects\\Aetherbound Idle\\godot)
+    AETHERBOUND_GODOT  the repo's root folder    (default C:\\ClaudeProjects\\Aetherbound Idle)
     AETHERBOUND_AI     the AI pipeline root       (default D:\\AI)
 If a folder does not exist the file is written next to this script instead, so the script also runs from the repo.
 """
@@ -18,10 +18,8 @@ import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-GODOT = Path(os.environ.get("AETHERBOUND_GODOT", r"C:\ClaudeProjects\Aetherbound Idle\godot"))
+GODOT = Path(os.environ["AETHERBOUND_GODOT"]) if os.environ.get("AETHERBOUND_GODOT") else HERE.parents[1]  # running from tools/art inside the repo
 AI_ROOT = Path(os.environ.get("AETHERBOUND_AI", r"D:\AI"))
-if not GODOT.exists():
-    GODOT = HERE.parents[1]  # running from godot/tools/art inside the repo
 DOC_OUT = GODOT / "docs" / "art-prompts-icons.md"
 ZONE_DOC_OUT = GODOT / "docs" / "art-prompts-zones.md"
 JSON_OUT = (AI_ROOT / "tools" / "icons.json") if (AI_ROOT / "tools").exists() else HERE / "icons.json"

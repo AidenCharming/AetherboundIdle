@@ -1,17 +1,18 @@
-node_modules/
-dist/
-dist-ssr/
-coverage/
-*.local
-.env
-.env.*
-!.env.example
+# Godot 4 editor/import cache: regenerated on first open.
+.godot/
+/android/
+*.tmp
+# Godot 4.4+ auto-generates one of these per script, 1:1, on first open. Pure regenerable cache,
+# same as .godot/ above, but it's per-file so it wasn't caught until a fresh script collided with
+# one already committed under the same name from another machine.
+*.uid
+# Local exports
+/export/
+tools/art/icons.json
+
 .DS_Store
 Thumbs.db
 *.log
-npm-debug.log*
-.vite/
 .vscode/*
 !.vscode/extensions.json
 .idea/
-release/
