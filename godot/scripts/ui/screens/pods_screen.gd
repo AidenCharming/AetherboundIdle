@@ -97,17 +97,19 @@ func _fill_bench() -> void:
 	cr.add_child(UI.label("Cost", "Faint"))
 	cr.add_child(UI.cost_row(cost, 24))
 	cr.add_child(UI.spacer())
-	var secs := Breeding.hatch_seconds(a, b, tier)
+	var secs := Breeding.hatch_seconds(a, b, tier, s)
 	cr.add_child(UI.stat_line("time", "Hatches in " + F.format_seconds(secs)))
 	_bench.add_child(cr)
 	# odds
-	var odds := Breeding.rarity_odds(a, b, tier)
+	var odds := Breeding.rarity_odds(a, b, tier, s)
 	_bench.add_child(_odds_bar(odds))
 	var legend := UI.flow(14, 4)
 	for i in odds.size():
 		if odds[i] > 0.00005:
 			legend.add_child(UI.label("%s %s" % [Data.rarities[i].name, F.pct(odds[i]) if odds[i] >= 0.001 else "<0.1%"], "Small", Data.rarity_color(i + 1)))
-	legend.add_child(UI.label("Shiny %s" % F.pct(Breeding.hatch_chance_shiny(s)), "Small", Palette.GOLD))
+	var shiny_parents := int(bool(a.shiny)) + int(bool(b.shiny))
+	var sl := UI.label("Shiny %s%s" % [F.pct(Breeding.hatch_chance_shiny(s, a, b)), " (shiny parent bonus)" if shiny_parents > 0 else ""], "Small", Palette.GOLD)
+	legend.add_child(sl)
 	var mb := Breeding.mutation_bonus(a, b)
 	if mb > 0:
 		legend.add_child(UI.label("Geneticist +%s mutation" % F.pct(mb), "Small", Palette.AETHER))

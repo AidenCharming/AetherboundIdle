@@ -34,13 +34,13 @@ No key colour and no cutout: backdrops are used as they are.
 | 1 | `whisperleaf-hollow` | [x] approved |
 | 2 | `fractured-quarry` | [x] approved |
 | 3 | `smoldering-caldera` | [x] approved |
-| 4 | `whispering-tides` | [ ] |
+| 4 | `whispering-tides` | [x] approved |
 | 5 | `thunderhum-steppe` | [x] approved |
 | 6 | `null-horizon` | [x] approved |
-| 7 | `verdigris-canopy` | [ ] |
+| 7 | `verdigris-canopy` | [x] approved |
 | 8 | `magmaglass-rift` | [x] approved |
 | 9 | `stormsea-expanse` | [x] approved |
-| 10 | `zenith-spire` | [ ] |
+| 10 | `zenith-spire` | [x] approved |
 
 ## 1. `whisperleaf-hollow`
 

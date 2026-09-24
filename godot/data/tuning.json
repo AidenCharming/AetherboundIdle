@@ -172,6 +172,7 @@
 		"hatchRate": 0.005,
 		"hatchPityStart": 150,
 		"hatchPityFull": 300,
+		"shinyParentBonus": 0.5,
 		"statBonus": 0.02
 	},
 	"attunement": {
@@ -183,6 +184,18 @@
 			9
 		],
 		"maxLocks": 2
+	},
+	"pearls": {
+		"shinyFound": 1,
+		"shinyRelease": 2,
+		"lensHatchPerLevel": 0.005,
+		"lensWildPerLevel": 0.001,
+		"mutationPerLevel": 0.2,
+		"attuneCostPerLevel": 0.1,
+		"strengthUpPerLevel": 0.05,
+		"hatchTimePerLevel": 0.08,
+		"bindPerLevel": 0.05,
+		"offlineHoursPerLevel": 2
 	},
 	"combat": {
 		"spriteFacing": "left",

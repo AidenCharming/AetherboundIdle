@@ -221,5 +221,251 @@
 				}
 			}
 		]
+	},
+	{
+		"id": "pearl-lens",
+		"name": "Pearl Lens",
+		"icon": "1fae7",
+		"blurb": "Shiny Aetherlings show up more often: +0.5% per level on every egg, +0.1% per level on wild encounters.",
+		"stat": "pearl-lens",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
+	},
+	{
+		"id": "pearl-resonator",
+		"name": "Pearl Resonator",
+		"icon": "1fae7",
+		"blurb": "Eggs break past their rarity ceiling more often: +20% mutation chance per level.",
+		"stat": "pearl-resonator",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
+	},
+	{
+		"id": "pearl-crucible",
+		"name": "Pearl Crucible",
+		"icon": "1fae7",
+		"blurb": "Attunement costs 10% less per level, and inherited traits grow a step 5% more often per level.",
+		"stat": "pearl-crucible",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
+	},
+	{
+		"id": "pearl-incubator",
+		"name": "Pearl Incubator",
+		"icon": "1fae7",
+		"blurb": "Eggs hatch 8% faster per level.",
+		"stat": "pearl-incubator",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
+	},
+	{
+		"id": "pearl-vessel",
+		"name": "Pearl Binding",
+		"icon": "1fae7",
+		"blurb": "Vessels bind 5% more often per level.",
+		"stat": "pearl-vessel",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
+	},
+	{
+		"id": "pearl-hourglass",
+		"name": "Pearl Hourglass",
+		"icon": "1fae7",
+		"blurb": "Time away counts for 2 more hours per level.",
+		"stat": "pearl-hourglass",
+		"base": 0,
+		"pearl": true,
+		"levels": [
+			{
+				"value": 1,
+				"cost": {
+					"aether-pearl": 3
+				}
+			},
+			{
+				"value": 2,
+				"cost": {
+					"aether-pearl": 6
+				}
+			},
+			{
+				"value": 3,
+				"cost": {
+					"aether-pearl": 10
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"aether-pearl": 15
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"aether-pearl": 20
+				}
+			}
+		]
 	}
 ]

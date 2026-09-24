@@ -200,3 +200,49 @@ func test_better_materials_lift_the_odds_and_zenith_needs_the_top_tier() -> void
 	var r8b := _c(s, "sproutlet", 8)
 	var z: float = Breeding.rarity_odds(r8a, r8b, Breeding.tier_count())[Data.max_rarity() - 1]
 	t.ok(z > 0.35 and z < 0.7, "two top-but-one parents on the top tier: about a coin flip (%.2f)" % z)
+
+
+## Shiny parents lift the egg's shiny chance a little: one shiny parent by half, two by double.
+func test_shiny_parents_raise_shiny_chance_slightly() -> void:
+	var s := GameState.new_game()
+	var a := _c(s, "sproutlet", 1, [])
+	var b := _c(s, "sproutlet", 1, [])
+	var base := Breeding.hatch_chance_shiny(s, a, b)
+	a.shiny = true
+	var one := Breeding.hatch_chance_shiny(s, a, b)
+	b.shiny = true
+	var two := Breeding.hatch_chance_shiny(s, a, b)
+	t.near(one, base * 1.5, 0.00001, "one shiny parent: x1.5")
+	t.near(two, base * 2.0, 0.00001, "two shiny parents: x2")
+	t.ok(two < 0.02, "still rare (%.2f%%)" % (two * 100.0))
+
+
+## Aether Pearls: the endgame currency. The Pearl upgrades do what they say, and pearls come from
+## releasing the rarest Aetherlings and shinies.
+func test_aether_pearl_upgrades_and_sources() -> void:
+	var s := GameState.new_game()
+	var a := _c(s, "sproutlet", 1, [])
+	var b := _c(s, "sproutlet", 1, [])
+	var pt: Dictionary = Data.tuning.pearls
+	var shiny0 := Breeding.hatch_chance_shiny(s, a, b)
+	var hatch0 := Breeding.hatch_seconds(a, b, 5, s)
+	var cost0 := Traits.attune_cost(a, 0, s)
+	var bind0 := Expedition.bind_chance(s, "tinkerers-vessel", 3, [])
+	for id in ["pearl-lens", "pearl-resonator", "pearl-crucible", "pearl-incubator", "pearl-vessel", "pearl-hourglass"]:
+		t.ok(Data.upgrades.has(id), "%s exists" % id)
+		s.upgrades[id] = 5
+	t.near(Breeding.hatch_chance_shiny(s, a, b), shiny0 + float(pt.lensHatchPerLevel) * 5.0, 0.00001, "Pearl Lens: +0.5% per level on eggs")
+	t.ok(Breeding.hatch_seconds(a, b, 5, s) < hatch0, "Pearl Incubator: faster hatching")
+	t.ok(Traits.attune_cost(a, 0, s) < cost0, "Pearl Crucible: cheaper attunement")
+	t.ok(Expedition.bind_chance(s, "tinkerers-vessel", 3, []) > bind0, "Pearl Binding: better bind chance")
+	# sources: releasing a Zenith, and a shiny
+	var z := _c(s, "sproutlet", Data.max_rarity(), [])
+	var sh := _c(s, "sproutlet", 1, [])
+	sh.shiny = true
+	var p0 := GameState.count(s, "aether-pearl")
+	Economy.release(s, z)
+	t.eq(int(GameState.count(s, "aether-pearl") - p0), int(Data.rarity(Data.max_rarity()).releasePearls), "a Zenith leaves pearls")
+	p0 = GameState.count(s, "aether-pearl")
+	Economy.release(s, sh)
+	t.eq(int(GameState.count(s, "aether-pearl") - p0), int(pt.shinyRelease), "a shiny leaves pearls")
+	t.ok(Data.zones["zenith-spire"].bossLoot.get("pearlChance", 0.0) > 0.0, "Zenith Spire's boss can drop a pearl")

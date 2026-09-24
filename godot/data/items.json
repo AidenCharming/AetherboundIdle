@@ -1253,6 +1253,15 @@
 		"desc": "Top-tier Sanctum building part."
 	},
 	{
+		"id": "aether-pearl",
+		"name": "Aether Pearl",
+		"tier": 10,
+		"category": "rare",
+		"sell": 0,
+		"icon": {"shape": "pearl", "color": "#f1e6ff"},
+		"desc": "A pearl of Aether pressed hard enough to hold a colour of its own. Found at the very end of the islands; spent on Pearl upgrades in Sanctum Works."
+	},
+	{
 		"id": "aether-crystal",
 		"name": "Aether Crystal",
 		"tier": 3,

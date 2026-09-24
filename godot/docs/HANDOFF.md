@@ -38,7 +38,8 @@ The fixes, all pushed: the Options panel going blank after going fullscreen, the
 music dropping out, blurry text, the Sanctum expedition card not updating, fighters facing the wrong way. The
 features: a harder first boss, inherited traits never getting weaker, new nameplates, type-specific attack sounds,
 damage numbers that spread out, the owned badge, rarity pips, animated top-tier colours, sprite and frame effects
-by rarity, shiny and rare entrance effects, and save slots that can be renamed.
+by rarity, shiny and rare entrance effects, save slots that can be renamed, shiny parents raising the egg's
+shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in Sanctum Works).
 
 ## Not yet seen or heard in the real game (check these first)
 
@@ -49,6 +50,8 @@ by rarity, shiny and rare entrance effects, and save slots that can be renamed.
   found and guarded three ways; confirm on Windows.
 
 ## Open for the designer
+
+- Aether Pearl drop rates are estimates from timed runs (3–7 a day at the end); check them in play.
 
 - Play-test pacing (one-month target) and creature XP.
 - Whether work XP should be raised.

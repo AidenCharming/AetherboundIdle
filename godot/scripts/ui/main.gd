@@ -404,8 +404,8 @@ func _backup_modal() -> void:
 func _dev_modal() -> void:
 	var v := UI.vbox(12)
 	v.add_child(UI.wrap_label("Testing shortcuts. Anything done here counts like normal play in this save slot.", "Faint", 560))
-	# grant a creature
-	var row := UI.flow(8, 8)
+	# grant a creature: one row (the dialog is wide enough for it)
+	var row := UI.hbox(8)
 	var sp := OptionButton.new()
 	for i in Data.species_list.size():
 		sp.add_item(Data.species_list[i].name, i)
@@ -468,7 +468,7 @@ func _dev_modal() -> void:
 	sr.add_child(sl)
 	sr.add_child(UI.button("Set", "", func(): Game.dev_skill_level(Data.skill_list[sk.selected].id, int(sl.value))))
 	v.add_child(sr)
-	Modal.open(v, "Developer tools", 700)
+	Modal.open(v, "Developer tools", 920)
 
 
 func _open_notifications() -> void:

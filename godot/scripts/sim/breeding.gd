@@ -59,7 +59,7 @@ static func mutation_bonus(a: Dictionary, b: Dictionary) -> float:
 ## halfway between two Dims and two Faints), and never go below the weaker parent. Better materials lift
 ## the centre by `centreLiftPerTier` per tier above the first, so a tier that shares its ceiling with the
 ## one below still has better odds. Then two separate mutation rolls can push past the ceiling.
-static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
+static func rarity_odds(a: Dictionary, b: Dictionary, tier: int, s: Dictionary = {}) -> Array:
 	var br: Dictionary = Data.tuning.breeding
 	var top := Data.max_rarity()
 	var ceil_r := ceiling(tier)
@@ -79,8 +79,9 @@ static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
 	for pair in base:
 		var k: int = pair[0]
 		var p: float = pair[1] / total
-		var p2: float = float(br.mutationPlusTwo) * (float(br.topTierMutationMult) if k + 2 >= top - 1 else 1.0)
-		var p1: float = (float(br.mutationPlusOne) + bonus) * (float(br.topTierMutationMult) if k + 1 >= top - 1 else 1.0)
+		var pm := 1.0 + float(Data.tuning.pearls.mutationPerLevel) * GameState.pearl(s, "pearl-resonator")
+		var p2: float = float(br.mutationPlusTwo) * pm * (float(br.topTierMutationMult) if k + 2 >= top - 1 else 1.0)
+		var p1: float = (float(br.mutationPlusOne) + bonus) * pm * (float(br.topTierMutationMult) if k + 1 >= top - 1 else 1.0)
 		if k + 2 > top:
 			p2 = 0.0
 		if k + 1 > top:
@@ -93,18 +94,26 @@ static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
 	return out
 
 
-static func hatch_chance_shiny(s: Dictionary) -> float:
+## Shiny chance for the next egg. Each shiny parent adds `shiny.shinyParentBonus` of the chance (0.5: one
+## shiny parent makes 0.5% into 0.75%, two make it 1%), on top of the pity that builds after many hatches.
+static func hatch_chance_shiny(s: Dictionary, a: Dictionary = {}, b: Dictionary = {}) -> float:
 	var sh: Dictionary = Data.tuning.shiny
 	var since := int(s.counters.hatchesSinceShiny)
-	if since <= int(sh.hatchPityStart):
-		return float(sh.hatchRate)
-	var t := clampf(float(since - int(sh.hatchPityStart)) / float(int(sh.hatchPityFull) - int(sh.hatchPityStart)), 0.0, 1.0)
-	return lerpf(float(sh.hatchRate), 0.2, t)
+	var p := float(sh.hatchRate)
+	if since > int(sh.hatchPityStart):
+		var t := clampf(float(since - int(sh.hatchPityStart)) / float(int(sh.hatchPityFull) - int(sh.hatchPityStart)), 0.0, 1.0)
+		p = lerpf(float(sh.hatchRate), 0.2, t)
+	var shiny_parents := int(bool(a.get("shiny", false))) + int(bool(b.get("shiny", false)))
+	p *= 1.0 + float(sh.get("shinyParentBonus", 0.0)) * shiny_parents
+	# the Pearl Lens adds a flat share per level
+	p += float(Data.tuning.pearls.lensHatchPerLevel) * GameState.pearl(s, "pearl-lens")
+	return minf(0.25, p)
 
 
-static func hatch_seconds(a: Dictionary, b: Dictionary, tier: int) -> float:
+static func hatch_seconds(a: Dictionary, b: Dictionary, tier: int, s: Dictionary = {}) -> float:
 	var red := minf(Traits.cap("hatch_time_reduction"), Traits.self_mod(a, "hatch_time_reduction") + Traits.self_mod(b, "hatch_time_reduction"))
-	return float(Data.tuning.breeding.hatchMinutes[tier - 1]) * 60.0 * (1.0 - red)
+	var pearl := 1.0 - float(Data.tuning.pearls.hatchTimePerLevel) * GameState.pearl(s, "pearl-incubator")
+	return float(Data.tuning.breeding.hatchMinutes[tier - 1]) * 60.0 * (1.0 - red) * pearl
 
 
 static func free_pod(s: Dictionary) -> int:
@@ -141,14 +150,14 @@ static func breed(s: Dictionary, a: Dictionary, b: Dictionary, tier: int, rng: R
 	for o in opts:
 		weights[o.species] = o.weight
 	var sp_id: String = Rng.weighted_key(rng, weights)
-	var rarity := Rng.weighted_index(rng, rarity_odds(a, b, tier)) + 1
-	var shiny := Rng.chance(rng, hatch_chance_shiny(s))
+	var rarity := Rng.weighted_index(rng, rarity_odds(a, b, tier, s)) + 1
+	var shiny := Rng.chance(rng, hatch_chance_shiny(s, a, b))
 	s.counters.hatchesSinceShiny = 0 if shiny else int(s.counters.hatchesSinceShiny) + 1
-	var traits := inherit(rng, a, b, Data.species[sp_id].types)
+	var traits := inherit(rng, a, b, Data.species[sp_id].types, s)
 	var shell := rarity
 	if not Rng.chance(rng, float(Data.tuning.breeding.shellTruthChance)):
 		shell = clampi(rarity + (1 if rng.randf() < 0.5 else -1), 1, Data.max_rarity())
-	var secs := hatch_seconds(a, b, tier)
+	var secs := hatch_seconds(a, b, tier, s)
 	var egg := {"species": sp_id, "rarity": rarity, "shiny": shiny, "traits": traits, "tier": tier, "laidAt": now,
 		"readyAt": now + secs, "parents": [a.species, b.species], "shell": shell}
 	var pod := free_pod(s)
@@ -159,7 +168,7 @@ static func breed(s: Dictionary, a: Dictionary, b: Dictionary, tier: int, rng: R
 
 ## Pool traits for an offspring: each parent trait may pass down (at its strength or one step stronger), then the
 ## empty slots roll fresh, with a small chance of a bonus mutation trait.
-static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, types: Array) -> Array:
+static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, types: Array, s: Dictionary = {}) -> Array:
 	var br: Dictionary = Data.tuning.breeding
 	var out := []
 	var pool := []
@@ -176,7 +185,8 @@ static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, ty
 		if Rng.chance(rng, float(br.inheritChance)):
 			# a passed-down trait keeps its strength or grows one step, never weaker (designer's rule)
 			var idx := Traits.STRENGTHS.find(t.s)
-			if Rng.chance(rng, float(br.traitStrengthUpChance)):
+			var up := float(br.traitStrengthUpChance) + float(Data.tuning.pearls.strengthUpPerLevel) * GameState.pearl(s, "pearl-crucible")
+			if Rng.chance(rng, up):
 				idx += 1
 			out.append({"id": t.id, "s": Traits.clamp_strength(t.id, Traits.STRENGTHS[clampi(idx, 0, 2)])})
 	if out.is_empty():
@@ -225,6 +235,8 @@ static func hatch(s: Dictionary, pod: int, now: float) -> Dictionary:
 	s.pods[pod] = {}
 	s.counters.hatches = int(s.counters.hatches) + 1
 	var events := Collection.on_owned(s, c)
+	if c.shiny:
+		events.append_array(GameState.give_pearls(s, int(Data.tuning.pearls.shinyFound), "a shiny hatched"))
 	return {"creature": c, "events": events, "egg": egg}
 
 
