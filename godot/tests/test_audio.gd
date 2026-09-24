@@ -87,3 +87,31 @@ func test_quick_switch_back_keeps_music_playing() -> void:
 	Music._current = saved[1]
 	Music._wanted = saved[2]
 	Music._active = saved[3]
+
+
+## Every type has its own hit and cast sound, and they sit at similar loudness (none drowns the others).
+func test_each_type_has_its_own_attack_sounds() -> void:
+	var rms := {}
+	for ty in Data.types:
+		for kind in ["hit_", "cast_"]:
+			var id: String = kind + ty
+			t.ok(Sfx._streams.has(id), "%s exists" % id)
+			if not Sfx._streams.has(id):
+				continue
+			var w: AudioStreamWAV = Sfx._streams[id]
+			var sum := 0.0
+			var peak := 0.0
+			var n := w.data.size() >> 1
+			for i in n:
+				var v := float(w.data.decode_s16(i * 2)) / 32000.0
+				sum += v * v
+				peak = maxf(peak, absf(v))
+			rms[id] = sqrt(sum / maxf(1.0, n))
+			t.ok(peak < 0.99, "%s does not clip (peak %.2f)" % [id, peak])
+			t.ok(float(n) / Sfx.RATE < 0.6, "%s is short" % id)
+	var hits: Array = Data.types.keys().map(func(ty): return float(rms.get("hit_" + ty, 0.0)))
+	t.ok(hits.max() < hits.min() * 3.0, "hit sounds within 3x loudness of each other: %s" % [hits])
+	var datas := {}
+	for id in rms:
+		datas[Sfx._streams[id].data] = true
+	t.eq(datas.size(), rms.size(), "every attack sound is different")

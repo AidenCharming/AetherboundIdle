@@ -185,6 +185,8 @@
 		"maxLocks": 2
 	},
 	"combat": {
+		"spriteFacing": "left",
+		"rareAnnounceChance": 0.1,
 		"baseAttackMs": 2400,
 		"minAttackMs": 700,
 		"wheelStrong": 1.5,

@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 81 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 86 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -88,6 +88,28 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   bars above its head (back-row name tags sit a step higher so neighbours don't overlap). Every fighter is
   sized for a full side of three, so a lone enemy is the same size as one of three, and each is kept a
   small margin inside the backdrop. Bosses stay 1.45× bigger.
+  - **Facing:** the sprites are painted facing left (`combat.spriteFacing` in tuning.json), so the party
+    on the left is mirrored to look right and wild Aetherlings are drawn as painted, looking left. A form
+    whose sprite faces another way can set `facing` ("left", "right" or "front") in species.json.
+  - **Nameplates** (designer's request): each fighter has a small glass plate edged in its rarity colour
+    (gold for a boss). It shows the owned badge for wild Aetherlings whose species you have, the name, a
+    level chip in the rarity colour, the health bar, and a shield bar that appears only while a shield holds.
+    Front-row plates sit over the head, back-row plates a step higher, and every plate stays inside the
+    arena. Ability names float up from above the plate instead of through it.
+  - **Telling rarity and shinies apart in battle** (designer's request): rarity pips, one small diamond per
+    tier, sit on the nameplate's top edge and along the bottom of every portrait rim, so the tier can be
+    counted, not just read from its colour. The top tiers' colours move: Zenith cycles a soft rainbow,
+    Resplendent and Brilliant pulse (`Data.rarity_color_live`). Gleaming moved from green to teal so it
+    no longer looks like Faint. A shiny's nameplate has the shiny mark and a gold name. When a shiny or a
+    rare wild Aetherling enters a fight (a rarity the island rolls at most `combat.rareAnnounceChance`,
+    10%, of the time), a burst of light, a "Shiny!" or rarity word and a sound (`shiny_appear`, a glittering
+    run; `rare_appear`, a bell chime) announce it once per wave.
+  - **Sprite and frame effects by rarity** (designer's request, no new art: all in `creature.gdshader`,
+    following each sprite's outline, set by `fx` in `data/rarities.json`). Luminous and Radiant get an
+    outline glow in their colour; Brilliant adds a band of light sweeping across the body; Resplendent's
+    glow pulses; Zenith has a rainbow edge, a soft rainbow sheen and motes rising around it. On the
+    portrait frame, lights orbit the rim for the top three tiers (one, two, three) and Zenith's whole rim
+    is a moving rainbow.
 - **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
   of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
   wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the
@@ -141,6 +163,14 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     `Music.RENDER_VERSION`, and stale renders are deleted.
   - **Sound effects:** a dozen short effects. **Evolution** has its own: two voices sweep up two octaves into a
     full major chord with a sparkle run, where hatching is a single run of notes.
+  - **Attacks sound like their type** (designer's request). Each type has a hit and an ability cast:
+    Verdant a leafy swish and woody pluck, Telluric a low thud with grit, Pyric a crackling burst, Aqueous
+    a rising bloop, Voltaic a falling square-wave zap, Void a detuned downward wobble. A super-effective hit
+    adds a bright ping. Hits vary their pitch a little so a flurry doesn't drone. The six hits sit within 2×
+    of each other in loudness (low sounds get more energy, as they sound quieter), and a test checks it.
+  - **Damage numbers take lanes:** numbers landing on one fighter within about half a second start centre,
+    left, right, then a row higher, so a flurry reads as separate numbers. They show whole numbers ("9",
+    not "8.8").
 - **Bosses reuse approved art:** each boss is a species' Form 3 sprite with its own name and stats
   (Granitusk is Tuskcub's Form 3, Ignis Prime is Emberfang's, and so on).
 

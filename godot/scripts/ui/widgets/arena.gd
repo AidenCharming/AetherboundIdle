@@ -14,7 +14,8 @@ var _ground: Control
 var _backdrop: TextureRect
 var _zone_type := "verdant"
 var _zone_seed := 0.0
-var _boss_music := false   # the boss track is playing because of this arena
+var _boss_music := false
+var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced   # the boss track is playing because of this arena
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
 ## row stands (a slight stagger, so each side reads as one line). Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
@@ -145,6 +146,149 @@ func _leaving() -> bool:
 	return false
 
 
+## Fighters face the other side: the party (left) looks right, wild Aetherlings (right) look left. The
+## sprites are painted facing left (`combat.spriteFacing`); a form whose sprite faces another way says so
+## with a `facing` of "left", "right" or "front" in species.json.
+static func _needs_flip(species_id: String, form: int, side: int) -> bool:
+	var forms: Array = Data.species[species_id].forms
+	var fd: Dictionary = forms[clampi(form, 1, forms.size()) - 1]
+	var native: String = fd.get("facing", Data.tuning.combat.get("spriteFacing", "left"))
+	if native == "front":
+		return false
+	return native != ("right" if side == 0 else "left")
+
+
+## A fighter's nameplate: a small glass panel edged in its rarity colour, with the owned badge (wild
+## Aetherlings whose species you have), the name, a level chip, and the health and shield bars.
+func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionary:
+	var rc := Data.rarity_color(int(f.rarity))
+	var edge := Palette.GOLD if boss else rc
+	var panel := PanelContainer.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := ThemeFactory.box(Color(0.05, 0.055, 0.13, 0.84), 9, 1, Color(edge, 0.85), 0)
+	sb.content_margin_left = 7
+	sb.content_margin_right = 7
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 5
+	sb.border_width_top = 2
+	sb.shadow_color = Color(0, 0, 0.04, 0.45)
+	sb.shadow_size = 4
+	sb.shadow_offset = Vector2(0, 2)
+	panel.add_theme_stylebox_override("panel", sb)
+	var v := UI.vbox(2)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(v)
+	var row := UI.hbox(4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
+		var mark := UI.owned_mark(14)
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(mark)
+	if bool(f.get("shiny", false)):
+		var sm := UI.icon(Data.ui_icon("shiny"), 14)
+		sm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(sm)
+	var nm := UI.label(f.name, "Small", Color("ffe9a8") if bool(f.get("shiny", false)) else Palette.TEXT)
+	nm.add_theme_font_size_override("font_size", 14 if boss else 12)
+	nm.clip_text = true
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nm.custom_minimum_size.x = 30
+	row.add_child(nm)
+	var lv := PanelContainer.new()
+	lv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var lsb := ThemeFactory.box(Color(rc, 0.22), 99, 1, Color(rc, 0.7), 0)
+	lsb.content_margin_left = 5
+	lsb.content_margin_right = 5
+	lv.add_theme_stylebox_override("panel", lsb)
+	var ll := UI.label("Lv %d" % int(f.level), "Small", rc.lightened(0.35))
+	ll.add_theme_font_size_override("font_size", 10)
+	lv.add_child(ll)
+	lv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	v.add_child(row)
+	# the level chip sits beside the bars, so the name gets the plate's full width
+	var bars_row := UI.hbox(5)
+	bars_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bars_row.add_child(lv)
+	var bars := UI.vbox(2)
+	bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 7)
+	bars.add_child(hp)
+	var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.9), 3)
+	sh.modulate.a = 0.0
+	bars.add_child(sh)
+	bars_row.add_child(bars)
+	v.add_child(bars_row)
+	panel.custom_minimum_size.x = width
+	# rarity pips sit on the plate's top edge, one per tier
+	var pips := Control.new()
+	pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tier := int(f.rarity)
+	pips.draw.connect(func(): UI.draw_pips(pips, Vector2.ZERO, tier, 3.2, Data.rarity_color_live(tier)))
+	return {"panel": panel, "hp": hp, "shield": sh, "pips": pips, "sb": sb, "tier": tier, "boss": boss}
+
+
+## A shiny or a rare wild Aetherling entering the fight gets a sound, a burst of light and a word over its
+## head, once per wave. "Rare" means a rarity this island rolls at most `combat.rareAnnounceChance` of the time.
+func _announce(b: Dictionary) -> void:
+	var key := "%s|%d|%d" % [b.zone, int(b.wave), int(Game.state.expedition.zones.get(b.zone, {}).get("runs", 0))]
+	if key == _announced:
+		return
+	_announced = key
+	var z: Dictionary = Data.zones[b.zone]
+	var weights: Array = z.rarityWeights
+	var total := 0.0
+	for w in weights:
+		total += float(w)
+	var sound := ""
+	for i in _enemies.size():
+		var f: Dictionary = b.enemies[i]
+		if f.get("boss", false):
+			continue
+		var r := int(f.rarity)
+		var share := float(weights[r - 1]) / total if r - 1 < weights.size() else 0.0
+		var rare := r > 1 and share <= float(Data.tuning.combat.get("rareAnnounceChance", 0.1))
+		if not (f.shiny or rare):
+			continue
+		var v: Dictionary = _enemies[i]
+		var col: Color = Color(CreaturePortrait.shiny_palette(f.species).light) if f.shiny else Data.rarity_color(r)
+		var centre: Vector2 = v.root.position + v.root.size * 0.5
+		_burst(centre, col, 1.4 if f.shiny else 1.0)
+		FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 10.0),
+			"Shiny!" if f.shiny else Data.rarity(r).name + "!", col, Data.ui_icon("shiny") if f.shiny else null, 17, 34.0, true)
+		sound = "shiny_appear" if f.shiny else (sound if sound != "" else "rare_appear")
+	if sound != "":
+		Sfx.play(sound)
+
+
+## An expanding ring of light with short rays, fading out.
+func _burst(at: Vector2, col: Color, strength: float) -> void:
+	var fx := Control.new()
+	fx.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx.position = at
+	fx.z_index = 8
+	_fx.add_child(fx)
+	var state := {"k": 0.0}
+	fx.draw.connect(func():
+		var k: float = state.k
+		var a := 1.0 - k
+		var r := 20.0 + 70.0 * k * strength
+		fx.draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(col, 0.8 * a), 3.0 + 3.0 * a, true)
+		fx.draw_circle(Vector2.ZERO, r * 0.6, Color(col, 0.18 * a))
+		for i in 10:
+			var ang := TAU * i / 10.0 + k * 0.6
+			var d := Vector2(cos(ang), sin(ang))
+			fx.draw_line(d * r * 0.75, d * (r * 1.15 + 10.0), Color(col.lightened(0.3), 0.7 * a), 2.0, true))
+	var tw := fx.create_tween()
+	tw.tween_method(func(k: float):
+		state.k = k
+		fx.queue_redraw(), 0.0, 1.0, 0.9 if Options.get_value("reduce_motion") == false else 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_callback(fx.queue_free)
+
+
 func _clear() -> void:
 	for list in [_allies, _enemies]:
 		for f in list:
@@ -182,7 +326,7 @@ func _build(b: Dictionary) -> void:
 			root.size = Vector2(px, px)
 			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), px)
 			por.plate = false
-			por.flip = side == 1
+			por.flip = _needs_flip(f.species, int(f.form), side)
 			por.size = Vector2(px, px)
 			por.refresh()
 			# stand the visible art on the ground line: its lowest opaque pixel touches the feet line
@@ -201,39 +345,27 @@ func _build(b: Dictionary) -> void:
 				shadow.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE))
 			root.add_child(shadow)
 			root.add_child(por)
-			# name and bars float just above the head
-			var head := art.position.y
-			var nm := UI.label("%s %d" % [f.name, int(f.level)], "Small", Data.rarity_color(int(f.rarity)).lightened(0.3) if side == 1 else Palette.TEXT)
-			nm.add_theme_color_override("font_outline_color", Palette.INK)
-			nm.add_theme_constant_override("outline_size", 5)
-			# the fighters stand almost in a line, so back-row name tags sit a step higher to stay readable
-			var tag_rise := 17.0 if back else 0.0
-			nm.position = Vector2(-20, head - 36 - tag_rise)
-			nm.size = Vector2(px + 40, 18)
-			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			root.add_child(nm)
-			var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 8)
-			hp.position = Vector2(art.get_center().x - px * 0.35, head - 16)
-			hp.size = Vector2(px * 0.7, 8)
-			root.add_child(hp)
-			var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.85), 4)
-			sh.position = Vector2(art.get_center().x - px * 0.35, head - 7)
-			sh.size = Vector2(px * 0.7, 4)
-			root.add_child(sh)
-			nm.add_theme_font_size_override("font_size", 15 if boss else 12)
 			root.z_index = 0 if back else 1
 			add_child(root)
-			# a wild Aetherling whose species you already own gets the owned badge just left of its name
-			if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
-				var fs := nm.get_theme_font_size("font_size")
-				var w := nm.get_theme_font("font").get_string_size(nm.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-				var mark := UI.owned_mark(16)
-				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				mark.position = Vector2(nm.position.x + (nm.size.x - minf(w, nm.size.x)) / 2.0 - 19.0, nm.position.y + 1.0)
-				root.add_child(mark)
-			var rec := {"root": root, "portrait": por, "hp": hp, "shield": sh, "home": root.position, "down": false}
+			# the nameplate floats above the head; back-row plates sit a step higher so neighbours never overlap
+			var plate_w := clampf(1.55 * side_w / maxf(1.0, float(full)) - 6.0, 92.0, 150.0)
+			if boss:
+				plate_w = 176.0
+			var np := _nameplate(f, side, boss, plate_w)
+			root.add_child(np.panel)
+			var ph: float = np.panel.get_combined_minimum_size().y
+			var head := art.position.y
+			var top := head - 6.0 - ph - ((ph + 4.0) if back else 0.0)
+			np.panel.size = Vector2(plate_w, ph)
+			# centred over the art, but never past the arena's edges
+			var plate_x := clampf(root.position.x + art.get_center().x - plate_w / 2.0, 4.0, s.x - 4.0 - plate_w)
+			np.panel.position = Vector2(plate_x - root.position.x, top)
+			root.add_child(np.pips)
+			np.pips.position = np.panel.position + Vector2(plate_w / 2.0, 0)
+			var rec := {"root": root, "portrait": por, "hp": np.hp, "shield": np.shield, "home": root.position, "down": false,
+				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss}
 			(_allies if side == 0 else _enemies).append(rec)
+	_announce(b)
 	var z: Dictionary = Data.zones[b.zone]
 	if int(b.wave) >= int(b.waves):
 		_show_banner("BOSS: " + z.boss.name, Palette.GOLD)
@@ -259,8 +391,12 @@ func _update(b: Dictionary) -> void:
 			var f: Dictionary = list[i]
 			var v: Dictionary = views[i]
 			v.hp.value = float(f.hp) / maxf(1.0, float(f.maxHp))
+			if Data.rarity_animated(int(v.get("tier", 1))):
+				v.pips.queue_redraw()
+				if not v.boss:
+					v.sb.border_color = Color(Data.rarity_color_live(int(v.tier)), 0.9)
 			v.shield.value = clampf(float(f.shield) / maxf(1.0, float(f.maxHp)), 0.0, 1.0)
-			v.shield.visible = float(f.shield) > 0.5
+			v.shield.modulate.a = 1.0 if float(f.shield) > 0.5 else 0.0   # keeps its space, so the plate never jumps
 			if not f.alive and not v.down:
 				v.down = true
 				var tw := create_tween()
@@ -275,6 +411,25 @@ func _update(b: Dictionary) -> void:
 			_status.text = "Moving on…" if int(b.wave) > 0 else "Setting out…"
 		_:
 			_status.text = "Meals left this run: %d" % int(b.meals)
+
+
+## Where the next number over a fighter starts. Numbers that land close together take the next lane
+## (centre, left, right, then a row higher), so a flurry of hits reads as separate numbers.
+const NUMBER_LANES := [Vector2(0, 0), Vector2(-0.3, -0.08), Vector2(0.3, -0.08), Vector2(-0.15, -0.3), Vector2(0.15, -0.3), Vector2(0, -0.45)]
+
+func _number_at(v: Dictionary) -> Vector2:
+	var now := Time.get_ticks_msec()
+	var recent: Array = v.get("nums", []).filter(func(t): return now - int(t) < 650)
+	var lane: Vector2 = NUMBER_LANES[recent.size() % NUMBER_LANES.size()]
+	recent.append(now)
+	v.nums = recent
+	var px: float = v.root.size.x
+	return v.root.position + Vector2(px * (0.5 + lane.x), px * (0.22 + lane.y))
+
+
+## Damage and healing as whole numbers ("9", not "8.8"); big ones keep the short form (1.2K).
+static func _num(v: float) -> String:
+	return str(maxi(1, roundi(v))) if v < 1000.0 else F.format_num(v)
 
 
 func _view(side: int, index: int) -> Dictionary:
@@ -304,20 +459,25 @@ func _on_event(e: Dictionary) -> void:
 				var st: Tween = def.root.create_tween()
 				st.tween_property(def.root, "position", def.home + Vector2(randf_range(-5, 5), randf_range(-3, 3)), 0.04)
 				st.tween_property(def.root, "position", def.home, 0.06)
+			var eff: float = e.eff
 			if Options.get_value("damage_numbers"):
-				var eff: float = e.eff
 				var col := Palette.GOLD if eff > 1.01 else (Palette.TEXT_FAINT if eff < 0.99 else Palette.TEXT)
-				var txt := F.format_num(e.dmg) + ("!" if eff > 1.01 else "")
-				var at: Vector2 = def.root.position + Vector2(def.root.size.x * randf_range(0.3, 0.6), def.root.size.x * 0.2)
-				FloatText.spawn(_fx, at, txt, col, null, 18 if e.ability != "" else 15, 40.0)
-			Sfx.play("hit", randf_range(0.85, 1.2))
+				FloatText.spawn(_fx, _number_at(def), _num(e.dmg) + ("!" if eff > 1.01 else ""), col, null, 18 if e.ability != "" else 15, 40.0, true)
+			# each type has its own hit sound; the pitch varies a little so a flurry doesn't drone
+			var dtype: String = e.get("dtype", "")
+			Sfx.play("hit_" + dtype if dtype != "" else "hit", randf_range(0.9, 1.12))
+			if eff > 1.01:
+				Sfx.play("strong", randf_range(0.97, 1.05))
 		"ability":
 			var v := _view(e.side, e.index)
 			if v.is_empty():
 				return
 			var ab: Dictionary = Data.abilities[e.ability]
-			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.1, -8)
-			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 30.0)
+			# starts above the name tag so it never crosses the fighter's own name
+			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 6.0)
+			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 26.0, true)
+			if Data.types.has(ab.damageType):
+				Sfx.play("cast_" + ab.damageType)
 			if motion:
 				var por: Control = v.portrait
 				por.pivot_offset = por.size / 2.0
@@ -327,11 +487,11 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			var v := _view(e.side, e.index)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, v.root.size.x * 0.1), "+" + F.format_num(e.amount), Palette.GOOD, null, 14, 34.0)
+				FloatText.spawn(_fx, _number_at(v), "+" + _num(e.amount), Palette.GOOD, null, 14, 34.0, true)
 		"thorns":
 			var v := _view(e.side, e.to)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, 0), F.format_num(e.dmg), Data.type_color("verdant"), null, 13, 30.0)
+				FloatText.spawn(_fx, _number_at(v), _num(e.dmg), Data.type_color("verdant"), null, 13, 30.0, true)
 		"captured":
 			var at := Vector2(size.x * 0.73, size.y * 0.35)
 			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 22, 60.0)

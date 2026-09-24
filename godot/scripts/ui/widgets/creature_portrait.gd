@@ -121,6 +121,8 @@ func _apply_shader() -> void:
 			_mat.set_shader_parameter("pal_mid", Color(pal.mid))
 			_mat.set_shader_parameter("pal_light", Color(pal.light))
 		_mat.set_shader_parameter("shimmer", 1.0 if on and not silhouette else 0.0)
+		_mat.set_shader_parameter("fx", float(Data.rarity(rarity).get("fx", 0)))
+		_mat.set_shader_parameter("fx_color", Data.rarity_color(rarity))
 
 
 ## The shiny palette for a species: its first type's (data/types.json "shiny").
@@ -159,6 +161,8 @@ func _layout() -> void:
 
 
 func _process(delta: float) -> void:
+	if plate and not silhouette and Data.rarity_animated(rarity) and is_visible_in_tree():
+		queue_redraw()
 	if shiny and not silhouette and is_visible_in_tree() and _glints:
 		_twinkle_t += delta
 		_glints.queue_redraw()
@@ -211,7 +215,7 @@ func _draw_plate() -> void:
 	# rarity glow: soft rings outside the plate
 	var glow: float = Data.rarity(rarity).glow * glow_scale if not silhouette else 0.0
 	if glow > 0.0:
-		var rc := Data.rarity_color(rarity)
+		var rc := Data.rarity_color_live(rarity)
 		for i in 6:
 			var rr := r + s * 0.012 * (i + 1)
 			draw_circle(c, rr, Color(rc, 0.07 * glow * (1.0 - i / 6.0)))
@@ -221,4 +225,26 @@ func _draw_plate() -> void:
 		draw_circle(c - Vector2(0, r * 0.12 * i / 5.0), r * (0.95 - i * 0.12), Color(type_c, 0.035))
 	draw_arc(c, r, 0, TAU, 64, Color(type_c, 0.85), maxf(2.0, s * 0.022), true)
 	if not silhouette and rarity > 1:
-		draw_arc(c, r + s * 0.02, -PI * 0.85, -PI * 0.15, 32, Color(Data.rarity_color(rarity), 0.9), maxf(1.5, s * 0.014), true)
+		draw_arc(c, r + s * 0.02, -PI * 0.85, -PI * 0.15, 32, Color(Data.rarity_color_live(rarity), 0.9), maxf(1.5, s * 0.014), true)
+	# frame effects for the top tiers: Zenith's rim is a moving rainbow, and lights orbit the rim
+	if not silhouette and Data.rarity_animated(rarity):
+		var t := Time.get_ticks_msec() / 1000.0
+		if rarity >= Data.max_rarity():
+			for i in 24:
+				var a0 := TAU * i / 24.0
+				draw_arc(c, r, a0, a0 + TAU / 24.0 + 0.02, 4, Color.from_hsv(fmod(t * 0.18 + i / 24.0, 1.0), 0.45, 1.0, 0.95), maxf(2.0, s * 0.026), true)
+		var orbiters := rarity - (Data.max_rarity() - 3)
+		for i in orbiters:
+			var a := t * 0.9 + TAU * i / float(orbiters)
+			var p := c + Vector2(cos(a), sin(a)) * (r + s * 0.02)
+			var oc := Data.rarity_color_live(rarity)
+			draw_circle(p, maxf(2.0, s * 0.02), Color(oc, 0.35))
+			draw_circle(p, maxf(1.2, s * 0.011), Color(oc.lightened(0.5), 0.95))
+	# rarity pips (one per tier) along the bottom of the rim, so the tier can be counted, not just colour-read
+	if not silhouette and s >= 44.0:
+		var pr := clampf(s * 0.024, 2.2, 5.0)
+		var n := rarity
+		var step_a := (pr * 2.3) / r
+		for i in n:
+			var a := PI / 2.0 + (float(i) - float(n - 1) / 2.0) * step_a
+			UI.draw_pips(self, c + Vector2(cos(a), sin(a)) * r, 1, pr, Data.rarity_color_live(rarity))

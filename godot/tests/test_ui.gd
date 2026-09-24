@@ -350,3 +350,78 @@ func test_island_preview_marks_owned_species() -> void:
 	t.eq(marks.size(), owned.size(), "one badge per owned species")
 	main.free()
 	_teardown()
+
+
+## The Sanctum's expedition card follows the run live: new log lines and health changes show up without
+## the player opening the Expeditions page.
+func test_sanctum_expedition_card_follows_the_run() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	Game.battle_log.clear()
+	Game.set_party(0, Game.state.creatures.keys()[0])
+	Game.start_expedition("whisperleaf-hollow")
+	main.show_screen("sanctum")
+	var screen: Node = main._screen
+	var b: Dictionary = Game.state.expedition.battle
+	t.ok(screen._exp_status != null, "the card shows the running expedition")
+	t.eq(screen._exp_hp.size(), b.allies.size(), "a health bar per party member")
+	Game.battle_log.push_front({"text": "Bound a Dim Mossgear", "color": Palette.TEXT, "time": Game.now_sec() + 1.0})
+	b.allies[0].hp = float(b.allies[0].maxHp) * 0.5
+	screen._update_expedition()
+	var lines: Array = screen._exp_log.get_children().map(func(l): return l.text)
+	t.ok("Bound a Dim Mossgear" in lines, "the newest log line appears: %s" % [lines])
+	t.near(screen._exp_hp[0].value, 0.5, 0.01, "health follows the fight")
+	Game.stop_expedition()
+	screen._update_expedition()
+	t.ok(screen._exp_status == null, "the card goes back to 'no expedition' when the run stops")
+	Game.battle_log.clear()
+	main.free()
+	_teardown()
+
+
+## Fighters face each other: sprites are painted facing left, so the party (left side) is mirrored to look
+## right and wild Aetherlings (right side) are drawn as painted. A form can override its facing.
+func test_fighters_face_each_other() -> void:
+	t.ok(Arena._needs_flip("sproutlet", 1, 0), "the party is mirrored to face right")
+	t.ok(not Arena._needs_flip("sproutlet", 1, 1), "wild Aetherlings face left as painted")
+	var fd: Dictionary = Data.species["sproutlet"].forms[0]
+	fd.facing = "right"
+	t.ok(not Arena._needs_flip("sproutlet", 1, 0) and Arena._needs_flip("sproutlet", 1, 1), "a right-facing sprite flips the other way")
+	fd.facing = "front"
+	t.ok(not Arena._needs_flip("sproutlet", 1, 0) and not Arena._needs_flip("sproutlet", 1, 1), "a front-facing sprite never flips")
+	fd.erase("facing")
+
+
+## Numbers landing on one fighter close together start in different places, so they never overlap.
+func test_damage_numbers_spread_out() -> void:
+	var arena := Arena.new()
+	var root := Control.new()
+	root.size = Vector2(90, 90)
+	var rec := {"root": root}
+	var spots := []
+	for i in 5:
+		spots.append(arena._number_at(rec))
+	for i in spots.size():
+		for j in range(i + 1, spots.size()):
+			t.ok(spots[i].distance_to(spots[j]) > 12.0, "numbers %d and %d are apart: %s / %s" % [i, j, spots[i], spots[j]])
+	t.eq(Arena._num(8.8), "9", "whole numbers")
+	t.eq(Arena._num(0.2), "1", "never 0")
+	root.free()
+	arena.free()
+
+
+## A save slot can be named ("Dev Save") and the title screen's slot info reports the name.
+func test_save_slots_can_be_renamed() -> void:
+	var n := 3
+	var had := FileAccess.file_exists(Game.slot_path(n))
+	var backup := FileAccess.get_file_as_string(Game.slot_path(n)) if had else ""
+	FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(JSON.stringify(GameState.new_game()))
+	Game.rename_slot(n, "  Dev Save  ")
+	t.eq(Game.slot_info(n).get("name"), "Dev Save", "named and trimmed")
+	Game.rename_slot(n, "")
+	t.eq(Game.slot_info(n).get("name"), "", "cleared")
+	if had:
+		FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(backup)
+	else:
+		DirAccess.remove_absolute(Game.slot_path(n))
