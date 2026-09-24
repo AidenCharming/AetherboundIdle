@@ -4,3 +4,4 @@
 *.tmp
 # Local exports
 /export/
+tools/art/icons.json

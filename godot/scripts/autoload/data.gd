@@ -133,11 +133,21 @@ func texture(path: String) -> Texture2D:
 func item_icon(id: String) -> Texture2D:
 	if id == "aether" or id == "gold":
 		return ui_icon(id)
-	return texture("res://assets/icons/items/%s.svg" % id)
+	return _icon("res://assets/icons/items/" + id)
 
 
 func ui_icon(name: String) -> Texture2D:
-	return texture("res://assets/icons/ui/%s.svg" % name)
+	return _icon("res://assets/icons/ui/" + name)
+
+
+## A painted PNG icon (from the art pipeline, tools/art/icon_runner.py) wins over the generated SVG placeholder.
+func _icon(base: String) -> Texture2D:
+	var png := base + ".png"
+	if _textures.has(png) or ResourceLoader.exists(png):
+		var tex := texture(png)
+		if tex:
+			return tex
+	return texture(base + ".svg")
 
 
 ## The sprite for a species and form: res://assets/creatures/<id>-f<form>.png (or the file named by the

@@ -59,6 +59,12 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   the item's colour with the same thick outline the creature sprites use, plus ~30 interface icons
   (skills, navigation, currencies, stats). New item → give it an `icon` entry in `items.json` → run the
   script.
+- **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for all 92 icons
+  (90 to generate; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
+  the creature pipeline's rules (magenta key, green for pink and purple things, no glow words, everything opaque).
+  `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
+  `sprite_tools.py`, and installs them into `assets/icons/`. The game uses a PNG icon whenever one exists and the
+  SVG placeholder otherwise. New PNGs import with mipmaps (a project import default), so they stay smooth at 24 px.
 - **Fonts:** Fredoka (headings; rounded, fits "cute stays cute") and Nunito (body). Both SIL Open Font
   License; licence files are next to them in `assets/fonts/`. They cover Latin only, so interface text
   avoids symbols outside that range.
