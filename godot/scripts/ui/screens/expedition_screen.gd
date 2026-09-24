@@ -436,10 +436,19 @@ func _fill_bottom() -> void:
 		bv.add_child(UI.wrap_label("No vessels! Fabrication makes them; the Market sells them.", "Small", 260))
 		bv.get_child(bv.get_child_count() - 1).add_theme_color_override("font_color", Palette.DANGER)
 	else:
-		var line := []
+		# the chance per rarity, each a pill in that rarity's colour
+		bv.add_child(UI.hbox(6, [UI.label("Bind chance with", "Faint"), UI.icon(Data.item_icon(best), 18), UI.label(Data.item_name(best), "Faint")]))
+		var flow := HFlowContainer.new()
+		flow.name = "BindChances"
+		flow.custom_minimum_size.x = 260
+		flow.add_theme_constant_override("h_separation", 6)
+		flow.add_theme_constant_override("v_separation", 6)
 		for r in [1, 2, 3, 4, 5]:
-			line.append("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, GameState.party(s)))])
-		bv.add_child(UI.wrap_label("Bind chance: " + " · ".join(line), "Faint", 260))
+			var c := UI.chip("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, GameState.party(s)))], Data.rarity_color(r), 13)
+			c.tooltip_text = "Chance a %s vessel binds a %s Aetherling" % [Data.item_name(best), Data.rarity(r).name]
+			c.mouse_filter = Control.MOUSE_FILTER_STOP
+			flow.add_child(c)
+		bv.add_child(flow)
 	var rb := _small_choice(bv2, "Only")
 	for i in Data.rarities.size():
 		rb.add_item("%s or better" % Data.rarities[i].name, i)

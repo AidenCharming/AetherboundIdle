@@ -465,6 +465,26 @@ func test_waiting_shinies_are_shown_first() -> void:
 	_teardown()
 
 
+## The Auto-bind tab shows each rarity's bind chance as a pill in that rarity's colour.
+func test_bind_chances_in_rarity_colours() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	GameState.add_item(Game.state, "tinkerers-vessel", 5)
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	var scr: Node = main._screen
+	scr._bottom_tab = "autobind"
+	scr._fill_bottom()
+	var flow: Node = scr.find_child("BindChances", true, false)
+	t.ok(flow != null and flow.get_child_count() == 5, "five bind-chance pills")
+	if flow:
+		var l: Label = flow.get_child(1).get_child(0)
+		t.ok(l.text.begins_with(Data.rarity(2).name), "each pill names its rarity")
+		t.ok(l.get_theme_color("font_color").is_equal_approx(Data.rarity_color(2).lightened(0.3)), "in the rarity's colour")
+	main.free()
+	_teardown()
+
+
 ## The Expeditions page's island list and log fold to slim strips, and the choice is remembered.
 func test_expedition_panels_fold() -> void:
 	_setup()
