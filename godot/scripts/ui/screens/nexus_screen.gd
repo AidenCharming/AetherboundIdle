@@ -373,7 +373,7 @@ func _attune(c: Dictionary) -> void:
 					locks.erase(t.id)
 				fill_ref.call(fill_ref))
 			body.add_child(cb)
-		var cost := Traits.attune_cost(cr, locks.size())
+		var cost := Traits.attune_cost(cr, locks.size(), Game.state)
 		var row := UI.hbox(10)
 		row.add_child(UI.label("Cost", "Faint"))
 		row.add_child(UI.amount("aether", cost, cost))

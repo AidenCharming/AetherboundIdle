@@ -102,6 +102,19 @@ static func upgrade_level(s: Dictionary, id: String) -> int:
 	return int(s.upgrades.get(id, 0))
 
 
+## A Pearl upgrade's level (0 without a state, e.g. a preview with no game loaded).
+static func pearl(s: Dictionary, id: String) -> int:
+	return 0 if s.is_empty() or not s.has("upgrades") else upgrade_level(s, id)
+
+
+## Adds Aether Pearls and returns the event that announces them (empty when n is 0).
+static func give_pearls(s: Dictionary, n: int, why: String) -> Array:
+	if n <= 0:
+		return []
+	add_item(s, "aether-pearl", n)
+	return [{"type": "pearl", "amount": n, "why": why}]
+
+
 static func upgrade_value(s: Dictionary, id: String) -> float:
 	var u: Dictionary = Data.upgrades[id]
 	var lv := upgrade_level(s, id)

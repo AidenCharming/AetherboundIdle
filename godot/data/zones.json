@@ -817,6 +817,7 @@
 			80
 		],
 		"bossLoot": {
+			"pearlChance": 0.0015,
 			"gold": 12000,
 			"items": {
 				"luminescent-vessel": 3,
@@ -924,6 +925,7 @@
 			100
 		],
 		"bossLoot": {
+			"pearlChance": 0.004,
 			"gold": 20000,
 			"items": {
 				"luminescent-vessel": 5,

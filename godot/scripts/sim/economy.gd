@@ -91,6 +91,10 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	Skills.unassign(s, c)
 	s.creatures.erase(c.id)
 	GameState.add_item(s, "aether", value)
+	# the rarest (and shinies) leave Aether Pearls behind
+	var pearls := int(Data.rarity(int(c.rarity)).get("releasePearls", 0)) + (int(Data.tuning.pearls.shinyRelease) if c.get("shiny", false) else 0)
+	if pearls > 0:
+		GameState.add_item(s, "aether-pearl", pearls)
 	s.counters.released = int(s.counters.released) + 1
 	return value
 

@@ -170,6 +170,7 @@ I("luminescent-vessel", "item", "Vessels", "m", ORB.format(body="made of pale-go
 I("timber-frame", "item", "Parts", "m", "A small square wooden crate frame made of planks with crossed braces and dark iron corner brackets.")
 I("resonance-frame", "item", "Parts", "m", "A diamond-shaped brass frame with small rivets, holding a round pale-blue crystal in its centre.")
 I("aether-lantern", "item", "Parts", "m", "An elegant brass lantern with a ring handle on top and opaque frosted panes, a small pale-cyan crystal flame inside drawn as a crisp flat shape.")
+I("aether-pearl", "item", "Rare finds", "g", "A single large round pearl, pale lilac-white with soft opal colours of pale pink, mint and sky blue swirled across its surface and one white highlight shape, resting in a small open grey-blue clam shell.")
 I("aether-crystal", "item", "Rare finds", "m", "A cluster of three pale-cyan crystal shards growing from a small grey rock base, with white highlight shapes on the facets.")
 
 # ----------------------------------------------------------------------------- interface: currencies and skills

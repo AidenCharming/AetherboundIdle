@@ -132,6 +132,7 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	var p: float = sh.encounterRate
 	if since > int(sh.encounterPityStart):
 		p = lerpf(sh.encounterRate, 1.0, clampf(float(since - int(sh.encounterPityStart)) / float(int(sh.encounterPityFull) - int(sh.encounterPityStart)), 0.0, 1.0))
+	p += float(Data.tuning.pearls.lensWildPerLevel) * GameState.pearl(s, "pearl-lens")
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
 	s.collection.seen[sp_id] = true
@@ -249,9 +250,10 @@ static func choose_vessel(s: Dictionary, w: Dictionary) -> String:
 	return want if GameState.count(s, want) >= 1 else ""
 
 
-static func bind_chance(_s: Dictionary, vessel_id: String, rarity: int, party: Array) -> float:
+static func bind_chance(s: Dictionary, vessel_id: String, rarity: int, party: Array) -> float:
 	var v: Dictionary = Data.items[vessel_id].vessel
 	var bonus := minf(Traits.cap("bind_rate"), Traits.party_mod(party, "bind_rate"))
+	bonus += float(Data.tuning.pearls.bindPerLevel) * GameState.pearl(s, "pearl-vessel")
 	return clampf(float(v.base) * pow(float(v.falloff), rarity - 1) * (1.0 + bonus), 0.0, 0.98)
 
 
@@ -322,6 +324,8 @@ static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, even
 	s.creatures[c.id] = c
 	s.counters.captures = int(s.counters.captures) + 1
 	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
+	if c.shiny:
+		events.append_array(GameState.give_pearls(s, int(Data.tuning.pearls.shinyFound), "a shiny was bound"))
 	events.append_array(Collection.on_owned(s, c))
 	return c
 
@@ -375,6 +379,9 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	GameState.add_item(s, "gold", float(bl.gold))
 	for id in bl.items:
 		GameState.add_item(s, id, float(bl.items[id]))
+	# the last islands' bosses sometimes leave an Aether Pearl
+	if Rng.chance(rng, float(bl.get("pearlChance", 0.0))):
+		events.append_array(GameState.give_pearls(s, 1, z.boss.name + " left a pearl"))
 	events.append({"type": "boss_defeated", "zone": z.id, "first": first, "loot": bl})
 	if first:
 		for other in Data.zone_list:

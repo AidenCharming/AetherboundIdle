@@ -185,6 +185,18 @@
 		],
 		"maxLocks": 2
 	},
+	"pearls": {
+		"shinyFound": 1,
+		"shinyRelease": 2,
+		"lensHatchPerLevel": 0.005,
+		"lensWildPerLevel": 0.001,
+		"mutationPerLevel": 0.2,
+		"attuneCostPerLevel": 0.1,
+		"strengthUpPerLevel": 0.05,
+		"hatchTimePerLevel": 0.08,
+		"bindPerLevel": 0.05,
+		"offlineHoursPerLevel": 2
+	},
 	"combat": {
 		"spriteFacing": "left",
 		"rareAnnounceChance": 0.1,

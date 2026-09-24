@@ -72,7 +72,7 @@
 	{
 		"tier": 8,
 		"id": "resplendent",
-		"name": "Resplendent", "fx": 4,
+		"name": "Resplendent", "releasePearls": 1, "fx": 4,
 		"color": "#c58bff",
 		"statMultiplier": 5.4,
 		"benchAetherPerMin": 256,
@@ -82,7 +82,7 @@
 	{
 		"tier": 9,
 		"id": "zenith",
-		"name": "Zenith", "fx": 5,
+		"name": "Zenith", "releasePearls": 3, "fx": 5,
 		"color": "#fff6d6",
 		"statMultiplier": 6.8,
 		"benchAetherPerMin": 512,

@@ -135,6 +135,9 @@ func _log_battle(e: Dictionary) -> void:
 		"boss_wave":
 			line = "The boss appears!"
 			col = Palette.GOLD
+		"pearl":
+			line = "+%d Aether Pearl (%s)" % [int(e.amount), e.why]
+			col = Color("f1e6ff")
 	if line != "":
 		battle_log.push_front({"text": line, "color": col, "time": now_sec()})
 		if battle_log.size() > 40:
@@ -147,6 +150,9 @@ func _handle(events: Array) -> void:
 		event.emit(e)
 		_log_battle(e)
 		match e.type:
+			"pearl":
+				_notify("+%d Aether Pearl · %s" % [int(e.amount), e.why], Data.item_icon("aether-pearl"), Color("f1e6ff"))
+				Sfx.play("rare")
 			"skill_level":
 				_notify("%s reached level %d" % [Data.skills[e.skill].name, e.level], Data.ui_icon(e.skill), Palette.GOLD)
 				Sfx.play("level")
@@ -522,11 +528,13 @@ func release(cid: String) -> void:
 	if c.job.get("kind", "") == "party" and Expedition.party_locked(state):
 		warn(Expedition.PARTY_LOCKED)
 		return
+	var pearls0 := GameState.count(state, "aether-pearl")
 	var v := Economy.release(state, c)
 	if v < 0:
 		warn("Locked Aetherlings (and your last one) cannot be released.")
 		return
-	info("Released. +%d Aether" % v, Data.ui_icon("aether"))
+	var pearls := int(GameState.count(state, "aether-pearl") - pearls0)
+	info("Released. +%d Aether%s" % [v, " and %d Aether Pearl%s" % [pearls, "" if pearls == 1 else "s"] if pearls > 0 else ""], Data.ui_icon("aether"))
 	changed.emit()
 
 

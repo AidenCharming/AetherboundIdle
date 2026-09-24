@@ -28,13 +28,16 @@ func refresh() -> void:
 		var cv := UI.vbox(10)
 		card.add_child(cv)
 		var h := UI.hbox(12)
-		h.add_child(UI.icon(Data.ui_icon(_icon(u.id)), 52))
+		var pearl: bool = u.get("pearl", false)
+		h.add_child(UI.icon(Data.item_icon("aether-pearl") if pearl else Data.ui_icon(_icon(u.id)), 52))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(u.name, "H2"))
 		tv.add_child(UI.label("Level %d of %d" % [lv, u.levels.size()], "Faint"))
 		h.add_child(tv)
 		cv.add_child(h)
 		cv.add_child(UI.wrap_label(u.blurb, "Dim"))
+		if pearl and lv == 0 and GameState.count(s, "aether-pearl") < 1:
+			cv.add_child(UI.wrap_label("Aether Pearls come from the last two islands' bosses (rarely), releasing Resplendent and Zenith Aetherlings, and finding or releasing shinies.", "Faint"))
 		var pips := UI.hbox(4)
 		for i in u.levels.size():
 			var pip := ColorRect.new()
@@ -60,7 +63,20 @@ func _icon(id: String) -> String:
 
 
 func _fmt(id: String, v: float) -> String:
+	var pt: Dictionary = Data.tuning.pearls
 	match id:
+		"pearl-lens":
+			return "+%s shiny on eggs" % F.pct(float(pt.lensHatchPerLevel) * v)
+		"pearl-resonator":
+			return "+%d%% mutation" % roundi(float(pt.mutationPerLevel) * v * 100.0)
+		"pearl-crucible":
+			return "-%d%% attunement cost" % roundi(float(pt.attuneCostPerLevel) * v * 100.0)
+		"pearl-incubator":
+			return "-%d%% hatch time" % roundi(float(pt.hatchTimePerLevel) * v * 100.0)
+		"pearl-vessel":
+			return "+%d%% bind chance" % roundi(float(pt.bindPerLevel) * v * 100.0)
+		"pearl-hourglass":
+			return "+%dh time away" % roundi(float(pt.offlineHoursPerLevel) * v)
 		"genesis-pods":
 			return "%d pods" % int(v)
 		"perches":
