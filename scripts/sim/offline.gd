@@ -55,7 +55,7 @@ static func diff(s: Dictionary, before: Dictionary, events: Array) -> Dictionary
 	for id in s.skills:
 		if int(s.skills[id].level) > int(before.levels.get(id, 1)):
 			levels[id] = [int(before.levels.get(id, 1)), int(s.skills[id].level)]
-	var notable := events.filter(func(e): return e.type in ["evolved", "captured", "boss_defeated", "zone_unlocked", "slot_unlocked", "discovered", "shiny"])
+	var notable := events.filter(func(e): return e.type in ["evolved", "captured", "boss_defeated", "zone_unlocked", "slot_unlocked", "discovered", "shiny", "pearl"])
 	var actions := 0
 	for e in events:
 		if e.type == "produced":

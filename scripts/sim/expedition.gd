@@ -463,7 +463,7 @@ static func offline(s: Dictionary, ms: float, rng: RandomNumberGenerator) -> Arr
 		for e in ev:
 			if e.type in ["run_complete", "wiped"]:
 				runs += 1
-			if e.type in ["captured", "evolved", "boss_defeated", "zone_unlocked", "discovered", "pending", "wiped", "escaped", "loot"]:
+			if e.type in ["captured", "evolved", "boss_defeated", "zone_unlocked", "discovered", "pending", "wiped", "escaped", "loot", "pearl"]:
 				events.append(e)
 	var remaining := ms - simulated
 	if remaining <= 0.0 or not is_running(s) or simulated <= 0.0:

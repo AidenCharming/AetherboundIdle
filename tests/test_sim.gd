@@ -123,6 +123,14 @@ func test_offline_cap_counts_the_pearl_hourglass() -> void:
 	t.near(float(Offline.apply(s, 1e9, _rng()).usedSeconds), cap * 3600.0, 0.01, "Offline.apply uses the same cap")
 
 
+## Pearls found while away reach the Welcome Back highlights.
+func test_offline_highlights_keep_pearls() -> void:
+	var s := GameState.new_game()
+	var got: Array = Offline.diff(s, Offline.snapshot(s), [{"type": "pearl", "amount": 1, "why": "x"}]).events
+	t.eq(got.size(), 1, "the pearl event is kept")
+	t.eq(got[0].type if got.size() > 0 else "", "pearl")
+
+
 func test_offline_crafting_chain_feeds_through_slices() -> void:
 	var s := GameState.new_game()
 	var miner := Creatures.make(s, "tuskcub", 3, 20, false, [], "test")
