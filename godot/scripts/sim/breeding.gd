@@ -157,7 +157,7 @@ static func breed(s: Dictionary, a: Dictionary, b: Dictionary, tier: int, rng: R
 	return {"pod": pod, "egg": egg}
 
 
-## Pool traits for an offspring: each parent trait may pass down (strength can drift one step), then the
+## Pool traits for an offspring: each parent trait may pass down (at its strength or one step stronger), then the
 ## empty slots roll fresh, with a small chance of a bonus mutation trait.
 static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, types: Array) -> Array:
 	var br: Dictionary = Data.tuning.breeding
@@ -174,17 +174,20 @@ static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, ty
 		if not (t.id in eligible) or out.any(func(o): return o.id == t.id):
 			continue
 		if Rng.chance(rng, float(br.inheritChance)):
+			# a passed-down trait keeps its strength or grows one step, never weaker (designer's rule)
 			var idx := Traits.STRENGTHS.find(t.s)
-			var r := rng.randf()
-			if r < 0.25:
-				idx -= 1
-			elif r > 0.85:
+			if Rng.chance(rng, float(br.traitStrengthUpChance)):
 				idx += 1
 			out.append({"id": t.id, "s": Traits.clamp_strength(t.id, Traits.STRENGTHS[clampi(idx, 0, 2)])})
 	if out.is_empty():
 		out = Traits.roll_fresh(rng, types)
 	if Rng.chance(rng, float(br.traitMutationChance)):
 		out = Traits.roll_into(rng, types, out, 1)
+	# a fresh roll can land on a trait a parent has: it never comes out weaker than the parent's
+	for o in out:
+		for t in a.traits + b.traits:
+			if t.id == o.id and Traits.STRENGTHS.find(t.s) > Traits.STRENGTHS.find(o.s):
+				o.s = t.s
 	return out
 
 

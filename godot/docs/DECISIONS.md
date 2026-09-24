@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 80 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 81 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -375,7 +375,8 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
 - **The pool-trait roll** (an open question in the reference, blocking its Phase 2): a new creature rolls
   0/1/2/3 pool traits with weights 35/40/20/5; strength Minor 65%, Moderate 28%, Major 7%; a trait of the
   creature's own type is 3× as likely; Void-only traits only on Void creatures and at Moderate minimum.
-  Offspring inherit each parent trait with 40% chance (strength can drift one step), fill up with fresh
+  Offspring inherit each parent trait with 40% chance, at the same strength or (15%) one step stronger, never
+  weaker (the designer's rule: no step down), fill up with fresh
   rolls if nothing passed down, and have a 5% chance of one extra mutation trait. All in `tuning.json`.
 - **Rarity:** the materials' tier sets the ceiling. There are ten egg tiers, one per material tier (the
   designer asked whether five was enough; it wasn't once materials went to ten). Tiers 1–10 cap at Faint,

@@ -161,6 +161,7 @@
 			70
 		],
 		"inheritChance": 0.4,
+		"traitStrengthUpChance": 0.15,
 		"traitMutationChance": 0.05,
 		"shellTruthChance": 0.75
 	},

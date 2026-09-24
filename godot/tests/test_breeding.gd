@@ -121,6 +121,25 @@ func test_inherited_traits_are_valid() -> void:
 			t.ok(Data.traits.has(x.id) and x.s in Traits.STRENGTHS)
 
 
+## Designer's rule: a trait passed down keeps its strength or grows a step; it never comes out weaker.
+func test_inherited_traits_never_weaken() -> void:
+	var s := GameState.new_game()
+	var rng := _rng()
+	var a := _c(s, "sproutlet", 1, [{"id": "lucky", "s": "moderate"}, {"id": "scholar", "s": "major"}])
+	var b := _c(s, "sproutlet", 1, [{"id": "green-thumb", "s": "minor"}])
+	var parent := {"lucky": "moderate", "scholar": "major", "green-thumb": "minor"}
+	var grew := 0
+	for i in 400:
+		for x in Breeding.inherit(rng, a, b, ["verdant"]):
+			if parent.has(x.id):
+				var was := Traits.STRENGTHS.find(parent[x.id])
+				var now := Traits.STRENGTHS.find(x.s)
+				t.ok(now >= was, "%s came out %s from a %s parent" % [x.id, x.s, parent[x.id]])
+				if now > was:
+					grew += 1
+	t.ok(grew > 0, "and sometimes grows a step (%d times)" % grew)
+
+
 func test_attunement_keeps_locked_traits_and_charges_more() -> void:
 	var s := GameState.new_game()
 	var c := _c(s, "sproutlet", 3, [{"id": "lucky", "s": "major"}, {"id": "scholar", "s": "minor"}])
