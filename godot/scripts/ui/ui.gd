@@ -68,6 +68,23 @@ static func draw_pips(ci: CanvasItem, at: Vector2, n: int, r: float, col: Color,
 		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r * 0.45, -r * 0.1), p + Vector2(0, -r * 0.2)]), Color(1, 1, 1, 0.55))
 
 
+## A small number chip in the nameplates' style: a rounded pill tinted with `color` (level, dex number).
+static func chip(text: String, color: Color, font_size := 11) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := ThemeFactory.box(Color(color, 0.18), 99, 1, Color(color, 0.65), 0)
+	sb.content_margin_left = 7
+	sb.content_margin_right = 7
+	sb.content_margin_top = 1
+	sb.content_margin_bottom = 1
+	p.add_theme_stylebox_override("panel", sb)
+	var l := label(text, "Small", color.lightened(0.3))
+	l.add_theme_font_size_override("font_size", font_size)
+	p.add_child(l)
+	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	return p
+
+
 static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
 	var b := HBoxContainer.new()
 	b.add_theme_constant_override("separation", gap)
