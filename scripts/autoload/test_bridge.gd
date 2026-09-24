@@ -18,6 +18,7 @@ var _errors: Array = []  # [{time, text}], newest last
 var _error_total := 0
 var _mutex := Mutex.new()
 var _logger: BridgeLogger
+var _modal_seen: Dictionary = {}   # modal instance id -> msec first seen by "modals"
 
 
 ## Collects engine and script errors (any thread) so `errors` can report them.
@@ -120,7 +121,23 @@ func _handle(r: Dictionary) -> Dictionary:
 		"buttons":
 			return {"ok": true, "buttons": _buttons()}
 		"click":
-			return await _click_button(String(r.get("text", "")), int(r.get("index", 0)), bool(r.get("reveal", true)))
+			return await _click_button(String(r.get("text", "")), int(r.get("index", 0)), bool(r.get("reveal", true)), String(r.get("cid", "")),
+				bool(r.get("exact", false)))
+		"goal":
+			return {"ok": true, "goal": goal_info()}
+		"player":
+			return {"ok": true, "player": player_snapshot()}
+		"modals":
+			return {"ok": true, "modals": modals_info(), "reveal": reveal_info()}
+		"focus":
+			# play as a player looking at the window: lift the background frame-rate cap (Options)
+			Options._focused = true
+			Options.apply()
+			return {"ok": true, "fps_cap": Engine.max_fps}
+		"invariants":
+			return {"ok": true, "breaks": invariants()}
+		"breed_check":
+			return {"ok": true, "results": breed_check(r.get("pairs", []), int(r.get("tier", 1)))}
 		"scroll":
 			await _wheel(Vector2(float(r.get("x", 800)), float(r.get("y", 450))), int(r.get("steps", 3)))
 			return {"ok": true}
@@ -148,9 +165,21 @@ func _handle(r: Dictionary) -> Dictionary:
 		"skip":
 			if not Game.running:
 				return _fail("not in a game")
+			# report the time-away summary the player is shown (the game screen clears it once shown)
+			var got := {}
+			var grab := func(summary: Dictionary): got.merge(summary)
+			Game.offline_summary.connect(grab)
 			Game.dev_fast_forward(float(r.get("hours", 1.0)))
+			Game.offline_summary.disconnect(grab)
 			await get_tree().process_frame
-			return {"ok": true}
+			var short := {}
+			for k in ["elapsed", "usedSeconds", "capped", "aether", "gold", "actions"]:
+				if got.has(k):
+					short[k] = got[k]
+			short.levels = got.get("levels", {}).size()
+			short.gained = got.get("gained", {}).size()
+			short.events = got.get("events", []).size()
+			return {"ok": true, "summary": short}
 		"game":
 			return _call_game(String(r.get("method", "")), r.get("args", []))
 		"eval":
@@ -175,10 +204,13 @@ func _state() -> Dictionary:
 	var out := {"ok": true, "scene": _scene_name(), "fps": Engine.get_frames_per_second(),
 		"memory_mb": snappedf(Performance.get_monitor(Performance.MEMORY_STATIC) / 1048576.0, 0.1),
 		"errors": _error_total, "modals": Modal.layer.get_child_count() if Modal.layer and is_instance_valid(Modal.layer) else 0,
-		"window": [get_window().size.x, get_window().size.y], "mode": get_window().mode}
+		"window": [get_window().size.x, get_window().size.y], "mode": get_window().mode,
+		"focused": Options._focused, "fps_cap": Engine.max_fps, "renderer": RenderingServer.get_video_adapter_name(),
+		"frame": Engine.get_frames_drawn(), "movie": "--write-movie" in OS.get_cmdline_args()}
 	if Main.instance and is_instance_valid(Main.instance):
 		out.screen = Main.instance.current
 		out.screen_arg = Main.instance.current_arg
+		out.reveal = reveal_info()
 	var s := Game.state
 	if not s.is_empty():
 		out.slot = Game.slot
@@ -194,6 +226,8 @@ func _state() -> Dictionary:
 			"wave": int(ex.battle.get("wave", 0)) if ex.battle is Dictionary else 0}
 		out.pods = s.pods.map(func(p): return {} if p.is_empty() else {"species": p.species, "readyIn": maxf(0.0, float(p.readyAt) - Game.now_sec())})
 		out.boosts = s.get("market", {}).get("boosts", {})
+		var g := goal_info()
+		out.goal = {"index": g.index, "id": g.id, "done": g.done}
 	return out
 
 
@@ -222,12 +256,32 @@ func _errors_since(since: int) -> Dictionary:
 ## Every button a player could click right now: visible, on screen, not hidden behind an open dialog.
 func _buttons() -> Array:
 	var out := []
-	var modal_open: bool = Modal.layer != null and is_instance_valid(Modal.layer) and Modal.layer.get_child_count() > 0
-	var roots: Array = [Modal.layer] if modal_open else [get_tree().root]
+	var top := _top_modal()
+	var modal_open := top != null
+	var rv := reveal_info()
+	if rv.active and not modal_open:
+		# a hatch or evolution reveal covers the screen and takes every click: only "continue" is there
+		if rv.can_continue:
+			var c := get_viewport().get_visible_rect().size / 2.0
+			out.append({"text": "Click to continue", "disabled": false, "kind": "Reveal", "x": roundi(c.x), "y": roundi(c.y),
+				"w": 200, "h": 40, "path": ""})
+		return out
+	var roots: Array = [top] if modal_open else [get_tree().root]   # a dialog covers everything under it
 	var screen := Rect2(Vector2.ZERO, get_viewport().get_visible_rect().size)
 	for root in roots:
 		_collect(root, out, screen)
 	return out
+
+
+## The dialog on top (the last one opened that isn't closing), or null.
+func _top_modal() -> Node:
+	if Modal.layer == null or not is_instance_valid(Modal.layer):
+		return null
+	for i in range(Modal.layer.get_child_count() - 1, -1, -1):
+		var m := Modal.layer.get_child(i)
+		if m is Modal and not m.is_queued_for_deletion():
+			return m
+	return null
 
 
 func _collect(n: Node, out: Array, screen: Rect2) -> void:
@@ -237,19 +291,24 @@ func _collect(n: Node, out: Array, screen: Rect2) -> void:
 		var b: BaseButton = n
 		var rect := b.get_global_rect()
 		if rect.size.x > 1.0 and rect.size.y > 1.0 and screen.intersects(rect) and _clickable(b):
-			out.append({"text": _label_of(b), "disabled": b.disabled, "kind": b.get_class(),
+			var entry := {"text": _label_of(b), "disabled": b.disabled, "kind": b.get_class(),
 				"x": roundi(rect.get_center().x), "y": roundi(rect.get_center().y), "w": roundi(rect.size.x), "h": roundi(rect.size.y),
-				"path": str(b.get_path())})
+				"path": str(b.get_path())}
+			if b.tooltip_text != "":
+				entry.tip = b.tooltip_text.get_slice("\n", 0)
+			if b.get("cid") is String:
+				entry.cid = b.get("cid")   # a creature card: click it with {"cid": ...}
+			out.append(entry)
 	for c in n.get_children():
 		_collect(c, out, screen)
 
 
-## A button inside a scroll area that has scrolled out of view can't be clicked.
+## A button inside a scroll area can be clicked only while its centre (where a click lands) is in view.
 func _clickable(b: Control) -> bool:
 	var p := b.get_parent()
-	var rect := b.get_global_rect()
+	var at := b.get_global_rect().get_center()
 	while p:
-		if p is ScrollContainer and not (p as Control).get_global_rect().intersects(rect):
+		if p is ScrollContainer and not (p as Control).get_global_rect().has_point(at):
 			return false
 		p = p.get_parent()
 	return true
@@ -277,17 +336,29 @@ func _first_label(n: Node) -> String:
 
 # ---------------------------------------------------------------- acting on the game
 
-## Clicks the button whose text matches (exactly first, then case-insensitively containing), the index-th
-## if several match, with a real mouse click at its centre, the same input a player's mouse makes.
-func _click_button(text: String, index: int, reveal := true) -> Dictionary:
+## Clicks the button whose text matches (exactly first, then its tooltip exactly, then case-insensitively
+## containing), the index-th if several match, with a real mouse click at its centre, the same input a
+## player's mouse makes. With `cid`, clicks the creature card of that Aetherling instead.
+func _click_button(text: String, index: int, reveal := true, cid := "", exact_only := false) -> Dictionary:
 	var all := _buttons()
-	var hits := all.filter(func(h): return h.text == text)
+	# an exact match comes first even when it's scrolled out of view: wheel to it rather than click a
+	# visible button that merely contains the text ("Sanctum" is not "Sanctum Works")
+	var hits := _matching(all, text, cid, true)
+	var low := text.to_lower()
+	if hits.is_empty() and reveal:
+		var exact: Callable = func(btn: BaseButton) -> bool:
+			return btn.get("cid") == cid if cid != "" else (_label_of(btn) == text or btn.tooltip_text.get_slice("\n", 0) == text)
+		if await _reveal(exact):
+			return await _click_button(text, index, false, cid, exact_only)
+	if hits.is_empty() and cid == "" and not exact_only:
+		hits = _matching(all, text, cid, false)
+	if hits.is_empty() and reveal and cid == "" and not exact_only:
+		var loose: Callable = func(btn: BaseButton) -> bool:
+			return _label_of(btn).to_lower().contains(low) or btn.tooltip_text.to_lower().contains(low)
+		if await _reveal(loose):
+			return await _click_button(text, index, false, cid)
 	if hits.is_empty():
-		hits = all.filter(func(h): return text.to_lower() in String(h.text).to_lower())
-	if hits.is_empty() and reveal and await _reveal(text):
-		return await _click_button(text, index, false)
-	if hits.is_empty():
-		return _fail("no visible button says \"%s\"" % text)
+		return _fail("no visible button says \"%s\"" % text if cid == "" else "no visible card for Aetherling %s" % cid)
 	if index >= hits.size():
 		return _fail("only %d buttons match \"%s\"" % [hits.size(), text])
 	var b: Dictionary = hits[index]
@@ -295,6 +366,27 @@ func _click_button(text: String, index: int, reveal := true) -> Dictionary:
 		return {"ok": false, "error": "that button is disabled", "button": b}
 	await _real_click(Vector2(b.x, b.y), true)
 	return {"ok": true, "clicked": b}
+
+
+## Buttons matching `text`: exactly (its text, then its tooltip), or with `exact` false, containing it.
+func _matching(all: Array, text: String, cid: String, exact: bool) -> Array:
+	if cid != "":
+		return all.filter(func(h): return h.get("cid", "") == cid)
+	var low := text.to_lower()
+	for pass_n in ([0, 1] if exact else [2, 3]):
+		var hits := all.filter(func(h):
+			var tip: String = h.get("tip", "")
+			match pass_n:
+				0:
+					return h.text == text
+				1:
+					return tip == text
+				2:
+					return low in String(h.text).to_lower()
+			return tip != "" and low in tip.to_lower())
+		if not hits.is_empty():
+			return hits
+	return []
 
 
 ## Moves the mouse there, presses and releases the left button a frame apart, then waits a frame.
@@ -317,10 +409,13 @@ func _real_click(pos: Vector2, canvas_coords: bool) -> void:
 
 
 ## A button that exists but sits scrolled out of view: wheel its scroll area (as a player would) until it shows.
-func _reveal(text: String) -> bool:
+func _reveal(pred: Callable) -> bool:
 	var target: BaseButton = null
-	for b in _all_buttons(get_tree().root):
-		if _label_of(b).to_lower().contains(text.to_lower()) and b.is_visible_in_tree():
+	var root: Node = get_tree().root
+	if _top_modal() != null:
+		root = _top_modal()
+	for b in _all_buttons(root):
+		if b.is_visible_in_tree() and pred.call(b):
 			target = b
 			break
 	if target == null:
@@ -337,8 +432,8 @@ func _reveal(text: String) -> bool:
 	for i in 40:
 		if _clickable(target):
 			return true
-		var down := target.get_global_rect().position.y > sc.get_global_rect().position.y
-		await _wheel(at, 2 if down else -2)
+		var down := target.get_global_rect().get_center().y > sc.get_global_rect().get_center().y
+		await _wheel(at, 1 if down else -1)
 	return _clickable(target)
 
 
@@ -422,3 +517,207 @@ func _eval(expr: String) -> Dictionary:
 	if e.has_execute_failed():
 		return _fail(e.get_error_text())
 	return {"ok": true, "value": v if typeof(v) in [TYPE_NIL, TYPE_BOOL, TYPE_INT, TYPE_FLOAT, TYPE_STRING, TYPE_DICTIONARY, TYPE_ARRAY] else str(v)}
+
+
+# ---------------------------------------------------------------- what a scripted player reads (read-only)
+
+## Overseer Vance's active goal: its id, text, check, progress and whether it can be claimed.
+func goal_info() -> Dictionary:
+	var s := Game.state
+	if s.is_empty():
+		return {"index": -1, "id": "", "done": false}
+	var g := Goals.current(s)
+	if g.is_empty():
+		return {"index": int(s.goals.index), "total": Data.goals.size(), "id": "", "done": false, "finished": true}
+	var p := Goals.progress(s, g)
+	return {"index": int(s.goals.index), "total": Data.goals.size(), "id": g.id, "text": g.text, "check": g.check,
+		"have": p[0], "need": p[1], "done": Goals.is_done(s, g)}
+
+
+## Everything a player can see on the screens, in one read: Aetherlings, skills and their tasks, the
+## expedition and islands, pods, items, Sanctum Works and the Market's work slots.
+func player_snapshot() -> Dictionary:
+	var s := Game.state
+	if s.is_empty():
+		return {}
+	var now := Game.now_sec()
+	var perched := {}
+	for c in Economy.perched(s):
+		perched[c.id] = true
+	var creatures := []
+	for c in s.creatures.values():
+		var sp: Dictionary = Data.species[c.species]
+		creatures.append({"id": c.id, "species": c.species, "name": Creatures.display_name(c), "kind": sp.kind,
+			"types": Creatures.types_of(c), "rarity": int(c.rarity), "level": int(c.level), "shiny": bool(c.shiny),
+			"job": Creatures.job_kind(c), "skill": c.job.get("id", "") if Creatures.job_kind(c) == "skill" else "",
+			"power": Creatures.power_rating(c), "locked": bool(c.get("locked", false)), "perched": perched.has(c.id)})
+	var skills := {}
+	for sk in Data.skill_list:
+		var st: Dictionary = s.skills[sk.id]
+		var actions := []
+		for a in sk.actions:
+			actions.append({"id": a.id, "name": a.name, "level": int(a.level), "unlocked": int(a.level) <= int(st.level),
+				"inputs": a.get("inputs", {}), "output": a.outputs.keys()[0], "can_make": Skills.affordable(s, a) > 0})
+		skills[sk.id] = {"name": sk.name, "type": sk.type, "level": int(st.level), "action": st.action,
+			"usable": sk.type == null or Collection.owned_type(s, sk.type), "slots": GameState.slot_count(s, sk.id),
+			"workers": GameState.workers(s, sk.id).map(func(c): return c.id), "actions": actions,
+			"slot_price": Market.next_slot_price(s, sk.id), "slot_error": Market.slot_check(s, sk.id)}
+	var zones := []
+	for z in Data.zone_list:
+		var zs := Expedition.zone_state(s, z.id)
+		zones.append({"id": z.id, "name": z.name, "type": z.type, "levels": z.levels, "unlocked": Expedition.zone_unlocked(s, z.id),
+			"cleared": bool(zs.cleared), "bestWave": int(zs.bestWave), "waves": int(z.waves)})
+	var ex: Dictionary = s.expedition
+	var pending_throwable := 0
+	for w in ex.pending:
+		if Expedition.choose_vessel(s, {"shiny": true, "species": w.species, "rarity": w.rarity}) != "":
+			pending_throwable += 1
+	var pods := []
+	for i in s.pods.size():
+		var egg: Dictionary = s.pods[i]
+		if egg.is_empty():
+			pods.append({"index": i, "empty": true})
+		else:
+			pods.append({"index": i, "empty": false, "ready": Breeding.is_ready(egg, now), "left": Breeding.remaining(egg, now),
+				"speed_up": Breeding.speed_up_cost(egg, now), "species": egg.species})
+	var items := {}
+	var item_meta := {}   # held items: [name, category, element, sell price]
+	for id in s.items:
+		if float(s.items[id]) > 0.0:
+			items[id] = float(s.items[id])
+			if Data.items.has(id):
+				var it: Dictionary = Data.items[id]
+				item_meta[id] = [it.name, it.category, it.get("element", ""), float(it.get("sell", 0))]
+	var upgrades := []
+	for u in Data.upgrade_list:
+		var nxt := Economy.next_upgrade(s, u.id)
+		upgrades.append({"id": u.id, "name": u.name, "level": GameState.upgrade_level(s, u.id), "max": u.levels.size(),
+			"affordable": not nxt.is_empty() and GameState.can_afford(s, nxt.cost), "cost": nxt.get("cost", {})})
+	var vessels := 0.0
+	var meals := 0.0
+	for it in Data.item_list:
+		if it.category == "vessel":
+			vessels += GameState.count(s, it.id)
+		elif it.category == "meal":
+			meals += GameState.count(s, it.id)
+	return {"gold": float(s.gold), "aether": float(s.aether), "vessels": vessels, "meals": meals, "creatures": creatures,
+		"skills": skills, "items": items, "item_meta": item_meta, "upgrades": upgrades, "pods": pods, "counters": s.counters,
+		"expedition": {"running": bool(ex.running), "zone": ex.zone, "party": ex.party.filter(func(id): return id != ""),
+			"party_size": int(Data.tuning.combat.partySize), "pending": ex.pending.size(), "pending_throwable": pending_throwable,
+			"autobind": ex.autobind, "zones": zones},
+		"species_logged": s.collection.species.size(), "recipes": s.collection.recipes.size(),
+		"milestones_to_claim": Collection.claimable(s).size(), "goal": goal_info(),
+		"game_seconds": float(s.get("playSeconds", 0.0)) + float(s.get("awaySeconds", 0.0))}
+
+
+## The dialogs open now, oldest first: title, how long each has been open (since this bridge first saw it)
+## and its buttons.
+func modals_info() -> Array:
+	var out := []
+	if Modal.layer == null or not is_instance_valid(Modal.layer):
+		return out
+	var now := Time.get_ticks_msec()
+	var live := {}
+	for m in Modal.layer.get_children():
+		if not (m is Modal) or m.is_queued_for_deletion():
+			continue
+		var key := m.get_instance_id()
+		live[key] = true
+		if not _modal_seen.has(key):
+			_modal_seen[key] = now
+		var title := ""
+		var head: Node = m.body.get_child(0) if m.body and m.body.get_child_count() > 1 else null
+		if head is HBoxContainer and head.get_child_count() > 0 and head.get_child(0) is Label:
+			title = (head.get_child(0) as Label).text
+		var buttons := []
+		for b in _all_buttons(m):
+			if b.is_visible_in_tree():
+				buttons.append(_label_of(b))
+		out.append({"title": title, "age": (now - int(_modal_seen[key])) / 1000.0, "buttons": buttons})
+	for key in _modal_seen.keys():
+		if not live.has(key):
+			_modal_seen.erase(key)
+	return out
+
+
+## The hatch or evolution reveal: whether it covers the screen and whether a click would move it on.
+func reveal_info() -> Dictionary:
+	if Main.instance == null or not is_instance_valid(Main.instance):
+		return {"active": false, "can_continue": false}
+	var rv: Reveal = Main.instance._reveal
+	return {"active": rv.active, "can_continue": rv.active and rv._can_continue, "queued": rv._queue.size()}
+
+
+## Rules the save must always keep. Returns one line per break (empty when all is well).
+func invariants() -> Array:
+	var s := Game.state
+	var out := []
+	if s.is_empty():
+		return out
+	for k in ["gold", "aether"]:
+		var v := float(s[k])
+		if is_nan(v) or is_inf(v) or v < -0.000001:
+			out.append("%s is %s" % [k, str(v)])
+	for id in s.items:
+		var v := float(s.items[id])
+		if is_nan(v) or is_inf(v) or v < -0.000001:
+			out.append("item %s count is %s" % [id, str(v)])
+	for sk in Data.skill_list:
+		var ws := GameState.workers(s, sk.id)
+		var slots := GameState.slot_count(s, sk.id)
+		if ws.size() > slots:
+			out.append("%s has %d workers in %d slots" % [sk.id, ws.size(), slots])
+		var lv := int(s.skills[sk.id].level)
+		if lv < 1 or lv > int(Data.tuning.skills.maxLevel) or is_nan(float(s.skills[sk.id].xp)):
+			out.append("%s level %d, xp %s" % [sk.id, lv, str(s.skills[sk.id].xp)])
+		for c in ws:
+			if not Creatures.can_work(c, sk.id):
+				out.append("%s (%s) works in %s but can't" % [c.id, c.species, sk.id])
+	var party: Array = s.expedition.party.filter(func(id): return id != "")
+	var seen := {}
+	for id in party:
+		if seen.has(id):
+			out.append("%s is in the party twice" % id)
+		seen[id] = true
+		if not s.creatures.has(id):
+			out.append("party member %s doesn't exist" % id)
+		elif Creatures.job_kind(s.creatures[id]) != "party":
+			out.append("party member %s has job %s" % [id, Creatures.job_kind(s.creatures[id])])
+	if party.size() > int(Data.tuning.combat.partySize):
+		out.append("party of %d" % party.size())
+	if bool(s.expedition.running) and party.is_empty():
+		out.append("an expedition runs with no party")
+	for c in s.creatures.values():
+		if Creatures.job_kind(c) == "party" and not seen.has(c.id):
+			out.append("%s has a party job but isn't in the party" % c.id)
+		if is_nan(float(c.xp)) or int(c.level) < 1 or int(c.level) > int(Data.tuning.creature.maxLevel):
+			out.append("%s level %s, xp %s" % [c.id, str(c.level), str(c.xp)])
+	if s.pods.size() != GameState.pod_count(s):
+		out.append("%d pods, %d built" % [s.pods.size(), GameState.pod_count(s)])
+	var gi := int(s.goals.index)
+	if gi < 0 or gi > Data.goals.size():
+		out.append("goals.index %d" % gi)
+	return out
+
+
+## Whether each pair could lay an egg at `tier`, what it costs and what could hatch (and whether that
+## species is new to the Aether-Log).
+func breed_check(pairs: Array, tier: int) -> Array:
+	var s := Game.state
+	var out := []
+	if s.is_empty():
+		return out
+	tier = clampi(tier, 1, Breeding.tier_count())
+	for p in pairs:
+		if not (p is Array) or p.size() < 2:
+			continue
+		var a := GameState.creature(s, str(p[0]))
+		var b := GameState.creature(s, str(p[1]))
+		if a.is_empty() or b.is_empty():
+			out.append({"a": p[0], "b": p[1], "tier": tier, "error": "no such Aetherling"})
+			continue
+		var offspring := Breeding.preview(s, a, b).map(func(o): return {"species": o.species, "chance": o.chance, "special": o.special,
+			"hybrid": Data.species[o.species].kind != "base", "new": not s.collection.species.has(o.species)})
+		out.append({"a": a.id, "b": b.id, "tier": tier, "error": Breeding.check(s, a, b, tier), "cost": Breeding.cost(a, b, tier),
+			"offspring": offspring})
+	return out

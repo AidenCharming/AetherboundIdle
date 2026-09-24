@@ -10,7 +10,7 @@ decided and why) and `README.md` (how to run things).
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
   Game. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and balance are JSON
   in `data/`. Never hardcode balance numbers.
-- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 105), and
+- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 108), and
   push to `godot-rebuild`.
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
@@ -47,6 +47,24 @@ features: a harder first boss, inherited traits never getting weaker, new namepl
 damage numbers that spread out, the owned badge, rarity pips, animated top-tier colours, sprite and frame effects
 by rarity, shiny and rare entrance effects, save slots that can be renamed, shiny parents raising the egg's
 shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in Sanctum Works).
+
+## Bug-test benchmark (new)
+
+`python tools/bridge.py run bugtest_benchmark` (from the repo root or `tools/`, with `GODOT` set or the game
+already running with `-- --bridge`) plays ten minutes like a player and writes a PASS/FAIL report to
+`bridge_runs/`. See `docs/TEST_BRIDGE.md` ("Scenarios"). Add `--movie` to record animation clips with Movie Maker.
+
+What its first runs found and fixed:
+- **The Sanctum's goal card never showed Claim for item and counter goals** while you stayed on the Sanctum
+  (it only rebuilt on structural changes). It now watches the goal's progress every half second.
+- **A Claim click could be lost**: the card was rebuilt on every `Game.changed` (captures, level-ups), freeing
+  the button between mouse down and up. It now rebuilds only when the goal or its progress moves.
+- Bridge fixes: clicks pick an exact match that's scrolled out of view before a visible partial match; only the
+  top dialog's buttons are listed; a button counts as visible only when its centre is in its scroll area.
+
+Still open (bigger than a quick fix): the same "rebuild everything on `Game.changed`" pattern is used by most
+screens (skill pages, pods, Works, Market), so a click there can be lost the same way during a busy expedition.
+Rebuilding only the parts that changed would fix it for good.
 
 ## Not yet seen or heard in the real game (check these first)
 

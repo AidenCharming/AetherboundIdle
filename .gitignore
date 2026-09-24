@@ -16,3 +16,7 @@ Thumbs.db
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Scenario runs (python tools/bridge.py run ...): reports, screenshots, clips
+bridge_runs/
+__pycache__/

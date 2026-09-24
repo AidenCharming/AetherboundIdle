@@ -16,6 +16,7 @@ var _exp_hp: Array = []
 var _exp_log: VBoxContainer
 var _exp_log_top := -1.0
 var _exp_key := ""
+var _goal_key := ""   # the goal and its progress as shown: when it changes, the goal card is rebuilt
 
 
 func _ready() -> void:
@@ -142,7 +143,26 @@ func refresh() -> void:
 
 func _fill_side() -> void:
 	var s := Game.state
-	# guidance
+	# only when the goal moved: rebuilding it on every change freed the Claim button mid-click
+	if _goal_state() != _goal_key:
+		_fill_goal()
+	_fill_side_rest(s)
+
+
+## Overseer Vance's card. Item and counter goals move without any structural change, so _process checks
+## the progress every half second and rebuilds this card when it moved (else Claim never showed up).
+func _goal_state() -> String:
+	var s := Game.state
+	var g := Goals.current(s)
+	if g.is_empty():
+		return "end"
+	var p := Goals.progress(s, g)
+	return "%s:%d/%d" % [g.id, int(p[0]), int(p[1])]
+
+
+func _fill_goal() -> void:
+	var s := Game.state
+	_goal_key = _goal_state()
 	UI.clear(_goal_box)
 	var g := Goals.current(s)
 	var gh := UI.hbox(8, [UI.icon(Data.ui_icon("xp"), 22), UI.label("Overseer Vance", "H3")])
@@ -171,6 +191,9 @@ func _fill_side() -> void:
 		else:
 			rrow.add_child(UI.count_chip(p[0], p[1], 13))
 		_goal_box.add_child(rrow)
+
+
+func _fill_side_rest(s: Dictionary) -> void:
 	# perches
 	UI.clear(_perch_box)
 	var perched := Economy.perched(s)
@@ -302,6 +325,8 @@ func _process(delta: float) -> void:
 		_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(Game.state))
 	if fmod(_t, 0.25) < delta:
 		_update_expedition()
+	if fmod(_t, 0.5) < delta and _goal_state() != _goal_key:
+		_fill_goal()
 
 
 func _on_event(e: Dictionary) -> void:

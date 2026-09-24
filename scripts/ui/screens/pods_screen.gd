@@ -138,6 +138,7 @@ func _parent_slot(which: int) -> Control:
 	var card := UI.button("", "Tile")
 	card.custom_minimum_size = Vector2(210, 250)
 	card.pressed.connect(func(): _pick(which))
+	card.tooltip_text = "Choose parent %s" % ("A" if which == 0 else "B")
 	var v := UI.vbox(4)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

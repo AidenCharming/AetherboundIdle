@@ -545,3 +545,24 @@ func test_expedition_panels_fold() -> void:
 	Options.set_value("exp_log_open", was_l)
 	main.free()
 	_teardown()
+
+
+## An item goal finishes without any structural change (no Game.changed): the Sanctum's goal card must
+## still show Claim while the player watches it (the bugtest benchmark found it never did).
+func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	Game.state.goals.index = Goals.index_of("logs")
+	Game.state.goals.id = "logs"
+	main.show_screen("sanctum")
+	var screen: Node = main._screen
+	t.ok(_find_button(screen._goal_box, "Claim") == null, "no Claim before the logs are in")
+	GameState.add_item(Game.state, "oak-log", 10)
+	screen._process(0.6)
+	var claim := _find_button(screen._goal_box, "Claim")
+	t.ok(claim != null, "Claim appears once the goal is done, without a refresh")
+	Game.changed.emit()
+	t.ok(is_instance_valid(claim) and not claim.is_queued_for_deletion(), "an unrelated change doesn't rebuild the card mid-click")
+	main.free()
+	_teardown()

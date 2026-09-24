@@ -52,7 +52,16 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   the running game (real mouse clicks and wheel, keys, pages, time skips, the save, errors, screenshots) through
   `tools/bridge.py`. Off unless started with `-- --bridge` on a debug build, localhost only, and it plays in save
   slot 2, named "Autoplay Slot". See `docs/TEST_BRIDGE.md`.
-- **Tests:** `tests/test_*.gd`, 105 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Bug-test benchmark** (designer's request): `python tools/bridge.py run bugtest_benchmark` plays about ten
+  minutes like a player (Overseer Vance's goals, workers, expeditions, breeding, the Market, every screen, a
+  save/load round trip, a jump of hours away) through real clicks, checks errors and invariants after every
+  action and writes a PASS/FAIL report to `bridge_runs/`. No cheats: the only time acceleration is `--compress`
+  (in-game hours skipped through the bridge, 8 by default), and the report says how much was used. The player's
+  reads are debug-only bridge commands (`player`, `goal`, `modals`, `invariants`, `breed_check`, `focus`), so
+  it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
+  `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
+  jump/flicker/settle check (`tools/frame_stats.gd`).
+- **Tests:** `tests/test_*.gd`, 108 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
