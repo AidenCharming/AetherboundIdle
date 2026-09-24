@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 66 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 72 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -88,9 +88,36 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   Hybrids use their first type's palette. The palettes are three colours per type in `data/types.json`
   (`"shiny": {dark, mid, light}`), easy to retune. The Aether-Log shows each species' shiny colours once
   you own that shiny.
-- **Music and sound effects are synthesised in code** (no audio files): three calm looping tracks (title,
-  Sanctum, expedition; pad chords, sub bass, bell arpeggio, echo) rendered on a worker thread the first
-  time and cached in `user://music/`, and a dozen short effects. Separate Music and SFX volume sliders.
+- **Music and sound effects are synthesised in code** (no audio files), with separate Music and SFX volume
+  sliders.
+  - **Tracks** (`Music.TRACKS`): title, Sanctum and expedition are calm, built from a pad, a sub bass and a
+    bell arpeggio. The **boss** track is D minor, i-VI-VII-V with a chord every bar at 138 bpm (expedition is
+    104 with a chord every two bars). It has plucked saw sixteenths, a pulsing saw bass, a kick and hi-hat,
+    and a square lead in its B section.
+  - **Boss switching:** the arena plays the boss track while a boss wave is fighting on screen. Victory, a
+    wipe, stopping the run or switching to another island's page brings the expedition track back. It
+    follows the battle state, not just the banner, so leaving mid-boss and coming back is handled.
+    `Music.play` does the usual 2-second crossfade.
+  - **Variation:** each loop plays its four chords four times, in an A / A2 / B / A form:
+    - A2 fills the arpeggio's rests with soft ghost notes and ends on a rising run.
+    - B turns the arpeggio upside down an octave higher. On a track with a lead, the lead sings the top line
+      instead.
+    - The pad and bass stay the same throughout, so each track is still one piece. Loops now run 55 s (boss)
+      to 2 min (title).
+  - **Timbres:** besides pad, bell and sine, there are PolyBLEP saw and square voices, each through a two-pole
+    low-pass that opens at the attack. Two filtered-noise drums: a kick (a falling sine plus low-passed
+    noise) and a hat (high-passed noise). Title, Sanctum and expedition use only pad, bell and sine, as
+    before.
+  - **Space:** the Music bus carries an `AudioEffectDelay` with taps at 3/4 and 1.5 beats, re-timed to each
+    track's tempo when it starts, the same echo the samples used to have baked in. After it come an
+    `AudioEffectReverb` and a hard limiter. The hand-rolled echo that wrapped round the loop point is gone.
+  - **Level:** every loop is normalised to the same loudness (RMS 0.17, peaks at most 0.95), so a track change
+    doesn't jump in volume.
+  - **Rendering:** tracks render on a worker thread the first time, about 25 s in total with the title track
+    first (about 7 s). They are cached in `user://music/`, keyed by the track's settings and
+    `Music.RENDER_VERSION`, and stale renders are deleted.
+  - **Sound effects:** a dozen short effects. **Evolution** has its own: two voices sweep up two octaves into a
+    full major chord with a sparkle run, where hatching is a single run of notes.
 - **Bosses reuse approved art:** each boss is a species' Form 3 sprite with its own name and stats
   (Granitusk is Tuskcub's Form 3, Ignis Prime is Emberfang's, and so on).
 

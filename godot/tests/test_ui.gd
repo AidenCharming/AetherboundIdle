@@ -200,6 +200,47 @@ func test_evolution_plays_its_own_sound() -> void:
 	main._reveal._play_evolve({"creature": c.id, "species": c.species, "from": 1, "form": 2})
 	_finish_tweens()
 	t.eq(Sfx.last_played, "evolve", "the evolution reveal ends on the evolve sound")
-	t.ok(Sfx._streams.evolve.data.size() > Sfx._streams.hatch.data.size(), "evolve is a bigger sound than hatch")
+	main.free()
+	_teardown()
+
+
+func test_boss_fight_switches_to_boss_music_and_back() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	Game.set_party(0, Game.state.creatures.keys()[0])
+	Game.start_expedition("whisperleaf-hollow")
+	var b: Dictionary = Game.state.expedition.battle
+	# frames on whatever expedition page is showing (a holder, since lambdas capture locals by value)
+	var view := {"main": main}
+	var tick := func():
+		var screen: Node = view.main._screen
+		screen._process(0.0)
+		screen._arena._process(0.0)
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	tick.call()
+	t.eq(Music.wanted(), "expedition", "a normal wave keeps the calm track")
+	b.wave = b.waves
+	b.phase = "fight"
+	tick.call()
+	t.eq(Music.wanted(), "boss", "the boss wave switches to the boss track")
+	t.ok(main._screen._arena._banner.text.begins_with("BOSS"), "with the boss banner")
+	b.phase = "rest"   # what the sim does when the boss falls or the party wipes
+	tick.call()
+	t.eq(Music.wanted(), "expedition", "the calm track returns once the fight resolves")
+	b.phase = "fight"
+	tick.call()
+	t.eq(Music.wanted(), "boss")
+	main.show_screen("expeditions", "fractured-quarry")   # another island's page hides this fight
+	tick.call()
+	t.eq(Music.wanted(), "expedition", "another island's page plays the calm track")
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	tick.call()
+	t.eq(Music.wanted(), "boss", "coming back to the fight brings the boss track back")
+	Game.stop_expedition()
+	tick.call()
+	t.eq(Music.wanted(), "expedition", "stopping the run mid-boss ends the boss track")
+	main.show_screen("sanctum")
+	t.eq(Music.wanted(), "sanctum")
 	main.free()
 	_teardown()

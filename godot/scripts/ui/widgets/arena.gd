@@ -14,6 +14,7 @@ var _ground: Control
 var _backdrop: TextureRect
 var _zone_type := "verdant"
 var _zone_seed := 0.0
+var _boss_music := false   # the boss track is playing because of this arena
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
 ## row stands. Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
@@ -113,12 +114,35 @@ func _process(_d: float) -> void:
 			_clear()
 			_banner.text = ""
 			_status.text = ""
+		_set_boss_music(false)
 		return
 	var key := "%s|%d|%d|%d" % [b.zone, int(b.wave), b.allies.size(), b.enemies.size()]
 	if key != _key:
 		_key = key
 		_build(b)
 	_update(b)
+	# the sim moves to "rest" in the same step it reports boss_defeated or wiped, so this also ends the boss
+	# music on those outcomes
+	_set_boss_music(is_visible_in_tree() and int(b.wave) >= int(b.waves) and b.phase == "fight")
+
+
+## A boss fight on screen gets the boss track; once it resolves (or the run stops, or another zone is shown)
+## the calm expedition track comes back. Music.play crossfades.
+func _set_boss_music(on: bool) -> void:
+	if on == _boss_music or _leaving():
+		return
+	_boss_music = on
+	Music.play("boss" if on else "expedition")
+
+
+## True while this arena's screen is being replaced, when the new screen has already chosen its music.
+func _leaving() -> bool:
+	var n: Node = self
+	while n:
+		if n.is_queued_for_deletion():
+			return true
+		n = n.get_parent()
+	return false
 
 
 func _clear() -> void:
