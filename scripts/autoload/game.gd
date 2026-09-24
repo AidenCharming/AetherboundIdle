@@ -635,9 +635,12 @@ func release(cid: String) -> void:
 
 
 func bulk_release(max_rarity: int) -> void:
+	var pearls0 := GameState.count(state, "aether-pearl")
 	var res := Economy.bulk_release(state, max_rarity)
+	var pearls := int(GameState.count(state, "aether-pearl") - pearls0)
 	if res.count > 0:
-		info("Released %d Aetherlings. +%s Aether" % [res.count, F.format_num(res.aether)], Data.ui_icon("aether"))
+		info("Released %d Aetherlings. +%s Aether%s" % [res.count, F.format_num(res.aether),
+			" and %d Aether Pearl%s" % [pearls, "" if pearls == 1 else "s"] if pearls > 0 else ""], Data.ui_icon("aether"))
 	save_game()
 	changed.emit()
 
