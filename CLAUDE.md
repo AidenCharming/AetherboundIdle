@@ -1,56 +1,65 @@
 # Aetherbound Idle
 
-A creature-collecting incremental (idle) game in the style of Melvor Idle. Players collect **Aetherlings**, assign them to skills, breed them into rarer and hybrid forms, and send them on simple idle-combat expeditions to capture new species.
+A creature-collecting idle game in the style of Melvor Idle: collect **Aetherlings**, put them to work in
+skills, breed rarer and hybrid forms, and send a party on idle-combat expeditions to bind wild ones. Built in
+**Godot 4.7** (GDScript, GL Compatibility, 1600×900, UI built in code). The old web version is archived on the
+`web-archive` branch; `docs/PROGRESS.md` and `docs/plan.md` describe that web build and are history only.
 
 ## Read these first
 
-* `docs/design.md`: full design (systems, rules, formulas, scope, build phases). Section 11 has the UI direction.
-* `docs/art-brief-background.md`: the app background image (prompt, specs, where the files are, how to wire it in). Art lives in `src/ui/assets/`; originals and prompts in `docs/reference/art/`. AI-generated: keep the prompt and tool record.
-* `docs/content-data.md`: every species, hybrid, and trait as tables. Convert these into JSON under `src/data/`.
+* `docs/HANDOFF.md`: where things stand, what to check first, what's open for the designer.
+* `docs/DECISIONS.md`: every decision and why (balance numbers, systems, test count).
+* `docs/design.md`: the original design (systems, formulas, scope). `docs/content-data.md`: species, hybrids, traits.
+* `docs/TEST_BRIDGE.md`: drive the running game from a script (real clicks, errors, screenshots).
 
-## Stack (change only if you have a strong reason, and tell me)
+## Layout
 
-* Vite + React + TypeScript
-* Zustand for game state
-* All content and balance numbers live in JSON under `src/data/`. **Never hardcode balance numbers in components or logic.**
-* Saves to localStorage (versioned, with a migration hook). Offline progress is computed on load from `lastSeen` timestamp.
-* Vitest for unit tests on the core sim (cooldowns, offline progress, breeding rolls, mutation odds, pity counters).
-* **Delivery: Windows `.exe`.** The designer wants the game to run as a desktop app, not a browser link. Done in step 1.9: an Electron wrapper in `electron/` (plain CommonJS, no IPC, no preload) opens the built `dist/`, and electron-builder makes an installer and a portable exe into `release/` (see "Desktop packaging" in `docs/PROGRESS.md`). Keep the app a plain static Vite build (`base: './'`) with no server dependency and no absolute-URL assumptions, and keep all wrapper code out of `src/`.
+| Path | What |
+|---|---|
+| `project.godot` | The project (repo root). Autoloads: Options, Data, Sfx, Music, Game, TestBridge |
+| `data/*.json` | All content and balance numbers (species, items, skills, zones, upgrades, market, tuning) |
+| `scripts/sim/` | Game rules as pure static functions on one state Dictionary (no UI) |
+| `scripts/ui/` | Title screen, game shell, screens and widgets, built in code |
+| `scripts/autoload/` | Data loading, the Game clock and actions, audio, options, the test bridge |
+| `tests/` | Headless tests (`test_*.gd`), screenshot tour, balance and one-month pacing probes |
+| `tools/` | Icon placeholders (`make_icons.py`), art prompt builder (`art/`), `bridge.py`, `check.sh` |
+| `assets/` | Sprites, icons, backdrops, fonts, shaders |
 
 ## Rules for working in this repo
 
-1. **Data-driven.** Species, traits, skills, resources, zones, recipes, and tuning knobs are JSON. Adding content must not need code changes.
-2. **Sim is separate from UI.** The game loop lives in `src/sim/` as pure functions on state (no React imports). UI only reads state and dispatches actions. This makes offline progress and tests easy.
-3. **Offline progress = time elapsed ÷ cooldown**, calculated in bulk, not by replaying ticks. Cap the offline window with a tunable value.
-4. **Placeholder art first.** Use emoji or generated SVG on colored cards. Type colors: Verdant green, Telluric brown, Pyric orange, Aqueous blue, Voltaic yellow, Void purple. Rarity is shown by frame/tint/glow, and shinies by a hue shift applied at runtime. Never create per-rarity or per-shiny art assets.
-5. **Build in phases** (see design.md, "Build phases"). Finish and run each phase before starting the next. Show me something playable after each phase.
-6. **Don't add systems that aren't in the design.** If something seems missing or contradictory, list it and ask me before deciding. Where the design says "placeholder" or "tunable," pick a sensible value and put it in JSON.
-7. Keep names as written in the docs. Do not rename species, forms, traits, or types.
-8. Keep the UI responsive (desktop first, must work on a phone-width screen).
-
-## Session protocol (usage limits and resuming)
-
-I may hit usage limits or switch models mid-project. Always leave the repo in a state where a fresh session can continue with no loss.
-
-1. **Start of every session:** read `docs/PROGRESS.md` first, then continue from "Next up."
-2. **Work in small checkpoints.** Each checkpoint is one step from the phase checklist in PROGRESS.md, ends with the project building and tests passing, and gets its own git commit with a clear message. Never leave a half-finished step uncommitted or the build broken.
-3. **Update `docs/PROGRESS.md` after every checkpoint:** tick the step, note any decisions or deviations from the design, and update "Next up" and "Open questions."
-4. **Save the plan.** The approved plan (folder structure, JSON schemas) goes in `docs/plan.md` so later sessions don't need to re-derive it.
-5. **If I say I'm running low on usage, or a limit warning appears:** stop starting new work, finish or cleanly revert the current step, commit, and update PROGRESS.md. Then tell me the exact next step.
-6. Prefer several small steps over one large one. Do not attempt a whole phase in a single pass.
-7. **Session naming.** Sessions use the format "Aetherbound P<phase> · <steps> <topic> (<model>)", e.g. "Aetherbound P1 · 1.4-1.5 Sim core + offline (Opus)". At the START of a session, tell me the suggested name for this session based on the steps I asked you to do, and give me the exact /rename command to paste. At the END of a session, when you tell me the next step, also give me the suggested name and the exact `/rename` command for the next session's first message.
+1. **Data-driven.** Content and tuning live in `data/*.json`. Never hardcode balance numbers in scripts.
+2. **Sim separate from UI.** `scripts/sim/` never touches nodes; the UI reads state and calls `Game` actions.
+3. **Offline progress is computed in bulk** (elapsed ÷ cooldown), never by replaying ticks; the window is capped.
+4. **Art:** rarity is shown by frames, tints and shader effects, shinies by a runtime hue shift. Never make
+   per-rarity or per-shiny art. Any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
+   in `tools/make_icons.py`. **While the designer paints locally, don't edit those two files from the cloud:**
+   put new entries in `tools/art/artnew_merge_me_on_pull.md`. Never commit a regenerated `docs/art-prompts-*.md`
+   from a machine without the designer's `D:\AI` art folders (it wipes the "approved" marks).
+5. **Don't add systems that aren't in the design** without asking. Keep names as written in the docs.
+6. **Tests pass and stay at zero warnings** before any push. Keep the test count in `docs/DECISIONS.md` current,
+   and update `docs/HANDOFF.md` and `docs/DECISIONS.md` with what changed and why.
+7. **Pacing target:** one month to every skill at 99 and Zenith Spire cleared. Check balance changes with the
+   month probe.
+8. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
+   pushes art to the same branch), then push.
 
 ## Commands
 
-| Task | Command | Notes |
-|---|---|---|
-| Dev server | `npm run dev` | Vite on http://localhost:5173 |
-| Build | `npm run build` | Type-checks with `tsc --noEmit`, then `vite build` |
-| Test | `npm test` | `vitest run`, one pass (specs in `test/`); `npm run test:watch` for watch mode |
-| Desktop app (dev) | `npm run electron:start` | Builds, then opens the built game in the Electron window (`electron/main.cjs`). Shares the real save with the packaged app; DevTools with F12 |
-| Wrapper smoke test | `npm run electron:smoke` | Builds, then launches Electron hidden three times on a throw-away profile: load (the sidebar and the Woodcutting page render, no console error), progress (a minimized, throttled window, with the creature assigned from the Woodcutting page and listed in the sidebar, earns exactly the time that passed and survives a reload), single instance. Exit 0 or 1. Never touches the real save. Add `-- --only=load` for one check |
-| Package | `npm run electron:pack` | Builds, **empties `release/`** (`electron/clean-release.mjs`), then electron-builder writes to `release/` (gitignored): `Aetherbound-Idle-<version>-setup.exe` (NSIS installer), `Aetherbound-Idle-<version>-portable.exe` (single exe) and `win-unpacked/`. Unsigned. About 100 MB each. Config: `electron-builder.yml`. The designer's rule: every exe build starts by deleting the old exes, so `release/` only ever holds the newest version |
-| Clean release folder | `node electron/clean-release.mjs` | Deletes everything inside `release/` (installers, portable exes, blockmaps, `win-unpacked/`, builder debug files) and keeps the folder. Runs by itself inside `electron:pack`; run it alone to clear the folder without building. Refuses unless the folder is exactly `<repo>/release` and a real folder. A locked file (the game is running, or an Explorer window is open in `release/`) is retried for about 5 s, then it stops with exit 1 and a "close the game and any Explorer window in release/, then run it again" message, so electron-builder never starts on a half-cleaned folder |
-| Packaged smoke test | `npm run electron:smoke:packaged` | The same three checks against `release/win-unpacked/Aetherbound Idle.exe`. For the portable or any other exe: `node electron/smoke-runner.mjs --exe="<path>"`. Run `electron:pack` first |
-| Placeholder icon | `node electron/make-icon.mjs` | Regenerates `electron/assets/icon.ico` and `icon.png` (generated shapes, not real art). Only needed if the icon script changes |
+| Task | Command |
+|---|---|
+| Run the game | `godot --path .` (editor: `godot --path . -e`) |
+| Import (once after cloning) | `godot --headless --path . --import` |
+| Tests | `godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null` (add `--verbose` to see warnings; exit 0 = pass). Or `tools/check.sh [godot]` |
+| Screenshot tour | `godot --path . res://tests/tour.tscn -- --out=DIR [--only=market,nexus,...]` (overwrites save slot 3) |
+| Pacing probe (~40 s) | `godot --headless --path . res://tests/month_probe.tscn -- --days=35 [--calibrate]` |
+| Test bridge | `python tools/bridge.py launch` then `new`, `buttons`, `click "…"`, `errors`, `screenshot`, `monkey` (plays in slot 2, "Autoplay Slot") |
+| Icon placeholders | `python3 tools/make_icons.py` |
+| Windows exe | Editor: Project > Export > Windows Desktop (see README), or `build-exe.bat` |
 
+## GDScript traps that bit this project
+
+* Lambdas capture locals by value: keep late-assigned values (a modal) in a Dictionary holder.
+* `:=` can't infer from Dictionary values or untyped calls: give those an explicit type.
+* A wrapping Label measured before its container has a width reports a huge height: give it a min width.
+* `Sfx` and `Music` do nothing headless; tests read `Sfx.last_played` and `Music.wanted()`.
+* Don't shadow built-ins or members (`sign`, `size`, `name`) in parameters and locals: it's a warning.
