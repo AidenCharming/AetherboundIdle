@@ -71,8 +71,12 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   the item's colour with the same thick outline the creature sprites use, plus ~30 interface icons
   (skills, navigation, currencies, stats). New item → give it an `icon` entry in `items.json` → run the
   script.
-- **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for all 92 icons
-  (90 to generate; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
+- **Standing rule (designer's request):** whenever the game needs a new icon, it gets a prompt in
+  `tools/art/build_icon_prompts.py` (and a placeholder in `tools/make_icons.py`) in the same change, and
+  `docs/art-prompts-icons.md` is regenerated. The designer's script lists whatever still needs painting
+  after a pull.
+- **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for every icon
+  (138 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
   the creature pipeline's rules (magenta key, green for pink and purple things, no glow words, everything opaque).
   `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
   `sprite_tools.py`, and installs them into `assets/icons/`. The game uses a PNG icon whenever one exists and the
