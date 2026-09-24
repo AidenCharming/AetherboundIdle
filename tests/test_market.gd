@@ -232,3 +232,14 @@ func test_buying_from_a_changed_stock_buys_nothing() -> void:
 	t.eq(s.pods, pods, "no egg laid")
 	t.ok(f.is_empty() or int(f.left) == 1, "the old featured egg is still for sale")
 	t.eq(Market.buy_offer(s, 0, now, rng, w), "", "the same window still buys")
+
+
+## Buying none (or a negative number) is refused, not reported as a purchase.
+func test_buying_nothing_is_refused() -> void:
+	var s := _game(1e6)
+	var id: String = Market.catalog("vessel")[0].id
+	var before := GameState.count(s, id)
+	for qty in [0, -5]:
+		t.ok(Market.buy(s, id, qty) != "", "qty %d is refused" % qty)
+	t.eq(float(s.gold), 1e6, "no gold taken")
+	t.eq(GameState.count(s, id), before, "no items added")

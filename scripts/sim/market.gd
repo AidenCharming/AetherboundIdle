@@ -67,7 +67,7 @@ static func catalog(category := "") -> Array:
 
 static func buy(s: Dictionary, id: String, qty: int) -> String:
 	if qty <= 0:
-		return ""
+		return "Choose how many to buy."
 	if not sells(id):
 		return "Not for sale."
 	if not for_sale(s, id):
