@@ -178,7 +178,7 @@ static func _hit(att: Dictionary, def: Dictionary, side: int, ai: int, di: int, 
 	var through := dmg - absorbed
 	def.hp -= through
 	events.append({"type": "hit", "side": side, "from": ai, "to": di, "dmg": dmg, "absorbed": absorbed, "ability": ability,
-		"eff": type_mult(dmg_type, def.types)})
+		"eff": type_mult(dmg_type, def.types), "dtype": dmg_type})
 	if def.thornsT > 0.0 and att.alive:
 		var back: float = dmg * float(Data.tuning.combat.thornsReflect)
 		att.hp -= back

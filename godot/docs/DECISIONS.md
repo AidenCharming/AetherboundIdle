@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 83 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 85 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -149,6 +149,14 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     `Music.RENDER_VERSION`, and stale renders are deleted.
   - **Sound effects:** a dozen short effects. **Evolution** has its own: two voices sweep up two octaves into a
     full major chord with a sparkle run, where hatching is a single run of notes.
+  - **Attacks sound like their type** (designer's request). Each type has a hit and an ability cast:
+    Verdant a leafy swish and woody pluck, Telluric a low thud with grit, Pyric a crackling burst, Aqueous
+    a rising bloop, Voltaic a falling square-wave zap, Void a detuned downward wobble. A super-effective hit
+    adds a bright ping. Hits vary their pitch a little so a flurry doesn't drone. The six hits sit within 2×
+    of each other in loudness (low sounds get more energy, as they sound quieter), and a test checks it.
+  - **Damage numbers take lanes:** numbers landing on one fighter within about half a second start centre,
+    left, right, then a row higher, so a flurry reads as separate numbers. They show whole numbers ("9",
+    not "8.8").
 - **Bosses reuse approved art:** each boss is a species' Form 3 sprite with its own name and stats
   (Granitusk is Tuskcub's Form 3, Ignis Prime is Emberfang's, and so on).
 

@@ -391,3 +391,21 @@ func test_fighters_face_each_other() -> void:
 	fd.facing = "front"
 	t.ok(not Arena._needs_flip("sproutlet", 1, 0) and not Arena._needs_flip("sproutlet", 1, 1), "a front-facing sprite never flips")
 	fd.erase("facing")
+
+
+## Numbers landing on one fighter close together start in different places, so they never overlap.
+func test_damage_numbers_spread_out() -> void:
+	var arena := Arena.new()
+	var root := Control.new()
+	root.size = Vector2(90, 90)
+	var rec := {"root": root}
+	var spots := []
+	for i in 5:
+		spots.append(arena._number_at(rec))
+	for i in spots.size():
+		for j in range(i + 1, spots.size()):
+			t.ok(spots[i].distance_to(spots[j]) > 12.0, "numbers %d and %d are apart: %s / %s" % [i, j, spots[i], spots[j]])
+	t.eq(Arena._num(8.8), "9", "whole numbers")
+	t.eq(Arena._num(0.2), "1", "never 0")
+	root.free()
+	arena.free()

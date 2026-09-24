@@ -338,6 +338,25 @@ func _update(b: Dictionary) -> void:
 			_status.text = "Meals left this run: %d" % int(b.meals)
 
 
+## Where the next number over a fighter starts. Numbers that land close together take the next lane
+## (centre, left, right, then a row higher), so a flurry of hits reads as separate numbers.
+const NUMBER_LANES := [Vector2(0, 0), Vector2(-0.3, -0.08), Vector2(0.3, -0.08), Vector2(-0.15, -0.3), Vector2(0.15, -0.3), Vector2(0, -0.45)]
+
+func _number_at(v: Dictionary) -> Vector2:
+	var now := Time.get_ticks_msec()
+	var recent: Array = v.get("nums", []).filter(func(t): return now - int(t) < 650)
+	var lane: Vector2 = NUMBER_LANES[recent.size() % NUMBER_LANES.size()]
+	recent.append(now)
+	v.nums = recent
+	var px: float = v.root.size.x
+	return v.root.position + Vector2(px * (0.5 + lane.x), px * (0.22 + lane.y))
+
+
+## Damage and healing as whole numbers ("9", not "8.8"); big ones keep the short form (1.2K).
+static func _num(v: float) -> String:
+	return str(maxi(1, roundi(v))) if v < 1000.0 else F.format_num(v)
+
+
 func _view(side: int, index: int) -> Dictionary:
 	var list: Array = _allies if side == 0 else _enemies
 	return list[index] if index >= 0 and index < list.size() else {}
@@ -365,13 +384,15 @@ func _on_event(e: Dictionary) -> void:
 				var st: Tween = def.root.create_tween()
 				st.tween_property(def.root, "position", def.home + Vector2(randf_range(-5, 5), randf_range(-3, 3)), 0.04)
 				st.tween_property(def.root, "position", def.home, 0.06)
+			var eff: float = e.eff
 			if Options.get_value("damage_numbers"):
-				var eff: float = e.eff
 				var col := Palette.GOLD if eff > 1.01 else (Palette.TEXT_FAINT if eff < 0.99 else Palette.TEXT)
-				var txt := F.format_num(e.dmg) + ("!" if eff > 1.01 else "")
-				var at: Vector2 = def.root.position + Vector2(def.root.size.x * randf_range(0.3, 0.6), def.root.size.x * 0.2)
-				FloatText.spawn(_fx, at, txt, col, null, 18 if e.ability != "" else 15, 40.0)
-			Sfx.play("hit", randf_range(0.85, 1.2))
+				FloatText.spawn(_fx, _number_at(def), _num(e.dmg) + ("!" if eff > 1.01 else ""), col, null, 18 if e.ability != "" else 15, 40.0, true)
+			# each type has its own hit sound; the pitch varies a little so a flurry doesn't drone
+			var dtype: String = e.get("dtype", "")
+			Sfx.play("hit_" + dtype if dtype != "" else "hit", randf_range(0.9, 1.12))
+			if eff > 1.01:
+				Sfx.play("strong", randf_range(0.97, 1.05))
 		"ability":
 			var v := _view(e.side, e.index)
 			if v.is_empty():
@@ -380,6 +401,8 @@ func _on_event(e: Dictionary) -> void:
 			# starts above the name tag so it never crosses the fighter's own name
 			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 6.0)
 			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 26.0, true)
+			if Data.types.has(ab.damageType):
+				Sfx.play("cast_" + ab.damageType)
 			if motion:
 				var por: Control = v.portrait
 				por.pivot_offset = por.size / 2.0
@@ -389,11 +412,11 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			var v := _view(e.side, e.index)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, v.root.size.x * 0.1), "+" + F.format_num(e.amount), Palette.GOOD, null, 14, 34.0)
+				FloatText.spawn(_fx, _number_at(v), "+" + _num(e.amount), Palette.GOOD, null, 14, 34.0, true)
 		"thorns":
 			var v := _view(e.side, e.to)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, 0), F.format_num(e.dmg), Data.type_color("verdant"), null, 13, 30.0)
+				FloatText.spawn(_fx, _number_at(v), _num(e.dmg), Data.type_color("verdant"), null, 13, 30.0, true)
 		"captured":
 			var at := Vector2(size.x * 0.73, size.y * 0.35)
 			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 22, 60.0)

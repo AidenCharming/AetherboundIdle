@@ -3,7 +3,7 @@ extends Node
 ## once at start-up; play() picks a free player from a small pool. Volume is the "SFX" bus (Options).
 
 const RATE := 22050
-const POOL := 6
+const POOL := 10
 
 var _streams: Dictionary = {}
 var last_played := ""   # the most recent sound asked for, even headless (tests read it)
@@ -16,7 +16,7 @@ func _ready() -> void:
 		p.bus = "SFX"
 		add_child(p)
 		_players.append(p)
-	# [frequency Hz, start s, length s, wave, gain, (glide-to Hz)]
+	# [frequency Hz, start s, length s, wave, gain, (glide-to Hz), ("drop": the glide decays like a pluck)]
 	_streams.click = _render([[880, 0.0, 0.05, "tri", 0.35]])
 	_streams.level = _render([[523, 0.0, 0.12, "tri", 0.4], [659, 0.08, 0.12, "tri", 0.4], [784, 0.16, 0.12, "tri", 0.4], [1047, 0.24, 0.3, "tri", 0.45]])
 	_streams.capture = _render([[392, 0.0, 0.1, "sine", 0.5], [587, 0.07, 0.1, "sine", 0.5], [784, 0.14, 0.25, "sine", 0.5], [1175, 0.2, 0.35, "sine", 0.25]])
@@ -34,6 +34,22 @@ func _ready() -> void:
 	_streams.error = _render([[196, 0.0, 0.12, "square", 0.2], [165, 0.1, 0.16, "square", 0.2]])
 	_streams.start = _render([[440, 0.0, 0.1, "tri", 0.35], [660, 0.08, 0.18, "tri", 0.35]])
 	_streams.hit = _render([[120, 0.0, 0.07, "noise", 0.25]])
+	# attacks sound like their type. A 7th element "drop" makes a glide pluck (falls in pitch, decays)
+	# instead of swelling. hit_<type> is a basic attack, cast_<type> an ability going off.
+	_streams.hit_verdant = _render([[2400, 0.0, 0.05, "noise", 0.16], [520, 0.0, 0.09, "tri", 0.34, 260, "drop"], [780, 0.02, 0.05, "tri", 0.14]], 1.25)
+	_streams.hit_telluric = _render([[140, 0.0, 0.16, "sine", 0.6, 55, "drop"], [90, 0.0, 0.08, "noise", 0.34], [70, 0.05, 0.05, "noise", 0.18]], 0.8)
+	_streams.hit_pyric = _render([[1400, 0.0, 0.14, "noise", 0.2], [600, 0.02, 0.06, "noise", 0.16], [330, 0.0, 0.12, "tri", 0.26, 150, "drop"]], 1.35)
+	_streams.hit_aqueous = _render([[280, 0.0, 0.1, "sine", 0.42, 820, "drop"], [3000, 0.02, 0.05, "noise", 0.1], [560, 0.05, 0.08, "sine", 0.18, 1300, "drop"]])
+	_streams.hit_voltaic = _render([[1500, 0.0, 0.08, "square", 0.14, 380, "drop"], [2200, 0.01, 0.04, "square", 0.08], [60, 0.0, 0.05, "noise", 0.2]], 1.4)
+	_streams.hit_void = _render([[240, 0.0, 0.2, "sine", 0.34, 90, "drop"], [247, 0.0, 0.2, "sine", 0.26, 93, "drop"], [120, 0.03, 0.16, "tri", 0.18]], 0.85)
+	_streams.cast_verdant = _render([[392, 0.0, 0.1, "tri", 0.26], [523, 0.06, 0.1, "tri", 0.26], [784, 0.12, 0.22, "tri", 0.26], [2400, 0.0, 0.2, "noise", 0.06]])
+	_streams.cast_telluric = _render([[98, 0.0, 0.3, "sine", 0.55, 65, "drop"], [196, 0.05, 0.18, "tri", 0.2], [80, 0.1, 0.12, "noise", 0.3]])
+	_streams.cast_pyric = _render([[200, 0.0, 0.3, "noise", 0.2], [262, 0.0, 0.25, "tri", 0.24, 520], [900, 0.1, 0.2, "noise", 0.12]])
+	_streams.cast_aqueous = _render([[330, 0.0, 0.1, "sine", 0.3, 880, "drop"], [440, 0.07, 0.1, "sine", 0.28, 1100, "drop"], [660, 0.14, 0.14, "sine", 0.26, 1500, "drop"]])
+	_streams.cast_voltaic = _render([[880, 0.0, 0.05, "square", 0.12], [1320, 0.05, 0.05, "square", 0.12], [1760, 0.1, 0.05, "square", 0.12], [2640, 0.15, 0.1, "square", 0.1], [60, 0.0, 0.08, "noise", 0.18]])
+	_streams.cast_void = _render([[196, 0.0, 0.35, "sine", 0.26, 392], [203, 0.0, 0.35, "sine", 0.2, 380], [98, 0.1, 0.3, "tri", 0.2]])
+	# a super-effective hit adds a bright ping on top
+	_streams.strong = _render([[1568, 0.0, 0.12, "sine", 0.22], [2349, 0.03, 0.14, "sine", 0.16]])
 	_streams.whoosh = _render([[400, 0.0, 0.25, "noise", 0.12]])
 
 
@@ -50,7 +66,7 @@ func play(sound: String, pitch := 1.0) -> void:
 			return
 
 
-func _render(notes: Array) -> AudioStreamWAV:
+func _render(notes: Array, gain := 1.0) -> AudioStreamWAV:
 	var length := 0.0
 	for n in notes:
 		length = maxf(length, n[1] + n[2])
@@ -66,6 +82,7 @@ func _render(notes: Array) -> AudioStreamWAV:
 		var samples := int(n[2] * RATE)
 		# a glide note sweeps exponentially to its end pitch and swells instead of decaying
 		var glide: float = n[5] if n.size() > 5 else 0.0
+		var pluck: bool = n.size() > 6 and n[6] == "drop"
 		var gph := 0.0
 		for i in samples:
 			var t := float(i) / RATE
@@ -73,7 +90,8 @@ func _render(notes: Array) -> AudioStreamWAV:
 			var ph := fmod(t * f, 1.0)
 			if glide > 0.0:
 				var x := float(i) / samples
-				env = pow(x, 1.2) * minf(1.0, (1.0 - x) / 0.08)
+				if not pluck:
+					env = pow(x, 1.2) * minf(1.0, (1.0 - x) / 0.08)
 				gph = fmod(gph + f * pow(glide / f, x) / RATE, 1.0)
 				ph = gph
 			var v := 0.0
@@ -88,7 +106,7 @@ func _render(notes: Array) -> AudioStreamWAV:
 					v = noise.randf_range(-1.0, 1.0) * (0.6 + 0.4 * sin(TAU * f * t))
 			var idx := start + i
 			if idx < count:
-				buf[idx] += v * env * float(n[4])
+				buf[idx] += v * env * float(n[4]) * gain
 	var bytes := PackedByteArray()
 	bytes.resize(count * 2)
 	for i in count:
