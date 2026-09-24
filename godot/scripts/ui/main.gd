@@ -93,9 +93,10 @@ func _ready() -> void:
 		var s := Game.last_offline_summary
 		Game.last_offline_summary = {}
 		_show_summary.call_deferred(s)
-		for e in s.events:
-			if e.type == "evolved":
-				_reveal.enqueue("evolve", e)
+		# play at most a handful of evolution reveals after a long absence; the summary lists the rest
+		var evolutions: Array = s.events.filter(func(e): return e.type == "evolved")
+		for e in evolutions.slice(0, 5):
+			_reveal.enqueue("evolve", e)
 	if int(Game.state.counters.actions) == 0 and Game.state.creatures.size() == 1:
 		_welcome.call_deferred()
 

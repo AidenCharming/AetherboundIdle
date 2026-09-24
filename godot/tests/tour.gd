@@ -44,6 +44,17 @@ func _run() -> void:
 		get_tree().change_scene_to_file("res://scenes/title.tscn")
 		await _wait(1.6)
 		await _shot("title")
+		var title: Node = get_tree().current_scene
+		title._slots_modal("load")
+		await _wait(0.5)
+		await _shot("title_load")
+		_close_modals()
+		title._slots_modal("new")
+		await _wait(0.3)
+		_close_modals()
+		title._credits()
+		await _wait(0.3)
+		_close_modals()
 	if _want("fresh"):
 		Game.start_slot(3, true)
 		get_tree().change_scene_to_file("res://scenes/main.tscn")

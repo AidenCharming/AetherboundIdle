@@ -97,9 +97,11 @@ func _apply_offline(seconds: float) -> void:
 	var summary := Offline.apply(state, seconds, rng)
 	state.lastSeen = now_sec()
 	last_offline_summary = summary
+	var shown := 0
 	for e in summary.events:
-		if e.type == "evolved":
+		if e.type == "evolved" and shown < 5:
 			reveal_requested.emit("evolve", e)
+			shown += 1
 	offline_summary.emit(summary)
 	changed.emit()
 	save_game()
