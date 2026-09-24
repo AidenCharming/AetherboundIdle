@@ -187,9 +187,9 @@ static func scroll(child: Control, horizontal := false) -> ScrollContainer:
 	gutter.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	gutter.add_child(child)
 	s.add_child(gutter)
-	var bar := s.get_v_scroll_bar()
-	var fit := func(): gutter.add_theme_constant_override("margin_right", 12 if bar.visible else 0)
-	bar.visibility_changed.connect(fit)
+	var vbar := s.get_v_scroll_bar()
+	var fit := func(): gutter.add_theme_constant_override("margin_right", 12 if vbar.visible else 0)
+	vbar.visibility_changed.connect(fit)
 	fit.call()
 	return s
 
