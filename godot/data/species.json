@@ -75,11 +75,11 @@
 			},
 			{
 				"name": "Mosscrank",
-				"desc": "Bipedal mossy mechanism."
+				"desc": "A mossy clockwork ball on brass legs, with a wind-up crank on its back and a round hatch in its side."
 			},
 			{
 				"name": "Mossbastion",
-				"desc": "Gentle lumbering botanical machine with emerald aura."
+				"desc": "A gentle fern-crowned clockwork walker with brass arms, moss grown thick over every gear."
 			}
 		],
 		"primarySkill": "herbalism",
@@ -133,7 +133,7 @@
 		"forms": [
 			{
 				"name": "Quakemaw",
-				"desc": "Stout jaw-heavy lizard with a glowing throat."
+				"desc": "A stout, jaw-heavy lizard with a pebbly brown hide and a bright orange scarf."
 			},
 			{
 				"name": "Faultjaw",
@@ -141,7 +141,7 @@
 			},
 			{
 				"name": "Craterchomp",
-				"desc": "Friendly earth-dragon with crystal teeth."
+				"desc": "A friendly earth-dragon with a stony horn, a toothy grin and crystal spurs along its tail."
 			}
 		],
 		"primarySkill": "mining",
@@ -172,7 +172,7 @@
 			},
 			{
 				"name": "Prismpulse",
-				"desc": "Orbiting stones around a bright crystal nucleus."
+				"desc": "A walking crystal nucleus on faceted limbs, carrying chunks of its old stone shell on its shoulders."
 			}
 		],
 		"primarySkill": "mining",
@@ -199,11 +199,11 @@
 			},
 			{
 				"name": "Shalestride",
-				"desc": "Multi-legged excavator."
+				"desc": "A six-legged shale crawler with a plated back and big digging claws."
 			},
 			{
 				"name": "Bedrockbound",
-				"desc": "Gentle plated centipede giant."
+				"desc": "A hulking, gentle rock beetle standing upright, its heavy shell studded with crystals."
 			}
 		],
 		"primarySkill": "mining",
@@ -261,7 +261,7 @@
 			},
 			{
 				"name": "Smolderbite",
-				"desc": "Sleek ash-coated feline."
+				"desc": "A sleek ash-grey cat laced with glowing lava cracks, its tail a lick of flame."
 			},
 			{
 				"name": "Emberroar",
@@ -327,7 +327,7 @@
 			},
 			{
 				"name": "Smolderplump",
-				"desc": "Massive affectionate salamander radiating cozy heat."
+				"desc": "A massive, affectionate salamander with a furnace glowing in its belly and little chimneys puffing on its back."
 			}
 		],
 		"primarySkill": "cooking",
@@ -350,7 +350,7 @@
 		"forms": [
 			{
 				"name": "Charwhisk",
-				"desc": "Bird with a tail that stirs coals."
+				"desc": "A round little bird with a kitchen-whisk tail it uses to stir the coals."
 			},
 			{
 				"name": "Coalstir",
@@ -385,11 +385,11 @@
 			},
 			{
 				"name": "Rillstream",
-				"desc": "Serpentine water elemental with silver bands."
+				"desc": "A water-drop body on stubby silver-banded limbs, always standing in a ripple of its own."
 			},
 			{
 				"name": "Tideflow",
-				"desc": "Serene looping water spirit."
+				"desc": "A serene water spirit wrapped in a curling wave that never quite breaks."
 			}
 		],
 		"primarySkill": "fishing",
@@ -416,7 +416,7 @@
 			},
 			{
 				"name": "Basincatch",
-				"desc": "Turtle with a basin of water on its back."
+				"desc": "A shell-backed toad hauling a brimming wooden bucket on its back."
 			},
 			{
 				"name": "Lakehaul",
@@ -536,7 +536,7 @@
 		"forms": [
 			{
 				"name": "Joulebug",
-				"desc": "Tiny glowing insect."
+				"desc": "A round, striped little bug with long antennae and a glow like a fresh battery."
 			},
 			{
 				"name": "Ohmroach",
@@ -571,7 +571,7 @@
 			},
 			{
 				"name": "Ionjack",
-				"desc": "Insulated serpent."
+				"desc": "A coiled snake sheathed in black-and-yellow insulation, with a two-pin plug for a tail."
 			},
 			{
 				"name": "Surgeport",
@@ -598,15 +598,15 @@
 		"forms": [
 			{
 				"name": "Coilchirp",
-				"desc": "Metallic bird wrapped in copper wire."
+				"desc": "A round songbird wrapped in loops of copper wire, its tail a springy coil."
 			},
 			{
 				"name": "Wirebeak",
-				"desc": "Conductive singing avian."
+				"desc": "A songbird with a crest of copper coils and a spring-wire tail that hums when it sings."
 			},
 			{
 				"name": "Gridtrill",
-				"desc": "Electric eagle."
+				"desc": "A proud copper-collared eagle whose cry crackles like a live wire."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -637,7 +637,7 @@
 			},
 			{
 				"name": "Penumbrum",
-				"desc": "Multi-ringed dark body bending light."
+				"desc": "A dark crescent framed by a blazing eclipse corona, bending the light around it."
 			}
 		],
 		"primarySkill": "aether-weaving",
@@ -660,15 +660,15 @@
 		"forms": [
 			{
 				"name": "Riftsneak",
-				"desc": "Shy shadowy biped peeking from portals."
+				"desc": "A shy purple kitten that peeks at the world through a pocket portal ring."
 			},
 			{
 				"name": "Nullprowl",
-				"desc": "Sleek cat-like shadow."
+				"desc": "A sleek, star-flecked cat with a ringed tail, slipping between shadows."
 			},
 			{
 				"name": "Gloamstalk",
-				"desc": "Elegant starry void panther."
+				"desc": "An elegant starry void lynx in dark armored bands, its tail tipped in white."
 			}
 		],
 		"primarySkill": "vessel-crafting",
@@ -695,7 +695,7 @@
 			},
 			{
 				"name": "Hushglide",
-				"desc": "Floating manta ray of twilight."
+				"desc": "A fuzzy moth gliding on wide, manta-like wings speckled with stars."
 			},
 			{
 				"name": "Silentwing",
@@ -753,13 +753,16 @@
 		],
 		"forms": [
 			{
-				"name": "Ashwood"
+				"name": "Ashwood",
+				"desc": "A small sapling creature with charcoal-grey bark and ember-orange leaves that smoulder but never burn."
 			},
 			{
-				"name": "Emberbark"
+				"name": "Emberbark",
+				"desc": "A sturdy four-legged treant whose cracked bark glows with banked embers."
 			},
 			{
-				"name": "Hearthtrunk"
+				"name": "Hearthtrunk",
+				"desc": "A great walking tree with a warm hearth burning in the hollow of its trunk."
 			}
 		],
 		"primarySkill": "woodcutting",
@@ -785,13 +788,16 @@
 		],
 		"forms": [
 			{
-				"name": "Brambletide"
+				"name": "Brambletide",
+				"desc": "A slippery ball of kelp-green brambles that rolls along riverbanks, dripping as it goes."
 			},
 			{
-				"name": "Briarripple"
+				"name": "Briarripple",
+				"desc": "A vine-wrapped water serpent with thorny fins, rippling through the reeds."
 			},
 			{
-				"name": "Thicketwave"
+				"name": "Thicketwave",
+				"desc": "A towering wave of tangled briar and seawater that curls around anything it catches."
 			}
 		],
 		"primarySkill": "fishing",
@@ -816,13 +822,16 @@
 		],
 		"forms": [
 			{
-				"name": "Sproutfault"
+				"name": "Sproutfault",
+				"desc": "A pebble-backed little tortoise with green sprouts pushing up through the cracks in its shell."
 			},
 			{
-				"name": "Timbershale"
+				"name": "Timbershale",
+				"desc": "A shale-plated tortoise with a small stand of saplings on its back."
 			},
 			{
-				"name": "Lumbercrag"
+				"name": "Lumbercrag",
+				"desc": "A massive tortoise carrying a rocky crag and a whole grove of trees."
 			}
 		],
 		"primarySkill": "herbalism",
@@ -847,13 +856,16 @@
 		],
 		"forms": [
 			{
-				"name": "Mosscoil"
+				"name": "Mosscoil",
+				"desc": "A mossy caterpillar coiled like a spring, sparking at the tips of its feelers."
 			},
 			{
-				"name": "Mossfuse"
+				"name": "Mossfuse",
+				"desc": "A moss-furred moth with fuse-wire antennae and softly crackling wings."
 			},
 			{
-				"name": "Canopygrid"
+				"name": "Canopygrid",
+				"desc": "A great moth whose wide leafy wings are veined with glowing circuitry."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -878,13 +890,16 @@
 		],
 		"forms": [
 			{
-				"name": "Mudskulker"
+				"name": "Mudskulker",
+				"desc": "A shy mudskipper with a pebbly back, hiding in riverbank mud."
 			},
 			{
-				"name": "Shaleflow"
+				"name": "Shaleflow",
+				"desc": "A stone-scaled salamander that flows through wet shale like water."
 			},
 			{
-				"name": "Bedrocktide"
+				"name": "Bedrocktide",
+				"desc": "A huge river guardian of bedrock and current, its back a mossy riverbed."
 			}
 		],
 		"primarySkill": "fishing",
@@ -908,13 +923,16 @@
 		],
 		"forms": [
 			{
-				"name": "Quakeforge"
+				"name": "Quakeforge",
+				"desc": "A stubby rock mole with a glowing, forge-hot nose."
 			},
 			{
-				"name": "Slagfist"
+				"name": "Slagfist",
+				"desc": "A burly stone brawler with fists of molten slag."
 			},
 			{
-				"name": "Craterhearth"
+				"name": "Craterhearth",
+				"desc": "A towering rock titan with a volcanic crater smouldering in its back."
 			}
 		],
 		"primarySkill": "mining",
@@ -939,13 +957,16 @@
 		],
 		"forms": [
 			{
-				"name": "Geodegrid"
+				"name": "Geodegrid",
+				"desc": "A cracked-geode hedgehog whose crystal quills hum with charge."
 			},
 			{
-				"name": "Crystalwire"
+				"name": "Crystalwire",
+				"desc": "A crystal-backed pangolin laced with copper wire."
 			},
 			{
-				"name": "Prismvolt"
+				"name": "Prismvolt",
+				"desc": "A radiant crystal beast whose prism spines split lightning into rainbows."
 			}
 		],
 		"primarySkill": "mining",
@@ -969,13 +990,16 @@
 		],
 		"forms": [
 			{
-				"name": "Cinderbasin"
+				"name": "Cinderbasin",
+				"desc": "A little clay-pot crab with warm water bubbling in the pot on its back."
 			},
 			{
-				"name": "Steamrill"
+				"name": "Steamrill",
+				"desc": "A steam-snorting crab whose shell is a hissing kettle."
 			},
 			{
-				"name": "Kettlebrine"
+				"name": "Kettlebrine",
+				"desc": "A grand kettle-shelled crab simmering a whole broth of the sea."
 			}
 		],
 		"primarySkill": "cooking",
@@ -1000,13 +1024,16 @@
 		],
 		"forms": [
 			{
-				"name": "Embersurge"
+				"name": "Embersurge",
+				"desc": "A spark-furred ferret that races about with a tail like a lit fuse."
 			},
 			{
-				"name": "Blazearc"
+				"name": "Blazearc",
+				"desc": "A lean ferret wreathed in arcing flame."
 			},
 			{
-				"name": "Infernodynamo"
+				"name": "Infernodynamo",
+				"desc": "A roaring weasel of flame and lightning that spins like a living dynamo."
 			}
 		],
 		"primarySkill": "smithing",
@@ -1031,13 +1058,16 @@
 		],
 		"forms": [
 			{
-				"name": "Brinecore"
+				"name": "Brinecore",
+				"desc": "A round sea urchin with a bright, charged core glowing between its spines."
 			},
 			{
-				"name": "Rillarc"
+				"name": "Rillarc",
+				"desc": "An electric ray that skims the shallows trailing little arcs."
 			},
 			{
-				"name": "Tidebolt"
+				"name": "Tidebolt",
+				"desc": "A great storm manta that calls lightning down onto the tide."
 			}
 		],
 		"primarySkill": "fishing",
@@ -1061,13 +1091,16 @@
 		],
 		"forms": [
 			{
-				"name": "Eclipseed"
+				"name": "Eclipseed",
+				"desc": "A dark seed pod with one sleepy eye, flecked with starlight."
 			},
 			{
-				"name": "Starsap"
+				"name": "Starsap",
+				"desc": "A drooping night-flower sprite dripping glowing, starry sap."
 			},
 			{
-				"name": "Nightbloom"
+				"name": "Nightbloom",
+				"desc": "A tall moonlit flower spirit that blooms only in the dark."
 			}
 		],
 		"primarySkill": "aether-weaving",
@@ -1093,13 +1126,16 @@
 		],
 		"forms": [
 			{
-				"name": "Nullshale"
+				"name": "Nullshale",
+				"desc": "A slate-dark pebble creature with a hollow, starry crack down its middle."
 			},
 			{
-				"name": "Riftrock"
+				"name": "Riftrock",
+				"desc": "A floating split boulder with a swirling rift between its halves."
 			},
 			{
-				"name": "Abysscrag"
+				"name": "Abysscrag",
+				"desc": "A looming crag of black stone orbiting a small abyss."
 			}
 		],
 		"primarySkill": "vessel-crafting",
@@ -1124,13 +1160,16 @@
 		],
 		"forms": [
 			{
-				"name": "Gloamforge"
+				"name": "Gloamforge",
+				"desc": "A little soot-dark imp carrying a lantern of violet flame."
 			},
 			{
-				"name": "Muteember"
+				"name": "Muteember",
+				"desc": "A silent hooded figure whose embers burn purple and make no sound."
 			},
 			{
-				"name": "Hushkiln"
+				"name": "Hushkiln",
+				"desc": "A towering walking kiln that fires its work in silent violet flame."
 			}
 		],
 		"primarySkill": "vessel-crafting",
@@ -1156,13 +1195,16 @@
 		],
 		"forms": [
 			{
-				"name": "Hushflow"
+				"name": "Hushflow",
+				"desc": "A quiet, ink-dark tadpole that leaves no ripple behind it."
 			},
 			{
-				"name": "Nullstream"
+				"name": "Nullstream",
+				"desc": "A long shadowy eel that seems to swim through a stream of night."
 			},
 			{
-				"name": "Riftcurrent"
+				"name": "Riftcurrent",
+				"desc": "A great serpent of dark water, flowing in and out of rifts."
 			}
 		],
 		"primarySkill": "aether-weaving",
@@ -1187,13 +1229,16 @@
 		],
 		"forms": [
 			{
-				"name": "Gridrift"
+				"name": "Gridrift",
+				"desc": "A floating cube of dark glass with violet sparks racing along its grid lines."
 			},
 			{
-				"name": "Corewire"
+				"name": "Corewire",
+				"desc": "A shadowy orb bound in glowing wire around a humming core."
 			},
 			{
-				"name": "Lodestar"
+				"name": "Lodestar",
+				"desc": "A dark star of magnetised shards drawn around a burning violet core."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -1222,10 +1267,12 @@
 				"desc": "A young mountain goat with a sorrel-brown coat and small stone-flecked horns, sure-footed among loose scree."
 			},
 			{
-				"name": "Fernscarp"
+				"name": "Fernscarp",
+				"desc": "A nimble goat with fern-fringed horns, bounding up sheer scree."
 			},
 			{
-				"name": "Highhorn"
+				"name": "Highhorn",
+				"desc": "A proud mountain goat with great stone-banded horns, standing on the highest ledges."
 			}
 		],
 		"primarySkill": "woodcutting",
@@ -1255,10 +1302,12 @@
 				"desc": "A slow, mossy tortoise whose shell is layered like flat grey slate, dotted with tiny hazel-brown flecks."
 			},
 			{
-				"name": "Mossflint"
+				"name": "Mossflint",
+				"desc": "A tortoise with a mossy shell of chipped flint plates."
 			},
 			{
-				"name": "Grovepeak"
+				"name": "Grovepeak",
+				"desc": "An ancient tortoise with a small wooded peak growing from its shell."
 			}
 		],
 		"primarySkill": "mining",
@@ -1288,10 +1337,12 @@
 				"desc": "A small hedgehog rolled into a ball of dry bracken fronds, with a faint warm glow between its curled spines."
 			},
 			{
-				"name": "Thornkiln"
+				"name": "Thornkiln",
+				"desc": "A hedgehog with smouldering bracken spines and a warm glow in its belly."
 			},
 			{
-				"name": "Scaldhearth"
+				"name": "Scaldhearth",
+				"desc": "A big, sleepy hedgehog whose ember-tipped quills keep a hearth warm around it."
 			}
 		],
 		"primarySkill": "woodcutting",
@@ -1322,10 +1373,12 @@
 				"desc": "A tiny sunbird with yarrow-white feathers and a throat that glows like a low ember."
 			},
 			{
-				"name": "Bloomember"
+				"name": "Bloomember",
+				"desc": "A sunbird with petal-white wings and an ember-bright throat."
 			},
 			{
-				"name": "Petalblaze"
+				"name": "Petalblaze",
+				"desc": "A radiant sunbird trailing a tail of burning flower petals."
 			}
 		],
 		"primarySkill": "herbalism",
@@ -1356,10 +1409,12 @@
 				"desc": "A slender heron standing on reed-thin legs in a bed of tall sedge grass."
 			},
 			{
-				"name": "Reedcurrent"
+				"name": "Reedcurrent",
+				"desc": "A tall heron with reed-green plumes, still as a post in the current."
 			},
 			{
-				"name": "Willowmire"
+				"name": "Willowmire",
+				"desc": "A great grey heron draped in trailing willow fronds, wading through the marsh."
 			}
 		],
 		"primarySkill": "fishing",
@@ -1389,10 +1444,12 @@
 				"desc": "A sleek river otter with a rowan-red sheen to its fur, sunning itself on a smooth wet boulder."
 			},
 			{
-				"name": "Fernbrook"
+				"name": "Fernbrook",
+				"desc": "A playful otter with fern-green markings, sliding down mossy brookside rocks."
 			},
 			{
-				"name": "Alderfalls"
+				"name": "Alderfalls",
+				"desc": "A big, glossy otter lounging beneath a waterfall, alder leaves caught in its fur."
 			}
 		],
 		"primarySkill": "woodcutting",
@@ -1422,10 +1479,12 @@
 				"desc": "A quick dragonfly with wings veined in trailing ivy and a faint crackle following each turn."
 			},
 			{
-				"name": "Vinespark"
+				"name": "Vinespark",
+				"desc": "A dragonfly whose ivy-veined wings leave a trail of tiny sparks."
 			},
 			{
-				"name": "Leafcharge"
+				"name": "Leafcharge",
+				"desc": "A large dragonfly with leaf-shaped wings that hum with stored charge."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -1455,10 +1514,12 @@
 				"desc": "A bright-eyed squirrel with a coat of clinging burrs that spark faintly when it leaps."
 			},
 			{
-				"name": "Quillspark"
+				"name": "Quillspark",
+				"desc": "A squirrel with a bristling coat of burr-quills that crackle when it leaps."
 			},
 			{
-				"name": "Quillstatic"
+				"name": "Stormbristle",
+				"desc": "A bushy-tailed squirrel whose quills stand on end in a crackling storm of static."
 			}
 		],
 		"primarySkill": "woodcutting",
@@ -1488,10 +1549,12 @@
 				"desc": "A stone-plated scorpion whose pincers glow faint orange at the tips, like scorched rock cooling."
 			},
 			{
-				"name": "Sunspire"
+				"name": "Kilnclaw",
+				"desc": "A scorpion with heat-cracked stone plates and pincers glowing like a kiln."
 			},
 			{
-				"name": "Blazingpeak"
+				"name": "Pyrestinger",
+				"desc": "A huge stone scorpion whose tail stinger burns white-hot at the tip."
 			}
 		],
 		"primarySkill": "mining",
@@ -1521,10 +1584,12 @@
 				"desc": "A horned lizard the color of sun-baked mesa clay, its spines tipped with a dull, stubborn heat."
 			},
 			{
-				"name": "Spurmesa"
+				"name": "Spurback",
+				"desc": "A horned lizard with a ridge of hot, rust-red spurs down its back."
 			},
 			{
-				"name": "Spinehearth"
+				"name": "Spinehearth",
+				"desc": "A broad horned lizard whose spines glow like the coals of a banked hearth."
 			}
 		],
 		"primarySkill": "cooking",
@@ -1554,10 +1619,12 @@
 				"desc": "A slate-grey crab with a teal-veined shell, one oversized claw, and a tiny puddle glinting in a hollow of its shell."
 			},
 			{
-				"name": "Reefpincer"
+				"name": "Reefpincer",
+				"desc": "A reef crab with a coral-crusted shell and one enormous pincer."
 			},
 			{
-				"name": "Boulderclaw"
+				"name": "Boulderclaw",
+				"desc": "A giant crab carrying a boulder for a shell, its claw big enough to crack stone."
 			}
 		],
 		"primarySkill": "fishing",
@@ -1586,10 +1653,12 @@
 				"desc": "A broad-snouted crocodile in mottled stone and marsh green, with a ridged back and a glint of quartz between its teeth."
 			},
 			{
-				"name": "Slatesnout"
+				"name": "Slatesnout",
+				"desc": "A crocodile with a long slate-grey snout and quartz-studded teeth."
 			},
 			{
-				"name": "Ridgehide"
+				"name": "Ridgehide",
+				"desc": "A massive crocodile whose ridged back looks like a riverbank of stone."
 			}
 		],
 		"primarySkill": "mining",
@@ -1618,10 +1687,12 @@
 				"desc": "A round-eared bat with dusky wings edged in copper thread and a small quartz chime glowing at its throat."
 			},
 			{
-				"name": "Pumiceglide"
+				"name": "Pumiceglide",
+				"desc": "A bat with light pumice-grey wings, gliding on warm air with a chime at its throat."
 			},
 			{
-				"name": "Fluxwing"
+				"name": "Fluxwing",
+				"desc": "A broad-winged bat whose copper-edged wings crackle as it banks."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -1650,10 +1721,12 @@
 				"desc": "A stocky ram with spiral horns of banded stone and a curly cream fleece that crackles faintly at the tips."
 			},
 			{
-				"name": "Ampcurl"
+				"name": "Ampcurl",
+				"desc": "A young ram with banded stone horns and a fleece that crackles with static."
 			},
 			{
-				"name": "Mesahorn"
+				"name": "Mesahorn",
+				"desc": "A great ram with spiral mesa-stone horns and a thundercloud of fleece."
 			}
 		],
 		"primarySkill": "mining",
@@ -1682,10 +1755,12 @@
 				"desc": "A rosy flamingo whose long neck shades to orange at the tips, wading on thin legs with a ruffle of warm-lit plumes."
 			},
 			{
-				"name": "Flarewade"
+				"name": "Flarewade",
+				"desc": "A flamingo wading through warm shallows, its plumes flaring orange at the tips."
 			},
 			{
-				"name": "Pyreplume"
+				"name": "Pyreplume",
+				"desc": "A tall flamingo crowned with a fan of flame-bright plumes."
 			}
 		],
 		"primarySkill": "cooking",
@@ -1715,10 +1790,12 @@
 				"desc": "A round, unbothered capybara with damp chestnut fur, a faint steam curl over its head, and a warm orange glow beneath its belly."
 			},
 			{
-				"name": "Brooksoak"
+				"name": "Brooksoak",
+				"desc": "A capybara soaking contentedly in a warm brook, steam curling off its back."
 			},
 			{
-				"name": "Lavabask"
+				"name": "Lavabask",
+				"desc": "A huge, placid capybara basking in a hot spring with a lava glow beneath it."
 			}
 		],
 		"primarySkill": "fishing",
@@ -1748,10 +1825,12 @@
 				"desc": "A dark-shelled firefly whose belly lamp burns amber and flickers with a thin blue line."
 			},
 			{
-				"name": "Arcflicker"
+				"name": "Arcflicker",
+				"desc": "A firefly whose amber lamp flickers with little blue arcs."
 			},
 			{
-				"name": "Blazefly"
+				"name": "Blazefly",
+				"desc": "A big firefly with a blazing lamp and wings that throw sparks."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -1781,10 +1860,12 @@
 				"desc": "A russet fox with a bushy tail tipped in bright orange and a thick ruff that puffs up when it is excited."
 			},
 			{
-				"name": "Brandtail"
+				"name": "Brandtail",
+				"desc": "A russet fox whose tail tip burns like a brand."
 			},
 			{
-				"name": "Scorchfox"
+				"name": "Scorchfox",
+				"desc": "A tall fox with a mane of flickering flame and a sparking tail."
 			}
 		],
 		"primarySkill": "smithing",
@@ -1814,10 +1895,12 @@
 				"desc": "A long silver eel with a rust-orange underside and pale blue bands running the length of its body."
 			},
 			{
-				"name": "Kelpeel"
+				"name": "Kelpeel",
+				"desc": "A silver eel draped in kelp ribbons, pulsing with faint blue light."
 			},
 			{
-				"name": "Dynamoeel"
+				"name": "Dynamoeel",
+				"desc": "A thick eel coiled like a dynamo, its blue bands crackling with current."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -1846,10 +1929,12 @@
 				"desc": "A compact kingfisher with a cobalt back, an amber chest, a long dark beak, and thin copper pinstripes on its wings."
 			},
 			{
-				"name": "Pulsedart"
+				"name": "Pulsedart",
+				"desc": "A kingfisher that dives like a dart, leaving a pulse of spray and sparks."
 			},
 			{
-				"name": "Voltfisher"
+				"name": "Voltfisher",
+				"desc": "A proud kingfisher with a lightning-blue back and a crackling, copper-edged beak."
 			}
 		],
 		"primarySkill": "fishing",
@@ -1878,10 +1963,12 @@
 				"desc": "A small dark-furred mole with pale root-like whiskers, pushing tunnels through loose black soil."
 			},
 			{
-				"name": "Palevine"
+				"name": "Palevine",
+				"desc": "A mole with pale root-vine whiskers that twist through the soil ahead of it."
 			},
 			{
-				"name": "Loamgrove"
+				"name": "Loamgrove",
+				"desc": "A big old mole with a small grove of pale saplings growing on its back."
 			}
 		],
 		"primarySkill": "herbalism",
@@ -1912,10 +1999,12 @@
 				"desc": "A pale hare that moves fastest right at dusk, nibbling flowers that close as it passes."
 			},
 			{
-				"name": "Wanevine"
+				"name": "Wanehop",
+				"desc": "A hare with moon-pale fur that bounds through closing flowers at dusk."
 			},
 			{
-				"name": "Waneflower"
+				"name": "Moonwarren",
+				"desc": "A tall, silver-furred hare wreathed in night-blooming flowers, keeper of a warren of shadows."
 			}
 		],
 		"primarySkill": "herbalism",
@@ -1946,10 +2035,12 @@
 				"desc": "A stocky badger with slate-grey fur and claws that seem to swallow the light around them."
 			},
 			{
-				"name": "Chasmclaw"
+				"name": "Chasmclaw",
+				"desc": "A broad badger with dark claws that tear small rifts in the stone."
 			},
 			{
-				"name": "Gravelgrit"
+				"name": "Abyssburrow",
+				"desc": "A huge slate badger that digs straight into the dark between places."
 			}
 		],
 		"primarySkill": "vessel-crafting",
@@ -1979,10 +2070,12 @@
 				"desc": "A small armored armadillo whose plates look chiseled from dark, unpolished stone."
 			},
 			{
-				"name": "Grimplate"
+				"name": "Grimplate",
+				"desc": "An armadillo with dark, chiselled stone plates that seem to drink the light."
 			},
 			{
-				"name": "Grimstone"
+				"name": "Umbralith",
+				"desc": "A great armadillo that rolls up into a black monolith of stone and shadow."
 			}
 		],
 		"primarySkill": "mining",
@@ -2012,10 +2105,12 @@
 				"desc": "A dark vulture with ash-grey feathers and eyes like two dying coals."
 			},
 			{
-				"name": "Ashgloam"
+				"name": "Ashgloam",
+				"desc": "A vulture with ash-grey wings and a ruff of smouldering feathers."
 			},
 			{
-				"name": "Ashplume"
+				"name": "Cinderwraith",
+				"desc": "A great ghostly vulture trailing smoke and cinders from its wings."
 			}
 		],
 		"primarySkill": "smithing",
@@ -2046,10 +2141,12 @@
 				"desc": "A lean jackal with a warm rust coat, trotting low along the last light of evening."
 			},
 			{
-				"name": "Wanescorch"
+				"name": "Wanescorch",
+				"desc": "A lean jackal with a smouldering rust coat that dims as the light fades."
 			},
 			{
-				"name": "Sunflare"
+				"name": "Gloamfang",
+				"desc": "A tall jackal with a coat like the last light of sunset and fangs of dark flame."
 			}
 		],
 		"primarySkill": "cooking",
@@ -2080,10 +2177,12 @@
 				"desc": "A translucent jellyfish drifting just beneath the surface, faintly dark at its core."
 			},
 			{
-				"name": "Murkveil"
+				"name": "Murkveil",
+				"desc": "A jellyfish trailing long veils of murky, ink-dark tendrils."
 			},
 			{
-				"name": "Sootveil"
+				"name": "Abyssbloom",
+				"desc": "A vast deep-sea jellyfish that opens like a dark flower, lit from within."
 			}
 		],
 		"primarySkill": "fishing",
@@ -2113,10 +2212,12 @@
 				"desc": "A pale, near-transparent newt gliding through still, shadowed water."
 			},
 			{
-				"name": "Hollowbrook"
+				"name": "Stillgill",
+				"desc": "A glassy, feathery-gilled newt that barely disturbs the water."
 			},
 			{
-				"name": "Palepool"
+				"name": "Palepool",
+				"desc": "A large pale newt that rests in shadowed pools, nearly invisible."
 			}
 		],
 		"primarySkill": "aether-weaving",
@@ -2146,10 +2247,12 @@
 				"desc": "A slender mantis whose limbs crackle faintly at each joint, dark against the light."
 			},
 			{
-				"name": "Wanewire"
+				"name": "Wanewire",
+				"desc": "A mantis with wire-thin limbs that spark faintly at every joint."
 			},
 			{
-				"name": "Faintpulse"
+				"name": "Shadescythe",
+				"desc": "A tall dark mantis with crackling scythe arms, all but invisible until it strikes."
 			}
 		],
 		"primarySkill": "circuitry",
@@ -2179,10 +2282,12 @@
 				"desc": "A slim dark spider whose web faintly sparks whenever something brushes it."
 			},
 			{
-				"name": "Wanecoil"
+				"name": "Wanecoil",
+				"desc": "A spider that spins coiled webs of faintly sparking thread."
 			},
 			{
-				"name": "Faintweb"
+				"name": "Gloomweaver",
+				"desc": "A large dark spider whose vast webs glitter with trapped sparks, like a night sky."
 			}
 		],
 		"primarySkill": "aether-weaving",

@@ -163,9 +163,9 @@ riftsneak, hushflutter, netherpod.
 | `sedgestilt` | Sedgestilt / Reedcurrent / Willowmire (a heron) | Verdant / Aqueous |
 | `rowanboulder` | Rowanboulder / Fernbrook / Alderfalls (an otter) | Verdant / Aqueous |
 | `ivyflux` | Ivyflux / Vinespark / Leafcharge (a dragonfly) | Verdant / Voltaic |
-| `burrbolt` | Burrbolt / Quillspark / Quillstatic (a squirrel) | Verdant / Voltaic |
-| `cliffscorch` | Cliffscorch / Sunspire / Blazingpeak (a scorpion) | Telluric / Pyric |
-| `nettlemesa` | Nettlemesa / Spurmesa / Spinehearth (a horned lizard) | Telluric / Pyric |
+| `burrbolt` | Burrbolt / Quillspark / Stormbristle (a squirrel) | Verdant / Voltaic |
+| `cliffscorch` | Cliffscorch / Kilnclaw / Pyrestinger (a scorpion) | Telluric / Pyric |
+| `nettlemesa` | Nettlemesa / Spurback / Spinehearth (a horned lizard) | Telluric / Pyric |
 | `gravelnip` | Gravelnip / Reefpincer / Boulderclaw (a crab) | Telluric / Aqueous |
 | `ripplesnap` | Ripplesnap / Slatesnout / Ridgehide (a crocodile) | Telluric / Aqueous |
 | `cairnflit` | Cairnflit / Pumiceglide / Fluxwing (a bat) | Telluric / Voltaic |
@@ -177,15 +177,15 @@ riftsneak, hushflutter, netherpod.
 | `eddyelver` | Eddyelver / Kelpeel / Dynamoeel (an eel) | Aqueous / Voltaic |
 | `sprayfledge` | Sprayfledge / Pulsedart / Voltfisher (a kingfisher) | Aqueous / Voltaic |
 | `murkroot` | Murkroot / Palevine / Loamgrove (a mole) | Void / Verdant |
-| `duskbloom` | Duskbloom / Wanevine / Waneflower (a hare) | Void / Verdant |
-| `riftshale` | Riftshale / Chasmclaw / Gravelgrit (a badger) | Void / Telluric |
-| `nethershale` | Nethershale / Grimplate / Grimstone (an armadillo) | Void / Telluric |
-| `wraithcoal` | Wraithcoal / Ashgloam / Ashplume (a vulture) | Void / Pyric |
-| `duskflare` | Duskflare / Wanescorch / Sunflare (a jackal) | Void / Pyric |
-| `murkmire` | Murkmire / Murkveil / Sootveil (a jellyfish) | Void / Aqueous |
-| `hollowstream` | Hollowstream / Hollowbrook / Palepool (a newt) | Void / Aqueous |
-| `wraithwire` | Wraithwire / Wanewire / Faintpulse (a mantis) | Void / Voltaic |
-| `duskvolt` | Duskvolt / Wanecoil / Faintweb (a spider) | Void / Voltaic |
+| `duskbloom` | Duskbloom / Wanehop / Moonwarren (a hare) | Void / Verdant |
+| `riftshale` | Riftshale / Chasmclaw / Abyssburrow (a badger) | Void / Telluric |
+| `nethershale` | Nethershale / Grimplate / Umbralith (an armadillo) | Void / Telluric |
+| `wraithcoal` | Wraithcoal / Ashgloam / Cinderwraith (a vulture) | Void / Pyric |
+| `duskflare` | Duskflare / Wanescorch / Gloamfang (a jackal) | Void / Pyric |
+| `murkmire` | Murkmire / Murkveil / Abyssbloom (a jellyfish) | Void / Aqueous |
+| `hollowstream` | Hollowstream / Stillgill / Palepool (a newt) | Void / Aqueous |
+| `wraithwire` | Wraithwire / Wanewire / Shadescythe (a mantis) | Void / Voltaic |
+| `duskvolt` | Duskvolt / Wanecoil / Gloomweaver (a spider) | Void / Voltaic |
 
 To replace any of the 72 existing sprites with newer cutouts, overwrite the file of the same name.
 
@@ -262,6 +262,24 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Creature names and descriptions
+- **Reviewed against the sprites** (designer's request): all 72 base forms were checked on contact sheets.
+  - Every base name fits its art, so none changed.
+  - 23 descriptions that described something not in the art, or said too little, were rewritten to what is
+    drawn. For example, Rillstream is a water drop on silver-banded legs, not "serpentine"; Bedrockbound is
+    an upright rock beetle, not a centipede; and Quakemaw wears an orange scarf rather than a glowing throat.
+- **Every hybrid form now has a description.** The 15 default hybrids had none and the 30 secret hybrids
+  only had their first form's, so 105 were written. Each follows its first form's animal, or the two parent
+  types for the default hybrids, so they can double as art briefs.
+- **14 hybrid form names changed**; species ids are unchanged, so saves are unaffected:
+  - They started with a rarity's name: Faintpulse → Shadescythe, Faintweb → Gloomweaver.
+  - They repeated the form before them: Quillstatic → Stormbristle, Spurmesa → Spurback,
+    Hollowbrook → Stillgill, Grimstone → Umbralith, Ashplume → Cinderwraith, Sootveil → Abyssbloom.
+  - They read as places or plants rather than the animal:
+    - the scorpion: Sunspire / Blazingpeak → Kilnclaw / Pyrestinger;
+    - the hare: Wanevine / Waneflower → Wanehop / Moonwarren;
+    - Gravelgrit → Abyssburrow, and Sunflare → Gloamfang.
 
 ### Pacing
 - **Creature XP curve** (designer feedback: one cleared Fractured Quarry run gave ten levels): now
