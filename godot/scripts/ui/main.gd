@@ -87,6 +87,8 @@ func _ready() -> void:
 	Game.notifications_changed.connect(_update_bell)
 	show_screen("sanctum")
 	Music.play("sanctum")
+	if DisplayServer.get_name() != "headless":
+		DisplayServer.window_set_title("Aetherbound Idle · Slot %d" % Game.slot)
 	if not Game.last_offline_summary.is_empty():
 		var s := Game.last_offline_summary
 		Game.last_offline_summary = {}
@@ -311,10 +313,18 @@ func _process(delta: float) -> void:
 		_top.status.text = "%d working · %d perched" % [working, Economy.perched(s).size()]
 
 
+const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works"}
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not Modal.any_open() and not _reveal.active:
 		get_viewport().set_input_as_handled()
 		open_pause_menu()
+	elif event is InputEventKey and event.pressed and not event.echo and not Modal.any_open() and not _reveal.active:
+		var screen: String = SHORTCUTS.get(event.keycode, "")
+		if screen != "" and not (get_viewport().gui_get_focus_owner() is LineEdit):
+			get_viewport().set_input_as_handled()
+			show_screen(screen)
 
 
 # ---------------------------------------------------------------- menus and summaries
@@ -333,6 +343,8 @@ func open_pause_menu() -> void:
 		Game.save_game()
 		Game.info("Saved to slot %d" % Game.slot, Data.ui_icon("xp")))
 	add.call("Back up or restore this save", "", _backup_modal)
+	if Options.get_value("dev_tools"):
+		add.call("Developer tools", "", _dev_modal)
 	add.call("Save and return to title", "", func(): _leave(false))
 	if OS.get_name() != "Web":
 		add.call("Save and quit to desktop", "Ghost", func(): _leave(true))
@@ -341,6 +353,8 @@ func open_pause_menu() -> void:
 
 func _leave(quit: bool) -> void:
 	Game.leave()
+	if DisplayServer.get_name() != "headless":
+		DisplayServer.window_set_title("Aetherbound Idle")
 	var tw := create_tween()
 	tw.tween_property(_fade, "color:a", 1.0, 0.4)
 	tw.tween_callback(func():
@@ -378,6 +392,67 @@ func _backup_modal() -> void:
 				_fill_rail(), true)))
 	v.add_child(row)
 	Modal.open(v, "Back up or restore", 660)
+
+
+func _dev_modal() -> void:
+	var v := UI.vbox(12)
+	v.add_child(UI.wrap_label("Testing shortcuts. Anything done here counts like normal play in this save slot.", "Faint", 560))
+	# grant a creature
+	var row := UI.hbox(8)
+	var sp := OptionButton.new()
+	for i in Data.species_list.size():
+		sp.add_item(Data.species_list[i].name, i)
+	var rar := OptionButton.new()
+	for i in Data.rarities.size():
+		rar.add_item(Data.rarities[i].name, i)
+	var lvl := SpinBox.new()
+	lvl.min_value = 1
+	lvl.max_value = Data.tuning.creature.maxLevel
+	lvl.value = 1
+	var shiny := CheckButton.new()
+	shiny.text = "Shiny"
+	row.add_child(sp)
+	row.add_child(rar)
+	row.add_child(UI.label("Lv", "Faint"))
+	row.add_child(lvl)
+	row.add_child(shiny)
+	row.add_child(UI.button("Grant", "Primary", func():
+		Game.dev_grant(Data.species_list[sp.selected].id, rar.selected + 1, int(lvl.value), shiny.button_pressed)
+		Game.info("Granted %s" % Data.species_list[sp.selected].name)))
+	v.add_child(UI.label("Grant an Aetherling", "H3"))
+	v.add_child(row)
+	v.add_child(UI.label("Resources", "H3"))
+	var res := UI.flow(8, 8)
+	for pair in [["aether", 1000], ["aether", 100000], ["gold", 1000], ["gold", 100000]]:
+		res.add_child(UI.button("+%s %s" % [F.format_num(pair[1]), Data.item_name(pair[0])], "", func(): Game.dev_add(pair[0], pair[1])))
+	res.add_child(UI.button("+50 of every item", "", func():
+		for it in Data.item_list:
+			Game.dev_add(it.id, 50)))
+	v.add_child(res)
+	v.add_child(UI.label("Time", "H3"))
+	var ff := UI.flow(8, 8)
+	for h in [1, 4, 12]:
+		ff.add_child(UI.button("Fast-forward %dh" % h, "", func(): Game.dev_fast_forward(h)))
+	ff.add_child(UI.button("Finish all eggs", "", func():
+		for egg in Game.state.pods:
+			if not egg.is_empty():
+				egg.readyAt = Game.now_sec()
+		Game.changed.emit()))
+	v.add_child(ff)
+	v.add_child(UI.label("Skill level", "H3"))
+	var sr := UI.hbox(8)
+	var sk := OptionButton.new()
+	for i in Data.skill_list.size():
+		sk.add_item(Data.skill_list[i].name, i)
+	var sl := SpinBox.new()
+	sl.min_value = 1
+	sl.max_value = Data.tuning.skills.maxLevel
+	sl.value = 10
+	sr.add_child(sk)
+	sr.add_child(sl)
+	sr.add_child(UI.button("Set", "", func(): Game.dev_skill_level(Data.skill_list[sk.selected].id, int(sl.value))))
+	v.add_child(sr)
+	Modal.open(v, "Developer tools", 700)
 
 
 func _open_notifications() -> void:

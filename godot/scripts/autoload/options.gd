@@ -26,6 +26,7 @@ var values := {
 	"damage_numbers": true,
 	"screen_shake": true,
 	"toasts": true,
+	"dev_tools": false,
 }
 
 var _focused := true

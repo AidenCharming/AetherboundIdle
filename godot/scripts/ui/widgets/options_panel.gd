@@ -57,6 +57,8 @@ func _rebuild() -> void:
 			_toggle("Show damage numbers in battles", "damage_numbers")
 			_toggle("Screen shake on big moments", "screen_shake")
 			_toggle("Toast notifications", "toasts")
+			_toggle("Developer tools in the pause menu (for testing)", "dev_tools")
+			_page.add_child(UI.label("Shortcuts: 1 Sanctum · 2 Nexus · 3 Genesis Pods · 4 Expeditions · 5 Aether-Log · 6 Inventory · 7 Sanctum Works · Esc menu", "Faint"))
 
 
 func _row(title: String) -> HBoxContainer:
