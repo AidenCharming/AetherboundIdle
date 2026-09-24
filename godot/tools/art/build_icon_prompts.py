@@ -173,19 +173,19 @@ I("aether-lantern", "item", "Parts", "m", "An elegant brass lantern with a ring 
 I("aether-crystal", "item", "Rare finds", "m", "A cluster of three pale-cyan crystal shards growing from a small grey rock base, with white highlight shapes on the facets.")
 
 # ----------------------------------------------------------------------------- interface: currencies and skills
-I("aether", "ui", "Currencies", "m", "A four-pointed star-shaped crystal, faceted, pale cyan and white, with a small round indigo gem in its centre.", view="facing the viewer")
+I("aether", "ui", "Currencies", "m", "A faceted crystal shaped like a plus sign with long pointed tips: exactly four points (one up, one down, one left, one right) joined by deeply inward-curved sides, pale cyan and white, with a small round indigo gem in its centre.", view="facing the viewer")
 I("gold", "ui", "Currencies", "m", "A single thick gold coin with a raised star emblem and a beaded rim, with white highlight shapes.")
 I("woodcutting", "ui", "Skills", "m", "A small wood-chopping axe with a curved wooden handle and a steel head, pointing up diagonally.")
 I("herbalism", "ui", "Skills", "m", "A small woven wicker basket overflowing with fresh green leaves and one yellow flower.")
 I("mining", "ui", "Skills", "m", "A miner's pickaxe with a wooden handle and a double-pointed steel head, pointing up diagonally.")
 I("fishing", "ui", "Skills", "m", "A wooden fishing rod, pointing up diagonally, with a curved line and a round red-and-white float at the end of it.")
 I("scavenging", "ui", "Skills", "m", "A magnifying glass with a brass rim and a short wooden handle, the lens drawn opaque pale blue with white highlight shapes.")
-I("smithing", "ui", "Skills", "m", "A blacksmith's hammer with a wooden handle and a heavy steel head, pointing up diagonally.")
+I("smithing", "ui", "Skills", "m", "A blacksmith's hammer with a wooden handle and a heavy pale silver-grey steel head with white highlight shapes (light grey like a wrench, never black or charcoal), pointing up diagonally.")
 I("cooking", "ui", "Skills", "m", "A black frying pan with a short handle and a sunny-side-up egg in it.")
 I("circuitry", "ui", "Skills", "m", "A chunky yellow lightning-bolt shape with a thin copper wire curling around it.", view="facing the viewer")
 I("aether-weaving", "ui", "Skills", "g", "A wooden spool of violet thread with a silver sewing needle pushed through the thread.")
 I("vessel-crafting", "ui", "Skills", "g", "A round violet glass capture orb with a silver cap, drawn solid and opaque, resting on a small three-legged brass crafting stand.")
-I("fabrication", "ui", "Skills", "m", "A steel wrench and a screwdriver with a yellow handle, crossed in an X.")
+I("fabrication", "ui", "Skills", "m", "Exactly one chunky all-steel wrench and exactly one screwdriver with a thick yellow handle and a short steel shaft, crossed in an X.")
 
 # ----------------------------------------------------------------------------- interface: navigation
 I("sanctum", "ui", "Navigation", "m", "A small floating island of grey rock with grass on top, a tiny round stone tower with a teal-blue roof on it, and a few small rocks hanging beneath the island.")
@@ -195,7 +195,7 @@ I("expeditions", "ui", "Navigation", "m", "An open brass pocket compass with a c
 I("aetherlog", "ui", "Navigation", "g", "A thick closed book with a violet leather cover, gold metal corner caps and a gold star emblem on the front.")
 I("inventory", "ui", "Navigation", "m", "A brown leather satchel backpack with a buckled flap and a small gold clasp.")
 I("works", "ui", "Navigation", "m", "A large steel cog wheel with a smaller brass cog meshed beside it.", view="facing the viewer")
-I("settings", "ui", "Navigation", "m", "A single steel-grey cog wheel with a round hole in its centre.", view="facing the viewer")
+I("settings", "ui", "Navigation", "m", "A single chunky steel-grey cog wheel with visible thickness, a raised bevelled rim around a round hole in its centre, soft shading on the teeth and white highlight shapes, drawn with depth like a solid metal part, not a flat symbol.", view="facing the viewer")
 
 # ----------------------------------------------------------------------------- interface: markers and stats
 I("bell", "ui", "Markers", "m", "A golden notification bell with a small round clapper at the bottom and a little loop on top.")
@@ -207,7 +207,7 @@ I("time", "ui", "Stats", "m", "A small wooden hourglass with opaque frosted glas
 I("xp", "ui", "Stats", "m", "A plump five-pointed golden star with rounded points and a white highlight shape.", view="facing the viewer")
 I("upgrade", "ui", "Markers", "m", "A chunky mint-green arrow pointing straight up.", view="facing the viewer")
 I("owned", "ui", "Markers", "m", "A round emerald-green badge with a thick cream rim and a chunky cream paw print in the middle.", view="facing the viewer", note="Marks species you already own: in an island's list of Aetherlings and on wild fighters' name tags in battle. Shown small (16–20 px), so keep the paw bold.")
-I("shiny", "ui", "Markers", "m", "Two chunky four-pointed star shapes side by side, a large pale-gold one and a small pale-cyan one.", view="facing the viewer")
+I("shiny", "ui", "Markers", "m", "Two chunky shapes side by side, each shaped like a plus sign with long pointed tips: exactly four points (up, down, left, right) joined by deeply inward-curved sides, a white highlight shape on each, a large pale-gold one and a small pale-cyan one.", view="facing the viewer")
 I("vessel", "ui", "Markers", "m", "", same_as="items/tinkerers-vessel", note="The top bar's vessel counter uses the Tinker's Vessel icon.")
 I("meal", "ui", "Markers", "m", "", same_as="items/bubble-stew", note="The top bar's meal counter uses the stew icon.")
 
@@ -234,7 +234,7 @@ Z("smoldering-caldera", "A volcanic island inside a wide caldera.",
   "smoking stone vents at the far left and right and the jagged rim of a volcano in the distance",
   "a smoky sky of deep red and ash orange")
 Z("whispering-tides", "The edge of a floating island where streams pour off into the sky as waterfalls.",
-  "a flat wet stone shore with shallow clear tide pools",
+  "a wide flat wet stone shore reaching all the way to the bottom edge of the picture, with a few small shallow tide pools set level into the stone, no ledge, step or raised edge",
   "tall waterfalls tumbling off cliff edges at the far left and right, small floating rocks with their own waterfalls in the distance",
   "a cool evening sky of deep blue and sea green")
 Z("thunderhum-steppe", "A windswept grassy steppe high in the sky.",
@@ -246,7 +246,7 @@ Z("null-horizon", "The edge of the world, where the sky folds in on itself.",
   "broken islands drifting at the far left and right, the horizon bending upward into a swirl in the distance",
   "a deep indigo and violet sky full of stars and pale swirling nebula clouds")
 Z("verdigris-canopy", "An enormous ancient forest of giant trees growing on a floating island.",
-  "a wide flat platform of mossy roots, teal-green moss over old bark",
+  "flat mossy ground of old roots covered in teal-green moss, reaching all the way to the bottom edge of the picture, no raised ledge or edge",
   "huge arching roots and giant trunks with verdigris-green bark at the far left and right, hanging vines and more giant trunks in the distance",
   "deep green light filtering down through a distant leaf canopy")
 Z("magmaglass-rift", "A rift in the sky where molten rock cools into black glass.",
@@ -257,9 +257,9 @@ Z("stormsea-expanse", "A floating sea under a thunderstorm.",
   "a flat wet rock shelf at the edge of the sea",
   "dark churning waves and tall sea spray at the far left and right, water spouts far out at sea",
   "heavy dark storm clouds with bright lightning bolts")
-Z("zenith-spire", "The top of an impossibly tall stone spire high above the clouds.",
-  "a flat circular platform of pale stone with carved star patterns",
-  "broken pale stone arches at the far left and right, a sea of clouds far below in the distance",
+Z("zenith-spire", "The wide flat summit of an impossibly tall mountain of pale stone, high above the clouds.",
+  "a wide flat floor of pale stone with carved star patterns across the whole width, reaching all the way to the bottom edge of the picture, no raised edge",
+  "broken pale stone arches at the far left and right, a sea of dim blue-grey clouds far below in the distance, nothing standing in the middle",
   "a deep starry night sky with a large pale moon")
 
 

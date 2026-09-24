@@ -149,37 +149,37 @@ Or by hand: paste a prompt below into the text-to-image graph, pick the best, an
 | 103 | `resonance-frame` | item | Parts | magenta | [ ] |
 | 104 | `aether-lantern` | item | Parts | magenta | [ ] |
 | 105 | `aether-crystal` | item | Rare finds | magenta | [ ] |
-| 106 | `aether` | ui | Currencies | magenta | [ ] |
-| 107 | `gold` | ui | Currencies | magenta | [ ] |
-| 108 | `woodcutting` | ui | Skills | magenta | [ ] |
-| 109 | `herbalism` | ui | Skills | magenta | [ ] |
-| 110 | `mining` | ui | Skills | magenta | [ ] |
-| 111 | `fishing` | ui | Skills | magenta | [ ] |
-| 112 | `scavenging` | ui | Skills | magenta | [ ] |
-| 113 | `smithing` | ui | Skills | magenta | [ ] |
-| 114 | `cooking` | ui | Skills | magenta | [ ] |
-| 115 | `circuitry` | ui | Skills | magenta | [ ] |
-| 116 | `aether-weaving` | ui | Skills | green | [ ] |
-| 117 | `vessel-crafting` | ui | Skills | green | [ ] |
-| 118 | `fabrication` | ui | Skills | magenta | [ ] |
-| 119 | `sanctum` | ui | Navigation | magenta | [ ] |
-| 120 | `nexus` | ui | Navigation | green | [ ] |
-| 121 | `pods` | ui | Navigation | green | [ ] |
-| 122 | `expeditions` | ui | Navigation | magenta | [ ] |
-| 123 | `aetherlog` | ui | Navigation | green | [ ] |
-| 124 | `inventory` | ui | Navigation | magenta | [ ] |
-| 125 | `works` | ui | Navigation | magenta | [ ] |
-| 126 | `settings` | ui | Navigation | magenta | [ ] |
-| 127 | `bell` | ui | Markers | magenta | [ ] |
-| 128 | `lock` | ui | Markers | magenta | [ ] |
-| 129 | `health` | ui | Stats | green | [ ] |
-| 130 | `power` | ui | Stats | magenta | [ ] |
-| 131 | `guard` | ui | Stats | magenta | [ ] |
-| 132 | `time` | ui | Stats | magenta | [ ] |
-| 133 | `xp` | ui | Stats | magenta | [ ] |
-| 134 | `upgrade` | ui | Markers | magenta | [ ] |
+| 106 | `aether` | ui | Currencies | magenta | [x] approved |
+| 107 | `gold` | ui | Currencies | magenta | [x] approved |
+| 108 | `woodcutting` | ui | Skills | magenta | [x] approved |
+| 109 | `herbalism` | ui | Skills | magenta | [x] approved |
+| 110 | `mining` | ui | Skills | magenta | [x] approved |
+| 111 | `fishing` | ui | Skills | magenta | [x] approved |
+| 112 | `scavenging` | ui | Skills | magenta | [x] approved |
+| 113 | `smithing` | ui | Skills | magenta | [x] approved |
+| 114 | `cooking` | ui | Skills | magenta | [x] approved |
+| 115 | `circuitry` | ui | Skills | magenta | [x] approved |
+| 116 | `aether-weaving` | ui | Skills | green | [x] approved |
+| 117 | `vessel-crafting` | ui | Skills | green | [x] approved |
+| 118 | `fabrication` | ui | Skills | magenta | [x] approved |
+| 119 | `sanctum` | ui | Navigation | magenta | [x] approved |
+| 120 | `nexus` | ui | Navigation | green | [x] approved |
+| 121 | `pods` | ui | Navigation | green | [x] approved |
+| 122 | `expeditions` | ui | Navigation | magenta | [x] approved |
+| 123 | `aetherlog` | ui | Navigation | green | [x] approved |
+| 124 | `inventory` | ui | Navigation | magenta | [x] approved |
+| 125 | `works` | ui | Navigation | magenta | [x] approved |
+| 126 | `settings` | ui | Navigation | magenta | [x] approved |
+| 127 | `bell` | ui | Markers | magenta | [x] approved |
+| 128 | `lock` | ui | Markers | magenta | [x] approved |
+| 129 | `health` | ui | Stats | green | [x] approved |
+| 130 | `power` | ui | Stats | magenta | [x] approved |
+| 131 | `guard` | ui | Stats | magenta | [x] approved |
+| 132 | `time` | ui | Stats | magenta | [x] approved |
+| 133 | `xp` | ui | Stats | magenta | [x] approved |
+| 134 | `upgrade` | ui | Markers | magenta | [x] approved |
 | 135 | `owned` | ui | Markers | magenta | [ ] |
-| 136 | `shiny` | ui | Markers | magenta | [ ] |
+| 136 | `shiny` | ui | Markers | magenta | [x] approved |
 | 137 | `vessel` | ui | Markers | magenta | copy of `items/tinkerers-vessel` |
 | 138 | `meal` | ui | Markers | magenta | copy of `items/bubble-stew` |
 
@@ -1056,7 +1056,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\aether.png` -> `godot/assets/icons/ui/aether.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A four-pointed star-shaped crystal, faceted, pale cyan and white, with a small round indigo gem in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A faceted crystal shaped like a plus sign with long pointed tips: exactly four points (one up, one down, one left, one right) joined by deeply inward-curved sides, pale cyan and white, with a small round indigo gem in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 107. `gold`
@@ -1114,7 +1114,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\smithing.png` -> `godot/assets/icons/ui/smithing.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A blacksmith's hammer with a wooden handle and a heavy steel head, pointing up diagonally. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A blacksmith's hammer with a wooden handle and a heavy pale silver-grey steel head with white highlight shapes (light grey like a wrench, never black or charcoal), pointing up diagonally. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 114. `cooking`
@@ -1154,7 +1154,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\fabrication.png` -> `godot/assets/icons/ui/fabrication.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A steel wrench and a screwdriver with a yellow handle, crossed in an X. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Exactly one chunky all-steel wrench and exactly one screwdriver with a thick yellow handle and a short steel shaft, crossed in an X. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ## Interface icons: Navigation
@@ -1220,7 +1220,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\settings.png` -> `godot/assets/icons/ui/settings.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A single steel-grey cog wheel with a round hole in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A single chunky steel-grey cog wheel with visible thickness, a raised bevelled rim around a round hole in its centre, soft shading on the teeth and white highlight shapes, drawn with depth like a solid metal part, not a flat symbol. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ## Interface icons: Markers
@@ -1262,7 +1262,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\shiny.png` -> `godot/assets/icons/ui/shiny.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Two chunky four-pointed star shapes side by side, a large pale-gold one and a small pale-cyan one. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Two chunky shapes side by side, each shaped like a plus sign with long pointed tips: exactly four points (up, down, left, right) joined by deeply inward-curved sides, a white highlight shape on each, a large pale-gold one and a small pale-cyan one. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 137. `vessel`
