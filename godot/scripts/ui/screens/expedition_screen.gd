@@ -8,10 +8,14 @@ var _arena: Arena
 var _preview: VBoxContainer
 var _right: VBoxContainer
 var _log: VBoxContainer
+var _log_top := -1.0
+var _bind: VBoxContainer
 var _controls: HBoxContainer
 var _sky: SkyBackdrop
 var _log_count := -1
 var _party_locked := false
+var _pending_count := -1
+var _bottom_tab := "autobind"
 
 
 func setup(arg: String) -> void:
@@ -51,15 +55,25 @@ func _ready() -> void:
 	_arena_host.add_child(UI.margin(_preview, 28, 22, 28, 22))
 	_controls = UI.hbox(10)
 	mid.add_child(_controls)
-	var logp := UI.panel("CardFlat")
-	logp.custom_minimum_size.y = 150
-	_log = UI.vbox(2)
-	logp.add_child(UI.scroll(_log))
-	mid.add_child(logp)
-	# right: party and rules
+	# auto-bind rules sit under the battle, in two columns
+	_bind = UI.vbox(8)
+	mid.add_child(UI.panel("Glass", _bind))
+	# right: party and supplies on top, the expedition log filling the rest
+	var rcol := UI.vbox(12)
+	rcol.custom_minimum_size.x = 380
+	row.add_child(rcol)
 	_right = UI.vbox(12)
-	_right.custom_minimum_size.x = 320
-	row.add_child(UI.scroll(_right))
+	rcol.add_child(_right)
+	var logp := UI.panel("Glass")
+	logp.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	var lv := UI.vbox(8)
+	logp.add_child(lv)
+	lv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("aetherlog"), 22), UI.label("Expedition log", "H3")]))
+	_log = UI.vbox(4)
+	var lsc := UI.scroll(_log)
+	lsc.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	lv.add_child(lsc)
+	rcol.add_child(logp)
 	refresh()
 
 
@@ -231,35 +245,41 @@ func _fill_controls() -> void:
 func _fill_right() -> void:
 	var s := Game.state
 	UI.clear(_right)
-	# party
-	var pv := UI.vbox(8)
-	pv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("power"), 22), UI.label("Party", "H3")]))
-	pv.add_child(UI.wrap_label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
+	# shinies waiting for a vessel come first, with a pulsing gold edge, so they are never missed
+	if not s.expedition.pending.is_empty():
+		_right.add_child(_pending_panel())
+	# party, compact: the log below gets the room
+	var pv := UI.vbox(6)
 	var party := GameState.party(s)
 	var party_size: int = Data.tuning.combat.partySize
 	var locked := Expedition.party_locked(s)
 	_party_locked = locked
+	var ph := UI.hbox(8, [UI.icon(Data.ui_icon("power"), 22), UI.label("Party", "H3")])
 	if locked:
-		pv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.wrap_label("Locked while the expedition runs. Stop it to change the party.", "Dim")]))
+		ph.add_child(UI.spacer())
+		ph.add_child(UI.icon(Data.ui_icon("lock"), 16))
+		ph.add_child(UI.label("Locked during the run", "Faint"))
+	pv.add_child(ph)
+	if not locked:
+		pv.add_child(UI.wrap_label("Up to three. Party members don't work or gather Aether while they explore.", "Faint", 320))
 	for i in party_size:
 		var h := UI.hbox(10)
 		if i < party.size():
 			var c: Dictionary = party[i]
-			var por := CreaturePortrait.of(c, 64)
+			var por := CreaturePortrait.of(c, 50)
 			por.bob = false
 			h.add_child(por)
 			var cv := UI.vbox(0)
 			cv.add_child(UI.label(Creatures.display_name(c), "H3"))
 			var st := Creatures.stats(c)
-			cv.add_child(UI.label("Lv %d · %s" % [int(c.level), " / ".join(Creatures.types_of(c).map(func(t): return Data.types[t].name))], "Faint"))
-			cv.add_child(UI.label("HP %s · PWR %s · GRD %s" % [F.format_num(st.health), F.format_num(st.power), F.format_num(st.guard)], "Faint"))
+			cv.add_child(UI.label("Lv %d · HP %s · PWR %s · GRD %s" % [int(c.level), F.format_num(st.health), F.format_num(st.power), F.format_num(st.guard)], "Faint"))
 			h.add_child(cv)
 			h.add_child(UI.spacer())
 			if not locked:
 				h.add_child(UI.button("Swap", "Ghost", func(): _pick_party(i)))
 				h.add_child(UI.button("Remove", "Ghost", func(): Game.bench(c.id)))
 		elif not locked:
-			var e := WorkerBubble.make({}, "woodcutting", 64)
+			var e := WorkerBubble.make({}, "woodcutting", 50)
 			h.add_child(e)
 			h.add_child(UI.button("Add an Aetherling", "", func(): _pick_party(i)))
 		if h.get_child_count() > 0:
@@ -267,57 +287,77 @@ func _fill_right() -> void:
 		else:
 			h.free()
 	_right.add_child(UI.panel("Glass", pv))
-	# supplies
-	var sv := UI.vbox(8)
-	sv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("meal"), 22), UI.label("Supplies", "H3")]))
-	sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint"))
-	var ob := OptionButton.new()
-	ob.add_item("Best meal available", 0)
-	var meals := Data.item_list.filter(func(it): return it.category == "meal")
-	for i in meals.size():
-		ob.add_item("%s (heals %d%%) · %d" % [meals[i].name, roundi(float(meals[i].heal) * 100), int(GameState.count(s, meals[i].id))], i + 1)
-		if s.expedition.meal == meals[i].id:
-			ob.selected = i + 1
-	ob.item_selected.connect(func(i): Game.state.expedition.meal = "" if i == 0 else meals[i - 1].id)
-	sv.add_child(ob)
-	if GameState.count(s, Expedition.pick_meal(s)) < 1:
-		sv.add_child(UI.label("No meals: cook some (Cooking needs a Pyric Aetherling)", "Small", Palette.DANGER))
-	_right.add_child(UI.panel("Glass", sv))
-	# auto-bind
-	var bv := UI.vbox(8)
+	_fill_bottom()
+
+
+## The panel under the battle: Auto-bind and Supplies, as two tabs.
+func _fill_bottom() -> void:
+	var s := Game.state
+	UI.clear(_bind)
+	var tabs := UI.hbox(8)
+	for pair in [["autobind", "Auto-bind", "vessel"], ["supplies", "Supplies", "meal"]]:
+		var b := UI.button(pair[1], "ChipOn" if _bottom_tab == pair[0] else "Chip", func():
+			_bottom_tab = pair[0]
+			_fill_bottom(), Data.ui_icon(pair[2]))
+		tabs.add_child(b)
+	_bind.add_child(tabs)
+	if _bottom_tab == "supplies":
+		var sv := UI.vbox(8)
+		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 560))
+		var ob := OptionButton.new()
+		ob.add_item("Best meal available", 0)
+		var meals := Data.item_list.filter(func(it): return it.category == "meal")
+		for i in meals.size():
+			ob.add_item("%s (heals %d%%) · %d" % [meals[i].name, roundi(float(meals[i].heal) * 100), int(GameState.count(s, meals[i].id))], i + 1)
+			if s.expedition.meal == meals[i].id:
+				ob.selected = i + 1
+		ob.item_selected.connect(func(i): Game.state.expedition.meal = "" if i == 0 else meals[i - 1].id)
+		sv.add_child(ob)
+		if GameState.count(s, Expedition.pick_meal(s)) < 1:
+			sv.add_child(UI.label("No meals: cook some (Cooking needs a Pyric Aetherling)", "Small", Palette.DANGER))
+		_bind.add_child(sv)
+		return
 	var ab: Dictionary = s.expedition.autobind
-	bv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("vessel"), 22), UI.label("Auto-bind", "H3")]))
-	bv.add_child(UI.wrap_label("After a wild Aetherling is defeated, the party can throw a vessel to bind it. The first of each type you have never owned binds for free; shinies are always tried.", "Faint"))
+	var cols := UI.hbox(16)
+	_bind.add_child(cols)
+	var bv := UI.vbox(4)
+	bv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(bv)
+	var bv2 := UI.vbox(6)
+	cols.add_child(bv2)
 	var en := CheckButton.new()
-	en.text = "Throw vessels automatically"
+	en.text = "Throw vessels"
+	en.tooltip_text = "After a win the party can throw a vessel. The first of each type you've never owned binds free; shinies are always tried."
 	en.button_pressed = bool(ab.get("enabled", true))
 	en.toggled.connect(func(on): Game.state.expedition.autobind.enabled = on)
 	bv.add_child(en)
 	var ns := CheckButton.new()
-	ns.text = "Always try species I don't own"
+	ns.text = "Always try new species"
 	ns.button_pressed = bool(ab.get("newSpecies", true))
 	ns.toggled.connect(func(on): Game.state.expedition.autobind.newSpecies = on)
 	bv.add_child(ns)
-	var rrow := UI.hbox(8, [UI.label("Otherwise, only", "Dim")])
-	var rb := OptionButton.new()
+	var best := Expedition.choose_vessel(s, {"shiny": true, "species": "", "rarity": 1})
+	if best == "":
+		bv.add_child(UI.wrap_label("No vessels! Fabrication makes them; the Market sells them.", "Small", 260))
+		bv.get_child(bv.get_child_count() - 1).add_theme_color_override("font_color", Palette.DANGER)
+	else:
+		var line := []
+		for r in [1, 2, 3, 4, 5]:
+			line.append("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, GameState.party(s)))])
+		bv.add_child(UI.wrap_label("Bind chance: " + " · ".join(line), "Faint", 260))
+	var rb := _small_choice(bv2, "Only")
 	for i in Data.rarities.size():
 		rb.add_item("%s or better" % Data.rarities[i].name, i)
 	rb.selected = int(ab.get("minRarity", 1)) - 1
 	rb.item_selected.connect(func(i): Game.state.expedition.autobind.minRarity = i + 1)
-	rrow.add_child(rb)
-	bv.add_child(rrow)
-	var crow := UI.hbox(8, [UI.label("Keep at most", "Dim")])
-	var cb := OptionButton.new()
+	var cb := _small_choice(bv2, "Keep")
+	cb.tooltip_text = "A copy rarer than your best one is always tried."
 	var caps := [1, 3, 5, 10, 25, 999]
 	for i in caps.size():
 		cb.add_item("All of them" if caps[i] == 999 else "%d per species" % caps[i], i)
 	cb.selected = maxi(0, caps.find(int(ab.get("maxCopies", 5))))
 	cb.item_selected.connect(func(i): Game.state.expedition.autobind.maxCopies = caps[i])
-	crow.add_child(cb)
-	bv.add_child(crow)
-	bv.add_child(UI.label("A copy rarer than your best one is always tried.", "Faint"))
-	var vrow := UI.hbox(8, [UI.label("Vessel", "Dim")])
-	var vb := OptionButton.new()
+	var vb := _small_choice(bv2, "Vessel")
 	var vessel_ids := ["best", "cheapest"]
 	vb.add_item("Best I have", 0)
 	vb.add_item("Cheapest I have", 1)
@@ -327,36 +367,58 @@ func _fill_right() -> void:
 			vb.add_item("%s · %d" % [it.name, int(GameState.count(s, it.id))], vessel_ids.size() - 1)
 	vb.selected = maxi(0, vessel_ids.find(ab.get("vessel", "best")))
 	vb.item_selected.connect(func(i): Game.state.expedition.autobind.vessel = vessel_ids[i])
-	vrow.add_child(vb)
-	bv.add_child(vrow)
-	var odds := UI.vbox(2)
-	odds.add_child(UI.label("Bind chance with your best vessel", "Faint"))
-	var best := Expedition.choose_vessel(s, {"shiny": true, "species": "", "rarity": 1})
-	if best == "":
-		odds.add_child(UI.label("You have no vessels. Fabrication makes Tinker's Vessels; the Market sells them.", "Small", Palette.DANGER))
-	else:
-		var line := []
-		for r in [1, 2, 3, 4, 5]:
-			line.append("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, party))])
-		odds.add_child(UI.wrap_label(" · ".join(line), "Dim"))
-	bv.add_child(odds)
-	_right.add_child(UI.panel("Glass", bv))
-	# pending shinies
-	if not s.expedition.pending.is_empty():
-		var pd := UI.vbox(8)
-		pd.add_child(UI.label("Waiting to be bound", "H3", Palette.GOLD))
-		for i in s.expedition.pending.size():
-			var w: Dictionary = s.expedition.pending[i]
-			var h := UI.hbox(8)
-			h.add_child(CreaturePortrait.make(w.species, F.form_for_level(int(w.level)), int(w.rarity), bool(w.shiny), 56))
-			h.add_child(UI.label("%s %s" % [Data.rarity(int(w.rarity)).name, Data.species[w.species].name], ""))
-			h.add_child(UI.spacer())
-			var v := Expedition.choose_vessel(s, {"shiny": true, "species": w.species, "rarity": w.rarity})
-			var b := UI.button("Throw", "Gold", func(): Game.retry_pending(i, v))
-			b.disabled = v == ""
-			h.add_child(b)
-			pd.add_child(h)
-		_right.add_child(UI.panel("Glass", pd))
+
+
+## A labelled, fixed-width dropdown row for the Auto-bind column.
+func _small_choice(parent: Control, title: String) -> OptionButton:
+	var l := UI.label(title, "Dim")
+	l.custom_minimum_size.x = 56
+	var o := OptionButton.new()
+	o.custom_minimum_size.x = 200
+	o.clip_text = true
+	o.fit_to_longest_item = false
+	parent.add_child(UI.hbox(8, [l, o]))
+	return o
+
+
+func _pending_panel() -> PanelContainer:
+	var s := Game.state
+	var pd := UI.vbox(8)
+	var n: int = s.expedition.pending.size()
+	var head := UI.hbox(8, [UI.icon(Data.ui_icon("shiny"), 24), UI.label("%d waiting to be bound" % n, "H3", Palette.GOLD)])
+	head.add_child(UI.spacer())
+	head.add_child(UI.button("Throw at all", "Gold", func():
+		for i in range(Game.state.expedition.pending.size() - 1, -1, -1):
+			var w: Dictionary = Game.state.expedition.pending[i]
+			var v := Expedition.choose_vessel(Game.state, {"shiny": true, "species": w.species, "rarity": w.rarity})
+			if v != "":
+				Game.retry_pending(i, v)))
+	pd.add_child(head)
+	pd.add_child(UI.wrap_label("They wait until you throw a vessel. Out of vessels? Fabrication makes them; the Market sells them.", "Faint", 320))
+	var grid := UI.flow(6, 6)
+	for i in s.expedition.pending.size():
+		var w: Dictionary = s.expedition.pending[i]
+		var cell := UI.vbox(2)
+		var por := CreaturePortrait.make(w.species, F.form_for_level(int(w.level)), int(w.rarity), bool(w.shiny), 52)
+		por.bob = false
+		por.tooltip_text = "%s%s %s" % ["Shiny " if w.shiny else "", Data.rarity(int(w.rarity)).name, Data.species[w.species].name]
+		cell.add_child(por)
+		var v := Expedition.choose_vessel(s, {"shiny": true, "species": w.species, "rarity": w.rarity})
+		var b := UI.button("Throw", "Gold", func(): Game.retry_pending(i, v))
+		b.disabled = v == ""
+		cell.add_child(b)
+		grid.add_child(cell)
+	pd.add_child(grid)
+	var panel := UI.panel("Glass", pd)
+	var sb: StyleBoxFlat = panel.get_theme_stylebox("panel").duplicate()
+	sb.border_color = Palette.GOLD
+	sb.set_border_width_all(2)
+	sb.set_content_margin_all(12)
+	panel.add_theme_stylebox_override("panel", sb)
+	var tw := panel.create_tween().set_loops()
+	tw.tween_method(func(k: float): sb.border_color = Palette.GOLD.lerp(Color(Palette.GOLD, 0.25), k), 0.0, 1.0, 0.6)
+	tw.tween_method(func(k: float): sb.border_color = Palette.GOLD.lerp(Color(Palette.GOLD, 0.25), k), 1.0, 0.0, 0.6)
+	return panel
 
 
 func _pick_party(slot: int) -> void:
@@ -377,15 +439,53 @@ func _process(_d: float) -> void:
 	if _preview.visible == running_here:
 		_fill_preview()
 		_fill_controls()
-	if Expedition.party_locked(s) != _party_locked:
-		_fill_right()  # a run ending on its own frees the party
+	if Expedition.party_locked(s) != _party_locked or s.expedition.pending.size() != _pending_count:
+		_pending_count = s.expedition.pending.size()
+		_fill_right()  # a run ending on its own frees the party; a shiny may be waiting for a vessel
 	_arena.visible = running_here
-	if Game.battle_log.size() != _log_count or (not Game.battle_log.is_empty() and _log.get_child_count() > 0 and _log.get_child(0).get_meta("t", 0.0) != Game.battle_log[0].time):
+	var top: float = Game.battle_log[0].time if not Game.battle_log.is_empty() else -1.0
+	if Game.battle_log.size() != _log_count or top != _log_top:
 		_log_count = Game.battle_log.size()
-		UI.clear(_log)
-		if Game.battle_log.is_empty():
-			_log.add_child(UI.label("The expedition log fills up as your party explores.", "Faint"))
-		for e in Game.battle_log.slice(0, 20):
-			var l := UI.label(e.text, "Dim", e.color)
-			l.set_meta("t", e.time)
-			_log.add_child(l)
+		_log_top = top
+		_render_log()
+
+
+## The expedition log: each line a small card with an icon (a portrait for a capture), its text, and how long
+## ago it happened, edged in the line's colour.
+func _render_log() -> void:
+	UI.clear(_log)
+	if Game.battle_log.is_empty():
+		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 300))
+		return
+	var now := Game.now_sec()
+	for e in Game.battle_log.slice(0, 40):
+		var col: Color = e.color
+		var card := PanelContainer.new()
+		var sb := ThemeFactory.box(Color(col, 0.07), 8, 0, Palette.LINE, 0)
+		sb.border_width_left = 3
+		sb.border_color = Color(col, 0.8)
+		sb.content_margin_left = 8
+		sb.content_margin_right = 8
+		sb.content_margin_top = 4
+		sb.content_margin_bottom = 4
+		card.add_theme_stylebox_override("panel", sb)
+		var h := UI.hbox(8)
+		if e.has("species"):
+			var por := CreaturePortrait.make(e.species, 1, int(e.rarity), bool(e.shiny), 30)
+			por.bob = false
+			h.add_child(por)
+		elif e.get("icon") != null:
+			h.add_child(UI.icon(e.icon, 22))
+		else:
+			h.add_child(UI.icon(Data.ui_icon("expeditions"), 22))
+		var l := UI.label(e.text, "", col)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		l.custom_minimum_size.x = 60
+		l.tooltip_text = e.text
+		l.mouse_filter = Control.MOUSE_FILTER_PASS
+		h.add_child(l)
+		var ago := now - float(e.time)
+		h.add_child(UI.label("now" if ago < 60 else F.format_seconds(ago), "Faint"))
+		card.add_child(h)
+		_log.add_child(card)

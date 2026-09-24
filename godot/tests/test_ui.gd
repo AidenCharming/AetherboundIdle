@@ -425,3 +425,41 @@ func test_save_slots_can_be_renamed() -> void:
 		FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(backup)
 	else:
 		DirAccess.remove_absolute(Game.slot_path(n))
+
+
+## Party members on a running expedition are not offered as workers (they can't be moved mid-run).
+func test_worker_picker_hides_the_locked_party() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var s := Game.state
+	var fighter := Creatures.make(s, "sproutlet", 1, 3, false, [], "test")
+	s.creatures[fighter.id] = fighter
+	var idle := Creatures.make(s, "sproutlet", 1, 3, false, [], "test")
+	s.creatures[idle.id] = idle
+	Game.set_party(0, fighter.id)
+	Game.start_expedition("whisperleaf-hollow")
+	main.show_screen("skill", "woodcutting")
+	main._screen._pick("")
+	var m: Modal = _open_modals().back()
+	var picker: CreaturePicker = m.find_children("*", "", true, false).filter(func(n): return n is CreaturePicker)[0]
+	var ids: Array = picker._grid.get_children().filter(func(n): return n is CreatureCard).map(func(n): return n.cid)
+	t.ok(not ids.has(fighter.id), "the party member on the run is not offered")
+	t.ok(ids.has(idle.id), "an idle Aetherling is")
+	Game.stop_expedition()
+	main.free()
+	_teardown()
+
+
+## Shinies waiting for a vessel get their own panel at the top of the Expeditions page.
+func test_waiting_shinies_are_shown_first() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	Game.state.expedition.pending.append({"species": "buzzbud", "level": 3, "rarity": 2, "shiny": true})
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	var first: Node = main._screen._right.get_child(0)
+	t.ok(_find_button(first, "Throw at all") != null, "the waiting panel comes first, with Throw at all")
+	Game.state.expedition.pending.clear()
+	main.free()
+	_teardown()

@@ -110,38 +110,52 @@ func _apply_offline(seconds: float) -> void:
 func _log_battle(e: Dictionary) -> void:
 	var line := ""
 	var col := Palette.TEXT_DIM
+	var icon: Texture2D = null
 	match e.type:
 		"captured":
 			line = "Bound a %s %s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
 				" · first of its type, free" if e.how == "guaranteed" else ""]
-			col = Data.rarity_color(e.rarity)
+			col = Palette.GOLD if e.shiny else Data.rarity_color(e.rarity)
 		"escaped":
 			line = "A %s %s broke free%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else ""]
 			col = Palette.TEXT_FAINT
+			icon = Data.item_icon(e.vessel) if e.has("vessel") else Data.ui_icon("vessel")
 		"boss_defeated":
 			line = "%s defeated! +%d gold" % [Data.zones[e.zone].boss.name, int(e.loot.gold)]
 			col = Palette.GOLD
+			icon = Data.ui_icon("gold")
 		"wiped":
 			line = "The party was overwhelmed on wave %d and is resting" % int(e.wave)
 			col = Palette.DANGER
+			icon = Data.ui_icon("health")
 		"run_complete":
 			line = "Run complete. Setting out again…"
 			col = Palette.AETHER
+			icon = Data.ui_icon("expeditions")
 		"ate":
 			line = "The party ate %s" % Data.item_name(e.item)
+			icon = Data.item_icon(e.item)
 		"pending":
 			line = "A shiny %s is waiting: no vessel left to bind it" % Data.species[e.species].name
 			col = Palette.GOLD
+			icon = Data.ui_icon("shiny")
 		"boss_wave":
 			line = "The boss appears!"
 			col = Palette.GOLD
+			icon = Data.ui_icon("power")
 		"pearl":
 			line = "+%d Aether Pearl (%s)" % [int(e.amount), e.why]
 			col = Color("f1e6ff")
+			icon = Data.item_icon("aether-pearl")
 	if line != "":
-		battle_log.push_front({"text": line, "color": col, "time": now_sec()})
-		if battle_log.size() > 40:
-			battle_log.resize(40)
+		var entry := {"text": line, "color": col, "time": now_sec(), "icon": icon}
+		if e.type == "captured":
+			entry.species = e.species
+			entry.rarity = int(e.rarity)
+			entry.shiny = bool(e.shiny)
+		battle_log.push_front(entry)
+		if battle_log.size() > 60:
+			battle_log.resize(60)
 
 
 func _handle(events: Array) -> void:

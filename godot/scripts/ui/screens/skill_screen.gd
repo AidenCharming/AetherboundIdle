@@ -148,7 +148,9 @@ func _pick(replace_id: String) -> void:
 	var action := Skills.current_action(s, skill_id)
 	var auras := Skills.active_auras(s)
 	CreaturePicker.pick("Choose a worker for %s" % _skill.name,
-		func(c): return Creatures.can_work(c, skill_id) and not (c.job.get("kind", "") == "skill" and c.job.id == skill_id),
+		# party members on a running expedition can't be moved, so they aren't offered
+		func(c): return Creatures.can_work(c, skill_id) and not (c.job.get("kind", "") == "skill" and c.job.id == skill_id) \
+			and not (Creatures.job_kind(c) == "party" and Expedition.party_locked(Game.state)),
 		func(cid):
 			if replace_id != "":
 				Game.bench(replace_id)

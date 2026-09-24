@@ -28,6 +28,7 @@ var _reveal: Reveal
 var _fade: ColorRect
 var _sky: SkyBackdrop
 var _rail_refresh := 0.0
+var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
 
 
 func _ready() -> void:
@@ -235,14 +236,21 @@ func _refresh_rail() -> void:
 		nb.button.tooltip_text = "" if usable else "Needs a %s Aetherling" % Data.types[skill.type].name
 	var pods: Dictionary = _nav_buttons["pods:"]
 	var ready_count := Game.ready_eggs().size()
-	pods.extra.text = "%d ready_count" % ready_count if ready_count > 0 else ""
+	pods.extra.text = "%d ready" % ready_count if ready_count > 0 else ""
 	pods.extra.add_theme_color_override("font_color", Palette.GOLD)
 	var ex: Dictionary = _nav_buttons["expeditions:"]
-	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
-		ex.extra.text = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"
+	# shinies waiting for a vessel matter more than the wave count: gold, and they pulse (see _process)
+	_pending_flash = not s.expedition.pending.is_empty()
+	if _pending_flash:
+		ex.extra.text = "%d to bind!" % s.expedition.pending.size()
+		ex.extra.add_theme_color_override("font_color", Palette.GOLD)
 	else:
-		ex.extra.text = "%d waiting" % s.expedition.pending.size() if not s.expedition.pending.is_empty() else ""
-	ex.extra.add_theme_color_override("font_color", Palette.AETHER)
+		ex.extra.modulate.a = 1.0
+		ex.extra.add_theme_color_override("font_color", Palette.AETHER)
+		if Expedition.is_running(s) and not s.expedition.battle.is_empty():
+			ex.extra.text = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"
+		else:
+			ex.extra.text = ""
 	var log_nav: Dictionary = _nav_buttons["aetherlog:"]
 	var claim := Collection.claimable(s).size()
 	log_nav.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
@@ -309,6 +317,8 @@ func _process(delta: float) -> void:
 			meals += GameState.count(s, it.id)
 	_top.vessels.value.text = F.format_num(vessels)
 	_top.meals.value.text = F.format_num(meals)
+	if _pending_flash and _nav_buttons.has("expeditions:"):
+		_nav_buttons["expeditions:"].extra.modulate.a = 0.55 + 0.45 * sin(Time.get_ticks_msec() / 180.0)
 	_rail_refresh -= delta
 	if _rail_refresh <= 0.0:
 		_rail_refresh = 1.0
