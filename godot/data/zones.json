@@ -89,11 +89,11 @@
 		"waves": 6,
 		"enemiesPerWave": [
 			1,
-			1,
 			2,
-			2
+			2,
+			3
 		],
-		"enemyMult": 0.72,
+		"enemyMult": 0.85,
 		"rarityWeights": [
 			70,
 			22,

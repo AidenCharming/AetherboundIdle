@@ -10,7 +10,7 @@ decided and why) and `README.md` (how to run things).
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
   Game. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and balance are JSON
   in `data/`. Never hardcode balance numbers.
-- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 86), and
+- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 93), and
   push to `godot-rebuild`.
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
@@ -55,7 +55,8 @@ shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in
 
 - Aether Pearl drop rates are estimates from timed runs (3–7 a day at the end); check them in play.
 
-- Play-test pacing (one-month target) and creature XP.
+- Play-test pacing (one-month target) and creature XP. Fights now weigh levels (`combat.levelGap`) and
+  Fractured Quarry is tougher; check the early islands feel right.
 - Whether work XP should be raised.
 - Hybrid art: 135 sprites; the game shows a placeholder blob until then. FLUX prompts could be written.
 - Gear stays out (it would upset the balance).

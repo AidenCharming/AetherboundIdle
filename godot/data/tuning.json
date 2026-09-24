@@ -210,6 +210,7 @@
 		"variance": 0.1,
 		"waveGapMs": 1200,
 		"exhaustMs": 10000,
+		"levelGap": {"perLevel": 0.04, "min": 0.4, "max": 2.5},
 		"eatBelow": 0.6,
 		"partySize": 3,
 		"xpPerKill": {

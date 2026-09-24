@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 91 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 93 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -115,7 +115,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   "N to bind!") and the expedition log filling the rest. Log lines are small cards with an icon (a portrait for
   captures), the text and how long ago, edged in the line's colour. Party, Auto-bind and Supplies sit under the
   battle as three tabs. The island list and the log column each fold to a slim strip (the battle widens), and the
-  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). Folded, the log strip still lists its latest 16 lines as small icon tiles in the line's colour (hover for the text and time, click to unfold). The run controls (Explore or Stop, Repeat) sit on the
+  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). Auto-bind shows the bind chance for each rarity as a pill in that rarity's colour, for the vessel it would throw. Folded, the log strip still lists its latest 16 lines as small icon tiles in the line's colour (hover for the text and time, click to unfold). The run controls (Explore or Stop, Repeat) sit on the
   tab row. The painted backdrop covers the arena resting on its bottom edge (a wide arena crops sky, never ground),
   and the fighters' ground line follows the image as drawn, so they always stand on the painted ground. Party members on a running expedition are no longer offered in the worker picker.
 - **Welcome back** (designer's request): a headline with the time away, big tiles for Aether, gold, tasks and ready
@@ -368,6 +368,16 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     its level-16 boss, all-Faint wins from about 10), so it is unchanged. The month probe's `_combat`
     rounds party levels down to multiples of 3, which is why the level-4 target had really been tested
     at level 3.
+  - **Levels matter in a fight** (designer's play-test: a level 5–6 Dim/Faint party cleared Fractured Quarry
+    and its boss easily, and nearly beat a level-24 Caldera wild). Two causes: one rarity step (×1.3 stats)
+    was worth about ten levels, and islands scale their wilds down (`enemyMult` below 1), so a nameplate's
+    level overstated its strength. Every hit is now multiplied by `1.04^(attacker level − target level)`,
+    clamped to 0.4–2.5 (`combat.levelGap`); equal levels change nothing. Fractured Quarry's wilds went
+    from ×0.72 to ×0.85 with 1–3 per wave (was 1–2). Measured with that party (8 runs each): an all-Dim
+    party clears the Quarry from about level 12–14, all-Faint from 8–10, all-Steady from 6; a level-3 party
+    falls around wave 4, and a level-6 party is wiped by the Caldera's first wave. The month probe still
+    reaches 99 in every skill around day 29–33; islands now clear on days 1, 1, 1, 2, 3, 5, 6, 10, 15 and
+    22 (the late middle islands later, the Spire, gated by the Zenith rarity cap, a little sooner).
 - **Skill XP curve** `1.0 × level³ × 1.028^(level−1)`, and **creature XP curve** `8.45 × level^3.3 × 1.014^(level−1)`.
   Both were fitted to the target timeline from the probe's measured XP rates.
   - **Skills:** the old skill curve (`10 × level² × 1.06^(level−1)`) was quick in the middle and slow at the

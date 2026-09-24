@@ -44,6 +44,28 @@ func test_strong_party_beats_a_weak_wild() -> void:
 	t.ok(ally.alive, "ally standing")
 
 
+## Levels matter: a lead lands harder hits, a deficit softer ones, within limits; three Dim level-6s can't
+## beat one level-24 Caldera wild on numbers alone.
+func test_level_gap() -> void:
+	var lg: Dictionary = Data.tuning.combat.levelGap
+	t.near(Combat.level_gap_mult(10, 10), 1.0, 0.0001, "equal levels change nothing")
+	t.ok(Combat.level_gap_mult(12, 10) > 1.0 and Combat.level_gap_mult(10, 12) < 1.0, "a lead helps, a deficit hurts")
+	t.near(Combat.level_gap_mult(100, 1), float(lg.max), 0.0001, "capped above")
+	t.near(Combat.level_gap_mult(1, 100), float(lg.min), 0.0001, "capped below")
+	var s := _party_game([["sproutlet", 1, 6], ["mossgear", 1, 6], ["buzzbud", 1, 6]])
+	var allies := []
+	for c in s.creatures.values():
+		allies.append(Combat.ally(c))
+	var m: float = Data.zones["smoldering-caldera"].enemyMult
+	var enemy := Combat.wild("emberfang", 24, 1, false, {"health": m, "power": m, "guard": m})
+	var rng := _rng()
+	for i in 2000:
+		Combat.step(allies, [enemy], 250.0, rng)
+		if not enemy.alive or not Combat.any_alive(allies):
+			break
+	t.ok(enemy.alive and not Combat.any_alive(allies), "a party 18 levels under loses")
+
+
 func test_start_needs_a_party_and_an_unlocked_zone() -> void:
 	var s := GameState.new_game()
 	var rng := _rng()

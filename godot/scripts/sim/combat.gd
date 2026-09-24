@@ -167,7 +167,14 @@ static func damage(att: Dictionary, def: Dictionary, mult: float, dmg_type: Stri
 	var p: float = att.power * (1.0 + att.buffPower)
 	var g: float = def.guard * (1.0 + def.buffGuard)
 	var v := rng.randf_range(1.0 - cb.variance, 1.0 + cb.variance)
-	return maxf(1.0, p * p / (p + g) * mult * type_mult(dmg_type, def.types) * v)
+	return maxf(1.0, p * p / (p + g) * mult * type_mult(dmg_type, def.types) * level_gap_mult(int(att.level), int(def.level)) * v)
+
+
+## A level lead makes every hit land harder and a level deficit softer, so a party far below a zone's
+## levels can't win on numbers alone. Equal levels change nothing.
+static func level_gap_mult(att_level: int, def_level: int) -> float:
+	var lg: Dictionary = Data.tuning.combat.levelGap
+	return clampf(pow(1.0 + float(lg.perLevel), att_level - def_level), float(lg.min), float(lg.max))
 
 
 static func _hit(att: Dictionary, def: Dictionary, side: int, ai: int, di: int, mult: float, dmg_type: String, ability: String,
