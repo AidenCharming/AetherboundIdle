@@ -121,6 +121,20 @@ func test_inherited_traits_are_valid() -> void:
 			t.ok(Data.traits.has(x.id) and x.s in Traits.STRENGTHS)
 
 
+## Trait inheritance uses only the game's generator: the same seed gives the same traits whatever the global
+## generator does in between (Array.shuffle() used to read the global one).
+func test_inherited_traits_repeat_from_a_seed() -> void:
+	var s := GameState.new_game()
+	var a := _c(s, "sproutlet", 1, [{"id": "lucky", "s": "moderate"}, {"id": "scholar", "s": "major"}])
+	var b := _c(s, "sproutlet", 1, [{"id": "green-thumb", "s": "minor"}, {"id": "overgrowth", "s": "moderate"}])
+	for seed_value in 30:
+		seed(12345)
+		var first := Breeding.inherit(_rng(seed_value), a, b, ["verdant"])
+		randomize()
+		var second := Breeding.inherit(_rng(seed_value), a, b, ["verdant"])
+		t.eq(second, first, "seed %d" % seed_value)
+
+
 ## Designer's rule: a trait passed down keeps its strength or grows a step; it never comes out weaker.
 func test_inherited_traits_never_weaken() -> void:
 	var s := GameState.new_game()
