@@ -491,7 +491,7 @@
 		"name": "Copper Coil",
 		"tier": 1,
 		"category": "component",
-		"sell": 14,
+		"sell": 16,
 		"icon": {
 			"shape": "coil",
 			"color": "#d27a3c"
@@ -503,7 +503,7 @@
 		"name": "Iron Capacitor",
 		"tier": 2,
 		"category": "component",
-		"sell": 30,
+		"sell": 35,
 		"icon": {
 			"shape": "capacitor",
 			"color": "#9aa4b2"
@@ -515,7 +515,7 @@
 		"name": "Sun Resonator",
 		"tier": 3,
 		"category": "component",
-		"sell": 64,
+		"sell": 78,
 		"icon": {
 			"shape": "chip",
 			"color": "#ffb640"
@@ -527,7 +527,7 @@
 		"name": "Sky Relay",
 		"tier": 4,
 		"category": "component",
-		"sell": 125,
+		"sell": 158,
 		"icon": {
 			"shape": "chip",
 			"color": "#6fd3ff"
@@ -539,7 +539,7 @@
 		"name": "Aether Dynamo",
 		"tier": 5,
 		"category": "component",
-		"sell": 250,
+		"sell": 320,
 		"icon": {
 			"shape": "dynamo",
 			"color": "#bf93ff"
@@ -611,7 +611,7 @@
 		"name": "Tinker's Vessel",
 		"tier": 1,
 		"category": "vessel",
-		"sell": 5,
+		"sell": 12,
 		"icon": {
 			"shape": "vessel",
 			"color": "#c9a36a"
@@ -627,7 +627,7 @@
 		"name": "Sturdy Vessel",
 		"tier": 2,
 		"category": "vessel",
-		"sell": 15,
+		"sell": 50,
 		"icon": {
 			"shape": "vessel",
 			"color": "#8fa3b8"
@@ -643,7 +643,7 @@
 		"name": "Polished Vessel",
 		"tier": 3,
 		"category": "vessel",
-		"sell": 40,
+		"sell": 110,
 		"icon": {
 			"shape": "vessel",
 			"color": "#6fd3ff"
@@ -659,7 +659,7 @@
 		"name": "Resonant Vessel",
 		"tier": 4,
 		"category": "vessel",
-		"sell": 90,
+		"sell": 225,
 		"icon": {
 			"shape": "vessel",
 			"color": "#b98bff"
@@ -675,7 +675,7 @@
 		"name": "Luminescent Vessel",
 		"tier": 5,
 		"category": "vessel",
-		"sell": 200,
+		"sell": 450,
 		"icon": {
 			"shape": "vessel",
 			"color": "#fff0a0"
@@ -715,7 +715,7 @@
 		"name": "Aether Lantern",
 		"tier": 5,
 		"category": "part",
-		"sell": 300,
+		"sell": 385,
 		"icon": {
 			"shape": "lantern",
 			"color": "#9ff3ff"

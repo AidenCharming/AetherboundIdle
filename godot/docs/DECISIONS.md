@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 61 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 62 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -206,6 +206,13 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
   Health. This is Cooking's job in the economy.
 - **Vessel market:** Tinker's Vessels always buyable for gold, so a player can never be stuck without a
   way to bind.
+- **Sell prices follow two rules** (designer's, checked by `test_content.gd` `test_market_prices`):
+  anything the shop sells sells back for at most half its shop price, so buy-and-resell never pays
+  (Tinker's Vessel: buy 30, sell 12, was 5); and every crafted item sells for at least 1.25× its inputs,
+  so crafting and selling always beats selling the raw materials. The first pass broke the second rule:
+  vessels sold for about half their inputs and circuitry parts and the Aether Lantern for barely more,
+  so those were raised (Sturdy 15 → 50, Polished 40 → 110, Resonant 90 → 225, Luminescent 200 → 450,
+  coils to dynamos about 1.3× their inputs, Aether Lantern 300 → 385).
 - **Aether Crystals:** a rare drop from every crafting skill, shattered in the Inventory for Aether.
 - **Scavenging** yields salvage (scrap, springs, lenses, clockwork, starglass) plus a little gold per
   action; Fabrication and Circuitry use the salvage.
