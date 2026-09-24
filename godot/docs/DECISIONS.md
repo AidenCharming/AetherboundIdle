@@ -115,7 +115,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   "N to bind!") and the expedition log filling the rest. Log lines are small cards with an icon (a portrait for
   captures), the text and how long ago, edged in the line's colour. Party, Auto-bind and Supplies sit under the
   battle as three tabs. The island list and the log column each fold to a slim strip (the battle widens), and the
-  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). The run controls (Explore or Stop, Repeat) sit on the
+  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). Folded, the log strip still lists its latest 16 lines as small icon tiles in the line's colour (hover for the text and time, click to unfold). The run controls (Explore or Stop, Repeat) sit on the
   tab row. The painted backdrop covers the arena resting on its bottom edge (a wide arena crops sky, never ground),
   and the fighters' ground line follows the image as drawn, so they always stand on the painted ground. Party members on a running expedition are no longer offered in the worker picker.
 - **Welcome back** (designer's request): a headline with the time away, big tiles for Aether, gold, tasks and ready

@@ -19,6 +19,7 @@ var _pending_count := -1
 var _bottom_tab := "party"
 var _folds := {}          # "zones"/"log" -> [full panel, folded strip]
 var _log_strip: VBoxContainer
+var _log_mini: VBoxContainer  # the folded log strip's column of recent entries, as small icon cards
 
 
 func setup(arg: String) -> void:
@@ -93,6 +94,15 @@ func _ready() -> void:
 	lh.add_child(lfold)
 	lv.add_child(lh)
 	_log_strip = _strip("‹", "Show the log", Data.ui_icon("aetherlog"), func(): _set_open("exp_log_open", true))
+	# folded, the log still shows its latest lines as icons; hover one for its text, click to unfold
+	var clip := Control.new()
+	clip.clip_contents = true
+	clip.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	clip.custom_minimum_size.x = 44
+	_log_mini = UI.vbox(6)
+	_log_mini.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	clip.add_child(_log_mini)
+	_log_strip.add_child(clip)
 	row.add_child(_log_strip)
 	_folds.log = [rcol, _log_strip]
 	_log = UI.vbox(4)
@@ -536,33 +546,21 @@ func _process(_d: float) -> void:
 
 
 ## The expedition log: each line a small card with an icon (a portrait for a capture), its text, and how long
-## ago it happened, edged in the line's colour.
+## ago it happened, edged in the line's colour. The folded strip shows the same lines as icon-only cards.
 func _render_log() -> void:
 	UI.clear(_log)
+	UI.clear(_log_mini)
 	if Game.battle_log.is_empty():
 		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 300))
 		return
 	var now := Game.now_sec()
 	for e in Game.battle_log.slice(0, 40):
 		var col: Color = e.color
-		var card := PanelContainer.new()
-		var sb := ThemeFactory.box(Color(col, 0.07), 8, 0, Palette.LINE, 0)
-		sb.border_width_left = 3
-		sb.border_color = Color(col, 0.8)
-		sb.content_margin_left = 8
-		sb.content_margin_right = 8
-		sb.content_margin_top = 4
-		sb.content_margin_bottom = 4
-		card.add_theme_stylebox_override("panel", sb)
+		var ago := now - float(e.time)
+		var when := "now" if ago < 60 else F.format_seconds(ago)
+		var card := _log_card(col, 8)
 		var h := UI.hbox(8)
-		if e.has("species"):
-			var por := CreaturePortrait.make(e.species, 1, int(e.rarity), bool(e.shiny), 30)
-			por.bob = false
-			h.add_child(por)
-		elif e.get("icon") != null:
-			h.add_child(UI.icon(e.icon, 22))
-		else:
-			h.add_child(UI.icon(Data.ui_icon("expeditions"), 22))
+		h.add_child(_log_icon(e, 30, 22))
 		var l := UI.label(e.text, "", col)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -570,7 +568,46 @@ func _render_log() -> void:
 		l.tooltip_text = e.text
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		h.add_child(l)
-		var ago := now - float(e.time)
-		h.add_child(UI.label("now" if ago < 60 else F.format_seconds(ago), "Faint"))
+		h.add_child(UI.label(when, "Faint"))
 		card.add_child(h)
 		_log.add_child(card)
+	for e in Game.battle_log.slice(0, 16):
+		var tile := _log_card(e.color, 3)
+		tile.tooltip_text = "%s  (%s)" % [e.text, "now" if now - float(e.time) < 60 else F.format_seconds(now - float(e.time)) + " ago"]
+		tile.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+		tile.gui_input.connect(func(ev: InputEvent):
+			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
+				_set_open("exp_log_open", true))
+		var ic := _log_icon(e, 26, 22)
+		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		tile.add_child(ic)
+		_log_mini.add_child(tile)
+
+
+## A log line's card, edged on the left in the line's colour.
+func _log_card(col: Color, pad: int) -> PanelContainer:
+	var card := PanelContainer.new()
+	var sb := ThemeFactory.box(Color(col, 0.07), 8, 0, Palette.LINE, 0)
+	sb.border_width_left = 3
+	sb.border_color = Color(col, 0.8)
+	sb.content_margin_left = pad
+	sb.content_margin_right = pad
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 4
+	card.add_theme_stylebox_override("panel", sb)
+	return card
+
+
+## A log line's icon: the Aetherling's portrait for a capture, else the line's own icon.
+func _log_icon(e: Dictionary, portrait: int, icon: int) -> Control:
+	var c: Control
+	if e.has("species"):
+		var por := CreaturePortrait.make(e.species, 1, int(e.rarity), bool(e.shiny), portrait)
+		por.bob = false
+		c = por
+	elif e.get("icon") != null:
+		c = UI.icon(e.icon, icon)
+	else:
+		c = UI.icon(Data.ui_icon("expeditions"), icon)
+	c.mouse_filter = Control.MOUSE_FILTER_PASS
+	return c
