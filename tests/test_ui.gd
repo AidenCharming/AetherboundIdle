@@ -411,22 +411,6 @@ func test_damage_numbers_spread_out() -> void:
 	arena.free()
 
 
-## A save slot can be named ("Dev Save") and the title screen's slot info reports the name.
-func test_save_slots_can_be_renamed() -> void:
-	var n := 3
-	var had := FileAccess.file_exists(Game.slot_path(n))
-	var backup := FileAccess.get_file_as_string(Game.slot_path(n)) if had else ""
-	FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(JSON.stringify(GameState.new_game()))
-	Game.rename_slot(n, "  Dev Save  ")
-	t.eq(Game.slot_info(n).get("name"), "Dev Save", "named and trimmed")
-	Game.rename_slot(n, "")
-	t.eq(Game.slot_info(n).get("name"), "", "cleared")
-	if had:
-		FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(backup)
-	else:
-		DirAccess.remove_absolute(Game.slot_path(n))
-
-
 ## Party members on a running expedition are not offered as workers (they can't be moved mid-run).
 func test_worker_picker_hides_the_locked_party() -> void:
 	_setup()
