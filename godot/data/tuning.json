@@ -1,6 +1,6 @@
 {
 	"creature": {
-		"maxLevel": 60,
+		"maxLevel": 100,
 		"formLevels": [
 			1,
 			20,
@@ -20,8 +20,9 @@
 		"other": 0.9,
 		"statPerLevel": 0.06,
 		"xpCurve": {
-			"base": 40,
-			"growth": 1.13
+			"base": 6,
+			"growth": 1.0,
+			"power": 2.9
 		},
 		"workXpShare": 0.5,
 		"maxPoolTraits": 3

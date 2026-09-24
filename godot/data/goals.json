@@ -248,6 +248,55 @@
 		}
 	},
 	{
+		"id": "boss7",
+		"text": "Defeat Lumbercrown in the Verdigris Canopy",
+		"check": {
+			"kind": "zone",
+			"zone": "verdigris-canopy"
+		},
+		"reward": {
+			"items": {
+				"luminescent-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "boss8",
+		"text": "Defeat Craterchomp in the Magmaglass Rift",
+		"check": {
+			"kind": "zone",
+			"zone": "magmaglass-rift"
+		},
+		"reward": {
+			"gold": 25000
+		}
+	},
+	{
+		"id": "boss9",
+		"text": "Defeat Brinesoul over the Stormsea Expanse",
+		"check": {
+			"kind": "zone",
+			"zone": "stormsea-expanse"
+		},
+		"reward": {
+			"aether": 60000
+		}
+	},
+	{
+		"id": "boss10",
+		"text": "Defeat The Hollow Sovereign atop the Zenith Spire",
+		"check": {
+			"kind": "zone",
+			"zone": "zenith-spire"
+		},
+		"reward": {
+			"aether": 150000,
+			"items": {
+				"luminescent-vessel": 5
+			}
+		}
+	},
+	{
 		"id": "special",
 		"text": "Discover a hidden special recipe",
 		"check": {

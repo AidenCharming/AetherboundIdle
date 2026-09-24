@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 63 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 65 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -178,7 +178,7 @@ A creature-collecting idle game in five loops that feed each other:
    Buzzbud") and pays 5 × 2^(rarity − 1) Aether (Faint 10 … Zenith 1,280; `collection.json` `newRarity`).
    The Creaturedex opens with a strip of all five tracks' counts (designer's request).
 
-Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, each paying a small reward.
+Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, each paying a small reward.
 
 ## Added
 
@@ -230,6 +230,13 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
 ## Changed
 
 ### Pacing
+- **Creature XP curve** (designer feedback: one cleared Fractured Quarry run gave ten levels): now
+  `6 × level^2.9` XP per level (was `40 × 1.13^(level − 1)`, which was cheap early and exploded after 60).
+  Measured with `tests/balance_probe.tscn`, a party fighting at its own level takes about 3–5 minutes per
+  level early on, 10–20 in the middle islands and 30–45 at the top: roughly 30 hours of expedition time to
+  level 100, with offline time counting. One run at your level is now a fraction of a level
+  (`test_one_run_is_a_fraction_of_a_level`). Saves keep every creature's level: migration resets XP to the
+  start of the saved level when the curve no longer matches it.
 - **Skill max level 99** (reference 250) with a new XP curve, `10 × level² × 1.06^(level-1)`, found by
   modelling a team that grows as slots open against targets: first level in seconds, level 10 in about
   half an hour, 30 in about 8 hours, 50 in about 2 days, 99 in about two months for a full team.
@@ -274,6 +281,15 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
   *Old Thicketroll*; the reference had "none/tutorial") and a named Voltaic island (*Thunderhum Steppe*,
   boss *Stormcrest, the Relay Eagle*; the reference had "TBD"). **Islands open by beating the previous
   boss** instead of gear requirements (gear is not built).
+- **Four late islands for levels 59–95** (designer's request), each unlocked by the one before:
+  *Verdigris Canopy* (Verdant, 59–67, boss *Lumbercrown, the Canopy King*), *Magmaglass Rift* (Pyric,
+  68–76, *Craterchomp, the Magma Maw*), *Stormsea Expanse* (Aqueous, 77–85, *Brinesoul, the Drowned
+  Storm*) and *Zenith Spire* (Void, 86–95, *The Hollow Sovereign*, level 97). Their wild pools mix two or
+  more types, their rarity odds climb (Zenith Spire can field Resplendent), they drop tier-5 materials and
+  Aether Crystals, bosses pay Luminescent Vessels, and each first clear gives a Gleaming or Luminous
+  creature. The **creature level cap is now 100** (was 60) so these islands have somewhere to go. Balance
+  probe: a Gleaming party handles the Rift at 72, the Expanse needs Luminous, the Spire wants Radiant (or
+  Luminous in the 90s). Four goals follow the old last boss goal.
 - A wiped party rests 20 seconds and tries again (the reference's "briefly exhausted").
 - **The party is locked while an expedition runs.** Adding, swapping, removing, putting a member to work,
   resting or releasing one is refused until the expedition is stopped. (At first a party change restarted

@@ -196,3 +196,24 @@ func test_the_party_is_locked_while_a_run_is_going() -> void:
 	Expedition.stop(s)
 	t.eq(Expedition.set_party_member(s, 1, extra), "", "free again once stopped")
 	t.eq(GameState.party(s).size(), 2)
+
+
+## Designer feedback: one cleared Fractured Quarry run once gave a fresh party ten levels. A run at the
+## party's own level should now be a fraction of a level.
+func test_one_run_is_a_fraction_of_a_level() -> void:
+	var s := _party_game([["sproutlet", 2, 12], ["tuskcub", 2, 12], ["buzzbud", 2, 12]])
+	for z in Data.zone_list:
+		s.expedition.zones[z.id] = {"cleared": true, "runs": 0, "bestWave": 0, "kills": 0}
+	s.items.clear()
+	s.expedition.autoRepeat = false
+	var lead: Dictionary = s.creatures.values()[0]
+	var rng := _rng()
+	t.eq(Expedition.start(s, "fractured-quarry", rng), "")
+	var ms := 0.0
+	while Expedition.is_running(s) and ms < 600000.0:
+		for e in Expedition.step(s, 250.0, rng):
+			if e.type in ["run_complete", "wiped"]:
+				Expedition.stop(s)
+		ms += 250.0
+	t.ok(int(lead.level) <= 13, "level %d after one run from 12" % int(lead.level))
+	t.ok(float(lead.xp) > F.xp_for_level(F.creature_curve(), 12, Data.tuning.creature.maxLevel), "but it did earn XP")

@@ -451,7 +451,7 @@
 			"brambletrundle": 2,
 			"charwhisk": 2
 		},
-		"blurb": "The edge of the map, where the sky folds in on itself. Void Aetherlings drift here.",
+		"blurb": "Where the sky folds in on itself. Void Aetherlings drift here, and the stranger islands lie beyond.",
 		"boss": {
 			"name": "The Aetherial Apex",
 			"model": "eclipsa",
@@ -511,5 +511,386 @@
 			"rarity": 3
 		},
 		"unlockAfter": "thunderhum-steppe"
+	},
+	{
+		"id": "verdigris-canopy",
+		"name": "Verdigris Canopy",
+		"type": "verdant",
+		"levels": [
+			59,
+			67
+		],
+		"waves": 8,
+		"enemiesPerWave": [
+			2,
+			2,
+			3
+		],
+		"enemyMult": 0.92,
+		"rarityWeights": [
+			36,
+			30,
+			18,
+			9,
+			4,
+			2,
+			1
+		],
+		"species": {
+			"sproutlet": 3,
+			"buzzbud": 3,
+			"mossgear": 3,
+			"brambletrundle": 2,
+			"pebblescoot": 2,
+			"dewdrop": 2
+		},
+		"blurb": "A forest grown so tall it floats on its own roots, older than any map of the sky.",
+		"boss": {
+			"name": "Lumbercrown, the Canopy King",
+			"model": "sproutlet",
+			"form": 3,
+			"type": "verdant",
+			"level": 69,
+			"ability": "leaf-shield",
+			"lean": "guard",
+			"mult": {
+				"health": 5.4,
+				"power": 1.22,
+				"guard": 1.15
+			},
+			"rarity": 1
+		},
+		"loot": [
+			{
+				"item": "starbark-log",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "aetherbloom",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "aether-crystal",
+				"chance": 0.1,
+				"qty": [
+					1,
+					1
+				]
+			}
+		],
+		"gold": [
+			26,
+			55
+		],
+		"bossLoot": {
+			"gold": 5000,
+			"items": {
+				"luminescent-vessel": 2,
+				"starbark-log": 15
+			}
+		},
+		"firstClearCreature": {
+			"types": [
+				"verdant",
+				"telluric"
+			],
+			"rarity": 4
+		},
+		"unlockAfter": "null-horizon"
+	},
+	{
+		"id": "magmaglass-rift",
+		"name": "Magmaglass Rift",
+		"type": "pyric",
+		"levels": [
+			68,
+			76
+		],
+		"waves": 8,
+		"enemiesPerWave": [
+			2,
+			3,
+			3
+		],
+		"enemyMult": 0.94,
+		"rarityWeights": [
+			32,
+			30,
+			20,
+			10,
+			5,
+			2,
+			1
+		],
+		"species": {
+			"emberfang": 2,
+			"charwhisk": 2,
+			"roastbelly": 2,
+			"cinderpup": 2,
+			"quakemaw": 2,
+			"geodecore": 2,
+			"tuskcub": 2
+		},
+		"blurb": "A split in the sky where molten rock cools into black glass as it falls.",
+		"boss": {
+			"name": "Craterchomp, the Magma Maw",
+			"model": "quakemaw",
+			"form": 3,
+			"type": "telluric",
+			"level": 78,
+			"ability": "stone-crunch",
+			"lean": "power",
+			"mult": {
+				"health": 5.8,
+				"power": 1.25,
+				"guard": 1.15
+			},
+			"rarity": 1
+		},
+		"loot": [
+			{
+				"item": "aetherite",
+				"chance": 0.35,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "starglass",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "aether-crystal",
+				"chance": 0.1,
+				"qty": [
+					1,
+					1
+				]
+			}
+		],
+		"gold": [
+			32,
+			65
+		],
+		"bossLoot": {
+			"gold": 8000,
+			"items": {
+				"luminescent-vessel": 3,
+				"aetherite": 15
+			}
+		},
+		"firstClearCreature": {
+			"types": [
+				"pyric",
+				"telluric"
+			],
+			"rarity": 4
+		},
+		"unlockAfter": "verdigris-canopy"
+	},
+	{
+		"id": "stormsea-expanse",
+		"name": "Stormsea Expanse",
+		"type": "aqueous",
+		"levels": [
+			77,
+			85
+		],
+		"waves": 9,
+		"enemiesPerWave": [
+			2,
+			3,
+			3
+		],
+		"enemyMult": 0.96,
+		"rarityWeights": [
+			28,
+			30,
+			21,
+			12,
+			6,
+			2,
+			1
+		],
+		"species": {
+			"dewdrop": 2,
+			"puddlescoop": 2,
+			"frothsprite": 2,
+			"splashfin": 2,
+			"voltfluff": 2,
+			"joulebug": 2,
+			"plasmaplug": 2
+		},
+		"blurb": "A floating sea under a permanent thunderstorm. The lightning never quite reaches the water.",
+		"boss": {
+			"name": "Brinesoul, the Drowned Storm",
+			"model": "frothsprite",
+			"form": 3,
+			"type": "aqueous",
+			"level": 87,
+			"ability": "mist-veil",
+			"lean": "health",
+			"mult": {
+				"health": 6.2,
+				"power": 1.27,
+				"guard": 1.18
+			},
+			"rarity": 1
+		},
+		"loot": [
+			{
+				"item": "starfin",
+				"chance": 0.35,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "starglass",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "aether-crystal",
+				"chance": 0.12,
+				"qty": [
+					1,
+					1
+				]
+			}
+		],
+		"gold": [
+			40,
+			80
+		],
+		"bossLoot": {
+			"gold": 12000,
+			"items": {
+				"luminescent-vessel": 3,
+				"starfin": 15
+			}
+		},
+		"firstClearCreature": {
+			"types": [
+				"aqueous",
+				"voltaic"
+			],
+			"rarity": 5
+		},
+		"unlockAfter": "magmaglass-rift"
+	},
+	{
+		"id": "zenith-spire",
+		"name": "Zenith Spire",
+		"type": "void",
+		"levels": [
+			86,
+			95
+		],
+		"waves": 9,
+		"enemiesPerWave": [
+			3,
+			3,
+			3
+		],
+		"enemyMult": 1.0,
+		"rarityWeights": [
+			24,
+			28,
+			22,
+			14,
+			7,
+			3,
+			1,
+			1
+		],
+		"species": {
+			"eclipsa": 2,
+			"riftsneak": 2,
+			"hushflutter": 2,
+			"netherpod": 2,
+			"tuskcub": 1,
+			"emberfang": 1,
+			"splashfin": 1,
+			"coilchirp": 1,
+			"buzzbud": 1
+		},
+		"blurb": "The highest point in the sky: a needle of stone and starlight where every kind of Aetherling gathers.",
+		"boss": {
+			"name": "The Hollow Sovereign",
+			"model": "riftsneak",
+			"form": 3,
+			"type": "void",
+			"level": 97,
+			"ability": "shadow-strike",
+			"lean": "power",
+			"mult": {
+				"health": 7.0,
+				"power": 1.3,
+				"guard": 1.2
+			},
+			"rarity": 1
+		},
+		"loot": [
+			{
+				"item": "aetherite",
+				"chance": 0.3,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "aetherbloom",
+				"chance": 0.3,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "aether-crystal",
+				"chance": 0.15,
+				"qty": [
+					1,
+					2
+				]
+			}
+		],
+		"gold": [
+			50,
+			100
+		],
+		"bossLoot": {
+			"gold": 20000,
+			"items": {
+				"luminescent-vessel": 5,
+				"aether-crystal": 5
+			}
+		},
+		"firstClearCreature": {
+			"types": [
+				"void"
+			],
+			"rarity": 5
+		},
+		"unlockAfter": "stormsea-expanse"
 	}
 ]

@@ -3,7 +3,7 @@ extends RefCounted
 ## The shape of a save, new-game setup, inventory helpers and save migration.
 ## The whole game is one Dictionary so it serialises straight to JSON.
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2  # 2: creature XP curve changed (levels kept, see migrate)
 
 
 static func new_game(seed_value: int = 0) -> Dictionary:
@@ -169,6 +169,12 @@ static func migrate(s: Dictionary) -> Dictionary:
 			if not c.has(k):
 				c[k] = {"job": {}, "progress": 0.0, "overclock": 0, "nick": "", "locked": false, "traits": [], "shiny": false}[k]
 		c.traits = c.traits.filter(func(t): return Data.traits.has(t.id))
+		# the saved level is the truth: if the XP curve changed since the save, put the XP back at the start of
+		# that level instead of letting the next XP gain recompute (and lower) the level
+		var max_lv: int = Data.tuning.creature.maxLevel
+		c.level = clampi(int(c.level), 1, max_lv)
+		if F.level_for_xp(F.creature_curve(), float(c.xp), max_lv) != int(c.level):
+			c.xp = F.xp_for_level(F.creature_curve(), int(c.level), max_lv)
 	for id in s.items.keys():
 		if not Data.items.has(id):
 			s.items.erase(id)

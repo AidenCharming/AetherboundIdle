@@ -210,3 +210,15 @@ func test_work_perks_list_only_what_helps_here() -> void:
 	t.ok("save_material_chance" in sm, "resourceful shows on a crafting action")
 	for p in perks:
 		t.ok(Describe.work_perk(p) != "", "every perk has a line")
+
+
+func test_migration_keeps_creature_levels_across_a_curve_change() -> void:
+	var s := GameState.new_game()
+	var c: Dictionary = s.creatures.values()[0]
+	c.level = 12
+	c.xp = 1500.0  # what level 12 cost on the old curve: far too little for the current one
+	GameState.migrate(s)
+	t.eq(int(c.level), 12, "level kept")
+	t.eq(F.level_for_xp(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel), 12, "XP now matches it")
+	Creatures.add_xp(c, 1.0)
+	t.eq(int(c.level), 12, "and the next XP gain does not drop it")
