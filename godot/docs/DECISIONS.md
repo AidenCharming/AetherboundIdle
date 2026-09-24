@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 90 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 91 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -112,9 +112,10 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     is a moving rainbow.
 - **Expeditions page layout** (designer's request): the right column is Aetherlings waiting for a vessel (a pulsing
   gold panel with Throw and Throw at all, shown first when any are waiting; the Expeditions menu entry also pulses
-  "N to bind!"), a compact Party, and the expedition log filling the rest. Log lines are small cards with an icon (a
-  portrait for captures), the text and how long ago, edged in the line's colour. Auto-bind and Supplies moved under
-  the battle as two tabs. Party members on a running expedition are no longer offered in the worker picker.
+  "N to bind!") and the expedition log filling the rest. Log lines are small cards with an icon (a portrait for
+  captures), the text and how long ago, edged in the line's colour. Party, Auto-bind and Supplies sit under the
+  battle as three tabs. The island list and the log column each fold to a slim strip (the battle widens), and the
+  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). Party members on a running expedition are no longer offered in the worker picker.
 - **Welcome back** (designer's request): a headline with the time away, big tiles for Aether, gold, tasks and ready
   eggs, items as named cards, level-ups with before and after, highlights with icons, and captures grouped by kind
   with portraits (shinies first).

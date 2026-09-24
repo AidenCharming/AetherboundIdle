@@ -27,6 +27,8 @@ var values := {
 	"screen_shake": true,
 	"toasts": true,
 	"dev_tools": false,
+	"exp_zones_open": true,   # Expeditions page: the island list is shown (or folded to a strip)
+	"exp_log_open": true,     # Expeditions page: the log column is shown (or folded to a strip)
 }
 
 var _focused := true

@@ -15,7 +15,9 @@ var _sky: SkyBackdrop
 var _log_count := -1
 var _party_locked := false
 var _pending_count := -1
-var _bottom_tab := "autobind"
+var _bottom_tab := "party"
+var _folds := {}          # "zones"/"log" -> [full panel, folded strip]
+var _log_strip: VBoxContainer
 
 
 func setup(arg: String) -> void:
@@ -30,13 +32,22 @@ func _ready() -> void:
 	var m := UI.margin(row, 22, 10, 22, 18)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	# zones
+	# zones: a list that folds to a slim strip (the choice is remembered in Options)
 	var zl := UI.vbox(10)
 	zl.custom_minimum_size.x = 268
-	zl.add_child(UI.header("Expeditions", "", Data.ui_icon("expeditions"), 38))
+	var zh := UI.hbox(6)
+	zh.add_child(UI.header("Expeditions", "", Data.ui_icon("expeditions"), 38))
+	zh.get_child(0).size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	var zfold := _fold_button("‹", func(): _set_open("exp_zones_open", false))
+	zfold.tooltip_text = "Hide the island list"
+	zh.add_child(zfold)
+	zl.add_child(zh)
 	_zones = UI.vbox(8)
 	zl.add_child(UI.scroll(_zones))
 	row.add_child(zl)
+	var zstrip := _strip("›", "Show the island list", Data.ui_icon("expeditions"), func(): _set_open("exp_zones_open", true))
+	row.add_child(zstrip)
+	_folds.zones = [zl, zstrip]
 	# centre: arena + log
 	var mid := UI.vbox(12)
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -55,10 +66,10 @@ func _ready() -> void:
 	_arena_host.add_child(UI.margin(_preview, 28, 22, 28, 22))
 	_controls = UI.hbox(10)
 	mid.add_child(_controls)
-	# auto-bind rules sit under the battle, in two columns
+	# party, auto-bind and supplies sit under the battle as tabs
 	_bind = UI.vbox(8)
 	mid.add_child(UI.panel("Glass", _bind))
-	# right: party and supplies on top, the expedition log filling the rest
+	# right: shinies waiting for a vessel, then the expedition log filling the column; it folds to a strip
 	var rcol := UI.vbox(12)
 	rcol.custom_minimum_size.x = 380
 	row.add_child(rcol)
@@ -68,7 +79,14 @@ func _ready() -> void:
 	logp.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	var lv := UI.vbox(8)
 	logp.add_child(lv)
-	lv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("aetherlog"), 22), UI.label("Expedition log", "H3")]))
+	var lh := UI.hbox(8, [UI.icon(Data.ui_icon("aetherlog"), 22), UI.label("Expedition log", "H3"), UI.spacer()])
+	var lfold := _fold_button("›", func(): _set_open("exp_log_open", false))
+	lfold.tooltip_text = "Hide the log"
+	lh.add_child(lfold)
+	lv.add_child(lh)
+	_log_strip = _strip("‹", "Show the log", Data.ui_icon("aetherlog"), func(): _set_open("exp_log_open", true))
+	row.add_child(_log_strip)
+	_folds.log = [rcol, _log_strip]
 	_log = UI.vbox(4)
 	var lsc := UI.scroll(_log)
 	lsc.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -80,6 +98,7 @@ func _ready() -> void:
 func refresh() -> void:
 	if Game.state.is_empty():
 		return
+	_apply_folds()
 	_fill_zones()
 	_fill_preview()
 	_fill_controls()
@@ -245,62 +264,115 @@ func _fill_controls() -> void:
 func _fill_right() -> void:
 	var s := Game.state
 	UI.clear(_right)
+	_party_locked = Expedition.party_locked(s)
 	# shinies waiting for a vessel come first, with a pulsing gold edge, so they are never missed
 	if not s.expedition.pending.is_empty():
 		_right.add_child(_pending_panel())
-	# party, compact: the log below gets the room
+	# the folded log strip shows the waiting count too
+	var badge: Label = _log_strip.get_node_or_null("Badge")
+	if badge:
+		badge.text = "%d!" % s.expedition.pending.size() if not s.expedition.pending.is_empty() else ""
+	_fill_bottom()
+
+
+## A slim strip standing in for a folded panel: an unfold button and the panel's icon.
+func _strip(arrow: String, tip: String, tex: Texture2D, on_open: Callable) -> VBoxContainer:
+	var v := UI.vbox(10)
+	v.custom_minimum_size.x = 44
+	var b := _fold_button(arrow, on_open)
+	b.tooltip_text = tip
+	v.add_child(b)
+	var ic := UI.icon(tex, 26)
+	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	ic.tooltip_text = tip
+	ic.mouse_filter = Control.MOUSE_FILTER_PASS
+	v.add_child(ic)
+	var badge := UI.label("", "Small", Palette.GOLD)
+	badge.name = "Badge"
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	v.add_child(badge)
+	return v
+
+
+## The small square button that folds or unfolds a panel.
+func _fold_button(arrow: String, on_press: Callable) -> Button:
+	var b := UI.button(arrow, "Chip", on_press)
+	b.add_theme_font_size_override("font_size", 22)
+	b.custom_minimum_size = Vector2(38, 38)
+	return b
+
+
+func _set_open(key: String, open: bool) -> void:
+	Options.set_value(key, open)
+	_apply_folds()
+
+
+## Shows each foldable panel or its strip, as remembered in Options.
+func _apply_folds() -> void:
+	for pair in [["zones", "exp_zones_open"], ["log", "exp_log_open"]]:
+		if not _folds.has(pair[0]):
+			continue
+		var open := bool(Options.get_value(pair[1]))
+		_folds[pair[0]][0].visible = open
+		_folds[pair[0]][1].visible = not open
+
+
+func _party_tab() -> VBoxContainer:
+	var s := Game.state
 	var pv := UI.vbox(6)
 	var party := GameState.party(s)
 	var party_size: int = Data.tuning.combat.partySize
 	var locked := Expedition.party_locked(s)
-	_party_locked = locked
-	var ph := UI.hbox(8, [UI.icon(Data.ui_icon("power"), 22), UI.label("Party", "H3")])
 	if locked:
-		ph.add_child(UI.spacer())
-		ph.add_child(UI.icon(Data.ui_icon("lock"), 16))
-		ph.add_child(UI.label("Locked during the run", "Faint"))
-	pv.add_child(ph)
-	if not locked:
-		pv.add_child(UI.wrap_label("Up to three. Party members don't work or gather Aether while they explore.", "Faint", 320))
+		pv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("Locked during the run: stop it to change the party.", "Faint")]))
+	else:
+		pv.add_child(UI.label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
+	var row := UI.hbox(10)
 	for i in party_size:
-		var h := UI.hbox(10)
+		var card := UI.vbox(4)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if i < party.size():
 			var c: Dictionary = party[i]
+			var h := UI.hbox(8)
 			var por := CreaturePortrait.of(c, 50)
 			por.bob = false
 			h.add_child(por)
 			var cv := UI.vbox(0)
-			cv.add_child(UI.label(Creatures.display_name(c), "H3"))
+			var nm := UI.label(Creatures.display_name(c), "H3")
+			nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			nm.custom_minimum_size.x = 60
+			cv.add_child(nm)
 			var st := Creatures.stats(c)
-			cv.add_child(UI.label("Lv %d · HP %s · PWR %s · GRD %s" % [int(c.level), F.format_num(st.health), F.format_num(st.power), F.format_num(st.guard)], "Faint"))
+			cv.add_child(UI.label("Lv %d · HP %s" % [int(c.level), F.format_num(st.health)], "Faint"))
+			cv.add_child(UI.label("PWR %s · GRD %s" % [F.format_num(st.power), F.format_num(st.guard)], "Faint"))
+			cv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			h.add_child(cv)
-			h.add_child(UI.spacer())
+			card.add_child(h)
 			if not locked:
-				h.add_child(UI.button("Swap", "Ghost", func(): _pick_party(i)))
-				h.add_child(UI.button("Remove", "Ghost", func(): Game.bench(c.id)))
+				card.add_child(UI.hbox(4, [UI.button("Swap", "Ghost", func(): _pick_party(i)), UI.button("Remove", "Ghost", func(): Game.bench(c.id))]))
 		elif not locked:
-			var e := WorkerBubble.make({}, "woodcutting", 50)
-			h.add_child(e)
-			h.add_child(UI.button("Add an Aetherling", "", func(): _pick_party(i)))
-		if h.get_child_count() > 0:
-			pv.add_child(h)
+			card.add_child(UI.button("Add an Aetherling", "", func(): _pick_party(i)))
 		else:
-			h.free()
-	_right.add_child(UI.panel("Glass", pv))
-	_fill_bottom()
+			card.add_child(UI.label("Empty", "Faint"))
+		row.add_child(UI.panel("Inset", card))
+	pv.add_child(row)
+	return pv
 
 
-## The panel under the battle: Auto-bind and Supplies, as two tabs.
+## The panel under the battle: Party, Auto-bind and Supplies, as tabs.
 func _fill_bottom() -> void:
 	var s := Game.state
 	UI.clear(_bind)
 	var tabs := UI.hbox(8)
-	for pair in [["autobind", "Auto-bind", "vessel"], ["supplies", "Supplies", "meal"]]:
+	for pair in [["party", "Party", "power"], ["autobind", "Auto-bind", "vessel"], ["supplies", "Supplies", "meal"]]:
 		var b := UI.button(pair[1], "ChipOn" if _bottom_tab == pair[0] else "Chip", func():
 			_bottom_tab = pair[0]
 			_fill_bottom(), Data.ui_icon(pair[2]))
 		tabs.add_child(b)
 	_bind.add_child(tabs)
+	if _bottom_tab == "party":
+		_bind.add_child(_party_tab())
+		return
 	if _bottom_tab == "supplies":
 		var sv := UI.vbox(8)
 		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 560))

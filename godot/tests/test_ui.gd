@@ -463,3 +463,24 @@ func test_waiting_shinies_are_shown_first() -> void:
 	Game.state.expedition.pending.clear()
 	main.free()
 	_teardown()
+
+
+## The Expeditions page's island list and log fold to slim strips, and the choice is remembered.
+func test_expedition_panels_fold() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var was_z: bool = Options.values.exp_zones_open
+	var was_l: bool = Options.values.exp_log_open
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	var scr: Node = main._screen
+	scr._set_open("exp_zones_open", false)
+	t.ok(not scr._folds.zones[0].visible and scr._folds.zones[1].visible, "the island list folds to a strip")
+	scr._set_open("exp_log_open", false)
+	t.ok(not scr._folds.log[0].visible and scr._folds.log[1].visible, "the log folds to a strip")
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	t.ok(not main._screen._folds.zones[0].visible, "folded panels stay folded when the page opens again")
+	Options.set_value("exp_zones_open", was_z)
+	Options.set_value("exp_log_open", was_l)
+	main.free()
+	_teardown()
