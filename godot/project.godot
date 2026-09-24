@@ -11,7 +11,7 @@ config/description="A creature-collecting idle game. Collect Aetherlings, put th
 config/version="0.2.0"
 run/main_scene="res://scenes/title.tscn"
 config/features=PackedStringArray("4.7", "GL Compatibility")
-config/icon="res://icon.svg"
+config/icon="res://assets/app-icon.png"
 boot_splash/bg_color=Color(0.043, 0.051, 0.114, 1)
 boot_splash/show_image=false
 
