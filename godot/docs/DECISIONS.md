@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 82 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 83 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -88,6 +88,14 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   bars above its head (back-row name tags sit a step higher so neighbours don't overlap). Every fighter is
   sized for a full side of three, so a lone enemy is the same size as one of three, and each is kept a
   small margin inside the backdrop. Bosses stay 1.45× bigger.
+  - **Facing:** the sprites are painted facing left (`combat.spriteFacing` in tuning.json), so the party
+    on the left is mirrored to look right and wild Aetherlings are drawn as painted, looking left. A form
+    whose sprite faces another way can set `facing` ("left", "right" or "front") in species.json.
+  - **Nameplates** (designer's request): each fighter has a small glass plate edged in its rarity colour
+    (gold for a boss). It shows the owned badge for wild Aetherlings whose species you have, the name, a
+    level chip in the rarity colour, the health bar, and a shield bar that appears only while a shield holds.
+    Front-row plates sit over the head, back-row plates a step higher, and every plate stays inside the
+    arena. Ability names float up from above the plate instead of through it.
 - **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
   of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
   wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the

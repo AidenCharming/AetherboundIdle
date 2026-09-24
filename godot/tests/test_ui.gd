@@ -378,3 +378,16 @@ func test_sanctum_expedition_card_follows_the_run() -> void:
 	Game.battle_log.clear()
 	main.free()
 	_teardown()
+
+
+## Fighters face each other: sprites are painted facing left, so the party (left side) is mirrored to look
+## right and wild Aetherlings (right side) are drawn as painted. A form can override its facing.
+func test_fighters_face_each_other() -> void:
+	t.ok(Arena._needs_flip("sproutlet", 1, 0), "the party is mirrored to face right")
+	t.ok(not Arena._needs_flip("sproutlet", 1, 1), "wild Aetherlings face left as painted")
+	var fd: Dictionary = Data.species["sproutlet"].forms[0]
+	fd.facing = "right"
+	t.ok(not Arena._needs_flip("sproutlet", 1, 0) and Arena._needs_flip("sproutlet", 1, 1), "a right-facing sprite flips the other way")
+	fd.facing = "front"
+	t.ok(not Arena._needs_flip("sproutlet", 1, 0) and not Arena._needs_flip("sproutlet", 1, 1), "a front-facing sprite never flips")
+	fd.erase("facing")

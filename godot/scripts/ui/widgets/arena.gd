@@ -145,6 +145,82 @@ func _leaving() -> bool:
 	return false
 
 
+## Fighters face the other side: the party (left) looks right, wild Aetherlings (right) look left. The
+## sprites are painted facing left (`combat.spriteFacing`); a form whose sprite faces another way says so
+## with a `facing` of "left", "right" or "front" in species.json.
+static func _needs_flip(species_id: String, form: int, side: int) -> bool:
+	var forms: Array = Data.species[species_id].forms
+	var fd: Dictionary = forms[clampi(form, 1, forms.size()) - 1]
+	var native: String = fd.get("facing", Data.tuning.combat.get("spriteFacing", "left"))
+	if native == "front":
+		return false
+	return native != ("right" if side == 0 else "left")
+
+
+## A fighter's nameplate: a small glass panel edged in its rarity colour, with the owned badge (wild
+## Aetherlings whose species you have), the name, a level chip, and the health and shield bars.
+func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionary:
+	var rc := Data.rarity_color(int(f.rarity))
+	var edge := Palette.GOLD if boss else rc
+	var panel := PanelContainer.new()
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var sb := ThemeFactory.box(Color(0.05, 0.055, 0.13, 0.84), 9, 1, Color(edge, 0.85), 0)
+	sb.content_margin_left = 7
+	sb.content_margin_right = 7
+	sb.content_margin_top = 4
+	sb.content_margin_bottom = 5
+	sb.border_width_top = 2
+	sb.shadow_color = Color(0, 0, 0.04, 0.45)
+	sb.shadow_size = 4
+	sb.shadow_offset = Vector2(0, 2)
+	panel.add_theme_stylebox_override("panel", sb)
+	var v := UI.vbox(2)
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.add_child(v)
+	var row := UI.hbox(4)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
+		var mark := UI.owned_mark(14)
+		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(mark)
+	var nm := UI.label(f.name, "Small", Palette.TEXT)
+	nm.add_theme_font_size_override("font_size", 14 if boss else 12)
+	nm.clip_text = true
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nm.custom_minimum_size.x = 30
+	row.add_child(nm)
+	var lv := PanelContainer.new()
+	lv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var lsb := ThemeFactory.box(Color(rc, 0.22), 99, 1, Color(rc, 0.7), 0)
+	lsb.content_margin_left = 5
+	lsb.content_margin_right = 5
+	lv.add_theme_stylebox_override("panel", lsb)
+	var ll := UI.label("Lv %d" % int(f.level), "Small", rc.lightened(0.35))
+	ll.add_theme_font_size_override("font_size", 10)
+	lv.add_child(ll)
+	lv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	v.add_child(row)
+	# the level chip sits beside the bars, so the name gets the plate's full width
+	var bars_row := UI.hbox(5)
+	bars_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bars_row.add_child(lv)
+	var bars := UI.vbox(2)
+	bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	bars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 7)
+	bars.add_child(hp)
+	var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.9), 3)
+	sh.modulate.a = 0.0
+	bars.add_child(sh)
+	bars_row.add_child(bars)
+	v.add_child(bars_row)
+	panel.custom_minimum_size.x = width
+	return {"panel": panel, "hp": hp, "shield": sh}
+
+
 func _clear() -> void:
 	for list in [_allies, _enemies]:
 		for f in list:
@@ -182,7 +258,7 @@ func _build(b: Dictionary) -> void:
 			root.size = Vector2(px, px)
 			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), px)
 			por.plate = false
-			por.flip = side == 1
+			por.flip = _needs_flip(f.species, int(f.form), side)
 			por.size = Vector2(px, px)
 			por.refresh()
 			# stand the visible art on the ground line: its lowest opaque pixel touches the feet line
@@ -201,38 +277,23 @@ func _build(b: Dictionary) -> void:
 				shadow.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE))
 			root.add_child(shadow)
 			root.add_child(por)
-			# name and bars float just above the head
-			var head := art.position.y
-			var nm := UI.label("%s %d" % [f.name, int(f.level)], "Small", Data.rarity_color(int(f.rarity)).lightened(0.3) if side == 1 else Palette.TEXT)
-			nm.add_theme_color_override("font_outline_color", Palette.INK)
-			nm.add_theme_constant_override("outline_size", 5)
-			# the fighters stand almost in a line, so back-row name tags sit a step higher to stay readable
-			var tag_rise := 17.0 if back else 0.0
-			nm.position = Vector2(-20, head - 36 - tag_rise)
-			nm.size = Vector2(px + 40, 18)
-			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			root.add_child(nm)
-			var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 8)
-			hp.position = Vector2(art.get_center().x - px * 0.35, head - 16)
-			hp.size = Vector2(px * 0.7, 8)
-			root.add_child(hp)
-			var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.85), 4)
-			sh.position = Vector2(art.get_center().x - px * 0.35, head - 7)
-			sh.size = Vector2(px * 0.7, 4)
-			root.add_child(sh)
-			nm.add_theme_font_size_override("font_size", 15 if boss else 12)
 			root.z_index = 0 if back else 1
 			add_child(root)
-			# a wild Aetherling whose species you already own gets the owned badge just left of its name
-			if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
-				var fs := nm.get_theme_font_size("font_size")
-				var w := nm.get_theme_font("font").get_string_size(nm.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-				var mark := UI.owned_mark(16)
-				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
-				mark.position = Vector2(nm.position.x + (nm.size.x - minf(w, nm.size.x)) / 2.0 - 19.0, nm.position.y + 1.0)
-				root.add_child(mark)
-			var rec := {"root": root, "portrait": por, "hp": hp, "shield": sh, "home": root.position, "down": false}
+			# the nameplate floats above the head; back-row plates sit a step higher so neighbours never overlap
+			var plate_w := clampf(1.55 * side_w / maxf(1.0, float(full)) - 6.0, 92.0, 150.0)
+			if boss:
+				plate_w = 176.0
+			var np := _nameplate(f, side, boss, plate_w)
+			root.add_child(np.panel)
+			var ph: float = np.panel.get_combined_minimum_size().y
+			var head := art.position.y
+			var top := head - 6.0 - ph - ((ph + 4.0) if back else 0.0)
+			np.panel.size = Vector2(plate_w, ph)
+			# centred over the art, but never past the arena's edges
+			var plate_x := clampf(root.position.x + art.get_center().x - plate_w / 2.0, 4.0, s.x - 4.0 - plate_w)
+			np.panel.position = Vector2(plate_x - root.position.x, top)
+			var rec := {"root": root, "portrait": por, "hp": np.hp, "shield": np.shield, "home": root.position, "down": false,
+				"tag_top": top}
 			(_allies if side == 0 else _enemies).append(rec)
 	var z: Dictionary = Data.zones[b.zone]
 	if int(b.wave) >= int(b.waves):
@@ -260,7 +321,7 @@ func _update(b: Dictionary) -> void:
 			var v: Dictionary = views[i]
 			v.hp.value = float(f.hp) / maxf(1.0, float(f.maxHp))
 			v.shield.value = clampf(float(f.shield) / maxf(1.0, float(f.maxHp)), 0.0, 1.0)
-			v.shield.visible = float(f.shield) > 0.5
+			v.shield.modulate.a = 1.0 if float(f.shield) > 0.5 else 0.0   # keeps its space, so the plate never jumps
 			if not f.alive and not v.down:
 				v.down = true
 				var tw := create_tween()
@@ -316,8 +377,9 @@ func _on_event(e: Dictionary) -> void:
 			if v.is_empty():
 				return
 			var ab: Dictionary = Data.abilities[e.ability]
-			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.1, -8)
-			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 30.0)
+			# starts above the name tag so it never crosses the fighter's own name
+			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 6.0)
+			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 26.0, true)
 			if motion:
 				var por: Control = v.portrait
 				por.pivot_offset = por.size / 2.0
