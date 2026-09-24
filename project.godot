@@ -22,6 +22,7 @@ Data="*res://scripts/autoload/data.gd"
 Sfx="*res://scripts/autoload/sfx.gd"
 Music="*res://scripts/autoload/music.gd"
 Game="*res://scripts/autoload/game.gd"
+TestBridge="*res://scripts/autoload/test_bridge.gd"
 
 [display]
 

@@ -1,21 +1,23 @@
 # Aetherbound Idle (Godot)
 
 A creature-collecting idle game: collect Aetherlings, put them to work, explore the islands to bind wild
-ones, and breed rarer and hybrid forms. Godot 4.7 rebuild of the web version on `main`.
+ones, and breed rarer and hybrid forms. Built with Godot 4.7 (the earlier web version is archived on the `web-archive` branch).
 
 What changed from the web version's design, and why: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
 See `docs/HANDOFF.md` for where things stand and what to check first.
 
+Bug testing with a script or a local Claude session driving the running game: [`docs/TEST_BRIDGE.md`](docs/TEST_BRIDGE.md).
+
 ## Open and run
 
 1. Install **Godot 4.7** (the standard build, not .NET): <https://godotengine.org/download>. It is a
    single executable; no installer needed.
-2. Start Godot. In the Project Manager choose **Import**, pick `godot/project.godot` in this repo, then
+2. Start Godot. In the Project Manager choose **Import**, pick `project.godot` in this repo, then
    **Import & Edit**. The first open takes a minute while Godot imports the sprites and icons.
 3. Press **F5** (or the ▶ Play button, top right) to run the game.
 
-From a terminal: `godot --path godot` runs the game; `godot --path godot -e` opens the editor.
+From a terminal: `godot --path .` runs the game; `godot --path . -e` opens the editor.
 
 ## Build a Windows .exe
 
@@ -45,22 +47,22 @@ Saves are in three slots under Godot's user folder (on Windows
 ## Tests
 
 ```
-godot --headless --path godot --import                       # once, after cloning
-godot --headless --path godot res://tests/test_runner.tscn   # exit code 0 = all passed
+godot --headless --path . --import                       # once, after cloning
+godot --headless --path . res://tests/test_runner.tscn   # exit code 0 = all passed
 ```
 
-Or `godot/tools/check.sh [path-to-godot]`, which does both.
+Or `tools/check.sh [path-to-godot]`, which does both.
 
 Visual tour (needs a display; writes a PNG of every screen and dialog; overwrites save slot 3):
 
 ```
-godot --path godot res://tests/tour.tscn -- --out=/some/folder
+godot --path . res://tests/tour.tscn -- --out=/some/folder
 ```
 
 Balance probe (prints how far sample parties get on each island):
 
 ```
-godot --headless --path godot res://tests/balance_probe.tscn
+godot --headless --path . res://tests/balance_probe.tscn
 ```
 
 Month probe (a dedicated player's first month through the real sim: the day each skill reaches 10/30/50/70/
@@ -68,7 +70,7 @@ Month probe (a dedicated player's first month through the real sim: the day each
 described in docs/DECISIONS.md under Pacing):
 
 ```
-godot --headless --path godot res://tests/month_probe.tscn -- --days=35
+godot --headless --path . res://tests/month_probe.tscn -- --days=35
 ```
 
 ## Adding art

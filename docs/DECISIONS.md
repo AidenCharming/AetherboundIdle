@@ -48,7 +48,11 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 102 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Test bridge** (designer's request): `scripts/autoload/test_bridge.gd` lets a script or a local Claude session drive
+  the running game (real mouse clicks and wheel, keys, pages, time skips, the save, errors, screenshots) through
+  `tools/bridge.py`. Off unless started with `-- --bridge` on a debug build, localhost only, and it plays in save
+  slot 2, named "Autoplay Slot". See `docs/TEST_BRIDGE.md`.
+- **Tests:** `tests/test_*.gd`, 103 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app

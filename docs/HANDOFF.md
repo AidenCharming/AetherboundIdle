@@ -10,7 +10,7 @@ decided and why) and `README.md` (how to run things).
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
   Game. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and balance are JSON
   in `data/`. Never hardcode balance numbers.
-- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 102), and
+- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 103), and
   push to `godot-rebuild`.
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
@@ -26,6 +26,7 @@ decided and why) and `README.md` (how to run things).
 
 - Tests: `godot --headless --debug --path godot res://tests/test_runner.tscn < /dev/null` (close stdin: with
   `--debug` a script error waits at a debugger prompt). Add `--verbose` to see warnings; keep it at zero warnings.
+- Driving the running game (real clicks, errors, screenshots): `docs/TEST_BRIDGE.md`.
 - Screenshots: `godot --path godot res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display).
 - Pacing probe (about 40 s): `res://tests/month_probe.tscn -- --days=35 [--skills|--rates|--calibrate]`. Its
   `_combat` rounds party levels down to multiples of 3.
