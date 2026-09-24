@@ -82,7 +82,24 @@ static func chip(text: String, color: Color, font_size := 11) -> PanelContainer:
 	l.add_theme_font_size_override("font_size", font_size)
 	p.add_child(l)
 	p.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	return p
+
+
+## Recolours and retexts a chip made by chip() (for numbers that change in place).
+static func set_chip(p: PanelContainer, text: String, color: Color) -> void:
+	var sb := p.get_theme_stylebox("panel") as StyleBoxFlat
+	sb.bg_color = Color(color, 0.18)
+	sb.border_color = Color(color, 0.65)
+	var l := p.get_child(0) as Label
+	l.text = text
+	l.add_theme_color_override("font_color", color.lightened(0.3))
+
+
+## A count against a target as a chip: gold when done, aether while going.
+static func count_chip(have: float, need: float, font_size := 12) -> PanelContainer:
+	var done := have >= need
+	return chip("%s / %s" % [F.format_num(have), F.format_num(need)], Palette.GOOD if done else Palette.AETHER, font_size)
 
 
 static func hbox(gap := 10, children: Array = []) -> HBoxContainer:

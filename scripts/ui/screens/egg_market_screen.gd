@@ -134,7 +134,7 @@ func _egg_card(type_id: String) -> Control:
 		return card
 	var g: Dictionary = Market.grades()[grade]
 	cv.add_child(_odds_row(grade))
-	cv.add_child(UI.label("Hatches in %s" % F.format_seconds(float(g.minutes) * 60.0), "Faint"))
+	cv.add_child(UI.stat_line("time", "Hatches in %s" % F.format_seconds(float(g.minutes) * 60.0)))
 	var price := Market.egg_price(grade)
 	var row := UI.hbox(8, [UI.amount("gold", price, price, 20), UI.spacer()])
 	var err := Market.egg_check(s, type_id, grade)

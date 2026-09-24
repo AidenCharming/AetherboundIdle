@@ -357,6 +357,16 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
 
 ## Changed
 
+### No faint grey numbers (designer's request)
+- **Numbers are chips or coloured**, the way the Aether-Log's dex numbers are: `UI.chip` / `UI.count_chip`
+  (new `UI.set_chip` recolours one in place). Done for the goal counter ("Goal N / 112", gold) and progress,
+  the nav rail's skill levels and badges (aether when someone works there), the top bar's working/perched,
+  zone level ranges, party cards (level chip + stat icons), Works levels, Nexus counts and card levels,
+  pods, Market tiers/stock/slots, inventory tier and sell price (gold icon), milestones' "to go", locked
+  slot levels, XP and XP/h, rare-drop odds and the level-up list.
+- Creature card status lines take a colour by job: green working, gold on an expedition, aether perched.
+- Faint grey stays for prose only (descriptions, hints), never for a number.
+
 ### Overseer Vance's goals: 26 → 112
 - **Why:** the designer asked for at least 100 missions over the month; the old chain ended after the bosses.
 - **Pacing:** ordered along the month probe's timeline (islands cleared on days 1-22, rarity caps, party levels,

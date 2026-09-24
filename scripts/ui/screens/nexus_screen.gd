@@ -9,7 +9,7 @@ var _filter_type := ""
 var _filter_status := ""
 var _sort := "rarity"
 var _search: LineEdit
-var _count: Label
+var _count: HBoxContainer
 var _type_row: HFlowContainer
 var _status_row: HFlowContainer
 var _sort_row: HFlowContainer
@@ -30,7 +30,7 @@ func _ready() -> void:
 	row.add_child(left)
 	var head := UI.hbox(12)
 	head.add_child(UI.header("Nexus", "Every Aetherling you have. Resting ones sit on the perches and gather Aether.", Data.ui_icon("nexus")))
-	_count = UI.label("", "Dim")
+	_count = UI.hbox(6)
 	head.add_child(_count)
 	head.add_child(UI.button("Bulk release", "", _bulk_release))
 	left.add_child(head)
@@ -139,7 +139,9 @@ func _fill_grid() -> void:
 	UI.clear(_grid)
 	CreatureCard.refresh_perched()
 	var list := _sorted_list()
-	_count.text = "%d of %d shown · %s Aether/min" % [list.size(), Game.state.creatures.size(), F.format_num(Economy.aether_per_min(Game.state))]
+	UI.clear(_count)
+	_count.add_child(UI.chip("%d / %d shown" % [list.size(), Game.state.creatures.size()], Palette.TEXT_DIM, 12))
+	_count.add_child(UI.chip("+%s Aether/min" % F.format_num(Economy.aether_per_min(Game.state)), Palette.AETHER, 12))
 	for c in list:
 		var card := CreatureCard.make(c, c.id == selected)
 		card.picked.connect(func(id):
@@ -198,7 +200,7 @@ func _fill_detail() -> void:
 	lv.add_child(_xp_bar)
 	var levels: Array = Data.tuning.creature.formLevels
 	if form < 3:
-		lv.add_child(UI.label("Evolves at %d" % int(levels[form]), "Faint"))
+		lv.add_child(UI.chip("Evolves at Lv %d" % int(levels[form]), Palette.GOLD, 11))
 	_detail.add_child(lv)
 	# stats
 	var st := Creatures.stats(c)
@@ -207,7 +209,7 @@ func _fill_detail() -> void:
 	sr.add_child(UI.stat_line("health", F.format_num(st.health), "Health"))
 	sr.add_child(UI.stat_line("power", F.format_num(st.power), "Power"))
 	sr.add_child(UI.stat_line("guard", F.format_num(st.guard), "Guard"))
-	sr.add_child(UI.label("Leans %s" % sp.statLean.capitalize(), "Faint"))
+	sr.add_child(UI.chip("Leans %s" % sp.statLean.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 11))
 	_detail.add_child(UI.panel("Inset", sr))
 	# jobs
 	_detail.add_child(UI.label("Work", "H3"))

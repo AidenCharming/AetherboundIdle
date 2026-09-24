@@ -147,7 +147,7 @@ func _fill_side() -> void:
 	var g := Goals.current(s)
 	var gh := UI.hbox(8, [UI.icon(Data.ui_icon("xp"), 22), UI.label("Overseer Vance", "H3")])
 	gh.add_child(UI.spacer())
-	gh.add_child(UI.label("%d / %d" % [mini(int(s.goals.index) + 1, Data.goals.size()), Data.goals.size()], "Faint"))
+	gh.add_child(UI.chip("Goal %d / %d" % [mini(int(s.goals.index) + 1, Data.goals.size()), Data.goals.size()], Palette.GOLD, 13))
 	_goal_box.add_child(gh)
 	if g.is_empty():
 		_goal_box.add_child(UI.wrap_label("You've done everything I had planned. The Sanctum is yours, Architect: chase the rarities and the hidden recipes.", "Dim"))
@@ -158,7 +158,7 @@ func _fill_side() -> void:
 		pb.value = float(p[0]) / maxf(1.0, float(p[1]))
 		_goal_box.add_child(pb)
 		var rrow := UI.hbox(8)
-		rrow.add_child(UI.label("Reward:", "Faint"))
+		rrow.add_child(UI.label("Reward", "Small", Palette.GOLD))
 		for k in g.reward:
 			if k == "items":
 				for id in g.reward.items:
@@ -169,7 +169,7 @@ func _fill_side() -> void:
 		if Goals.is_done(s, g):
 			rrow.add_child(UI.button("Claim", "Gold", func(): Game.claim_goal()))
 		else:
-			rrow.add_child(UI.label("%d / %d" % p, "Faint"))
+			rrow.add_child(UI.count_chip(p[0], p[1], 13))
 		_goal_box.add_child(rrow)
 	# perches
 	UI.clear(_perch_box)

@@ -146,7 +146,8 @@ func _fill_zones() -> void:
 		h.add_child(_fit(UI.label(z.name, "H3")))
 		h.add_child(UI.type_badge(z.type, true))
 		v.add_child(h)
-		v.add_child(_fit(UI.label("Levels %d–%d · Boss: %s" % [int(z.levels[0]), int(z.levels[1]), z.boss.name], "Faint")))
+		var zl := UI.hbox(6, [UI.chip("Lv %d–%d" % [int(z.levels[0]), int(z.levels[1])], Data.type_color(z.type), 11), _fit(UI.label("Boss: %s" % z.boss.name, "Small", Palette.TEXT_DIM))])
+		v.add_child(zl)
 		card.tooltip_text = "%s\nLevels %d–%d · Boss: %s" % [z.name, int(z.levels[0]), int(z.levels[1]), z.boss.name]
 		var fill := Control.new()
 		fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -366,8 +367,8 @@ func _party_tab() -> VBoxContainer:
 			nm.custom_minimum_size.x = 60
 			cv.add_child(nm)
 			var st := Creatures.stats(c)
-			cv.add_child(UI.label("Lv %d · HP %s" % [int(c.level), F.format_num(st.health)], "Faint"))
-			cv.add_child(UI.label("PWR %s · GRD %s" % [F.format_num(st.power), F.format_num(st.guard)], "Faint"))
+			cv.add_child(UI.hbox(8, [UI.chip("Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)), 11), _mini_stat("health", st.health)]))
+			cv.add_child(UI.hbox(10, [_mini_stat("power", st.power), _mini_stat("guard", st.guard)]))
 			cv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			h.add_child(cv)
 			card.add_child(h)
@@ -620,3 +621,9 @@ func _log_icon(e: Dictionary, portrait: int, icon: int) -> Control:
 		c = UI.icon(Data.ui_icon("expeditions"), icon)
 	c.mouse_filter = Control.MOUSE_FILTER_PASS
 	return c
+
+
+## A small icon and number for the party cards (health, power, guard).
+func _mini_stat(icon_name: String, value: float) -> HBoxContainer:
+	var l := UI.label(F.format_num(value), "Small", Palette.TEXT)
+	return UI.hbox(3, [UI.icon(Data.ui_icon(icon_name), 14), l])

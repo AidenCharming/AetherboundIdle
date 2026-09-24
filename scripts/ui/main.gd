@@ -204,19 +204,29 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	h.offset_left = 10
-	h.offset_right = -10
+	h.offset_right = -6
 	h.add_child(UI.icon(Data.ui_icon(icon_name), 24))
 	var l := UI.label(text)
 	l.add_theme_font_override("font", ThemeFactory.bold_font())
 	l.add_theme_font_size_override("font_size", 15)
 	h.add_child(l)
 	h.add_child(UI.spacer())
-	var extra := UI.label("", "Small")
+	var extra := UI.chip("", Palette.AETHER, 11)
+	extra.custom_minimum_size.x = 26
+	(extra.get_child(0) as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	extra.visible = false
 	h.add_child(extra)
 	b.add_child(h)
 	b.pressed.connect(func(): show_screen(screen, arg))
 	_rail_list.add_child(b)
 	_nav_buttons[screen + ":" + arg] = {"button": b, "extra": extra, "label": l, "icon": h.get_child(0)}
+
+
+## A nav entry's badge: a chip, hidden when there's nothing to say.
+func _set_extra(nb: Dictionary, text: String, color: Color) -> void:
+	nb.extra.visible = text != ""
+	if text != "":
+		UI.set_chip(nb.extra, text, color)
 
 
 func _update_nav() -> void:
@@ -235,43 +245,37 @@ func _refresh_rail() -> void:
 			continue
 		var workers := GameState.workers(s, skill.id).size()
 		var usable := skill.type == null or Collection.owned_type(s, skill.type)
-		nb.extra.text = "%d" % int(s.skills[skill.id].level)
-		nb.extra.add_theme_color_override("font_color", Palette.AETHER if workers > 0 else Palette.TEXT_FAINT)
+		# the level as a chip: aether while someone works there, a quiet indigo otherwise
+		_set_extra(nb, "%d" % int(s.skills[skill.id].level), Palette.AETHER if workers > 0 else Palette.TEXT_DIM.darkened(0.2))
 		nb.label.modulate.a = 1.0 if usable else 0.45
 		nb.icon.modulate.a = 1.0 if usable else 0.4
+		nb.extra.modulate.a = 1.0 if usable else 0.45
 		nb.button.tooltip_text = "" if usable else "Needs a %s Aetherling" % Data.types[skill.type].name
-	var pods: Dictionary = _nav_buttons["pods:"]
 	var ready_count := Game.ready_eggs().size()
-	pods.extra.text = "%d ready" % ready_count if ready_count > 0 else ""
-	pods.extra.add_theme_color_override("font_color", Palette.GOLD)
+	_set_extra(_nav_buttons["pods:"], "%d ready" % ready_count if ready_count > 0 else "", Palette.GOLD)
 	var ex: Dictionary = _nav_buttons["expeditions:"]
 	# shinies waiting for a vessel matter more than the wave count: gold, and they pulse (see _process)
 	_pending_flash = not s.expedition.pending.is_empty()
 	if _pending_flash:
-		ex.extra.text = "%d to bind!" % s.expedition.pending.size()
-		ex.extra.add_theme_color_override("font_color", Palette.GOLD)
+		_set_extra(ex, "%d to bind!" % s.expedition.pending.size(), Palette.GOLD)
 	else:
 		ex.extra.modulate.a = 1.0
-		ex.extra.add_theme_color_override("font_color", Palette.AETHER)
+		var wave := ""
 		if Expedition.is_running(s) and not s.expedition.battle.is_empty():
-			ex.extra.text = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"
-		else:
-			ex.extra.text = ""
-	var log_nav: Dictionary = _nav_buttons["aetherlog:"]
+			wave = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"
+		_set_extra(ex, wave, Palette.AETHER)
 	var claim := Collection.claimable(s).size()
-	log_nav.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
-	log_nav.extra.add_theme_color_override("font_color", Palette.GOLD)
+	_set_extra(_nav_buttons["aetherlog:"], "%d" % claim if claim > 0 else "", Palette.GOLD)
+	_nav_buttons["aetherlog:"].button.tooltip_text = "%d milestone reward%s to claim" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
 	# the Market: a rare limited offer pulses in gold; fresh stock you haven't looked at says "new"
 	var mk: Dictionary = _nav_buttons["market:"]
 	var now := Game.now_sec()
 	_limited_flash = Market.has_limited(s, now)
 	if _limited_flash:
-		mk.extra.text = "limited!"
-		mk.extra.add_theme_color_override("font_color", Palette.GOLD)
+		_set_extra(mk, "limited!", Palette.GOLD)
 	else:
 		mk.extra.modulate.a = 1.0
-		mk.extra.text = "new" if int(Market.state(s).seenWindow) != Market.window(now) else ""
-		mk.extra.add_theme_color_override("font_color", Palette.AETHER)
+		_set_extra(mk, "new" if int(Market.state(s).seenWindow) != Market.window(now) else "", Palette.AETHER)
 	_fill_boosts()
 
 
@@ -307,8 +311,14 @@ func _build_top_bar() -> Control:
 	bar.add_child(UI.spacer())
 	_boosts_box = UI.hbox(6)
 	bar.add_child(_boosts_box)
-	_top.status = UI.label("", "Dim")
-	bar.add_child(_top.status)
+	_top.working = UI.chip("", Palette.GOOD, 14)
+	_top.working.tooltip_text = "Aetherlings working in skills"
+	_top.working.mouse_filter = Control.MOUSE_FILTER_PASS
+	bar.add_child(_top.working)
+	_top.perched = UI.chip("", Palette.AETHER, 14)
+	_top.perched.tooltip_text = "Aetherlings resting on the perches, making Aether"
+	_top.perched.mouse_filter = Control.MOUSE_FILTER_PASS
+	bar.add_child(_top.perched)
 	var bell := UI.button("", "Ghost", _open_notifications, Data.ui_icon("bell"))
 	bell.tooltip_text = "Notifications"
 	_top.bell = bell
@@ -337,7 +347,7 @@ func _chip(icon_name: String, tip: String) -> Dictionary:
 	var v := UI.label("0", "Num")
 	v.add_theme_font_size_override("font_size", 18)
 	h.add_child(v)
-	var sub := UI.label("", "Faint")
+	var sub := UI.label("", "Small", Palette.AETHER.darkened(0.1))
 	h.add_child(sub)
 	p.add_child(h)
 	return {"panel": p, "value": v, "sub": sub}
@@ -375,7 +385,8 @@ func _process(delta: float) -> void:
 		for c in s.creatures.values():
 			if Creatures.job_kind(c) == "skill":
 				working += 1
-		_top.status.text = "%d working · %d perched" % [working, Economy.perched(s).size()]
+		UI.set_chip(_top.working, "%d working" % working, Palette.GOOD)
+		UI.set_chip(_top.perched, "%d perched" % Economy.perched(s).size(), Palette.AETHER)
 
 
 const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works",
@@ -610,8 +621,8 @@ func _show_summary(s: Dictionary) -> void:
 			row.add_child(UI.icon(Data.ui_icon(id), 28))
 			row.add_child(UI.label(Data.skills[id].name, ""))
 			row.add_child(UI.spacer())
-			row.add_child(UI.label(str(int(lv[0])), "Faint"))
-			row.add_child(UI.label("→", "Faint"))
+			row.add_child(UI.label(str(int(lv[0])), "Num", Palette.AETHER.darkened(0.15)))
+			row.add_child(UI.label("→", "", Palette.GOLD))
 			row.add_child(UI.label(str(int(lv[1])), "Num", Palette.GOOD))
 			row.add_child(UI.chip("+%d" % (int(lv[1]) - int(lv[0])), Palette.GOOD))
 			right.add_child(UI.panel("Inset", row))

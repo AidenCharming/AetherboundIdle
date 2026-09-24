@@ -13,7 +13,7 @@ const CATEGORIES := [["", "Everything"], ["log", "Logs"], ["herb", "Herbs"], ["o
 var _grid: HFlowContainer
 var _detail: VBoxContainer
 var _cats: HFlowContainer
-var _worth: Label
+var _worth: HBoxContainer
 
 
 func _ready() -> void:
@@ -27,7 +27,7 @@ func _ready() -> void:
 	var head := UI.hbox(10)
 	head.add_child(UI.header("Inventory", "Sell what you don't need. Keep what the next tier needs.", Data.ui_icon("inventory")))
 	head.add_child(UI.spacer())
-	_worth = UI.label("", "Dim")
+	_worth = UI.hbox(6)
 	head.add_child(_worth)
 	head.add_child(UI.button("Sell in bulk…", "Gold", _bulk_sell, Data.ui_icon("gold")))
 	left.add_child(head)
@@ -104,7 +104,9 @@ func _fill_grid() -> void:
 		_grid.add_child(b)
 	if not any:
 		_grid.add_child(UI.label("Nothing here yet.", "Dim"))
-	_worth.text = "Everything would sell for %s gold" % F.format_num(worth)
+	UI.clear(_worth)
+	_worth.add_child(UI.label("Everything would sell for", "Dim"))
+	_worth.add_child(UI.amount("gold", worth, -1, 20))
 
 
 func _fill_detail() -> void:
@@ -119,7 +121,7 @@ func _fill_detail() -> void:
 	h.add_child(UI.icon(Data.item_icon(selected), 84))
 	var hv := UI.vbox(2)
 	hv.add_child(UI.label(it.name, "H2"))
-	hv.add_child(UI.label("Tier %d · %s" % [int(it.tier), it.category.capitalize()], "Faint"))
+	hv.add_child(UI.hbox(6, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 12), UI.chip(it.category.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 12)]))
 	hv.add_child(UI.label("You have %s" % F.format_num(n), "Dim"))
 	h.add_child(hv)
 	h.add_child(UI.spacer())
@@ -169,7 +171,7 @@ func _fill_detail() -> void:
 	row2.add_child(UI.button("Sell", "Gold", func(): Game.sell(selected, int(qty.value))))
 	row2.add_child(UI.button("Sell all but 10", "", func(): Game.sell(selected, maxi(0, n - 10))))
 	_detail.add_child(row2)
-	_detail.add_child(UI.label("%d gold each" % int(it.sell), "Faint"))
+	_detail.add_child(UI.hbox(6, [UI.label("Sells for", "Dim"), UI.amount("gold", float(it.sell), -1, 18), UI.label("each", "Dim")]))
 
 
 ## Buy more of this item from the Market, when it stocks it.

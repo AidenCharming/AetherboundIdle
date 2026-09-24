@@ -44,7 +44,7 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	add_child(v)
 	var top := UI.hbox(4)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var lv := UI.label("Lv %d" % int(c.level), "Small")
+	var lv := UI.chip("Lv %d" % int(c.level), Palette.AETHER, 11)
 	top.add_child(lv)
 	top.add_child(UI.spacer())
 	if c.shiny:
@@ -67,7 +67,7 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(r)
 	if not compact:
-		var st := UI.label(note if note != "" else status_text(c), "Faint")
+		var st := UI.label(note if note != "" else status_text(c), "Faint", Palette.TEXT_DIM if note != "" else status_color(c))
 		st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		st.clip_text = true
 		st.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -100,5 +100,17 @@ static func status_text(c: Dictionary) -> String:
 		"party":
 			return "On an expedition"
 	if perched_ids.has(c.id):
-		return "Perched · %s Aether/min" % F.format_num(Creatures.bench_rate_per_min(c))
+		return "Perched · +%s/min" % F.format_num(Creatures.bench_rate_per_min(c))
 	return "Resting"
+
+
+## The status line's colour: green at work, gold on an expedition, aether on a perch, soft indigo at rest.
+static func status_color(c: Dictionary) -> Color:
+	match Creatures.job_kind(c):
+		"skill":
+			return Palette.GOOD
+		"party":
+			return Palette.GOLD
+	if perched_ids.has(c.id):
+		return Palette.AETHER
+	return Palette.TEXT_DIM

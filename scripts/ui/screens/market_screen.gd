@@ -164,7 +164,7 @@ func _offer_card(o: Dictionary, i: int) -> Control:
 	if float(o.get("discount", 0.0)) > 0.0:
 		row.add_child(UI.chip("-%d%%" % roundi(float(o.discount) * 100.0), Palette.GOOD, 12))
 	row.add_child(UI.spacer())
-	row.add_child(UI.label("%d left" % int(o.left), "Faint"))
+	row.add_child(UI.chip("%d left" % int(o.left), Palette.GOLD if int(o.left) > 0 else Palette.DANGER, 12))
 	cv.add_child(row)
 	var b := UI.button("Buy" if int(o.left) > 0 else "Sold out", "Gold", func(): Game.buy_offer(i))
 	b.disabled = int(o.left) <= 0 or float(Game.state.gold) < float(o.gold)
@@ -231,7 +231,7 @@ func _fill_wares(list: Array, amounts: Array) -> void:
 		h.add_child(UI.icon(Data.item_icon(it.id), 44))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(it.name, "H3"))
-		tv.add_child(UI.label("Tier %d · you have %s" % [int(it.tier), F.format_num(GameState.count(s, it.id))], "Faint"))
+		tv.add_child(UI.hbox(6, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 11), UI.label("you have", "Small", Palette.TEXT_DIM), UI.label(F.format_num(GameState.count(s, it.id)), "Num", Palette.TEXT)]))
 		h.add_child(tv)
 		cv.add_child(h)
 		if it.has("vessel"):
@@ -247,7 +247,7 @@ func _fill_wares(list: Array, amounts: Array) -> void:
 			flow.add_child(card)
 			continue
 		var price := Market.buy_price(it.id)
-		cv.add_child(UI.hbox(8, [UI.amount("gold", price, price, 18), UI.label("each · sells for %d" % int(it.sell), "Faint")]))
+		cv.add_child(UI.hbox(8, [UI.amount("gold", price, price, 18), UI.label("each", "Dim"), UI.spacer(), UI.chip("sells for %s" % F.format_num(float(it.sell)), Palette.GOOD, 11)]))
 		var row := UI.hbox(6)
 		for n in amounts:
 			var b := UI.button("Buy %s" % F.format_num(n), "Gold" if n == amounts[0] else "", func(): Game.market_buy(it.id, n))
@@ -310,7 +310,7 @@ func _fill_slots() -> void:
 		h.add_child(UI.icon(Data.ui_icon(skill.id), 40))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(skill.name, "H3"))
-		tv.add_child(UI.label("Level %d · %d slots (%d bought)" % [int(s.skills[skill.id].level), GameState.slot_count(s, skill.id), Market.extra_slots(s, skill.id)], "Faint"))
+		tv.add_child(UI.hbox(6, [UI.chip("Lv %d" % int(s.skills[skill.id].level), Palette.AETHER, 11), UI.chip("%d slots" % GameState.slot_count(s, skill.id), Palette.GOOD, 11), UI.chip("%d bought" % Market.extra_slots(s, skill.id), Palette.GOLD, 11)]))
 		h.add_child(tv)
 		cv.add_child(h)
 		var price := Market.next_slot_price(s, skill.id)

@@ -222,7 +222,8 @@ func _recipes() -> void:
 	_body.add_child(g)
 	_body.add_child(UI.label("Secret recipes", "H2"))
 	var found: int = s.collection.recipes.filter(func(id): return Data.species[id].kind == "special").size()
-	_body.add_child(UI.wrap_label("%d of %d found. Each is one exact pair of species. Collection milestones reveal a few pairs outright." % [found, Data.special_list.size()], "Faint"))
+	_body.add_child(UI.count_chip(found, Data.special_list.size(), 13))
+	_body.add_child(UI.wrap_label("Each is one exact pair of species. Collection milestones reveal a few pairs outright.", "Dim"))
 	var f := UI.flow(12, 12)
 	for r in Data.special_list:
 		var known: bool = r.result in s.collection.recipes
@@ -296,7 +297,7 @@ func _milestones() -> void:
 			elif p >= target:
 				mv.add_child(UI.button("Claim", "Gold", func(): Game.claim_milestone(t.id, i)))
 			else:
-				mv.add_child(UI.label("%d to go" % (target - p), "Faint"))
+				mv.add_child(UI.chip("%d to go" % (target - p), Palette.AETHER, 11))
 			ms.add_child(mc)
 		v.add_child(ms)
 		_body.add_child(card)

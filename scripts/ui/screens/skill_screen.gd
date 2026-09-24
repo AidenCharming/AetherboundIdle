@@ -48,7 +48,8 @@ func _ready() -> void:
 	_xp_bar = UI.bar(Data.type_color(_skill.type) if _skill.type != null else Palette.AETHER, 12)
 	_xp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	xr.add_child(_xp_bar)
-	_xp_label = UI.label("", "Faint")
+	_xp_label = UI.label("", "Num", Palette.AETHER.lightened(0.2))
+	_xp_label.add_theme_font_size_override("font_size", 15)
 	xr.add_child(_xp_label)
 	hv.add_child(xr)
 	_rate = UI.vbox(4)
@@ -111,7 +112,7 @@ func _fill_slots() -> void:
 			cv.add_child(top)
 			var bar := UI.bar(Palette.AETHER, 8)
 			cv.add_child(bar)
-			var note := UI.label("", "Faint")
+			var note := UI.label("", "Small", Palette.AETHER.lightened(0.15))
 			cv.add_child(note)
 			_slot_bars.append({"cid": c.id, "bar": bar, "label": note, "cd": cd})
 			var row := UI.hbox(8)
@@ -137,8 +138,8 @@ func _fill_slots() -> void:
 			card.custom_minimum_size.x = 150
 			card.modulate.a = 0.5
 			cv.add_child(UI.icon(Data.ui_icon("lock"), 36))
-			var l := UI.label("Opens at level %d" % int(levels[i]), "Dim")
-			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			var l := UI.chip("Opens at Lv %d" % int(levels[i]), Palette.AETHER, 12)
+			l.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			cv.add_child(l)
 		_slots.add_child(card)
 	# past the fifth, slots are bought in the Market; offer the next one here once the five are open
@@ -284,7 +285,7 @@ func _have_row(id: String, note: String) -> HBoxContainer:
 	name_l.clip_text = true
 	nv.add_child(name_l)
 	if note != "":
-		nv.add_child(UI.label(note, "Faint"))
+		nv.add_child(UI.label(note, "Small", Palette.GOLD))
 	row.add_child(nv)
 	row.tooltip_text = Data.item_name(id)
 	_have_labels.append({"id": id, "label": n, "last": -1.0})
@@ -326,13 +327,13 @@ func _fill_rate() -> void:
 		var ph := Skills.per_hour(s, c, skill_id)
 		per_h += ph.actions
 		xp_h += ph.xp
-	_rate.add_child(UI.label("Per hour", "Faint"))
+	_rate.add_child(UI.label("Per hour", "Small", Palette.TEXT_DIM))
 	for id in action.outputs:
 		_rate.add_child(UI.amount(id, per_h * float(action.outputs[id])))
 	for id in action.get("inputs", {}):
-		var row := UI.hbox(6, [UI.label("uses", "Faint"), UI.amount(id, per_h * float(action.inputs[id]))])
+		var row := UI.hbox(6, [UI.label("uses", "Small", Palette.TEXT_DIM), UI.amount(id, per_h * float(action.inputs[id]))])
 		_rate.add_child(row)
-	_rate.add_child(UI.label("%s XP/h" % F.format_num(xp_h), "Faint"))
+	_rate.add_child(UI.stat_line("xp", "%s XP/h" % F.format_num(xp_h)))
 	if Skills.affordable(s, action) <= 0:
 		_rate.add_child(UI.label("Waiting for materials", "Small", Palette.DANGER))
 

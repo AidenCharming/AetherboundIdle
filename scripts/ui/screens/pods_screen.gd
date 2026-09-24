@@ -163,8 +163,8 @@ func _parent_slot(which: int) -> Control:
 		var r := UI.label("%s · Lv %d" % [Data.rarity(int(c.rarity)).name, int(c.level)], "Faint", Data.rarity_color(int(c.rarity)))
 		r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(r)
-		var tl := UI.label("%d pool trait%s" % [c.traits.size(), "" if c.traits.size() == 1 else "s"], "Faint")
-		tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		var tl := UI.chip("%d pool trait%s" % [c.traits.size(), "" if c.traits.size() == 1 else "s"], Palette.AETHER_DEEP.lightened(0.25), 11)
+		tl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(tl)
 	return card
 
@@ -227,7 +227,9 @@ func _fill_pods() -> void:
 		var v := UI.vbox(6)
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
 		card.add_child(v)
-		v.add_child(UI.label("Pod %d" % (i + 1), "Faint"))
+		var pod_chip := UI.chip("Pod %d" % (i + 1), Palette.AETHER, 12)
+		pod_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		v.add_child(pod_chip)
 		if egg.is_empty():
 			var e := WorkerBubble.make({}, "woodcutting", 120)
 			e.size_flags_horizontal = Control.SIZE_SHRINK_CENTER

@@ -32,7 +32,7 @@ func refresh() -> void:
 		h.add_child(UI.icon(Data.item_icon("aether-pearl") if pearl else Data.ui_icon(_icon(u.id)), 52))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(u.name, "H2"))
-		tv.add_child(UI.label("Level %d of %d" % [lv, u.levels.size()], "Faint"))
+		tv.add_child(UI.chip("Maxed" if lv >= u.levels.size() else "Level %d / %d" % [lv, u.levels.size()], Palette.GOOD if lv >= u.levels.size() else (Palette.AETHER if lv > 0 else Palette.AETHER_DEEP.lightened(0.3)), 12))
 		h.add_child(tv)
 		cv.add_child(h)
 		cv.add_child(UI.wrap_label(u.blurb, "Dim"))
