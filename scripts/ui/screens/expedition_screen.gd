@@ -14,6 +14,8 @@ var _tabs_box: HBoxContainer
 var _controls: HBoxContainer
 var _sky: SkyBackdrop
 var _log_count := -1
+var _log_whens: Array = []   # [{label, tile, time}] the log's "how long ago" texts, refreshed once a second
+var _whens_left := 0.0
 var _party_locked := false
 var _pending_count := -1
 var _bottom_tab := "party"
@@ -536,7 +538,7 @@ func _pick_party(slot: int) -> void:
 		"best")
 
 
-func _process(_d: float) -> void:
+func _process(d: float) -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
@@ -553,6 +555,24 @@ func _process(_d: float) -> void:
 		_log_count = Game.battle_log.size()
 		_log_top = top
 		_render_log()
+	_whens_left -= d
+	if _whens_left <= 0.0:
+		_whens_left = 1.0
+		_update_whens()
+
+
+## Brings the log's "now" / "3m" texts up to date without rebuilding the cards.
+func _update_whens() -> void:
+	var now := Game.now_sec()
+	for w in _log_whens:
+		if w.label != null and is_instance_valid(w.label):
+			w.label.text = _when(now, w.time)
+		if w.tile != null and is_instance_valid(w.tile):
+			w.tile.tooltip_text = "%s  (%s)" % [w.text, _when(now, w.time) + ("" if now - w.time < 60 else " ago")]
+
+
+static func _when(now: float, time: float) -> String:
+	return "now" if now - time < 60 else F.format_seconds(now - time)
 
 
 ## The expedition log: each line a small card with an icon (a portrait for a capture), its text, and how long
@@ -560,14 +580,14 @@ func _process(_d: float) -> void:
 func _render_log() -> void:
 	UI.clear(_log)
 	UI.clear(_log_mini)
+	_log_whens.clear()
+	_whens_left = 1.0
 	if Game.battle_log.is_empty():
 		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 300))
 		return
 	var now := Game.now_sec()
 	for e in Game.battle_log.slice(0, 40):
 		var col: Color = e.color
-		var ago := now - float(e.time)
-		var when := "now" if ago < 60 else F.format_seconds(ago)
 		var card := _log_card(col, 8)
 		var h := UI.hbox(8)
 		h.add_child(_log_icon(e, 30, 22))
@@ -578,12 +598,15 @@ func _render_log() -> void:
 		l.tooltip_text = e.text
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		h.add_child(l)
-		h.add_child(UI.label(when, "Faint"))
+		var when := UI.label(_when(now, float(e.time)), "Faint")
+		_log_whens.append({"label": when, "tile": null, "time": float(e.time), "text": e.text})
+		h.add_child(when)
 		card.add_child(h)
 		_log.add_child(card)
 	for e in Game.battle_log.slice(0, 16):
 		var tile := _log_card(e.color, 3)
-		tile.tooltip_text = "%s  (%s)" % [e.text, "now" if now - float(e.time) < 60 else F.format_seconds(now - float(e.time)) + " ago"]
+		tile.tooltip_text = "%s  (%s)" % [e.text, _when(now, float(e.time)) + ("" if now - float(e.time) < 60 else " ago")]
+		_log_whens.append({"label": null, "tile": tile, "time": float(e.time), "text": e.text})
 		tile.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		tile.gui_input.connect(func(ev: InputEvent):
 			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
