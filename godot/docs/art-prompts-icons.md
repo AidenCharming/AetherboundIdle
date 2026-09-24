@@ -44,143 +44,143 @@ Or by hand: paste a prompt below into the text-to-image graph, pick the best, an
 
 | # | Icon | Group | Category | Key | Status |
 |---|---|---|---|---|---|
-| 1 | `oak-log` | item | Logs | magenta | [ ] |
-| 2 | `willow-log` | item | Logs | magenta | [ ] |
-| 3 | `maple-log` | item | Logs | magenta | [ ] |
-| 4 | `mangrove-log` | item | Logs | magenta | [ ] |
-| 5 | `yew-log` | item | Logs | green | [ ] |
-| 6 | `duskwood-log` | item | Logs | magenta | [ ] |
-| 7 | `starbark-log` | item | Logs | magenta | [ ] |
-| 8 | `cinderpine-log` | item | Logs | magenta | [ ] |
-| 9 | `thunderash-log` | item | Logs | magenta | [ ] |
-| 10 | `crownwood-log` | item | Logs | magenta | [ ] |
-| 11 | `seedcache` | item | Rare finds | magenta | [ ] |
-| 12 | `mintleaf` | item | Herbs | magenta | [ ] |
-| 13 | `sunpetal` | item | Herbs | magenta | [ ] |
-| 14 | `glowcap` | item | Herbs | magenta | [ ] |
-| 15 | `tidewort` | item | Herbs | magenta | [ ] |
-| 16 | `dreamroot` | item | Herbs | green | [ ] |
-| 17 | `nullshade` | item | Herbs | green | [ ] |
-| 18 | `aetherbloom` | item | Herbs | green | [ ] |
-| 19 | `firelily` | item | Herbs | magenta | [ ] |
-| 20 | `stormsage` | item | Herbs | magenta | [ ] |
-| 21 | `skylotus` | item | Herbs | magenta | [ ] |
-| 22 | `lucky-clover` | item | Rare finds | magenta | [ ] |
-| 23 | `copper-ore` | item | Ores & gems | magenta | [ ] |
-| 24 | `iron-ore` | item | Ores & gems | magenta | [ ] |
-| 25 | `sunstone` | item | Ores & gems | magenta | [ ] |
-| 26 | `tidesilver-ore` | item | Ores & gems | magenta | [ ] |
-| 27 | `skyquartz` | item | Ores & gems | magenta | [ ] |
-| 28 | `nullite` | item | Ores & gems | green | [ ] |
-| 29 | `aetherite` | item | Ores & gems | green | [ ] |
-| 30 | `magmite` | item | Ores & gems | magenta | [ ] |
-| 31 | `fulgurite` | item | Ores & gems | magenta | [ ] |
-| 32 | `celestine` | item | Ores & gems | magenta | [ ] |
-| 33 | `heartgeode` | item | Rare finds | green | [ ] |
-| 34 | `minnow` | item | Fish | magenta | [ ] |
-| 35 | `sunfish` | item | Fish | magenta | [ ] |
-| 36 | `bubblepuff` | item | Fish | magenta | [ ] |
-| 37 | `coralback` | item | Fish | green | [ ] |
-| 38 | `lanternfish` | item | Fish | magenta | [ ] |
-| 39 | `gloomeel` | item | Fish | magenta | [ ] |
-| 40 | `starfin` | item | Fish | magenta | [ ] |
-| 41 | `cinderkoi` | item | Fish | magenta | [ ] |
-| 42 | `stormray` | item | Fish | magenta | [ ] |
-| 43 | `skymarlin` | item | Fish | magenta | [ ] |
-| 44 | `moonpearl` | item | Rare finds | green | [ ] |
-| 45 | `sunken-trinket` | item | Treasure | magenta | [ ] |
-| 46 | `scrap` | item | Salvage | magenta | [ ] |
-| 47 | `spring` | item | Salvage | magenta | [ ] |
-| 48 | `glass-lens` | item | Salvage | magenta | [ ] |
-| 49 | `brass-gear` | item | Salvage | magenta | [ ] |
-| 50 | `clockwork-heart` | item | Salvage | magenta | [ ] |
-| 51 | `null-prism` | item | Salvage | green | [ ] |
-| 52 | `starglass` | item | Salvage | green | [ ] |
-| 53 | `magmaglass-shard` | item | Salvage | magenta | [ ] |
-| 54 | `thunder-cell` | item | Salvage | magenta | [ ] |
-| 55 | `zenith-compass` | item | Salvage | magenta | [ ] |
-| 56 | `tinkers-cache` | item | Rare finds | magenta | [ ] |
-| 57 | `copper-bar` | item | Bars | magenta | [ ] |
-| 58 | `iron-bar` | item | Bars | magenta | [ ] |
-| 59 | `sunsteel-bar` | item | Bars | magenta | [ ] |
-| 60 | `tidesilver-bar` | item | Bars | magenta | [ ] |
-| 61 | `skysteel-bar` | item | Bars | magenta | [ ] |
-| 62 | `nullsteel-bar` | item | Bars | green | [ ] |
-| 63 | `aether-ingot` | item | Bars | green | [ ] |
-| 64 | `magmasteel-bar` | item | Bars | magenta | [ ] |
-| 65 | `stormsteel-bar` | item | Bars | magenta | [ ] |
-| 66 | `celestine-ingot` | item | Bars | magenta | [ ] |
-| 67 | `grilled-minnow` | item | Meals | magenta | [ ] |
-| 68 | `herb-sunfish` | item | Meals | magenta | [ ] |
-| 69 | `bubble-stew` | item | Meals | magenta | [ ] |
-| 70 | `coralback-skewer` | item | Meals | green | [ ] |
-| 71 | `lantern-roll` | item | Meals | magenta | [ ] |
-| 72 | `gloomeel-pie` | item | Meals | magenta | [ ] |
-| 73 | `starfin-feast` | item | Meals | magenta | [ ] |
-| 74 | `cinderkoi-curry` | item | Meals | magenta | [ ] |
-| 75 | `stormray-chowder` | item | Meals | magenta | [ ] |
-| 76 | `skymarlin-banquet` | item | Meals | magenta | [ ] |
-| 77 | `copper-coil` | item | Components | magenta | [ ] |
-| 78 | `iron-capacitor` | item | Components | magenta | [ ] |
-| 79 | `sun-resonator` | item | Components | magenta | [ ] |
-| 80 | `tidesilver-wiring` | item | Components | magenta | [ ] |
-| 81 | `sky-relay` | item | Components | magenta | [ ] |
-| 82 | `null-conduit` | item | Components | green | [ ] |
-| 83 | `aether-dynamo` | item | Components | green | [ ] |
-| 84 | `magmasteel-turbine` | item | Components | magenta | [ ] |
-| 85 | `tempest-capacitor` | item | Components | magenta | [ ] |
-| 86 | `zenith-engine` | item | Components | magenta | [ ] |
-| 87 | `dusk-thread` | item | Threads | green | [ ] |
-| 88 | `gloam-thread` | item | Threads | green | [ ] |
-| 89 | `star-thread` | item | Threads | magenta | [ ] |
-| 90 | `moonlit-thread` | item | Threads | magenta | [ ] |
-| 91 | `veil-thread` | item | Threads | green | [ ] |
-| 92 | `midnight-thread` | item | Threads | magenta | [ ] |
-| 93 | `eventide-thread` | item | Threads | green | [ ] |
-| 94 | `aurora-thread` | item | Threads | magenta | [ ] |
-| 95 | `tempest-thread` | item | Threads | magenta | [ ] |
-| 96 | `zenith-thread` | item | Threads | magenta | [ ] |
-| 97 | `tinkerers-vessel` | item | Vessels | magenta | [ ] |
-| 98 | `sturdy-vessel` | item | Vessels | magenta | [ ] |
-| 99 | `polished-vessel` | item | Vessels | magenta | [ ] |
-| 100 | `resonant-vessel` | item | Vessels | green | [ ] |
-| 101 | `luminescent-vessel` | item | Vessels | magenta | [ ] |
-| 102 | `timber-frame` | item | Parts | magenta | [ ] |
-| 103 | `resonance-frame` | item | Parts | magenta | [ ] |
-| 104 | `aether-lantern` | item | Parts | magenta | [ ] |
+| 1 | `oak-log` | item | Logs | magenta | [x] approved |
+| 2 | `willow-log` | item | Logs | magenta | [x] approved |
+| 3 | `maple-log` | item | Logs | magenta | [x] approved |
+| 4 | `mangrove-log` | item | Logs | magenta | [x] approved |
+| 5 | `yew-log` | item | Logs | green | [x] approved |
+| 6 | `duskwood-log` | item | Logs | magenta | [x] approved |
+| 7 | `starbark-log` | item | Logs | magenta | [x] approved |
+| 8 | `cinderpine-log` | item | Logs | magenta | [x] approved |
+| 9 | `thunderash-log` | item | Logs | magenta | [x] approved |
+| 10 | `crownwood-log` | item | Logs | magenta | [x] approved |
+| 11 | `seedcache` | item | Rare finds | magenta | [x] approved |
+| 12 | `mintleaf` | item | Herbs | magenta | [x] approved |
+| 13 | `sunpetal` | item | Herbs | magenta | [x] approved |
+| 14 | `glowcap` | item | Herbs | magenta | [x] approved |
+| 15 | `tidewort` | item | Herbs | magenta | [x] approved |
+| 16 | `dreamroot` | item | Herbs | green | [x] approved |
+| 17 | `nullshade` | item | Herbs | green | [x] approved |
+| 18 | `aetherbloom` | item | Herbs | green | [x] approved |
+| 19 | `firelily` | item | Herbs | magenta | [x] approved |
+| 20 | `stormsage` | item | Herbs | magenta | [x] approved |
+| 21 | `skylotus` | item | Herbs | magenta | [x] approved |
+| 22 | `lucky-clover` | item | Rare finds | magenta | [x] approved |
+| 23 | `copper-ore` | item | Ores & gems | magenta | [x] approved |
+| 24 | `iron-ore` | item | Ores & gems | magenta | [x] approved |
+| 25 | `sunstone` | item | Ores & gems | magenta | [x] approved |
+| 26 | `tidesilver-ore` | item | Ores & gems | magenta | [x] approved |
+| 27 | `skyquartz` | item | Ores & gems | magenta | [x] approved |
+| 28 | `nullite` | item | Ores & gems | green | [x] approved |
+| 29 | `aetherite` | item | Ores & gems | green | [x] approved |
+| 30 | `magmite` | item | Ores & gems | magenta | [x] approved |
+| 31 | `fulgurite` | item | Ores & gems | magenta | [x] approved |
+| 32 | `celestine` | item | Ores & gems | magenta | [x] approved |
+| 33 | `heartgeode` | item | Rare finds | green | [x] approved |
+| 34 | `minnow` | item | Fish | magenta | [x] approved |
+| 35 | `sunfish` | item | Fish | magenta | [x] approved |
+| 36 | `bubblepuff` | item | Fish | magenta | [x] approved |
+| 37 | `coralback` | item | Fish | green | [x] approved |
+| 38 | `lanternfish` | item | Fish | magenta | [x] approved |
+| 39 | `gloomeel` | item | Fish | magenta | [x] approved |
+| 40 | `starfin` | item | Fish | magenta | [x] approved |
+| 41 | `cinderkoi` | item | Fish | magenta | [x] approved |
+| 42 | `stormray` | item | Fish | magenta | [x] approved |
+| 43 | `skymarlin` | item | Fish | magenta | [x] approved |
+| 44 | `moonpearl` | item | Rare finds | green | [x] approved |
+| 45 | `sunken-trinket` | item | Treasure | magenta | [x] approved |
+| 46 | `scrap` | item | Salvage | magenta | [x] approved |
+| 47 | `spring` | item | Salvage | magenta | [x] approved |
+| 48 | `glass-lens` | item | Salvage | magenta | [x] approved |
+| 49 | `brass-gear` | item | Salvage | magenta | [x] approved |
+| 50 | `clockwork-heart` | item | Salvage | magenta | [x] approved |
+| 51 | `null-prism` | item | Salvage | green | [x] approved |
+| 52 | `starglass` | item | Salvage | green | [x] approved |
+| 53 | `magmaglass-shard` | item | Salvage | magenta | [x] approved |
+| 54 | `thunder-cell` | item | Salvage | magenta | [x] approved |
+| 55 | `zenith-compass` | item | Salvage | magenta | [x] approved |
+| 56 | `tinkers-cache` | item | Rare finds | magenta | [x] approved |
+| 57 | `copper-bar` | item | Bars | magenta | [x] approved |
+| 58 | `iron-bar` | item | Bars | magenta | [x] approved |
+| 59 | `sunsteel-bar` | item | Bars | magenta | [x] approved |
+| 60 | `tidesilver-bar` | item | Bars | magenta | [x] approved |
+| 61 | `skysteel-bar` | item | Bars | magenta | [x] approved |
+| 62 | `nullsteel-bar` | item | Bars | green | [x] approved |
+| 63 | `aether-ingot` | item | Bars | green | [x] approved |
+| 64 | `magmasteel-bar` | item | Bars | magenta | [x] approved |
+| 65 | `stormsteel-bar` | item | Bars | magenta | [x] approved |
+| 66 | `celestine-ingot` | item | Bars | magenta | [x] approved |
+| 67 | `grilled-minnow` | item | Meals | magenta | [x] approved |
+| 68 | `herb-sunfish` | item | Meals | magenta | [x] approved |
+| 69 | `bubble-stew` | item | Meals | magenta | [x] approved |
+| 70 | `coralback-skewer` | item | Meals | green | [x] approved |
+| 71 | `lantern-roll` | item | Meals | magenta | [x] approved |
+| 72 | `gloomeel-pie` | item | Meals | magenta | [x] approved |
+| 73 | `starfin-feast` | item | Meals | magenta | [x] approved |
+| 74 | `cinderkoi-curry` | item | Meals | magenta | [x] approved |
+| 75 | `stormray-chowder` | item | Meals | magenta | [x] approved |
+| 76 | `skymarlin-banquet` | item | Meals | magenta | [x] approved |
+| 77 | `copper-coil` | item | Components | magenta | [x] approved |
+| 78 | `iron-capacitor` | item | Components | magenta | [x] approved |
+| 79 | `sun-resonator` | item | Components | magenta | [x] approved |
+| 80 | `tidesilver-wiring` | item | Components | magenta | [x] approved |
+| 81 | `sky-relay` | item | Components | magenta | [x] approved |
+| 82 | `null-conduit` | item | Components | green | [x] approved |
+| 83 | `aether-dynamo` | item | Components | green | [x] approved |
+| 84 | `magmasteel-turbine` | item | Components | magenta | [x] approved |
+| 85 | `tempest-capacitor` | item | Components | magenta | [x] approved |
+| 86 | `zenith-engine` | item | Components | magenta | [x] approved |
+| 87 | `dusk-thread` | item | Threads | green | [x] approved |
+| 88 | `gloam-thread` | item | Threads | green | [x] approved |
+| 89 | `star-thread` | item | Threads | magenta | [x] approved |
+| 90 | `moonlit-thread` | item | Threads | magenta | [x] approved |
+| 91 | `veil-thread` | item | Threads | green | [x] approved |
+| 92 | `midnight-thread` | item | Threads | magenta | [x] approved |
+| 93 | `eventide-thread` | item | Threads | green | [x] approved |
+| 94 | `aurora-thread` | item | Threads | magenta | [x] approved |
+| 95 | `tempest-thread` | item | Threads | magenta | [x] approved |
+| 96 | `zenith-thread` | item | Threads | magenta | [x] approved |
+| 97 | `tinkerers-vessel` | item | Vessels | magenta | [x] approved |
+| 98 | `sturdy-vessel` | item | Vessels | magenta | [x] approved |
+| 99 | `polished-vessel` | item | Vessels | magenta | [x] approved |
+| 100 | `resonant-vessel` | item | Vessels | green | [x] approved |
+| 101 | `luminescent-vessel` | item | Vessels | magenta | [x] approved |
+| 102 | `timber-frame` | item | Parts | magenta | [x] approved |
+| 103 | `resonance-frame` | item | Parts | magenta | [x] approved |
+| 104 | `aether-lantern` | item | Parts | magenta | [x] approved |
 | 105 | `aether-pearl` | item | Rare finds | green | [ ] |
-| 106 | `aether-crystal` | item | Rare finds | magenta | [ ] |
-| 107 | `aether` | ui | Currencies | magenta | [ ] |
-| 108 | `gold` | ui | Currencies | magenta | [ ] |
-| 109 | `woodcutting` | ui | Skills | magenta | [ ] |
-| 110 | `herbalism` | ui | Skills | magenta | [ ] |
-| 111 | `mining` | ui | Skills | magenta | [ ] |
-| 112 | `fishing` | ui | Skills | magenta | [ ] |
-| 113 | `scavenging` | ui | Skills | magenta | [ ] |
-| 114 | `smithing` | ui | Skills | magenta | [ ] |
-| 115 | `cooking` | ui | Skills | magenta | [ ] |
-| 116 | `circuitry` | ui | Skills | magenta | [ ] |
-| 117 | `aether-weaving` | ui | Skills | green | [ ] |
-| 118 | `vessel-crafting` | ui | Skills | green | [ ] |
-| 119 | `fabrication` | ui | Skills | magenta | [ ] |
-| 120 | `sanctum` | ui | Navigation | magenta | [ ] |
-| 121 | `nexus` | ui | Navigation | green | [ ] |
-| 122 | `pods` | ui | Navigation | green | [ ] |
-| 123 | `expeditions` | ui | Navigation | magenta | [ ] |
-| 124 | `aetherlog` | ui | Navigation | green | [ ] |
-| 125 | `inventory` | ui | Navigation | magenta | [ ] |
-| 126 | `works` | ui | Navigation | magenta | [ ] |
-| 127 | `settings` | ui | Navigation | magenta | [ ] |
-| 128 | `bell` | ui | Markers | magenta | [ ] |
-| 129 | `lock` | ui | Markers | magenta | [ ] |
-| 130 | `health` | ui | Stats | green | [ ] |
-| 131 | `power` | ui | Stats | magenta | [ ] |
-| 132 | `guard` | ui | Stats | magenta | [ ] |
-| 133 | `time` | ui | Stats | magenta | [ ] |
-| 134 | `xp` | ui | Stats | magenta | [ ] |
-| 135 | `upgrade` | ui | Markers | magenta | [ ] |
-| 136 | `owned` | ui | Markers | magenta | [ ] |
-| 137 | `shiny` | ui | Markers | magenta | [ ] |
+| 106 | `aether-crystal` | item | Rare finds | magenta | [x] approved |
+| 107 | `aether` | ui | Currencies | magenta | [x] approved |
+| 108 | `gold` | ui | Currencies | magenta | [x] approved |
+| 109 | `woodcutting` | ui | Skills | magenta | [x] approved |
+| 110 | `herbalism` | ui | Skills | magenta | [x] approved |
+| 111 | `mining` | ui | Skills | magenta | [x] approved |
+| 112 | `fishing` | ui | Skills | magenta | [x] approved |
+| 113 | `scavenging` | ui | Skills | magenta | [x] approved |
+| 114 | `smithing` | ui | Skills | magenta | [x] approved |
+| 115 | `cooking` | ui | Skills | magenta | [x] approved |
+| 116 | `circuitry` | ui | Skills | magenta | [x] approved |
+| 117 | `aether-weaving` | ui | Skills | green | [x] approved |
+| 118 | `vessel-crafting` | ui | Skills | green | [x] approved |
+| 119 | `fabrication` | ui | Skills | magenta | [x] approved |
+| 120 | `sanctum` | ui | Navigation | magenta | [x] approved |
+| 121 | `nexus` | ui | Navigation | green | [x] approved |
+| 122 | `pods` | ui | Navigation | green | [x] approved |
+| 123 | `expeditions` | ui | Navigation | magenta | [x] approved |
+| 124 | `aetherlog` | ui | Navigation | green | [x] approved |
+| 125 | `inventory` | ui | Navigation | magenta | [x] approved |
+| 126 | `works` | ui | Navigation | magenta | [x] approved |
+| 127 | `settings` | ui | Navigation | magenta | [x] approved |
+| 128 | `bell` | ui | Markers | magenta | [x] approved |
+| 129 | `lock` | ui | Markers | magenta | [x] approved |
+| 130 | `health` | ui | Stats | green | [x] approved |
+| 131 | `power` | ui | Stats | magenta | [x] approved |
+| 132 | `guard` | ui | Stats | magenta | [x] approved |
+| 133 | `time` | ui | Stats | magenta | [x] approved |
+| 134 | `xp` | ui | Stats | magenta | [x] approved |
+| 135 | `upgrade` | ui | Markers | magenta | [x] approved |
+| 136 | `owned` | ui | Markers | magenta | [x] approved |
+| 137 | `shiny` | ui | Markers | magenta | [x] approved |
 | 138 | `vessel` | ui | Markers | magenta | copy of `items/tinkerers-vessel` |
 | 139 | `meal` | ui | Markers | magenta | copy of `items/bubble-stew` |
 
@@ -559,7 +559,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\items\stormray.png` -> `godot/assets/icons/items/stormray.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A flat blue-grey ray fish with wide wing-like fins, a long thin tail and small yellow zigzag markings on its back, seen from above. One object alone, seen from above, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A manta ray, not an ordinary fish: a wide flat diamond-shaped blue-grey body with broad pointed wing fins spreading out to the left and right, a long thin whip tail and small yellow zigzag markings on its back. One object alone, seen from directly above, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 43. `skymarlin`
@@ -791,7 +791,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\items\gloomeel-pie.png` -> `godot/assets/icons/items/gloomeel-pie.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A small round golden pie with a crimped pastry crust, an eel-shaped pastry decoration curled on top and a slice cut out showing a dark filling. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A small round golden pie with a crimped pastry crust, a long thin eel shape cut from pastry lying flat on the crust in a loose coil, with no head sticking up, and a slice cut out showing a dark filling. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 73. `starfin-feast`
@@ -815,7 +815,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\items\stormray-chowder.png` -> `godot/assets/icons/items/stormray-chowder.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A round bread bowl filled with creamy pale chowder, a few green herb flecks and a wooden spoon resting in it. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A round crusty golden-brown bread loaf hollowed out as the bowl, filled with creamy pale chowder with a few green herb flecks, no dish or plate. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 76. `skymarlin-banquet`
@@ -1065,7 +1065,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\aether.png` -> `godot/assets/icons/ui/aether.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A four-pointed star-shaped crystal, faceted, pale cyan and white, with a small round indigo gem in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A faceted crystal shaped like a plus sign with long pointed tips: exactly four points (one up, one down, one left, one right) joined by deeply inward-curved sides, pale cyan and white, with a small round indigo gem in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 108. `gold`
@@ -1123,7 +1123,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\smithing.png` -> `godot/assets/icons/ui/smithing.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A blacksmith's hammer with a wooden handle and a heavy steel head, pointing up diagonally. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A blacksmith's hammer with a wooden handle and a heavy pale silver-grey steel head with white highlight shapes (light grey like a wrench, never black or charcoal), pointing up diagonally. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 115. `cooking`
@@ -1163,7 +1163,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\fabrication.png` -> `godot/assets/icons/ui/fabrication.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A steel wrench and a screwdriver with a yellow handle, crossed in an X. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Exactly one chunky all-steel wrench and exactly one screwdriver with a thick yellow handle and a short steel shaft, crossed in an X. One object alone, seen from a slight three-quarter angle, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ## Interface icons: Navigation
@@ -1229,7 +1229,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\settings.png` -> `godot/assets/icons/ui/settings.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A single steel-grey cog wheel with a round hole in its centre. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. A single chunky steel-grey cog wheel with visible thickness, a raised bevelled rim around a round hole in its centre, soft shading on the teeth and white highlight shapes, drawn with depth like a solid metal part, not a flat symbol. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ## Interface icons: Markers
@@ -1271,7 +1271,7 @@ A single game icon for a cute creature-collecting idle game, in a soft painterly
 key: **magenta #FF00FF** | file: `D:\AI\icons\approved\ui\shiny.png` -> `godot/assets/icons/ui/shiny.png`
 
 ```
-A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Two chunky four-pointed star shapes side by side, a large pale-gold one and a small pale-cyan one. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
+A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick dark indigo outlines, chunky cartoon proportions and vibrant saturated colours. Two chunky shapes side by side, each shaped like a plus sign with long pointed tips: exactly four points (up, down, left, right) joined by deeply inward-curved sides, a white highlight shape on each, a large pale-gold one and a small pale-cyan one. One object alone, facing the viewer, centred, filling about 75 percent of the frame with clear margin, a bold simple silhouette that reads clearly at a small size. Everything drawn solid and opaque, nothing see-through. Solid pure magenta background (#FF00FF), evenly lit and completely flat, with no floor, no shadow, no glow effect, no halo, no light rays, no sparkles, no scenery, no text, no letters, no numbers, no border, no frame, no watermark.
 ```
 
 ### 138. `vessel`

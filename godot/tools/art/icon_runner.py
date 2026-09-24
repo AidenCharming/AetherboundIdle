@@ -334,21 +334,105 @@ def cmd_fix(args):
 
 # ---------- finish ----------
 
+ADJUST = HERE / "icon_adjust.json"
+
+
+def load_adjust():
+    """icon_adjust.json: which finished icons are mirrored, and which families are matched in tilt and size."""
+    data = json.loads(ADJUST.read_text(encoding="utf-8")) if ADJUST.exists() else {}
+    return {"flip": set(data.get("flip", [])), "match": data.get("match", {})}
+
+
+def _save_cutout(im, dst):
+    """Writes a finished cutout and its QA image (the icon over cyan), like sprite_tools.cutout_file."""
+    from PIL import Image
+    im.save(dst)
+    qa = Image.new("RGBA", im.size, (0, 255, 255, 255))
+    qa.alpha_composite(im)
+    qa.convert("RGB").save(str(dst).replace(".png", "_qa.png"))
+
+
+def _axis_angle(alpha):
+    """Tilt of the silhouette's long axis in degrees above horizontal (PCA of the opaque pixels)."""
+    import numpy as np
+    ys, xs = np.nonzero(alpha > 128)
+    w, v = np.linalg.eigh(np.cov(np.stack([xs - xs.mean(), ys - ys.mean()])))
+    x, y = v[:, np.argmax(w)]
+    if x < 0:
+        x, y = -x, -y
+    return float(np.degrees(np.arctan2(-y, x)))
+
+
+def _finish_matched(icons, args, adjust, st):
+    """Each match family (all approved members, even under --only, so the result never depends on the selection) is
+    rotated to the family's median tilt, scaled to the same opaque area, then given one shared scale so the largest
+    member just fits the square with the usual 4% margin. Colours are left alone."""
+    import numpy as np
+    from PIL import Image
+    by_id = {c["id"]: c for c in icons}
+    selected = {c["id"] for c in select(icons, args)}
+    made = []
+    for ids in adjust["match"].values():
+        if not selected & set(ids):
+            continue
+        members = [by_id[i] for i in ids if i in by_id and approved_path(by_id[i]).exists()]
+        cuts = {}
+        for c in members:
+            rgba, _ = st.cutout_array(Image.open(approved_path(c)))
+            im = Image.fromarray(rgba, "RGBA")
+            if c["id"] in adjust["flip"]:
+                im = im.transpose(Image.FLIP_LEFT_RIGHT)
+            cuts[c["id"]] = im
+        target = float(np.median([_axis_angle(np.asarray(im)[..., 3]) for im in cuts.values()]))
+        # premultiplied rotate and resize so transparent pixels never bleed their colour into the edge
+        rotated = {i: im.convert("RGBa").rotate(target - _axis_angle(np.asarray(im)[..., 3]), resample=Image.BICUBIC,
+                                                expand=True) for i, im in cuts.items()}
+        rotated = {i: im.crop(im.getbbox()) for i, im in rotated.items()}
+        weight = {i: np.sqrt((np.asarray(im)[..., 3] > 128).sum()) for i, im in rotated.items()}
+        ref = min(weight.values())
+        # scale that makes every member's weight equal ref, then one factor so the largest side fits the square
+        rel = {i: ref / weight[i] for i in rotated}
+        biggest = max(max(im.size) * rel[i] for i, im in rotated.items())
+        k = args.size * 0.92 / biggest
+        for c in members:
+            if c["id"] not in selected:
+                continue
+            im = rotated[c["id"]]
+            s = rel[c["id"]] * k
+            im = im.resize((max(1, round(im.width * s)), max(1, round(im.height * s))), Image.LANCZOS).convert("RGBA")
+            a = np.asarray(im)[..., 3]
+            ys, xs = np.nonzero(a > 128)
+            canvas = Image.new("RGBA", (args.size, args.size), (0, 0, 0, 0))
+            # centred on the silhouette's bounding box (not its centre of mass) so nothing is pushed off the edge
+            canvas.alpha_composite(im, (round((args.size - (xs.min() + xs.max())) / 2), round((args.size - (ys.min() + ys.max())) / 2)))
+            dst = CUTOUTS / folder(c["group"]) / f"{c['id']}.png"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            _save_cutout(canvas, dst)
+            print(f"{c['id']}: matched to {target:.0f} deg, scale {s:.3f} -> {dst}")
+            made.append((c, dst))
+    return made
+
+
 def cmd_finish(args):
     _use_comfy_python_if_needed()
     import sprite_tools as st
     from PIL import Image, ImageDraw
     icons = load_icons()
+    adjust = load_adjust()
+    matched = {i for ids in adjust["match"].values() for i in ids}
     made = []
     zones = _finish_zones(icons, args)
     for c in select(icons, args):
         src = approved_path(c)
-        if not src.exists() or c["group"] == "zone":
+        if not src.exists() or c["group"] == "zone" or c["id"] in matched:
             continue
         # bg_hex=None: measure the background from the border (the rendered key drifts per image, see batch_runner);
         # halo off (the prompts forbid glow); margin 0.04 so the icon fills its square
         out = st.cutout_file(str(src), str(CUTOUTS / folder(c["group"])), args.size, 0.04, None, True, False, False, None)
+        if c["id"] in adjust["flip"]:
+            _save_cutout(Image.open(out).transpose(Image.FLIP_LEFT_RIGHT), Path(out))
         made.append((c, Path(out)))
+    made += _finish_matched(icons, args, adjust, st)
     # copy-only icons take the finished file of the icon they reuse
     by_key = {f"{folder(c['group'])}/{c['id']}": p for c, p in made}
     for c in select(icons, args, generated_only=False):

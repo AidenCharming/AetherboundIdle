@@ -31,16 +31,16 @@ No key colour and no cutout: backdrops are used as they are.
 
 | # | Island | Status |
 |---|---|---|
-| 1 | `whisperleaf-hollow` | [ ] |
-| 2 | `fractured-quarry` | [ ] |
-| 3 | `smoldering-caldera` | [ ] |
-| 4 | `whispering-tides` | [ ] |
-| 5 | `thunderhum-steppe` | [ ] |
-| 6 | `null-horizon` | [ ] |
-| 7 | `verdigris-canopy` | [ ] |
-| 8 | `magmaglass-rift` | [ ] |
-| 9 | `stormsea-expanse` | [ ] |
-| 10 | `zenith-spire` | [ ] |
+| 1 | `whisperleaf-hollow` | [x] approved |
+| 2 | `fractured-quarry` | [x] approved |
+| 3 | `smoldering-caldera` | [x] approved |
+| 4 | `whispering-tides` | [x] approved |
+| 5 | `thunderhum-steppe` | [x] approved |
+| 6 | `null-horizon` | [x] approved |
+| 7 | `verdigris-canopy` | [x] approved |
+| 8 | `magmaglass-rift` | [x] approved |
+| 9 | `stormsea-expanse` | [x] approved |
+| 10 | `zenith-spire` | [x] approved |
 
 ## 1. `whisperleaf-hollow`
 
@@ -71,7 +71,7 @@ A painted background for a side-view battle scene in a cute creature-collecting 
 file: `D:\AI\icons\approved\zones\whispering-tides.png` -> `godot/assets/zones/whispering-tides.jpg`
 
 ```
-A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. The edge of a floating island where streams pour off into the sky as waterfalls. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: a flat wet stone shore with shallow clear tide pools, an empty stage running straight across from edge to edge. Behind it, tall waterfalls tumbling off cliff edges at the far left and right, small floating rocks with their own waterfalls in the distance; the horizon at about 60 percent of the height. Sky: a cool evening sky of deep blue and sea green. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
+A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. The edge of a floating island where streams pour off into the sky as waterfalls. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: a wide flat wet stone shore reaching all the way to the bottom edge of the picture, with a few small shallow tide pools set level into the stone, no ledge, step or raised edge, an empty stage running straight across from edge to edge. Behind it, tall waterfalls tumbling off cliff edges at the far left and right, small floating rocks with their own waterfalls in the distance; the horizon at about 60 percent of the height. Sky: a cool evening sky of deep blue and sea green. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
 ```
 
 ## 5. `thunderhum-steppe`
@@ -95,7 +95,7 @@ A painted background for a side-view battle scene in a cute creature-collecting 
 file: `D:\AI\icons\approved\zones\verdigris-canopy.png` -> `godot/assets/zones/verdigris-canopy.jpg`
 
 ```
-A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. An enormous ancient forest of giant trees growing on a floating island. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: a wide flat platform of mossy roots, teal-green moss over old bark, an empty stage running straight across from edge to edge. Behind it, huge arching roots and giant trunks with verdigris-green bark at the far left and right, hanging vines and more giant trunks in the distance; the horizon at about 60 percent of the height. Sky: deep green light filtering down through a distant leaf canopy. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
+A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. An enormous ancient forest of giant trees growing on a floating island. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: flat mossy ground of old roots covered in teal-green moss, reaching all the way to the bottom edge of the picture, no raised ledge or edge, an empty stage running straight across from edge to edge. Behind it, huge arching roots and giant trunks with verdigris-green bark at the far left and right, hanging vines and more giant trunks in the distance; the horizon at about 60 percent of the height. Sky: deep green light filtering down through a distant leaf canopy. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
 ```
 
 ## 8. `magmaglass-rift`
@@ -119,7 +119,7 @@ A painted background for a side-view battle scene in a cute creature-collecting 
 file: `D:\AI\icons\approved\zones\zenith-spire.png` -> `godot/assets/zones/zenith-spire.jpg`
 
 ```
-A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. The top of an impossibly tall stone spire high above the clouds. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: a flat circular platform of pale stone with carved star patterns, an empty stage running straight across from edge to edge. Behind it, broken pale stone arches at the far left and right, a sea of clouds far below in the distance; the horizon at about 60 percent of the height. Sky: a deep starry night sky with a large pale moon. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
+A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital illustration style with rich colour. The wide flat summit of an impossibly tall mountain of pale stone, high above the clouds. Seen from the side at eye level. The whole bottom third of the picture is flat open ground: a wide flat floor of pale stone with carved star patterns across the whole width, reaching all the way to the bottom edge of the picture, no raised edge, an empty stage running straight across from edge to edge. Behind it, broken pale stone arches at the far left and right, a sea of dim blue-grey clouds far below in the distance, nothing standing in the middle; the horizon at about 60 percent of the height. Sky: a deep starry night sky with a large pale moon. Keep the middle of the picture open and uncluttered, and the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.
 ```
 
 ## Records

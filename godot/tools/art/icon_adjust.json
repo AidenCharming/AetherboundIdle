@@ -1,0 +1,8 @@
+{
+  "_about": "Applied by icon_runner.py finish after the cutout. flip: mirrored left-right so a family faces one way (fish face left, thread ends trail off to the right). match: each group is rotated to one shared tilt and scaled to the same visual weight, so the family reads as one set. Edit after picking a new candidate: the flip depends on which way the chosen candidate faces.",
+  "flip": ["sunfish", "gloomeel", "starfin", "cinderkoi", "gloam-thread", "moonlit-thread"],
+  "match": {
+    "logs": ["oak-log", "willow-log", "maple-log", "mangrove-log", "yew-log", "duskwood-log", "starbark-log",
+             "cinderpine-log", "thunderash-log", "crownwood-log"]
+  }
+}
