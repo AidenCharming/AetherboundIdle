@@ -9,7 +9,8 @@ collect every engine and script error, and take screenshots. `tools/bridge.py` i
 editor, or a debug export) opens it. A release export never listens. It listens on `127.0.0.1` only (port
 47625; change it with `--bridge-port=N` and the `BRIDGE_PORT` environment variable for the client).
 
-**It plays in save slot 2, named "Autoplay Slot"**, so your own saves are never touched (`new` wipes slot 2).
+**It plays in save slot 2, named "Autoplay Slot"**, so your own saves are never touched (`new` wipes slot 2, and refuses any other slot unless the request says
+`"force": true`; `load` of another slot leaves its name alone).
 
 ## Start
 
@@ -40,7 +41,7 @@ Or start the game yourself: `Godot.exe --path . -- --bridge`.
 | `scroll <x> <y> [steps]` | Mouse-wheel at a point; positive steps scroll down |
 | `key <name>` | A key press: `Escape`, `Enter`, `1` … `9` (page shortcuts), `F11` |
 | `go <screen> [arg]` | Jump to a page without clicking: `sanctum`, `skill woodcutting`, `nexus`, `pods`, `expeditions`, `aetherlog`, `inventory`, `market`, `eggmarket`, `works` |
-| `new [slot]` / `load [slot]` | Start slot 2 fresh / load it, and open the game screen |
+| `new [slot] [--force]` / `load [slot]` | Start slot 2 fresh / load it, and open the game screen. `new` refuses any other slot without `--force` (it would wipe it), and only slot 2 is renamed "Autoplay Slot" |
 | `title` | Leave to the title screen |
 | `skip <hours>` | Fast-forward as time away (the offline summary appears); returns the summary's numbers |
 | `game <method> [args…]` | Call any `Game` method, e.g. `game dev_add gold 50000`, `game dev_grant emberfang 3 20 false`, `game start_expedition whisperleaf-hollow` |

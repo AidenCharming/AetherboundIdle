@@ -34,3 +34,12 @@ func test_bridge_player_snapshot_and_goal() -> void:
 	var r := TestBridge.breed_check([[cid, cid]], 1)
 	t.eq(r[0].error, "Choose two different Aetherlings.", "breed_check reports why a pair can't breed")
 	Game.state = keep
+
+
+## "new" wipes the slot it starts, so it refuses the player's slots unless forced, and touches nothing.
+func test_bridge_new_refuses_other_slots() -> void:
+	var before := FileAccess.get_file_as_string(Game.slot_path(1)) if FileAccess.file_exists(Game.slot_path(1)) else ""
+	var res: Dictionary = await TestBridge._handle({"cmd": "new", "slot": 1})
+	t.eq(res.get("ok"), false, "refused: %s" % res)
+	t.eq(FileAccess.get_file_as_string(Game.slot_path(1)) if FileAccess.file_exists(Game.slot_path(1)) else "", before, "slot 1 untouched")
+	t.eq(Game.slot, 0, "no game started")
