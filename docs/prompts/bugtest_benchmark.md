@@ -12,8 +12,9 @@ bridge, then writes a report. The designer's whole job should be: open a termina
   It has real mouse clicks by button text (with auto-scroll), `buttons`, `state`, `get <path>`, `errors
   [since]`, `screenshot`, `go`, `key`, `skip <hours>`, `wait`, `game <method> …`, `eval`, `new`/`load` (slot 2,
   "Autoplay Slot"). There's a random-click `monkey` mode. This task adds a *purposeful* player.
-* `data/goals.json`: the tutorial goal chain (work → logs → explore → bind → team → vessel → wc10 → breed →
-  hatch → boss1 → telluric → slot2 → works → …). Each goal has a `check.kind`. The first screen after a new
+* `data/goals.json` and `scripts/sim/goals.gd`: Overseer Vance's goal chain. There are 112 goals, one active
+  at a time. `goals.index` in the save points at the active one, and `goals.id` holds its id. Each goal has a
+  `check.kind`, and `Goals.KINDS` lists every kind the game understands. The first screen after a new
   game shows a "Let's start: open Woodcutting" button (`scripts/ui/main.gd`).
 * `scripts/autoload/game.gd`: the player actions (assign, set_action, set_party, start_expedition,
   retry_pending, breed, hatch, sell, buy_upgrade, market_buy, claim_goal, …). The benchmark should reach these
@@ -62,7 +63,10 @@ bridge, then writes a report. The designer's whole job should be: open a termina
        * `zone`: stronger party and the right zone.
        * `slots`: buy a work slot.
        * `upgrades`: build something in Sanctum Works.
-       * … and the rest.
+       * `rarity`, `creature_level`, `total_level`, `skills_at`: these need no action of their own. Keep
+         breeding, fighting and working until they're done.
+       * `species`, `hybrids`, `specials`: breed different pairs.
+       * Handle every kind in `Goals.KINDS`; the chain uses all of them.
      * **Housekeeping each lap:**
        * Assign idle Aetherlings to the skill with free slots.
        * Switch skills to their best unlocked action.
