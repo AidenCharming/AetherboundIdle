@@ -97,7 +97,7 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 	b.enemies = []
 	if int(b.wave) >= int(b.waves):
 		var boss: Dictionary = z.boss
-		b.enemies.append(Combat.wild(boss.model, int(boss.level), 3, false, boss.mult, boss.name, boss.ability, int(boss.form)))
+		b.enemies.append(Combat.wild(boss.model, int(boss.level), int(boss.get("rarity", 1)), false, boss.mult, boss.name, boss.ability, int(boss.form)))
 		events.append({"type": "boss_wave", "zone": z.id})
 	else:
 		var count: int = Rng.pick(rng, z.enemiesPerWave)

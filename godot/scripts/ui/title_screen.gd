@@ -1,0 +1,217 @@
+extends Control
+## Title screen: Continue, New Game, Load Game (three save slots), Options, Credits, Quit.
+
+const GAME_SCENE := "res://scenes/main.tscn"
+
+var _overlay: Control
+var _drifters: Array = []
+var _bg: TextureRect
+var _t := 0.0
+var _fade: ColorRect
+
+
+func _ready() -> void:
+	theme = ThemeFactory.get_theme()
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var sky := SkyBackdrop.new()
+	add_child(sky)
+	_bg = TextureRect.new()
+	_bg.texture = load("res://assets/backgrounds/sanctum.jpg")
+	_bg.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_bg.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_bg.modulate = Color(1, 1, 1, 0.9)
+	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_bg)
+	_spawn_drifters()
+	var shade := ColorRect.new()
+	shade.color = Color(0.02, 0.02, 0.07, 0.35)
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(shade)
+	_build_menu()
+	_overlay = Control.new()
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_overlay)
+	Modal.layer = _overlay
+	_fade = ColorRect.new()
+	_fade.color = Color(0, 0, 0, 1)
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_fade)
+	create_tween().tween_property(_fade, "color:a", 0.0, 0.8)
+	Music.play("title")
+
+
+func _build_menu() -> void:
+	var root := UI.margin(UI.vbox(0), 96, 70, 60, 50)
+	root.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
+	root.custom_minimum_size.x = 620
+	add_child(root)
+	var col: VBoxContainer = root.get_child(0)
+	col.add_theme_constant_override("separation", 10)
+	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(UI.spacer(true))
+	var logo := UI.label("Aetherbound", "Title")
+	logo.add_theme_font_size_override("font_size", 92)
+	logo.add_theme_color_override("font_color", Color("f3f1ff"))
+	logo.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.55))
+	logo.add_theme_constant_override("shadow_outline_size", 22)
+	logo.add_theme_constant_override("shadow_offset_x", 0)
+	logo.add_theme_constant_override("shadow_offset_y", 0)
+	logo.add_theme_color_override("font_outline_color", Palette.INK)
+	logo.add_theme_constant_override("outline_size", 10)
+	col.add_child(logo)
+	var sub := UI.label("I   D   L   E", "H2", Palette.AETHER)
+	sub.add_theme_font_size_override("font_size", 24)
+	col.add_child(UI.margin(sub, 8, -14, 0, 0))
+	col.add_child(UI.label("Collect Aetherlings. Put them to work. Breed the impossible.", "Dim"))
+	col.add_child(UI.spacer(false, 26))
+	var last := _last_slot()
+	if last > 0:
+		var info := Game.slot_info(last)
+		var cont := _menu_button("Continue", "Primary", func(): _start(last, false))
+		col.add_child(cont)
+		col.add_child(UI.margin(UI.label("Slot %d · %s played · last seen %s" % [last, F.format_seconds(info.playSeconds), _ago(info.lastSeen)], "Faint"), 6, -4, 0, 6))
+	col.add_child(_menu_button("New Game", "" if last > 0 else "Primary", func(): _slots_modal("new")))
+	col.add_child(_menu_button("Load Game", "", func(): _slots_modal("load")))
+	col.add_child(_menu_button("Options", "", func(): OptionsPanel.open_modal()))
+	col.add_child(_menu_button("Credits", "", _credits))
+	if OS.get_name() != "Web":
+		col.add_child(_menu_button("Quit", "Ghost", func(): get_tree().quit()))
+	col.add_child(UI.spacer(true))
+	col.add_child(UI.label("Version %s · Godot rebuild · progress saves automatically" % ProjectSettings.get_setting("application/config/version"), "Faint"))
+
+
+func _menu_button(text: String, variation: String, cb: Callable) -> Button:
+	var b := UI.button(text, variation, cb)
+	b.custom_minimum_size = Vector2(320, 52)
+	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
+	b.add_theme_font_override("font", ThemeFactory.head_font())
+	b.add_theme_font_size_override("font_size", 21)
+	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	b.mouse_entered.connect(func(): Sfx.play("click", 1.4))
+	return b
+
+
+func _last_slot() -> int:
+	var best := 0
+	var best_time := -1.0
+	for n in range(1, Game.SLOTS + 1):
+		var info := Game.slot_info(n)
+		if not info.is_empty() and info.lastSeen > best_time:
+			best_time = info.lastSeen
+			best = n
+	return best
+
+
+func _ago(unix: float) -> String:
+	var d := Time.get_unix_time_from_system() - unix
+	if d < 90:
+		return "just now"
+	return F.format_seconds(d) + " ago"
+
+
+# ---------------------------------------------------------------- save slots
+
+func _slots_modal(mode: String) -> void:
+	var row := UI.hbox(16)
+	var m: Modal = Modal.open(row, "Choose a save slot" if mode == "new" else "Load a game", 1060)
+	_fill_slots(row, mode, m)
+
+
+func _fill_slots(row: HBoxContainer, mode: String, m: Modal) -> void:
+	UI.clear(row)
+	for n in range(1, Game.SLOTS + 1):
+		var info := Game.slot_info(n)
+		var card := UI.panel("Card")
+		card.custom_minimum_size = Vector2(320, 330)
+		var v := UI.vbox(8)
+		card.add_child(v)
+		v.add_child(UI.label("Slot %d" % n, "H2"))
+		if info.is_empty():
+			v.add_child(UI.label("Empty", "Dim"))
+			v.add_child(UI.spacer(true))
+			v.add_child(UI.wrap_label("A fresh Sanctum, one Sproutlet and five Tinker's Vessels.", "Faint"))
+			v.add_child(UI.button("Start a new game here", "Primary", func(): _start(n, true)))
+		else:
+			if info.title != "":
+				v.add_child(UI.label(info.title, "", Palette.GOLD))
+			v.add_child(UI.label("Last played %s" % _ago(info.lastSeen), "Dim"))
+			v.add_child(UI.sep())
+			v.add_child(UI.stat_line("time", "%s played" % F.format_seconds(info.playSeconds)))
+			v.add_child(UI.stat_line("nexus", "%d Aetherlings · %d species" % [info.creatures, info.species]))
+			if info.bestSkill != "":
+				v.add_child(UI.stat_line(info.bestSkill, "%s level %d" % [Data.skills[info.bestSkill].name, info.bestLevel]))
+			v.add_child(UI.stat_line("expeditions", "%d of %d islands cleared" % [info.zones, Data.zone_list.size()]))
+			v.add_child(UI.stat_line("aether", "%s Aether" % F.format_num(info.aether)))
+			v.add_child(UI.spacer(true))
+			if mode == "load":
+				v.add_child(UI.button("Load", "Primary", func(): _start(n, false)))
+			else:
+				v.add_child(UI.button("Overwrite with a new game", "Danger", func():
+					Modal.confirm("Overwrite slot %d?" % n, "This deletes the game in slot %d for good and starts over." % n, "Overwrite", func(): _start(n, true), true)))
+			v.add_child(UI.button("Delete", "Ghost", func():
+				Modal.confirm("Delete slot %d?" % n, "The save in slot %d will be gone for good." % n, "Delete", func():
+					Game.delete_slot(n)
+					_fill_slots(row, mode, m), true)))
+		row.add_child(card)
+
+
+func _start(n: int, fresh: bool) -> void:
+	Sfx.play("start")
+	mouse_filter = Control.MOUSE_FILTER_STOP
+	var tw := create_tween()
+	tw.tween_property(_fade, "color:a", 1.0, 0.45)
+	tw.tween_callback(func():
+		Game.start_slot(n, fresh)
+		get_tree().change_scene_to_file(GAME_SCENE))
+
+
+func _credits() -> void:
+	var v := UI.vbox(10)
+	v.add_child(UI.rich("[b]Aetherbound Idle[/b], rebuilt in Godot %s.\n\n" % Engine.get_version_info().string
+		+ "[b]Creature art[/b]: the designer's approved Aetherling sprites.\n"
+		+ "[b]Background[/b]: the designer's approved Sanctum background.\n"
+		+ "[b]Icons, shaders, music and sound effects[/b]: generated in code for this project.\n"
+		+ "[b]Fonts[/b]: Fredoka (The Fredoka Project Authors) and Nunito (The Nunito Project Authors), SIL Open Font License 1.1.\n"
+		+ "[b]Engine[/b]: Godot Engine, MIT licence, godotengine.org."))
+	Modal.open(v, "Credits", 620)
+
+
+# ---------------------------------------------------------------- drifting creatures
+
+func _spawn_drifters() -> void:
+	var base := Data.species_list.filter(func(s): return s.kind == "base")
+	var rng := RandomNumberGenerator.new()
+	rng.randomize()
+	for i in 7:
+		var sp: Dictionary = base[rng.randi_range(0, base.size() - 1)]
+		var depth := rng.randf_range(0.45, 1.0)
+		var p := CreaturePortrait.make(sp.id, rng.randi_range(1, 3), 1, rng.randf() < 0.15, 150.0 * depth)
+		p.plate = false
+		p.modulate = Color(0.75 + 0.25 * depth, 0.75 + 0.25 * depth, 0.9 + 0.1 * depth, 0.35 + 0.55 * depth)
+		p.set_meta("speed", rng.randf_range(10.0, 26.0) * depth)
+		p.set_meta("y", rng.randf_range(0.15, 0.85))
+		p.set_meta("phase", rng.randf() * TAU)
+		p.position.x = rng.randf_range(0.0, 1.0)
+		add_child(p)
+		_drifters.append(p)
+
+
+func _process(delta: float) -> void:
+	_t += delta
+	var vs := size
+	for p in _drifters:
+		var sp: float = p.get_meta("speed")
+		var x: float = p.position.x + sp * delta
+		if x > vs.x + 40:
+			x = -p.custom_minimum_size.x - 20
+		if p.position.x <= 1.0 and p.position.x >= 0.0 and not p.has_meta("placed"):
+			x = p.position.x * vs.x
+			p.set_meta("placed", true)
+		p.position = Vector2(x, vs.y * p.get_meta("y") + sin(_t * 0.6 + p.get_meta("phase")) * 16.0)
+	if not Options.get_value("reduce_motion"):
+		_bg.scale = Vector2.ONE * (1.04 + 0.02 * sin(_t * 0.05))
+		_bg.pivot_offset = _bg.size / 2.0

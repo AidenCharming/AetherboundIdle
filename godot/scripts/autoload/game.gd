@@ -18,6 +18,8 @@ var state: Dictionary = {}
 var rng := RandomNumberGenerator.new()
 var running := false
 var notifications: Array = []   ## [{text, icon, time}] newest first, not saved
+var last_offline_summary: Dictionary = {}  ## kept until the game screen shows it
+var battle_log: Array = []   ## recent expedition lines [{text, color}], newest first, not saved
 var unread := 0
 
 var _last_tick := 0.0
@@ -41,6 +43,8 @@ func backup_path(n: int) -> String:
 ## Applies offline progress and starts the clock.
 func start_slot(n: int, fresh := false) -> void:
 	slot = n
+	last_offline_summary = {}
+	battle_log.clear()
 	notifications.clear()
 	unread = 0
 	if fresh or not load_game():
@@ -92,6 +96,7 @@ func _process(_delta: float) -> void:
 func _apply_offline(seconds: float) -> void:
 	var summary := Offline.apply(state, seconds, rng)
 	state.lastSeen = now_sec()
+	last_offline_summary = summary
 	for e in summary.events:
 		if e.type == "evolved":
 			reveal_requested.emit("evolve", e)
@@ -100,10 +105,45 @@ func _apply_offline(seconds: float) -> void:
 	save_game()
 
 
+func _log_battle(e: Dictionary) -> void:
+	var line := ""
+	var col := Palette.TEXT_DIM
+	match e.type:
+		"captured":
+			line = "Bound a %s %s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
+				" · first of its type, free" if e.how == "guaranteed" else ""]
+			col = Data.rarity_color(e.rarity)
+		"escaped":
+			line = "A %s %s broke free%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else ""]
+			col = Palette.TEXT_FAINT
+		"boss_defeated":
+			line = "%s defeated! +%d gold" % [Data.zones[e.zone].boss.name, int(e.loot.gold)]
+			col = Palette.GOLD
+		"wiped":
+			line = "The party was overwhelmed on wave %d and is resting" % int(e.wave)
+			col = Palette.DANGER
+		"run_complete":
+			line = "Run complete. Setting out again…"
+			col = Palette.AETHER
+		"ate":
+			line = "The party ate %s" % Data.item_name(e.item)
+		"pending":
+			line = "A shiny %s is waiting: no vessel left to bind it" % Data.species[e.species].name
+			col = Palette.GOLD
+		"boss_wave":
+			line = "The boss appears!"
+			col = Palette.GOLD
+	if line != "":
+		battle_log.push_front({"text": line, "color": col, "time": now_sec()})
+		if battle_log.size() > 40:
+			battle_log.resize(40)
+
+
 func _handle(events: Array) -> void:
 	var structural := false
 	for e in events:
 		event.emit(e)
+		_log_battle(e)
 		match e.type:
 			"skill_level":
 				_notify("%s reached level %d" % [Data.skills[e.skill].name, e.level], Data.ui_icon(e.skill), Palette.GOLD)
@@ -123,7 +163,7 @@ func _handle(events: Array) -> void:
 				var sp: Dictionary = Data.species[e.species]
 				_notify("New in the Aether-Log: %s  (+%d Aether)" % [sp.name, int(e.reward.aether)], Data.ui_icon("aetherlog"), Palette.AETHER)
 			"captured":
-				_notify("Bound %s %s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, "  ✦ shiny!" if e.shiny else ""],
+				_notify("Bound %s %s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, "  (shiny!)" if e.shiny else ""],
 					Data.ui_icon("vessel"), Data.rarity_color(e.rarity))
 				Sfx.play("capture")
 				structural = true
@@ -494,6 +534,15 @@ func attune(cid: String, locked: Array) -> bool:
 	return true
 
 
+func claim_goal() -> void:
+	var g := Goals.claim(state)
+	if g.is_empty():
+		return
+	Sfx.play("level")
+	info("Goal complete: %s" % g.text, Data.ui_icon("xp"))
+	changed.emit()
+
+
 func claim_milestone(track_id: String, index: int) -> void:
 	var res := Collection.claim(state, track_id, index, rng)
 	if res.is_empty():
@@ -501,7 +550,7 @@ func claim_milestone(track_id: String, index: int) -> void:
 	Sfx.play("level")
 	for r in res.revealed:
 		_notify("A recipe hint is clearer now: %s" % Data.species[r].name, Data.ui_icon("aetherlog"), Palette.AETHER)
-	info("Milestone reward claimed", Data.ui_icon("star"))
+	info("Milestone reward claimed", Data.ui_icon("xp"))
 	changed.emit()
 
 

@@ -1,0 +1,478 @@
+class_name Main
+extends Control
+## The game shell: navigation rail, top bar, the current screen, and overlays (modals, toasts, reveals).
+
+const SCREENS := {
+	"sanctum": preload("res://scripts/ui/screens/sanctum_screen.gd"),
+	"skill": preload("res://scripts/ui/screens/skill_screen.gd"),
+	"nexus": preload("res://scripts/ui/screens/nexus_screen.gd"),
+	"pods": preload("res://scripts/ui/screens/pods_screen.gd"),
+	"expeditions": preload("res://scripts/ui/screens/expedition_screen.gd"),
+	"aetherlog": preload("res://scripts/ui/screens/aetherlog_screen.gd"),
+	"inventory": preload("res://scripts/ui/screens/inventory_screen.gd"),
+	"works": preload("res://scripts/ui/screens/works_screen.gd"),
+}
+
+static var instance: Control
+
+var current := ""
+var current_arg := ""
+var _content: Control
+var _screen: Control
+var _rail_list: VBoxContainer
+var _nav_buttons: Dictionary = {}
+var _top: Dictionary = {}
+var _overlay: Control
+var _reveal_layer: Control
+var _reveal: Reveal
+var _fade: ColorRect
+var _sky: SkyBackdrop
+var _rail_refresh := 0.0
+
+
+func _ready() -> void:
+	instance = self
+	theme = ThemeFactory.get_theme()
+	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if Game.state.is_empty():
+		Game.start_slot(1)
+	_sky = SkyBackdrop.new()
+	add_child(_sky)
+	var root := UI.hbox(0)
+	root.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(root)
+	root.add_child(_build_rail())
+	var right := UI.vbox(0)
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	root.add_child(right)
+	right.add_child(_build_top_bar())
+	_content = Control.new()
+	_content.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	_content.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_content.clip_contents = true
+	right.add_child(_content)
+	_reveal_layer = Control.new()
+	_reveal_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_reveal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_reveal_layer)
+	_overlay = Control.new()
+	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_overlay)
+	Modal.layer = _overlay
+	# toasts stack up from the bottom-right corner, clear of the top bar and the side panels' headers
+	var toasts := Toasts.new()
+	toasts.anchor_left = 1.0
+	toasts.anchor_right = 1.0
+	toasts.anchor_top = 1.0
+	toasts.anchor_bottom = 1.0
+	toasts.offset_left = -380
+	toasts.offset_right = -22
+	toasts.offset_top = -400
+	toasts.offset_bottom = -22
+	toasts.alignment = BoxContainer.ALIGNMENT_END
+	add_child(toasts)
+	_reveal = Reveal.new()
+	_reveal_layer.add_child(_reveal)
+	_fade = ColorRect.new()
+	_fade.color = Color(0, 0, 0, 1)
+	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_fade)
+	create_tween().tween_property(_fade, "color:a", 0.0, 0.6)
+
+	Game.changed.connect(_on_changed)
+	Game.offline_summary.connect(_show_summary)
+	Game.reveal_requested.connect(func(kind, data): _reveal.enqueue(kind, data))
+	Game.notifications_changed.connect(_update_bell)
+	show_screen("sanctum")
+	Music.play("sanctum")
+	if not Game.last_offline_summary.is_empty():
+		var s := Game.last_offline_summary
+		Game.last_offline_summary = {}
+		_show_summary.call_deferred(s)
+		for e in s.events:
+			if e.type == "evolved":
+				_reveal.enqueue("evolve", e)
+	if int(Game.state.counters.actions) == 0 and Game.state.creatures.size() == 1:
+		_welcome.call_deferred()
+
+
+# ---------------------------------------------------------------- navigation
+
+static func go(screen: String, arg := "") -> void:
+	if instance:
+		instance.show_screen(screen, arg)
+
+
+func show_screen(screen: String, arg := "") -> void:
+	if screen == current and arg == current_arg and _screen:
+		return
+	current = screen
+	current_arg = arg
+	if _screen:
+		_screen.queue_free()
+	var s: Control = SCREENS[screen].new()
+	s.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	if s.has_method("setup"):
+		s.setup(arg)
+	_screen = s
+	_content.add_child(s)
+	s.modulate.a = 0.0
+	create_tween().tween_property(s, "modulate:a", 1.0, 0.15)
+	_update_nav()
+	Music.play("expedition" if screen == "expeditions" else "sanctum")
+	var tint := {"expeditions": [Color(0.5, 0.25, 0.3), Color(0.2, 0.4, 0.7)], "pods": [Color(0.55, 0.3, 0.7), Color(0.2, 0.6, 0.6)],
+		"aetherlog": [Color(0.35, 0.3, 0.75), Color(0.6, 0.45, 0.2)]}
+	var tt: Array = tint.get(screen, [Color(0.25, 0.2, 0.7), Color(0.1, 0.55, 0.7)])
+	_sky.tint(tt[0], tt[1], 0.3)
+
+
+func _on_changed() -> void:
+	if _screen and _screen.has_method("refresh"):
+		_screen.refresh()
+	_refresh_rail()
+
+
+func _build_rail() -> Control:
+	var rail := UI.panel("Rail")
+	rail.custom_minimum_size.x = 236
+	var v := UI.vbox(6)
+	rail.add_child(v)
+	var logo := UI.hbox(8)
+	logo.add_child(UI.icon(Data.ui_icon("aether"), 30))
+	var name := UI.label("Aetherbound", "H2")
+	name.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
+	name.add_theme_constant_override("shadow_outline_size", 10)
+	logo.add_child(name)
+	v.add_child(UI.margin(logo, 6, 8, 0, 10))
+	_rail_list = UI.vbox(2)
+	v.add_child(UI.scroll(_rail_list))
+	var menu := UI.button("Menu", "Ghost", open_pause_menu, Data.ui_icon("settings"))
+	menu.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	v.add_child(menu)
+	_fill_rail()
+	return rail
+
+
+func _fill_rail() -> void:
+	UI.clear(_rail_list)
+	_nav_buttons.clear()
+	_nav_item("sanctum", "", "Sanctum", "sanctum")
+	_section("Skills")
+	for skill in Data.skill_list:
+		_nav_item("skill", skill.id, skill.name, skill.id)
+	_section("Creatures")
+	_nav_item("nexus", "", "Nexus", "nexus")
+	_nav_item("pods", "", "Genesis Pods", "pods")
+	_section("Adventure")
+	_nav_item("expeditions", "", "Expeditions", "expeditions")
+	_section("Collection")
+	_nav_item("aetherlog", "", "Aether-Log", "aetherlog")
+	_section("Sanctum")
+	_nav_item("inventory", "", "Inventory & Market", "inventory")
+	_nav_item("works", "", "Sanctum Works", "works")
+	_refresh_rail()
+
+
+func _section(text: String) -> void:
+	var l := UI.label(text.to_upper(), "Faint")
+	l.add_theme_font_size_override("font_size", 12)
+	_rail_list.add_child(UI.margin(l, 12, 12, 0, 2))
+
+
+func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> void:
+	var b := UI.button("", "Nav")
+	b.custom_minimum_size.y = 38
+	var h := UI.hbox(10)
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	h.offset_left = 10
+	h.offset_right = -10
+	h.add_child(UI.icon(Data.ui_icon(icon_name), 24))
+	var l := UI.label(text)
+	l.add_theme_font_override("font", ThemeFactory.bold_font())
+	l.add_theme_font_size_override("font_size", 15)
+	h.add_child(l)
+	h.add_child(UI.spacer())
+	var extra := UI.label("", "Small")
+	h.add_child(extra)
+	b.add_child(h)
+	b.pressed.connect(func(): show_screen(screen, arg))
+	_rail_list.add_child(b)
+	_nav_buttons[screen + ":" + arg] = {"button": b, "extra": extra, "label": l, "icon": h.get_child(0)}
+
+
+func _update_nav() -> void:
+	for key in _nav_buttons:
+		var b: Button = _nav_buttons[key].button
+		b.theme_type_variation = "NavActive" if key == current + ":" + current_arg else "Nav"
+
+
+func _refresh_rail() -> void:
+	if Game.state.is_empty():
+		return
+	var s := Game.state
+	for skill in Data.skill_list:
+		var nb: Dictionary = _nav_buttons.get("skill:" + skill.id, {})
+		if nb.is_empty():
+			continue
+		var workers := GameState.workers(s, skill.id).size()
+		var usable := skill.type == null or Collection.owned_type(s, skill.type)
+		nb.extra.text = "%d" % int(s.skills[skill.id].level)
+		nb.extra.add_theme_color_override("font_color", Palette.AETHER if workers > 0 else Palette.TEXT_FAINT)
+		nb.label.modulate.a = 1.0 if usable else 0.45
+		nb.icon.modulate.a = 1.0 if usable else 0.4
+		nb.button.tooltip_text = "" if usable else "Needs a %s Aetherling" % Data.types[skill.type].name
+	var pods: Dictionary = _nav_buttons["pods:"]
+	var ready := Game.ready_eggs().size()
+	pods.extra.text = "%d ready" % ready if ready > 0 else ""
+	pods.extra.add_theme_color_override("font_color", Palette.GOLD)
+	var ex: Dictionary = _nav_buttons["expeditions:"]
+	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
+		ex.extra.text = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"
+	else:
+		ex.extra.text = "%d waiting" % s.expedition.pending.size() if not s.expedition.pending.is_empty() else ""
+	ex.extra.add_theme_color_override("font_color", Palette.AETHER)
+	var log: Dictionary = _nav_buttons["aetherlog:"]
+	var claim := Collection.claimable(s).size()
+	log.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
+	log.extra.add_theme_color_override("font_color", Palette.GOLD)
+
+
+# ---------------------------------------------------------------- top bar
+
+func _build_top_bar() -> Control:
+	var bar := UI.hbox(10)
+	var m := UI.margin(bar, 18, 12, 18, 6)
+	_top.aether = _chip("aether", "Aether: your main currency. Perched Aetherlings and the Resonance Extractor make it.")
+	_top.gold = _chip("gold", "Gold: from selling items, scavenging and expeditions.")
+	_top.vessels = _chip("vessel", "Aether Vessels: bind wild Aetherlings on expeditions.")
+	_top.meals = _chip("meal", "Meals: your expedition party eats them to heal between waves.")
+	for k in ["aether", "gold", "vessels", "meals"]:
+		bar.add_child(_top[k].panel)
+	_top.vessels.panel.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: show_screen("inventory"))
+	bar.add_child(UI.spacer())
+	_top.status = UI.label("", "Dim")
+	bar.add_child(_top.status)
+	var bell := UI.button("", "Ghost", _open_notifications, Data.ui_icon("bell"))
+	bell.tooltip_text = "Notifications"
+	_top.bell = bell
+	bar.add_child(bell)
+	var menu := UI.button("", "Ghost", open_pause_menu, Data.ui_icon("settings"))
+	menu.tooltip_text = "Menu (Esc)"
+	bar.add_child(menu)
+	return m
+
+
+func _chip(icon_name: String, tip: String) -> Dictionary:
+	var p := UI.panel("Pill")
+	p.tooltip_text = tip
+	p.mouse_filter = Control.MOUSE_FILTER_PASS
+	var h := UI.hbox(8)
+	h.add_child(UI.icon(Data.ui_icon(icon_name), 24))
+	var v := UI.label("0", "Num")
+	v.add_theme_font_size_override("font_size", 18)
+	h.add_child(v)
+	var sub := UI.label("", "Faint")
+	h.add_child(sub)
+	p.add_child(h)
+	return {"panel": p, "value": v, "sub": sub}
+
+
+func _update_bell() -> void:
+	_top.bell.text = str(Game.unread) if Game.unread > 0 else ""
+
+
+func _process(delta: float) -> void:
+	if Game.state.is_empty():
+		return
+	var s := Game.state
+	_top.aether.value.text = F.format_num(float(s.aether))
+	_top.aether.sub.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
+	_top.gold.value.text = F.format_num(float(s.gold))
+	var vessels := 0.0
+	var meals := 0.0
+	for it in Data.item_list:
+		if it.category == "vessel":
+			vessels += GameState.count(s, it.id)
+		elif it.category == "meal":
+			meals += GameState.count(s, it.id)
+	_top.vessels.value.text = F.format_num(vessels)
+	_top.meals.value.text = F.format_num(meals)
+	_rail_refresh -= delta
+	if _rail_refresh <= 0.0:
+		_rail_refresh = 1.0
+		_refresh_rail()
+		var working := 0
+		for c in s.creatures.values():
+			if Creatures.job_kind(c) == "skill":
+				working += 1
+		_top.status.text = "%d working · %d perched" % [working, Economy.perched(s).size()]
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel") and not Modal.any_open() and not _reveal.active:
+		get_viewport().set_input_as_handled()
+		open_pause_menu()
+
+
+# ---------------------------------------------------------------- menus and summaries
+
+func open_pause_menu() -> void:
+	var v := UI.vbox(10)
+	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.upgrade_value(Game.state, "offline-cap")), "Faint", 380))
+	var m: Modal
+	var add := func(text: String, variation: String, cb: Callable):
+		var b := UI.button(text, variation, cb)
+		b.custom_minimum_size.y = 44
+		v.add_child(b)
+	add.call("Resume", "Primary", func(): m.close())
+	add.call("Options", "", func(): OptionsPanel.open_modal())
+	add.call("Save now", "", func():
+		Game.save_game()
+		Game.info("Saved to slot %d" % Game.slot, Data.ui_icon("xp")))
+	add.call("Back up or restore this save", "", _backup_modal)
+	add.call("Save and return to title", "", func(): _leave(false))
+	if OS.get_name() != "Web":
+		add.call("Save and quit to desktop", "Ghost", func(): _leave(true))
+	m = Modal.open(v, "Slot %d" % Game.slot, 440)
+
+
+func _leave(quit: bool) -> void:
+	Game.leave()
+	var tw := create_tween()
+	tw.tween_property(_fade, "color:a", 1.0, 0.4)
+	tw.tween_callback(func():
+		if quit:
+			get_tree().quit()
+		else:
+			get_tree().change_scene_to_file("res://scenes/title.tscn"))
+
+
+func _backup_modal() -> void:
+	var v := UI.vbox(12)
+	v.add_child(UI.wrap_label("Copy your save as text to keep it somewhere safe, or paste a saved text to restore it into this slot. Saves also live in the game's user folder:", "Dim", 560))
+	v.add_child(UI.label(ProjectSettings.globalize_path("user://"), "Faint"))
+	var te := TextEdit.new()
+	te.custom_minimum_size = Vector2(600, 150)
+	te.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
+	te.placeholder_text = "Paste a save here to restore it"
+	v.add_child(te)
+	var row := UI.hbox(10)
+	row.add_child(UI.button("Copy save to clipboard", "Primary", func():
+		DisplayServer.clipboard_set(Game.export_text())
+		Game.info("Save copied to the clipboard")))
+	row.add_child(UI.spacer())
+	row.add_child(UI.button("Restore pasted save", "Danger", func():
+		if te.text.strip_edges() == "":
+			Game.warn("Paste a save first.")
+			return
+		Modal.confirm("Restore this save?", "It replaces the game in slot %d." % Game.slot, "Restore", func():
+			var err := Game.import_text(te.text)
+			if err != "":
+				Game.warn(err)
+			else:
+				Game.info("Save restored")
+				show_screen("sanctum")
+				_fill_rail(), true)))
+	v.add_child(row)
+	Modal.open(v, "Back up or restore", 660)
+
+
+func _open_notifications() -> void:
+	Game.unread = 0
+	_update_bell()
+	var v := UI.vbox(6)
+	if Game.notifications.is_empty():
+		v.add_child(UI.label("Nothing yet. Level-ups, captures and rare finds show up here.", "Dim"))
+	for n in Game.notifications:
+		var h := UI.hbox(10)
+		if n.icon:
+			h.add_child(UI.icon(n.icon, 22))
+		h.add_child(UI.wrap_label(n.text, ""))
+		h.add_child(UI.label(F.format_seconds(Game.now_sec() - n.time) + " ago", "Faint"))
+		v.add_child(h)
+	var sc := UI.scroll(v)
+	sc.custom_minimum_size = Vector2(560, 420)
+	Modal.open(sc, "Notifications", 620)
+
+
+func _show_summary(s: Dictionary) -> void:
+	Game.last_offline_summary = {}
+	if float(s.get("used", 0.0)) < 60.0:
+		return
+	var v := UI.vbox(12)
+	var line := "You were away for %s." % F.format_seconds(s.elapsed)
+	if s.capped:
+		line += " Your Sanctum worked for the first %s (raise that with the Dream Anchor in Sanctum Works)." % F.format_seconds(s.used)
+	v.add_child(UI.wrap_label(line, "Dim", 560))
+	var cur := UI.hbox(24)
+	if s.aether > 0.5:
+		cur.add_child(UI.amount("aether", s.aether))
+	if s.gold > 0.5:
+		cur.add_child(UI.amount("gold", s.gold))
+	if s.actions > 0:
+		cur.add_child(UI.label("%s tasks finished" % F.format_num(s.actions), "Dim"))
+	v.add_child(cur)
+	if not s.gained.is_empty():
+		v.add_child(UI.label("Gathered and crafted", "H3"))
+		var f := UI.flow(14, 6)
+		var ids: Array = s.gained.keys()
+		ids.sort_custom(func(a, b): return s.gained[a] > s.gained[b])
+		for id in ids:
+			f.add_child(UI.amount(id, s.gained[id]))
+		v.add_child(f)
+	if not s.used.is_empty():
+		v.add_child(UI.label("Used up", "H3"))
+		var f2 := UI.flow(14, 6)
+		for id in s.used:
+			f2.add_child(UI.amount(id, s.used[id]))
+		v.add_child(f2)
+	if not s.levels.is_empty():
+		v.add_child(UI.label("Skill levels", "H3"))
+		for id in s.levels:
+			v.add_child(UI.stat_line(id, "%s: %d, now %d" % [Data.skills[id].name, s.levels[id][0], s.levels[id][1]]))
+	var notable := []
+	for e in s.events:
+		match e.type:
+			"captured":
+				notable.append("Bound a %s %s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else ""])
+			"evolved":
+				notable.append("%s evolved into %s" % [Data.form_name(e.species, e.from), Data.form_name(e.species, e.form)])
+			"boss_defeated":
+				if e.first:
+					notable.append("Defeated %s for the first time" % Data.zones[e.zone].boss.name)
+			"zone_unlocked":
+				notable.append("Unlocked %s" % Data.zones[e.zone].name)
+			"slot_unlocked":
+				notable.append("A new %s slot opened" % Data.skills[e.skill].name)
+	if not notable.is_empty():
+		v.add_child(UI.label("Highlights", "H3"))
+		var shown := notable.slice(0, 12)
+		for n in shown:
+			v.add_child(UI.label("•  " + n, "Dim"))
+		if notable.size() > shown.size():
+			v.add_child(UI.label("…and %d more" % (notable.size() - shown.size()), "Faint"))
+	var eggs := Game.ready_eggs().size()
+	if eggs > 0:
+		v.add_child(UI.button("%d egg%s ready to hatch" % [eggs, "" if eggs == 1 else "s"], "Gold", func(): show_screen("pods")))
+	var sc := UI.scroll(v)
+	sc.custom_minimum_size = Vector2(620, mini(560, 200 + s.gained.size() * 12 + notable.size() * 26))
+	Modal.open(sc, "Welcome back", 680)
+
+
+func _welcome() -> void:
+	var v := UI.vbox(14)
+	var h := UI.hbox(16)
+	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 120)
+	h.add_child(p)
+	h.add_child(UI.wrap_label("Welcome to your Sanctum, Architect. I'm Overseer Vance.\n\nThis little Sproutlet is your first Aetherling. "
+		+ "Put it to work chopping wood, send it exploring to bind new Aetherlings, and when you have a few, "
+		+ "breed them in the Genesis Pods for rarer ones.\n\nEverything keeps going while you're away.", "", 420))
+	v.add_child(h)
+	var m: Modal
+	v.add_child(UI.button("Let's start: open Woodcutting", "Primary", func():
+		m.close()
+		show_screen("skill", "woodcutting")))
+	m = Modal.open(v, "A new Sanctum", 620, false)

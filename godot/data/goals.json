@@ -1,0 +1,261 @@
+[
+	{
+		"id": "work",
+		"text": "Put your Sproutlet to work in Woodcutting",
+		"check": {
+			"kind": "working",
+			"skill": "woodcutting"
+		},
+		"reward": {
+			"aether": 30
+		}
+	},
+	{
+		"id": "logs",
+		"text": "Gather 10 Oak Logs",
+		"check": {
+			"kind": "item",
+			"item": "oak-log",
+			"n": 10
+		},
+		"reward": {
+			"gold": 25
+		}
+	},
+	{
+		"id": "explore",
+		"text": "Send an Aetherling exploring Whisperleaf Hollow",
+		"check": {
+			"kind": "expedition"
+		},
+		"reward": {
+			"items": {
+				"tinkerers-vessel": 2
+			}
+		}
+	},
+	{
+		"id": "bind",
+		"text": "Bind a wild Aetherling with a vessel",
+		"check": {
+			"kind": "captures",
+			"n": 1
+		},
+		"reward": {
+			"aether": 60
+		}
+	},
+	{
+		"id": "team",
+		"text": "Own 3 Aetherlings",
+		"check": {
+			"kind": "creatures",
+			"n": 3
+		},
+		"reward": {
+			"aether": 80,
+			"gold": 40
+		}
+	},
+	{
+		"id": "vessel",
+		"text": "Make a Tinker's Vessel in Fabrication (any Aetherling can)",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fabrication",
+			"n": 2
+		},
+		"reward": {
+			"items": {
+				"scrap": 5
+			}
+		}
+	},
+	{
+		"id": "wc10",
+		"text": "Reach Woodcutting level 10",
+		"check": {
+			"kind": "skill_level",
+			"skill": "woodcutting",
+			"n": 10
+		},
+		"reward": {
+			"gold": 120
+		}
+	},
+	{
+		"id": "breed",
+		"text": "Lay your first egg in a Genesis Pod",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 1
+		},
+		"reward": {
+			"aether": 150
+		}
+	},
+	{
+		"id": "hatch",
+		"text": "Hatch an egg",
+		"check": {
+			"kind": "counter",
+			"counter": "hatches",
+			"n": 1
+		},
+		"reward": {
+			"items": {
+				"tinkerers-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "boss1",
+		"text": "Defeat Old Thicketroll at the end of Whisperleaf Hollow",
+		"check": {
+			"kind": "zone",
+			"zone": "whisperleaf-hollow"
+		},
+		"reward": {
+			"gold": 200
+		}
+	},
+	{
+		"id": "telluric",
+		"text": "Bind your first Telluric Aetherling in the Fractured Quarry",
+		"check": {
+			"kind": "own_type",
+			"type": "telluric"
+		},
+		"reward": {
+			"items": {
+				"copper-ore": 20
+			}
+		}
+	},
+	{
+		"id": "slot2",
+		"text": "Open a second work slot in any skill (skill level 15)",
+		"check": {
+			"kind": "slots",
+			"n": 2
+		},
+		"reward": {
+			"aether": 400
+		}
+	},
+	{
+		"id": "works",
+		"text": "Build any upgrade in Sanctum Works",
+		"check": {
+			"kind": "upgrades",
+			"n": 1
+		},
+		"reward": {
+			"gold": 300
+		}
+	},
+	{
+		"id": "form2",
+		"text": "Evolve an Aetherling to its second form (level 20)",
+		"check": {
+			"kind": "form",
+			"n": 2
+		},
+		"reward": {
+			"aether": 500
+		}
+	},
+	{
+		"id": "species10",
+		"text": "Log 10 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 10
+		},
+		"reward": {
+			"items": {
+				"sturdy-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "boss2",
+		"text": "Defeat Granitusk in the Fractured Quarry",
+		"check": {
+			"kind": "zone",
+			"zone": "fractured-quarry"
+		},
+		"reward": {
+			"gold": 600
+		}
+	},
+	{
+		"id": "hybrid",
+		"text": "Hatch a hybrid (breed two Aetherlings of different types)",
+		"check": {
+			"kind": "hybrids",
+			"n": 1
+		},
+		"reward": {
+			"aether": 1000
+		}
+	},
+	{
+		"id": "boss3",
+		"text": "Defeat Ignis Prime in the Smoldering Caldera",
+		"check": {
+			"kind": "zone",
+			"zone": "smoldering-caldera"
+		},
+		"reward": {
+			"gold": 1500
+		}
+	},
+	{
+		"id": "boss4",
+		"text": "Defeat Leviathan Core at Whispering Tides",
+		"check": {
+			"kind": "zone",
+			"zone": "whispering-tides"
+		},
+		"reward": {
+			"items": {
+				"polished-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "boss5",
+		"text": "Defeat Stormcrest on the Thunderhum Steppe",
+		"check": {
+			"kind": "zone",
+			"zone": "thunderhum-steppe"
+		},
+		"reward": {
+			"gold": 5000
+		}
+	},
+	{
+		"id": "boss6",
+		"text": "Defeat The Aetherial Apex at Null Horizon",
+		"check": {
+			"kind": "zone",
+			"zone": "null-horizon"
+		},
+		"reward": {
+			"aether": 25000
+		}
+	},
+	{
+		"id": "special",
+		"text": "Discover a hidden special recipe",
+		"check": {
+			"kind": "specials",
+			"n": 1
+		},
+		"reward": {
+			"aether": 5000
+		}
+	}
+]

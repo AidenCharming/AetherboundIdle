@@ -5,7 +5,12 @@
 		"element": "Nature",
 		"color": "#5fcf6a",
 		"beats": "telluric",
-		"shinyHue": 150
+		"shiny": {
+			"name": "Autumn gold",
+			"dark": "#4a2408",
+			"mid": "#e3922b",
+			"light": "#fff0b3"
+		}
 	},
 	{
 		"id": "telluric",
@@ -13,7 +18,12 @@
 		"element": "Stone",
 		"color": "#b08a6e",
 		"beats": "voltaic",
-		"shinyHue": 150
+		"shiny": {
+			"name": "Rose quartz",
+			"dark": "#4a1a3a",
+			"mid": "#e0749f",
+			"light": "#ffe0ee"
+		}
 	},
 	{
 		"id": "pyric",
@@ -21,7 +31,12 @@
 		"element": "Flame",
 		"color": "#ff8f3a",
 		"beats": "verdant",
-		"shinyHue": 150
+		"shiny": {
+			"name": "Blue flame",
+			"dark": "#10164a",
+			"mid": "#3f82ff",
+			"light": "#d2f0ff"
+		}
 	},
 	{
 		"id": "aqueous",
@@ -29,7 +44,12 @@
 		"element": "Water",
 		"color": "#44a6ff",
 		"beats": "pyric",
-		"shinyHue": 150
+		"shiny": {
+			"name": "Sunset coral",
+			"dark": "#4a1030",
+			"mid": "#ff6f7a",
+			"light": "#ffe0c4"
+		}
 	},
 	{
 		"id": "voltaic",
@@ -37,7 +57,12 @@
 		"element": "Electric",
 		"color": "#ffd43b",
 		"beats": "aqueous",
-		"shinyHue": 150
+		"shiny": {
+			"name": "Neon violet",
+			"dark": "#2a0c4f",
+			"mid": "#b35cff",
+			"light": "#f3dcff"
+		}
 	},
 	{
 		"id": "void",
@@ -45,6 +70,11 @@
 		"element": "Aether",
 		"color": "#9d6bff",
 		"beats": null,
-		"shinyHue": 270
+		"shiny": {
+			"name": "Aurora teal",
+			"dark": "#06363a",
+			"mid": "#35d4b4",
+			"light": "#e0fff6"
+		}
 	}
 ]
