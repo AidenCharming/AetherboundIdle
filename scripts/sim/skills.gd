@@ -198,7 +198,6 @@ static func complete(s: Dictionary, c: Dictionary, skill_id: String, action: Dic
 	return n
 
 
-## The item of an element type at a tier (partner-element drops), or the nearest lower tier.
 ## A worker's trait bonuses on this action, as the numbers complete() actually uses (capped), for the UI:
 ## [{key, value}] plus {key: "partner_element_drop_chance", value, type} per partner drop. Speed is left
 ## out (it shows as the cooldown), and so is anything that does nothing on this action.
@@ -239,6 +238,7 @@ static func partner_drops_for(c: Dictionary, skill_id: String, action: Dictionar
 	return out
 
 
+## The item of an element type at a tier (partner-element drops), or the nearest lower tier.
 static func element_item(type_id: String, tier: int) -> String:
 	var best := ""
 	var best_tier := 0
@@ -302,7 +302,6 @@ static func unassign(s: Dictionary, c: Dictionary) -> void:
 	c.erase("stalled")
 
 
-## Expected output per hour for one worker (for the UI).
 ## What a worker would make per hour on an action, reckoned as complete() rolls it: its cooldown, the product
 ## (with extra-output rolls, online) and secondary finds (rare drop, treasure and partner-element drops).
 ## The worker picker sorts by these.
@@ -322,6 +321,7 @@ static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, aura
 	return {"cooldown": cd, "output": per * qty * (1.0 + Traits.capped_self(c, "extra_output_chance", skill_id)), "secondary": per * finds}
 
 
+## Expected output per hour for one worker (for the UI).
 static func per_hour(s: Dictionary, c: Dictionary, skill_id: String) -> Dictionary:
 	var action := current_action(s, skill_id)
 	var cd := worker_cooldown(c, skill_id, action, active_auras(s), speed(s))
