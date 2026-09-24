@@ -10,7 +10,7 @@ var _slots: HFlowContainer
 var _actions: HFlowContainer
 var _rate: VBoxContainer
 var _slot_bars: Array = []   # [{cid, bar, label}]
-var _have_labels: Dictionary = {}   # item id -> Label ("You have N"), updated live
+var _have_labels: Array = []   # [{id, label, last}] item counts on the action cards, updated live
 var _fx: Control
 
 
@@ -198,18 +198,68 @@ func _fill_actions() -> void:
 			for id in a.inputs:
 				need.add_child(UI.amount(id, float(a.inputs[id]), float(a.inputs[id]), 20))
 			cv.add_child(need)
+		# what the task makes and can drop, with how many you hold
+		cv.add_child(UI.spacer())
+		var hv := UI.vbox(4)
+		hv.add_child(UI.label("YOU HAVE", "Faint"))
+		hv.add_child(_have_row(out, ""))
 		if a.has("rare"):
-			var rr := UI.hbox(4, [UI.label("Rare:", "Faint"), UI.icon(Data.item_icon(a.rare.item), 18), UI.label("%s %s" % [Data.item_name(a.rare.item), F.pct(float(a.rare.chance))], "Faint")])
-			cv.add_child(rr)
+			hv.add_child(_have_row(a.rare.item, "Rare drop · %s" % F.pct(float(a.rare.chance))))
 		if a.has("treasure"):
-			cv.add_child(UI.hbox(4, [UI.label("Treasure:", "Faint"), UI.icon(Data.item_icon(a.treasure.item), 18), UI.label(F.pct(float(a.treasure.chance)), "Faint")]))
-		var have := UI.label("", "Faint")
-		_have_labels[out] = have
-		cv.add_child(have)
+			hv.add_child(_have_row(a.treasure.item, "Treasure · %s" % F.pct(float(a.treasure.chance))))
+		var hp := UI.panel("Inset", hv)
+		hp.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		cv.add_child(hp)
 		if not unlocked:
 			card.tooltip_text = "Reach %s level %d" % [_skill.name, int(a.level)]
 			card.modulate.a = 0.55
 		_actions.add_child(card)
+	_fit_cards.call_deferred()
+
+
+## One "You have" line: item icon, a big live count, the name and an optional drop-chance note.
+func _have_row(id: String, note: String) -> HBoxContainer:
+	var row := UI.hbox(6)
+	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	row.add_child(UI.icon(Data.item_icon(id), 26))
+	var n := UI.label("", "Num")
+	n.add_theme_font_size_override("font_size", 21)
+	n.custom_minimum_size.x = 28
+	row.add_child(n)
+	var nv := UI.vbox(-2)
+	nv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	nv.alignment = BoxContainer.ALIGNMENT_CENTER
+	var name_l := UI.label(Data.item_name(id), "Dim")
+	name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_l.clip_text = true
+	nv.add_child(name_l)
+	if note != "":
+		nv.add_child(UI.label(note, "Faint"))
+	row.add_child(nv)
+	row.tooltip_text = Data.item_name(id)
+	_have_labels.append({"id": id, "label": n, "last": -1.0})
+	_update_have()
+	return row
+
+
+## All action cards share the height of the tallest one so the row lines up.
+func _fit_cards() -> void:
+	var h := 236.0
+	for card in _actions.get_children():
+		if card.get_child_count() > 0:
+			h = maxf(h, card.get_child(0).get_combined_minimum_size().y + 24.0)
+	for card in _actions.get_children():
+		card.custom_minimum_size.y = h
+
+
+func _update_have() -> void:
+	for e in _have_labels:
+		var n := GameState.count(Game.state, e.id)
+		if n == e.last:
+			continue
+		e.last = n
+		e.label.text = F.format_num(n)
+		e.label.add_theme_color_override("font_color", Palette.TEXT if n > 0 else Palette.TEXT_FAINT)
 
 
 func _fill_rate() -> void:
@@ -240,8 +290,7 @@ func _fill_rate() -> void:
 func _process(_d: float) -> void:
 	if Game.state.is_empty():
 		return
-	for id in _have_labels:
-		_have_labels[id].text = "You have %s" % F.format_num(GameState.count(Game.state, id))
+	_update_have()
 	var sk: Dictionary = Game.state.skills[skill_id]
 	var max_lv: int = Data.tuning.skills.maxLevel
 	var lv := int(sk.level)

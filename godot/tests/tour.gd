@@ -81,7 +81,7 @@ func _run() -> void:
 	for m in Modal.layer.get_children():
 		m.queue_free()
 	await _wait(0.4)
-	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
+	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["skill", "fishing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
 		var name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
 		if not _want(name):
 			continue

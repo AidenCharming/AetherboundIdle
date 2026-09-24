@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 65 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 66 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -329,6 +329,9 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
 - **Aether-Weaving** makes threads from Aether and herbs (Void breeding material and vessel parts)
   instead of "enchanting" gear, since gear is not built. **Circuitry** makes components for Sanctum Works.
   **Fishing** has a treasure drop.
+- **Action cards end with a "You have" block**: a live count, in large type, of the thing the task makes, its
+  rare drop (with the drop chance) and, for Fishing, the treasure. The earlier layout had only a small
+  "You have N" line for the product and never showed how many rare drops you held.
 
 ## Dropped or not built
 

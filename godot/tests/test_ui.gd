@@ -159,3 +159,26 @@ func test_dialogs_draw_above_the_battle() -> void:
 	t.ok(main._overlay.z_index > arena_top + 20, "overlay z %d vs screens %d" % [main._overlay.z_index, arena_top])
 	main.free()
 	_teardown()
+
+
+func test_action_cards_show_what_you_hold() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var a: Dictionary = Data.skills.woodcutting.actions[0]
+	var out: String = a.outputs.keys()[0]
+	GameState.add_item(Game.state, out, 15)
+	GameState.add_item(Game.state, a.rare.item, 3)
+	main.show_screen("skill", "woodcutting")
+	var sk: Node = main._screen
+	sk._process(0.0)
+	var shown := {}
+	for e in sk._have_labels:
+		shown[e.id] = e.label.text
+	t.eq(shown.get(out, ""), "15", "the product count")
+	t.eq(shown.get(a.rare.item, ""), "3", "the rare drop count")
+	GameState.add_item(Game.state, a.rare.item, 1)
+	sk._process(0.0)
+	t.eq(sk._have_labels.filter(func(e): return e.id == a.rare.item)[0].label.text, "4", "counts update live")
+	main.free()
+	_teardown()
