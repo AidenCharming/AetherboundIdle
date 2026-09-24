@@ -1,3 +1,4 @@
+class_name InventoryScreen
 extends Control
 ## Inventory & Market: every item by category, with selling, shattering Aether Crystals, and the
 ## vessel shop.

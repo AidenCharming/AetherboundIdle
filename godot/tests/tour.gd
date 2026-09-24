@@ -44,6 +44,25 @@ func _run() -> void:
 		get_tree().change_scene_to_file("res://scenes/title.tscn")
 		await _wait(1.6)
 		await _shot("title")
+	if _want("fresh"):
+		Game.start_slot(3, true)
+		get_tree().change_scene_to_file("res://scenes/main.tscn")
+		await _wait(1.2)
+		await _shot("fresh_welcome")
+		for m in Modal.layer.get_children():
+			m.queue_free()
+		Main.go("skill", "woodcutting")
+		await _wait(0.3)
+		Game.assign(Game.state.creatures.keys()[0], "woodcutting")
+		await _wait(7.0)
+		await _shot("fresh_woodcutting")
+		Main.go("sanctum")
+		await _wait(4.0)
+		await _shot("fresh_sanctum")
+		Main.go("expeditions")
+		await _wait(0.6)
+		await _shot("fresh_expeditions")
+		Game.leave()
 	Game.start_slot(3, true)
 	_populate()
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
@@ -80,10 +99,104 @@ func _run() -> void:
 		await _shot("hatch_buildup")
 		await _wait(2.2)
 		await _shot("hatch_reveal")
+	if _want("smoke"):
+		await _smoke()
 	if _want("options"):
 		OptionsPanel.open_modal()
 		await _wait(0.5)
 		await _shot("options")
+
+
+## Opens every dialog and tab once so script errors show up in the log.
+func _smoke() -> void:
+	var s := Game.state
+	var main: Node = Main.instance
+	var any_c: Dictionary = s.creatures.values()[1]
+	Main.go("nexus", any_c.id)
+	await _wait(0.4)
+	var nx: Node = main._screen
+	nx._attune(any_c)
+	await _wait(0.3)
+	await _shot("smoke_attune")
+	_close_modals()
+	nx._rename(any_c)
+	await _wait(0.2)
+	_close_modals()
+	nx._release(any_c)
+	await _wait(0.2)
+	_close_modals()
+	nx._join_party(any_c)
+	for tab in ["recipes", "milestones", "dex"]:
+		Main.go("sanctum")
+		await _wait(0.1)
+		AetherlogScreen.tab = tab
+		Main.go("aetherlog")
+		await _wait(0.5)
+		await _shot("smoke_log_" + tab)
+	var log: Node = main._screen
+	log._detail(Data.species["sproutlet"])
+	await _wait(0.3)
+	await _shot("smoke_dex_detail")
+	_close_modals()
+	log._detail(Data.species["sorrelcliff"])
+	await _wait(0.2)
+	_close_modals()
+	Main.go("skill", "mining")
+	await _wait(0.3)
+	main._screen._pick("")
+	await _wait(0.4)
+	await _shot("smoke_picker")
+	_close_modals()
+	Main.go("pods")
+	await _wait(0.3)
+	var cs: Array = s.creatures.values()
+	PodsScreen.parent_a = cs[1].id
+	PodsScreen.parent_b = cs[5].id
+	main._screen.refresh()
+	await _wait(0.4)
+	await _shot("smoke_pods_pair")
+	main._screen._pick(0)
+	await _wait(0.2)
+	_close_modals()
+	Main.go("expeditions")
+	await _wait(0.3)
+	main._screen._pick_party(0)
+	await _wait(0.2)
+	_close_modals()
+	main.open_pause_menu()
+	await _wait(0.3)
+	await _shot("smoke_pause")
+	_close_modals()
+	main._backup_modal()
+	await _wait(0.2)
+	_close_modals()
+	main._open_notifications()
+	await _wait(0.2)
+	_close_modals()
+	main._show_summary(Offline.apply(s, 7200.0, Game.rng))
+	await _wait(0.4)
+	await _shot("smoke_summary")
+	_close_modals()
+	Main.go("inventory")
+	await _wait(0.2)
+	InventoryScreen.selected = "oak-log"
+	main._screen.refresh()
+	await _wait(0.3)
+	await _shot("smoke_inventory_item")
+	Game.sell("oak-log", 5)
+	Game.buy_vessel("tinkerers-vessel", 1)
+	Game.buy_upgrade("perches")
+	for i in 3:
+		Game.claim_goal()
+	for c in Collection.claimable(s):
+		Game.claim_milestone(c.track, c.index)
+	await _wait(0.3)
+
+
+func _close_modals() -> void:
+	for m in Modal.layer.get_children():
+		if m is Modal:
+			m.queue_free()
 
 
 ## A mid-game Sanctum: several species, a shiny of every type, resources, an egg in a pod.

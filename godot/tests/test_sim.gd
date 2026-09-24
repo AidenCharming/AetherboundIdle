@@ -109,7 +109,7 @@ func test_offline_matches_elapsed_over_cooldown() -> void:
 func test_offline_is_capped() -> void:
 	var s := GameState.new_game()
 	var summary := Offline.apply(s, 3600.0 * 100.0, _rng())
-	t.near(float(summary.used), 12.0 * 3600.0, 0.01)
+	t.near(float(summary.usedSeconds), 12.0 * 3600.0, 0.01)
 	t.ok(summary.capped)
 
 

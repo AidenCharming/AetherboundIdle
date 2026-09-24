@@ -1,3 +1,4 @@
+class_name AetherlogScreen
 extends Control
 ## The Aether-Log: the Creaturedex (silhouettes until found), the recipe book with hints, and the
 ## collection tracks with their milestone rewards.

@@ -29,15 +29,16 @@
 	"skills": {
 		"maxLevel": 99,
 		"xpCurve": {
-			"base": 100,
-			"growth": 1.12
+			"base": 10,
+			"growth": 1.06,
+			"power": 2.0
 		},
 		"slotLevels": [
 			1,
-			15,
-			30,
-			50,
-			75
+			10,
+			25,
+			45,
+			70
 		],
 		"secondaryAptitudeBonus": 0.15,
 		"hybridOffPrimaryEfficiency": 0.6,

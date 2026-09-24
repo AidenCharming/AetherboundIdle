@@ -10,6 +10,7 @@ var _slots: HFlowContainer
 var _actions: HFlowContainer
 var _rate: VBoxContainer
 var _slot_bars: Array = []   # [{cid, bar, label}]
+var _have_labels: Dictionary = {}   # item id -> Label ("You have N"), updated live
 var _fx: Control
 
 
@@ -133,6 +134,7 @@ func _fill_slots() -> void:
 				cv.add_child(UI.wrap_label("You need a %s Aetherling. Find one on the expedition islands." % Data.types[_skill.type].name, "Faint"))
 		else:
 			cv.alignment = BoxContainer.ALIGNMENT_CENTER
+			card.custom_minimum_size.x = 150
 			card.modulate.a = 0.5
 			cv.add_child(UI.icon(Data.ui_icon("lock"), 36))
 			var l := UI.label("Opens at level %d" % int(levels[i]), "Dim")
@@ -157,12 +159,13 @@ func _pick(replace_id: String) -> void:
 func _fill_actions() -> void:
 	var s := Game.state
 	UI.clear(_actions)
+	_have_labels.clear()
 	var current := Skills.current_action(s, skill_id)
 	for a in _skill.actions:
 		var unlocked := int(a.level) <= int(s.skills[skill_id].level)
 		var selected: bool = a.id == current.id
 		var card := UI.button("", "TileOn" if selected else "Tile")
-		card.custom_minimum_size = Vector2(250, 212)
+		card.custom_minimum_size = Vector2(250, 236)
 		card.disabled = not unlocked
 		card.pressed.connect(func(): Game.set_action(skill_id, a.id))
 		var cv := UI.vbox(6)
@@ -193,7 +196,14 @@ func _fill_actions() -> void:
 			for id in a.inputs:
 				need.add_child(UI.amount(id, float(a.inputs[id]), float(a.inputs[id]), 20))
 			cv.add_child(need)
-		cv.add_child(UI.label("You have %s" % F.format_num(GameState.count(s, out)), "Faint"))
+		if a.has("rare"):
+			var rr := UI.hbox(4, [UI.label("Rare:", "Faint"), UI.icon(Data.item_icon(a.rare.item), 18), UI.label("%s %s" % [Data.item_name(a.rare.item), F.pct(float(a.rare.chance))], "Faint")])
+			cv.add_child(rr)
+		if a.has("treasure"):
+			cv.add_child(UI.hbox(4, [UI.label("Treasure:", "Faint"), UI.icon(Data.item_icon(a.treasure.item), 18), UI.label(F.pct(float(a.treasure.chance)), "Faint")]))
+		var have := UI.label("", "Faint")
+		_have_labels[out] = have
+		cv.add_child(have)
 		if not unlocked:
 			card.tooltip_text = "Reach %s level %d" % [_skill.name, int(a.level)]
 			card.modulate.a = 0.55
@@ -228,6 +238,8 @@ func _fill_rate() -> void:
 func _process(_d: float) -> void:
 	if Game.state.is_empty():
 		return
+	for id in _have_labels:
+		_have_labels[id].text = "You have %s" % F.format_num(GameState.count(Game.state, id))
 	var sk: Dictionary = Game.state.skills[skill_id]
 	var max_lv: int = Data.tuning.skills.maxLevel
 	var lv := int(sk.level)
@@ -244,7 +256,12 @@ func _process(_d: float) -> void:
 		if c.is_empty():
 			continue
 		sb.bar.value = clampf(float(c.progress) / float(sb.cd), 0.0, 1.0)
-		sb.label.text = "Waiting for materials" if c.get("stalled", false) else "Lv %d · %s to next level" % [int(c.level), F.pct(1.0 - F.level_progress(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel))]
+		if c.get("stalled", false):
+			sb.label.text = "Waiting for materials"
+		elif int(c.level) >= int(Data.tuning.creature.maxLevel):
+			sb.label.text = "Max level"
+		else:
+			sb.label.text = "%s of the way to Lv %d" % [F.pct(F.level_progress(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel)), int(c.level) + 1]
 
 
 func _on_event(e: Dictionary) -> void:

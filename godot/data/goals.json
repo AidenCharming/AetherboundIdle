@@ -135,7 +135,7 @@
 	},
 	{
 		"id": "slot2",
-		"text": "Open a second work slot in any skill (skill level 15)",
+		"text": "Open a second work slot in any skill (skill level 10)",
 		"check": {
 			"kind": "slots",
 			"n": 2

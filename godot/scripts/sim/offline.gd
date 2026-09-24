@@ -20,7 +20,7 @@ static func apply(s: Dictionary, elapsed_sec: float, rng: RandomNumberGenerator)
 	s.awaySeconds = float(s.get("awaySeconds", 0.0)) + used
 	var summary := diff(s, before, events)
 	summary.elapsed = elapsed_sec
-	summary.used = used
+	summary.usedSeconds = used
 	summary.capped = elapsed_sec > cap
 	return summary
 

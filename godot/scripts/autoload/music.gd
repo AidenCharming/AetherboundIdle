@@ -44,9 +44,21 @@ func _exit_tree() -> void:
 		_thread.wait_to_finish()
 
 
+## Renders each track once and caches the samples in user://music/ (keyed by the track's settings), so
+## only the very first launch spends a few seconds synthesising.
 func _render_all() -> void:
+	DirAccess.make_dir_recursive_absolute("user://music")
 	for name in ["title", "sanctum", "expedition"]:
-		var stream := _render(TRACKS[name])
+		var path := "user://music/%s-%d.pcm" % [name, hash(str(TRACKS[name]) + str(RATE))]
+		var stream: AudioStreamWAV
+		if FileAccess.file_exists(path):
+			stream = _wav(FileAccess.get_file_as_bytes(path))
+		else:
+			stream = _render(TRACKS[name])
+			var f := FileAccess.open(path, FileAccess.WRITE)
+			if f:
+				f.store_buffer(stream.data)
+				f.close()
 		_mutex.lock()
 		_streams[name] = stream
 		_mutex.unlock()
@@ -129,6 +141,11 @@ func _render(t: Dictionary) -> AudioStreamWAV:
 	bytes.resize(n * 2)
 	for i in n:
 		bytes.encode_s16(i * 2, int(clampf(buf[i] * gain, -1.0, 1.0) * 32000.0))
+	return _wav(bytes)
+
+
+func _wav(bytes: PackedByteArray) -> AudioStreamWAV:
+	var n := bytes.size() / 2
 	var w := AudioStreamWAV.new()
 	w.format = AudioStreamWAV.FORMAT_16_BITS
 	w.mix_rate = RATE

@@ -7,13 +7,14 @@ static var _tables: Dictionary = {}
 
 # ---------------------------------------------------------------- XP curves
 
-## XP to go from `level` to `level + 1`.
+## XP to go from `level` to `level + 1`: base × level^power × growth^(level-1). The polynomial part keeps
+## the early game quick and the exponential part stretches the late game; power defaults to 0.
 static func xp_to_next(curve: Dictionary, level: int) -> float:
-	return roundf(curve.base * pow(curve.growth, level - 1))
+	return roundf(curve.base * pow(level, float(curve.get("power", 0.0))) * pow(curve.growth, level - 1))
 
 
 static func _table(curve: Dictionary, max_level: int) -> PackedFloat64Array:
-	var key := "%s|%s|%d" % [curve.base, curve.growth, max_level]
+	var key := "%s|%s|%s|%d" % [curve.base, curve.growth, curve.get("power", 0.0), max_level]
 	if _tables.has(key):
 		return _tables[key]
 	var t := PackedFloat64Array()

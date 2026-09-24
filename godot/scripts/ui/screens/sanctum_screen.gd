@@ -240,11 +240,11 @@ func _on_event(e: Dictionary) -> void:
 			var st: Dictionary = _stations.get(e.skill, {})
 			var b: WorkerBubble = st.get("bubbles", {}).get(e.creature)
 			if b and is_instance_valid(b):
-				var at := b.global_position - _fx.global_position + Vector2(b.size.x / 2, 0)
+				var at := b.global_position - _fx.global_position + Vector2(b.size.x * 0.75, b.size.y * 0.35)
 				for id in e.items:
 					if id.begins_with("_"):
 						continue
-					FloatText.spawn(_fx, at, "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 15)
+					FloatText.spawn(_fx, at, "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 15, 30.0)
 					break
 		"skill_level", "slot_unlocked", "captured", "evolved", "wiped", "run_complete":
 			_fill_side()

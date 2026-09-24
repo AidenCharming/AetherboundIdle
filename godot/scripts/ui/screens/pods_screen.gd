@@ -1,3 +1,4 @@
+class_name PodsScreen
 extends Control
 ## Genesis Pods: choose two parents and a material tier, see every odd, lay an egg, hatch it.
 

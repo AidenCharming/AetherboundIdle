@@ -400,12 +400,12 @@ func _open_notifications() -> void:
 
 func _show_summary(s: Dictionary) -> void:
 	Game.last_offline_summary = {}
-	if float(s.get("used", 0.0)) < 60.0:
+	if float(s.get("usedSeconds", 0.0)) < 60.0:
 		return
 	var v := UI.vbox(12)
 	var line := "You were away for %s." % F.format_seconds(s.elapsed)
 	if s.capped:
-		line += " Your Sanctum worked for the first %s (raise that with the Dream Anchor in Sanctum Works)." % F.format_seconds(s.used)
+		line += " Your Sanctum worked for the first %s (raise that with the Dream Anchor in Sanctum Works)." % F.format_seconds(s.usedSeconds)
 	v.add_child(UI.wrap_label(line, "Dim", 560))
 	var cur := UI.hbox(24)
 	if s.aether > 0.5:
