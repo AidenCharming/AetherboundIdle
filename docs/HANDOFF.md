@@ -54,6 +54,10 @@ shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in
 already running with `-- --bridge`) plays ten minutes like a player and writes a PASS/FAIL report to
 `bridge_runs/`. See `docs/TEST_BRIDGE.md` ("Scenarios"). Add `--movie` to record animation clips with Movie Maker.
 
+The last cloud run (xvfb, software renderer, seed 1, 8 h compressed) passed: 32 goals claimed in 10 minutes (on
+goal 33, `total150`), 45 screens covered, no errors, no invariant breaks, memory 77 → 82 MB. **Not yet run: `--movie`**
+(written but untested; run it locally and check the clips section of the report).
+
 What its first runs found and fixed:
 - **The Sanctum's goal card never showed Claim for item and counter goals** while you stayed on the Sanctum
   (it only rebuilt on structural changes). It now watches the goal's progress every half second.

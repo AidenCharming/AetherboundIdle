@@ -140,13 +140,13 @@ class Ctx:
 
     # ------------------------------------------------------------ Movie Maker clips
 
-    @contextlib.contextmanager
     def clip_once(self, name, settle=True):
         """A clip the first time only (and only when recording); otherwise a no-op block."""
         if not self.options.get("movie") or any(c["name"] == name for c in self.clips):
             return contextlib.nullcontext()
         return self.clip(name, settle)
 
+    @contextlib.contextmanager
     def clip(self, name, settle=True):
         """Marks the frames recorded inside the block as a clip (only with --movie). `settle`: the animation
         should be over by the clip's end, so frames still changing there get flagged."""
@@ -418,7 +418,7 @@ class Ctx:
             self.breach("memory grew %.0f%% (%.0f MB to %.0f MB)" % (mem_growth * 100, mem_start, mem_end), shot=False)
         if fps_judged and fps_sorted and fps_low < self.min_fps:
             self.breach("fps fell below %d (10th percentile %.0f, minimum %.0f)" % (self.min_fps, fps_low, fps_min), shot=False)
-        failed = bool(self.errors or self.breaks or self.game_died)
+        failed = bool(self.errors or self.breaks or self.game_died or extra.get("scenario_error"))
         data = {
             "scenario": scenario, "result": "FAIL" if failed else "PASS", "seed": self.seed,
             "minutes_asked": self.minutes, "real_seconds": round(self.elapsed(), 1),
@@ -527,6 +527,8 @@ def render_md(d):
         reasons.append("%d invariant break%s" % (len(d["invariant_breaks"]), "" if len(d["invariant_breaks"]) == 1 else "s"))
     if d["game_died"]:
         reasons.append("the game exited: %s" % d["game_exit_note"])
+    if d.get("scenario_error"):
+        reasons.append("the scenario script crashed (a bug in the benchmark, not the game): %s" % d["scenario_error"].strip().splitlines()[-1])
     w(("**Why it failed:** " + "; ".join(reasons) + "\n") if reasons else "No errors, no invariant breaks.\n")
     last = d["goals"][-1] if d["goals"] else None
     w("- Played %s real (asked for %s min), seed %s, %d steps." % (_fmt_s(d["real_seconds"]), d["minutes_asked"], d["seed"], d["steps"]))
