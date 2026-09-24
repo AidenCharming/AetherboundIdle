@@ -275,9 +275,20 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   modelling a team that grows as slots open against targets: first level in seconds, level 10 in about
   half an hour, 30 in about 8 hours, 50 in about 2 days, 99 in about two months for a full team.
   `tests/test_pacing.gd` guards the lone-starter landmarks.
-- **Five action tiers in every skill, at levels 1/10/25/45/70**, and **work slots at the same levels**, so
-  each new tier comes with a new worker. The reference spread five slots over a year of play
-  (1/50/100/165/225), which left the roster with nothing to do for months.
+- **Ten material tiers, one per island** (designer's request; names approved by the designer), unlocking at
+  skill levels 1/10/20/.../90:
+  - **Which skills:** the five gathering skills, and Smithing, Cooking, Circuitry and Aether-Weaving.
+  - **Recipes:** bars take ore ×2 plus a log a tier down, meals take a fish plus a herb a tier down,
+    components take a bar plus salvage, and threads take Aether plus a herb.
+  - **Islands:** island *n* drops tier-*n* materials, and its boss drops a stack of them plus that tier's bars.
+  - **Unchanged:** Vessel Crafting and Fabrication keep their products (the vessel ladder and the Sanctum
+    parts).
+  - **Work slots** still open at 1/10/25/45/70. The reference spread five slots over a year of play
+    (1/50/100/165/225), which left the roster with nothing to do for months.
+  - **Prices:** every crafted item sells for at least 1.25× its inputs (`test_market_prices`). Thread prices
+    also count the Aether they cost.
+  - **Icons:** placeholder icons come from `tools/make_icons.py`. The FLUX prompts are in
+    `docs/art-prompts-icons.md`.
 - **Creature max level 60, forms at 20 and 40** (reference 99, 30 and 60), so evolutions (with their
   reveal) happen in the first sessions. **Working creatures earn half the skill XP they produce**; the
   reference only gave combat XP, so a creature that never fought never evolved.

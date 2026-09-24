@@ -45,7 +45,7 @@
 		"loot": [
 			{
 				"item": "oak-log",
-				"chance": 0.5,
+				"chance": 0.4,
 				"qty": [
 					1,
 					3
@@ -53,7 +53,7 @@
 			},
 			{
 				"item": "mintleaf",
-				"chance": 0.4,
+				"chance": 0.3,
 				"qty": [
 					1,
 					2
@@ -61,7 +61,7 @@
 			},
 			{
 				"item": "scrap",
-				"chance": 0.3,
+				"chance": 0.25,
 				"qty": [
 					1,
 					2
@@ -76,7 +76,8 @@
 			"gold": 60,
 			"items": {
 				"tinkerers-vessel": 2,
-				"willow-log": 5
+				"oak-log": 7,
+				"copper-bar": 2
 			}
 		},
 		"unlockAfter": null
@@ -127,27 +128,27 @@
 		},
 		"loot": [
 			{
-				"item": "copper-ore",
-				"chance": 0.5,
+				"item": "iron-ore",
+				"chance": 0.4,
 				"qty": [
 					1,
 					3
 				]
 			},
 			{
-				"item": "iron-ore",
-				"chance": 0.25,
+				"item": "sunpetal",
+				"chance": 0.3,
 				"qty": [
 					1,
 					2
 				]
 			},
 			{
-				"item": "scrap",
-				"chance": 0.3,
+				"item": "spring",
+				"chance": 0.25,
 				"qty": [
 					1,
-					3
+					2
 				]
 			}
 		],
@@ -159,7 +160,8 @@
 			"gold": 180,
 			"items": {
 				"sturdy-vessel": 2,
-				"iron-ore": 10
+				"iron-ore": 9,
+				"iron-bar": 3
 			}
 		},
 		"unlockAfter": "whisperleaf-hollow"
@@ -212,6 +214,14 @@
 		"loot": [
 			{
 				"item": "sunstone",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "glowcap",
 				"chance": 0.3,
 				"qty": [
 					1,
@@ -219,16 +229,8 @@
 				]
 			},
 			{
-				"item": "maple-log",
-				"chance": 0.3,
-				"qty": [
-					1,
-					2
-				]
-			},
-			{
-				"item": "spring",
-				"chance": 0.3,
+				"item": "glass-lens",
+				"chance": 0.25,
 				"qty": [
 					1,
 					2
@@ -243,7 +245,8 @@
 			"gold": 450,
 			"items": {
 				"sturdy-vessel": 3,
-				"sunstone": 10
+				"sunstone": 11,
+				"sunsteel-bar": 3
 			}
 		},
 		"unlockAfter": "fractured-quarry"
@@ -295,7 +298,15 @@
 		},
 		"loot": [
 			{
-				"item": "bubblepuff",
+				"item": "coralback",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "tidewort",
 				"chance": 0.3,
 				"qty": [
 					1,
@@ -303,15 +314,7 @@
 				]
 			},
 			{
-				"item": "glowcap",
-				"chance": 0.3,
-				"qty": [
-					1,
-					2
-				]
-			},
-			{
-				"item": "glass-lens",
+				"item": "brass-gear",
 				"chance": 0.25,
 				"qty": [
 					1,
@@ -327,7 +330,8 @@
 			"gold": 900,
 			"items": {
 				"polished-vessel": 3,
-				"lanternfish": 8
+				"coralback": 13,
+				"tidesilver-bar": 4
 			}
 		},
 		"unlockAfter": "smoldering-caldera"
@@ -379,23 +383,23 @@
 		},
 		"loot": [
 			{
-				"item": "skyquartz",
-				"chance": 0.3,
-				"qty": [
-					1,
-					2
-				]
-			},
-			{
-				"item": "yew-log",
-				"chance": 0.3,
-				"qty": [
-					1,
-					2
-				]
-			},
-			{
 				"item": "clockwork-heart",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "dreamroot",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "skyquartz",
 				"chance": 0.25,
 				"qty": [
 					1,
@@ -411,7 +415,8 @@
 			"gold": 1600,
 			"items": {
 				"polished-vessel": 4,
-				"skyquartz": 10
+				"clockwork-heart": 15,
+				"skysteel-bar": 4
 			}
 		},
 		"unlockAfter": "whispering-tides"
@@ -469,7 +474,15 @@
 		},
 		"loot": [
 			{
-				"item": "aetherite",
+				"item": "null-prism",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "nullshade",
 				"chance": 0.3,
 				"qty": [
 					1,
@@ -477,7 +490,7 @@
 				]
 			},
 			{
-				"item": "starglass",
+				"item": "nullite",
 				"chance": 0.25,
 				"qty": [
 					1,
@@ -486,7 +499,7 @@
 			},
 			{
 				"item": "aether-crystal",
-				"chance": 0.1,
+				"chance": 0.08,
 				"qty": [
 					1,
 					1
@@ -501,7 +514,8 @@
 			"gold": 3000,
 			"items": {
 				"resonant-vessel": 3,
-				"aetherite": 12
+				"null-prism": 17,
+				"nullsteel-bar": 5
 			}
 		},
 		"firstClearCreature": {
@@ -563,10 +577,10 @@
 		"loot": [
 			{
 				"item": "starbark-log",
-				"chance": 0.3,
+				"chance": 0.4,
 				"qty": [
 					1,
-					2
+					3
 				]
 			},
 			{
@@ -578,8 +592,16 @@
 				]
 			},
 			{
+				"item": "starglass",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
 				"item": "aether-crystal",
-				"chance": 0.1,
+				"chance": 0.095,
 				"qty": [
 					1,
 					1
@@ -594,7 +616,8 @@
 			"gold": 5000,
 			"items": {
 				"luminescent-vessel": 2,
-				"starbark-log": 15
+				"starbark-log": 19,
+				"aether-ingot": 5
 			}
 		},
 		"firstClearCreature": {
@@ -657,15 +680,23 @@
 		},
 		"loot": [
 			{
-				"item": "aetherite",
-				"chance": 0.35,
+				"item": "magmite",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "firelily",
+				"chance": 0.3,
 				"qty": [
 					1,
 					2
 				]
 			},
 			{
-				"item": "starglass",
+				"item": "magmaglass-shard",
 				"chance": 0.25,
 				"qty": [
 					1,
@@ -674,7 +705,7 @@
 			},
 			{
 				"item": "aether-crystal",
-				"chance": 0.1,
+				"chance": 0.11,
 				"qty": [
 					1,
 					1
@@ -689,7 +720,8 @@
 			"gold": 8000,
 			"items": {
 				"luminescent-vessel": 3,
-				"aetherite": 15
+				"magmite": 21,
+				"magmasteel-bar": 6
 			}
 		},
 		"firstClearCreature": {
@@ -752,15 +784,23 @@
 		},
 		"loot": [
 			{
-				"item": "starfin",
-				"chance": 0.35,
+				"item": "stormray",
+				"chance": 0.4,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "stormsage",
+				"chance": 0.3,
 				"qty": [
 					1,
 					2
 				]
 			},
 			{
-				"item": "starglass",
+				"item": "thunder-cell",
 				"chance": 0.25,
 				"qty": [
 					1,
@@ -769,7 +809,7 @@
 			},
 			{
 				"item": "aether-crystal",
-				"chance": 0.12,
+				"chance": 0.125,
 				"qty": [
 					1,
 					1
@@ -784,7 +824,8 @@
 			"gold": 12000,
 			"items": {
 				"luminescent-vessel": 3,
-				"starfin": 15
+				"stormray": 23,
+				"stormsteel-bar": 6
 			}
 		},
 		"firstClearCreature": {
@@ -850,24 +891,32 @@
 		},
 		"loot": [
 			{
-				"item": "aetherite",
-				"chance": 0.3,
+				"item": "zenith-compass",
+				"chance": 0.4,
 				"qty": [
 					1,
 					3
 				]
 			},
 			{
-				"item": "aetherbloom",
+				"item": "skylotus",
 				"chance": 0.3,
 				"qty": [
 					1,
-					3
+					2
+				]
+			},
+			{
+				"item": "celestine",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
 				]
 			},
 			{
 				"item": "aether-crystal",
-				"chance": 0.15,
+				"chance": 0.14,
 				"qty": [
 					1,
 					2
@@ -882,6 +931,8 @@
 			"gold": 20000,
 			"items": {
 				"luminescent-vessel": 5,
+				"zenith-compass": 25,
+				"celestine-ingot": 7,
 				"aether-crystal": 5
 			}
 		},

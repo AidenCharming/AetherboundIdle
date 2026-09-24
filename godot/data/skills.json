@@ -25,8 +25,8 @@
 				"id": "willow-log",
 				"name": "Willow Tree",
 				"level": 10,
-				"ms": 4000,
-				"xp": 10,
+				"ms": 3600,
+				"xp": 9,
 				"outputs": {
 					"willow-log": 1
 				},
@@ -38,9 +38,9 @@
 			{
 				"id": "maple-log",
 				"name": "Maple Tree",
-				"level": 25,
-				"ms": 5000,
-				"xp": 18,
+				"level": 20,
+				"ms": 4200,
+				"xp": 15,
 				"outputs": {
 					"maple-log": 1
 				},
@@ -50,10 +50,24 @@
 				}
 			},
 			{
+				"id": "mangrove-log",
+				"name": "Mangrove Tree",
+				"level": 30,
+				"ms": 4800,
+				"xp": 22,
+				"outputs": {
+					"mangrove-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "yew-log",
 				"name": "Yew Tree",
-				"level": 45,
-				"ms": 6000,
+				"level": 40,
+				"ms": 5400,
 				"xp": 30,
 				"outputs": {
 					"yew-log": 1
@@ -64,13 +78,69 @@
 				}
 			},
 			{
+				"id": "duskwood-log",
+				"name": "Duskwood Tree",
+				"level": 50,
+				"ms": 6000,
+				"xp": 40,
+				"outputs": {
+					"duskwood-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "starbark-log",
 				"name": "Starbark Tree",
-				"level": 70,
-				"ms": 7500,
-				"xp": 50,
+				"level": 60,
+				"ms": 6600,
+				"xp": 52,
 				"outputs": {
 					"starbark-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "cinderpine-log",
+				"name": "Cinderpine Tree",
+				"level": 70,
+				"ms": 7200,
+				"xp": 66,
+				"outputs": {
+					"cinderpine-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "thunderash-log",
+				"name": "Thunderash Tree",
+				"level": 80,
+				"ms": 7800,
+				"xp": 82,
+				"outputs": {
+					"thunderash-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "crownwood-log",
+				"name": "Crownwood Tree",
+				"level": 90,
+				"ms": 8400,
+				"xp": 100,
+				"outputs": {
+					"crownwood-log": 1
 				},
 				"rare": {
 					"item": "seedcache",
@@ -105,8 +175,8 @@
 				"id": "sunpetal",
 				"name": "Sunpetal Bed",
 				"level": 10,
-				"ms": 4000,
-				"xp": 10,
+				"ms": 3600,
+				"xp": 9,
 				"outputs": {
 					"sunpetal": 1
 				},
@@ -118,9 +188,9 @@
 			{
 				"id": "glowcap",
 				"name": "Glowcap Ring",
-				"level": 25,
-				"ms": 5000,
-				"xp": 18,
+				"level": 20,
+				"ms": 4200,
+				"xp": 15,
 				"outputs": {
 					"glowcap": 1
 				},
@@ -130,10 +200,24 @@
 				}
 			},
 			{
+				"id": "tidewort",
+				"name": "Tidewort Marsh",
+				"level": 30,
+				"ms": 4800,
+				"xp": 22,
+				"outputs": {
+					"tidewort": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "dreamroot",
 				"name": "Dreamroot Hollow",
-				"level": 45,
-				"ms": 6000,
+				"level": 40,
+				"ms": 5400,
 				"xp": 30,
 				"outputs": {
 					"dreamroot": 1
@@ -144,13 +228,69 @@
 				}
 			},
 			{
+				"id": "nullshade",
+				"name": "Nullshade Grotto",
+				"level": 50,
+				"ms": 6000,
+				"xp": 40,
+				"outputs": {
+					"nullshade": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "aetherbloom",
 				"name": "Aetherbloom Garden",
-				"level": 70,
-				"ms": 7500,
-				"xp": 50,
+				"level": 60,
+				"ms": 6600,
+				"xp": 52,
 				"outputs": {
 					"aetherbloom": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "firelily",
+				"name": "Firelily Field",
+				"level": 70,
+				"ms": 7200,
+				"xp": 66,
+				"outputs": {
+					"firelily": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "stormsage",
+				"name": "Stormsage Bluff",
+				"level": 80,
+				"ms": 7800,
+				"xp": 82,
+				"outputs": {
+					"stormsage": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "skylotus",
+				"name": "Skylotus Terrace",
+				"level": 90,
+				"ms": 8400,
+				"xp": 100,
+				"outputs": {
+					"skylotus": 1
 				},
 				"rare": {
 					"item": "lucky-clover",
@@ -185,8 +325,8 @@
 				"id": "iron-ore",
 				"name": "Iron Vein",
 				"level": 10,
-				"ms": 4000,
-				"xp": 10,
+				"ms": 3600,
+				"xp": 9,
 				"outputs": {
 					"iron-ore": 1
 				},
@@ -198,9 +338,9 @@
 			{
 				"id": "sunstone",
 				"name": "Sunstone Seam",
-				"level": 25,
-				"ms": 5000,
-				"xp": 18,
+				"level": 20,
+				"ms": 4200,
+				"xp": 15,
 				"outputs": {
 					"sunstone": 1
 				},
@@ -210,10 +350,24 @@
 				}
 			},
 			{
+				"id": "tidesilver-ore",
+				"name": "Tidesilver Vein",
+				"level": 30,
+				"ms": 4800,
+				"xp": 22,
+				"outputs": {
+					"tidesilver-ore": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "skyquartz",
 				"name": "Skyquartz Cluster",
-				"level": 45,
-				"ms": 6000,
+				"level": 40,
+				"ms": 5400,
 				"xp": 30,
 				"outputs": {
 					"skyquartz": 1
@@ -224,13 +378,69 @@
 				}
 			},
 			{
+				"id": "nullite",
+				"name": "Nullite Seam",
+				"level": 50,
+				"ms": 6000,
+				"xp": 40,
+				"outputs": {
+					"nullite": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
 				"id": "aetherite",
 				"name": "Aetherite Core",
-				"level": 70,
-				"ms": 7500,
-				"xp": 50,
+				"level": 60,
+				"ms": 6600,
+				"xp": 52,
 				"outputs": {
 					"aetherite": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "magmite",
+				"name": "Magmite Flow",
+				"level": 70,
+				"ms": 7200,
+				"xp": 66,
+				"outputs": {
+					"magmite": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "fulgurite",
+				"name": "Fulgurite Strike",
+				"level": 80,
+				"ms": 7800,
+				"xp": 82,
+				"outputs": {
+					"fulgurite": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "celestine",
+				"name": "Celestine Geode",
+				"level": 90,
+				"ms": 8400,
+				"xp": 100,
+				"outputs": {
+					"celestine": 1
 				},
 				"rare": {
 					"item": "heartgeode",
@@ -269,8 +479,8 @@
 				"id": "sunfish",
 				"name": "Sunfish Pool",
 				"level": 10,
-				"ms": 4000,
-				"xp": 10,
+				"ms": 3600,
+				"xp": 9,
 				"outputs": {
 					"sunfish": 1
 				},
@@ -286,9 +496,9 @@
 			{
 				"id": "bubblepuff",
 				"name": "Bubblepuff Reef",
-				"level": 25,
-				"ms": 5000,
-				"xp": 18,
+				"level": 20,
+				"ms": 4200,
+				"xp": 15,
 				"outputs": {
 					"bubblepuff": 1
 				},
@@ -302,10 +512,28 @@
 				}
 			},
 			{
+				"id": "coralback",
+				"name": "Coralback Shoals",
+				"level": 30,
+				"ms": 4800,
+				"xp": 22,
+				"outputs": {
+					"coralback": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
 				"id": "lanternfish",
 				"name": "Lantern Deep",
-				"level": 45,
-				"ms": 6000,
+				"level": 40,
+				"ms": 5400,
 				"xp": 30,
 				"outputs": {
 					"lanternfish": 1
@@ -320,13 +548,85 @@
 				}
 			},
 			{
+				"id": "gloomeel",
+				"name": "Gloomeel Trench",
+				"level": 50,
+				"ms": 6000,
+				"xp": 40,
+				"outputs": {
+					"gloomeel": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
 				"id": "starfin",
 				"name": "Starfin Current",
-				"level": 70,
-				"ms": 7500,
-				"xp": 50,
+				"level": 60,
+				"ms": 6600,
+				"xp": 52,
 				"outputs": {
 					"starfin": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "cinderkoi",
+				"name": "Cinderkoi Springs",
+				"level": 70,
+				"ms": 7200,
+				"xp": 66,
+				"outputs": {
+					"cinderkoi": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "stormray",
+				"name": "Stormray Squall",
+				"level": 80,
+				"ms": 7800,
+				"xp": 82,
+				"outputs": {
+					"stormray": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "skymarlin",
+				"name": "Skymarlin Cloudstream",
+				"level": 90,
+				"ms": 8400,
+				"xp": 100,
+				"outputs": {
+					"skymarlin": 1
 				},
 				"rare": {
 					"item": "moonpearl",
@@ -366,8 +666,8 @@
 				"id": "spring",
 				"name": "Broken Carts",
 				"level": 10,
-				"ms": 4000,
-				"xp": 10,
+				"ms": 3600,
+				"xp": 9,
 				"outputs": {
 					"spring": 1
 				},
@@ -380,9 +680,9 @@
 			{
 				"id": "glass-lens",
 				"name": "Old Observatory",
-				"level": 25,
-				"ms": 5000,
-				"xp": 18,
+				"level": 20,
+				"ms": 4200,
+				"xp": 15,
 				"outputs": {
 					"glass-lens": 1
 				},
@@ -390,13 +690,28 @@
 					"item": "tinkers-cache",
 					"chance": 0.01
 				},
-				"gold": 4
+				"gold": 3
+			},
+			{
+				"id": "brass-gear",
+				"name": "Shipwreck Cove",
+				"level": 30,
+				"ms": 4800,
+				"xp": 22,
+				"outputs": {
+					"brass-gear": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 5
 			},
 			{
 				"id": "clockwork-heart",
 				"name": "Clocktower Ruin",
-				"level": 45,
-				"ms": 6000,
+				"level": 40,
+				"ms": 5400,
 				"xp": 30,
 				"outputs": {
 					"clockwork-heart": 1
@@ -408,11 +723,26 @@
 				"gold": 7
 			},
 			{
+				"id": "null-prism",
+				"name": "Hollow Vault",
+				"level": 50,
+				"ms": 6000,
+				"xp": 40,
+				"outputs": {
+					"null-prism": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 10
+			},
+			{
 				"id": "starglass",
 				"name": "Fallen Star Site",
-				"level": 70,
-				"ms": 7500,
-				"xp": 50,
+				"level": 60,
+				"ms": 6600,
+				"xp": 52,
 				"outputs": {
 					"starglass": 1
 				},
@@ -420,7 +750,52 @@
 					"item": "tinkers-cache",
 					"chance": 0.01
 				},
-				"gold": 12
+				"gold": 13
+			},
+			{
+				"id": "magmaglass-shard",
+				"name": "Glassworks Ruin",
+				"level": 70,
+				"ms": 7200,
+				"xp": 66,
+				"outputs": {
+					"magmaglass-shard": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 17
+			},
+			{
+				"id": "thunder-cell",
+				"name": "Storm Beacon Wreck",
+				"level": 80,
+				"ms": 7800,
+				"xp": 82,
+				"outputs": {
+					"thunder-cell": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 22
+			},
+			{
+				"id": "zenith-compass",
+				"name": "Skyship Wreck",
+				"level": 90,
+				"ms": 8400,
+				"xp": 100,
+				"outputs": {
+					"zenith-compass": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 28
 			}
 		]
 	},
@@ -453,8 +828,8 @@
 				"id": "iron-bar",
 				"name": "Iron Bar",
 				"level": 10,
-				"ms": 4500,
-				"xp": 14,
+				"ms": 4100,
+				"xp": 12,
 				"inputs": {
 					"iron-ore": 2,
 					"oak-log": 1
@@ -470,9 +845,9 @@
 			{
 				"id": "sunsteel-bar",
 				"name": "Sunsteel Bar",
-				"level": 25,
-				"ms": 5500,
-				"xp": 25,
+				"level": 20,
+				"ms": 4700,
+				"xp": 20,
 				"inputs": {
 					"sunstone": 2,
 					"willow-log": 1
@@ -486,14 +861,32 @@
 				}
 			},
 			{
+				"id": "tidesilver-bar",
+				"name": "Tidesilver Bar",
+				"level": 30,
+				"ms": 5300,
+				"xp": 29,
+				"inputs": {
+					"tidesilver-ore": 2,
+					"maple-log": 1
+				},
+				"outputs": {
+					"tidesilver-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "skysteel-bar",
 				"name": "Skysteel Bar",
-				"level": 45,
-				"ms": 6500,
+				"level": 40,
+				"ms": 5900,
 				"xp": 40,
 				"inputs": {
 					"skyquartz": 2,
-					"maple-log": 1
+					"mangrove-log": 1
 				},
 				"outputs": {
 					"skysteel-bar": 1
@@ -504,17 +897,89 @@
 				}
 			},
 			{
-				"id": "aether-ingot",
-				"name": "Aether Ingot",
-				"level": 70,
-				"ms": 8000,
-				"xp": 65,
+				"id": "nullsteel-bar",
+				"name": "Nullsteel Bar",
+				"level": 50,
+				"ms": 6500,
+				"xp": 52,
 				"inputs": {
-					"aetherite": 2,
+					"nullite": 2,
 					"yew-log": 1
 				},
 				"outputs": {
+					"nullsteel-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "aether-ingot",
+				"name": "Aether Ingot",
+				"level": 60,
+				"ms": 7100,
+				"xp": 66,
+				"inputs": {
+					"aetherite": 2,
+					"duskwood-log": 1
+				},
+				"outputs": {
 					"aether-ingot": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "magmasteel-bar",
+				"name": "Magmasteel Bar",
+				"level": 70,
+				"ms": 7700,
+				"xp": 82,
+				"inputs": {
+					"magmite": 2,
+					"starbark-log": 1
+				},
+				"outputs": {
+					"magmasteel-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "stormsteel-bar",
+				"name": "Stormsteel Bar",
+				"level": 80,
+				"ms": 8300,
+				"xp": 100,
+				"inputs": {
+					"fulgurite": 2,
+					"cinderpine-log": 1
+				},
+				"outputs": {
+					"stormsteel-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "celestine-ingot",
+				"name": "Celestine Ingot",
+				"level": 90,
+				"ms": 9000,
+				"xp": 120,
+				"inputs": {
+					"celestine": 2,
+					"thunderash-log": 1
+				},
+				"outputs": {
+					"celestine-ingot": 1
 				},
 				"rare": {
 					"item": "aether-crystal",
@@ -535,8 +1000,8 @@
 				"id": "grilled-minnow",
 				"name": "Grilled Minnow",
 				"level": 1,
-				"ms": 3000,
-				"xp": 6,
+				"ms": 3500,
+				"xp": 7,
 				"inputs": {
 					"minnow": 1
 				},
@@ -552,8 +1017,8 @@
 				"id": "herb-sunfish",
 				"name": "Herbed Sunfish",
 				"level": 10,
-				"ms": 4500,
-				"xp": 14,
+				"ms": 4100,
+				"xp": 12,
 				"inputs": {
 					"sunfish": 1,
 					"mintleaf": 1
@@ -569,9 +1034,9 @@
 			{
 				"id": "bubble-stew",
 				"name": "Bubblepuff Stew",
-				"level": 25,
-				"ms": 5500,
-				"xp": 25,
+				"level": 20,
+				"ms": 4700,
+				"xp": 20,
 				"inputs": {
 					"bubblepuff": 1,
 					"sunpetal": 1
@@ -585,14 +1050,32 @@
 				}
 			},
 			{
+				"id": "coralback-skewer",
+				"name": "Coralback Skewer",
+				"level": 30,
+				"ms": 5300,
+				"xp": 29,
+				"inputs": {
+					"coralback": 1,
+					"glowcap": 1
+				},
+				"outputs": {
+					"coralback-skewer": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "lantern-roll",
 				"name": "Lantern Roll",
-				"level": 45,
-				"ms": 6500,
+				"level": 40,
+				"ms": 5900,
 				"xp": 40,
 				"inputs": {
 					"lanternfish": 1,
-					"glowcap": 1
+					"tidewort": 1
 				},
 				"outputs": {
 					"lantern-roll": 1
@@ -603,17 +1086,89 @@
 				}
 			},
 			{
-				"id": "starfin-feast",
-				"name": "Starfin Feast",
-				"level": 70,
-				"ms": 8000,
-				"xp": 65,
+				"id": "gloomeel-pie",
+				"name": "Gloomeel Pie",
+				"level": 50,
+				"ms": 6500,
+				"xp": 52,
 				"inputs": {
-					"starfin": 1,
+					"gloomeel": 1,
 					"dreamroot": 1
 				},
 				"outputs": {
+					"gloomeel-pie": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "starfin-feast",
+				"name": "Starfin Feast",
+				"level": 60,
+				"ms": 7100,
+				"xp": 66,
+				"inputs": {
+					"starfin": 1,
+					"nullshade": 1
+				},
+				"outputs": {
 					"starfin-feast": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "cinderkoi-curry",
+				"name": "Cinderkoi Curry",
+				"level": 70,
+				"ms": 7700,
+				"xp": 82,
+				"inputs": {
+					"cinderkoi": 1,
+					"aetherbloom": 1
+				},
+				"outputs": {
+					"cinderkoi-curry": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "stormray-chowder",
+				"name": "Stormray Chowder",
+				"level": 80,
+				"ms": 8300,
+				"xp": 100,
+				"inputs": {
+					"stormray": 1,
+					"firelily": 1
+				},
+				"outputs": {
+					"stormray-chowder": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "skymarlin-banquet",
+				"name": "Skymarlin Banquet",
+				"level": 90,
+				"ms": 9000,
+				"xp": 120,
+				"inputs": {
+					"skymarlin": 1,
+					"stormsage": 1
+				},
+				"outputs": {
+					"skymarlin-banquet": 1
 				},
 				"rare": {
 					"item": "aether-crystal",
@@ -652,8 +1207,8 @@
 				"id": "iron-capacitor",
 				"name": "Iron Capacitor",
 				"level": 10,
-				"ms": 4500,
-				"xp": 14,
+				"ms": 4100,
+				"xp": 12,
 				"inputs": {
 					"iron-bar": 1,
 					"spring": 1
@@ -669,9 +1224,9 @@
 			{
 				"id": "sun-resonator",
 				"name": "Sun Resonator",
-				"level": 25,
-				"ms": 5500,
-				"xp": 25,
+				"level": 20,
+				"ms": 4700,
+				"xp": 20,
 				"inputs": {
 					"sunsteel-bar": 1,
 					"glass-lens": 1
@@ -685,10 +1240,28 @@
 				}
 			},
 			{
+				"id": "tidesilver-wiring",
+				"name": "Tidesilver Wiring",
+				"level": 30,
+				"ms": 5300,
+				"xp": 29,
+				"inputs": {
+					"tidesilver-bar": 1,
+					"brass-gear": 1
+				},
+				"outputs": {
+					"tidesilver-wiring": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "sky-relay",
 				"name": "Sky Relay",
-				"level": 45,
-				"ms": 6500,
+				"level": 40,
+				"ms": 5900,
 				"xp": 40,
 				"inputs": {
 					"skysteel-bar": 1,
@@ -703,17 +1276,89 @@
 				}
 			},
 			{
+				"id": "null-conduit",
+				"name": "Null Conduit",
+				"level": 50,
+				"ms": 6500,
+				"xp": 52,
+				"inputs": {
+					"nullsteel-bar": 1,
+					"null-prism": 1
+				},
+				"outputs": {
+					"null-conduit": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "aether-dynamo",
 				"name": "Aether Dynamo",
-				"level": 70,
-				"ms": 8000,
-				"xp": 65,
+				"level": 60,
+				"ms": 7100,
+				"xp": 66,
 				"inputs": {
 					"aether-ingot": 1,
 					"starglass": 1
 				},
 				"outputs": {
 					"aether-dynamo": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "magmasteel-turbine",
+				"name": "Magmasteel Turbine",
+				"level": 70,
+				"ms": 7700,
+				"xp": 82,
+				"inputs": {
+					"magmasteel-bar": 1,
+					"magmaglass-shard": 1
+				},
+				"outputs": {
+					"magmasteel-turbine": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "tempest-capacitor",
+				"name": "Tempest Capacitor",
+				"level": 80,
+				"ms": 8300,
+				"xp": 100,
+				"inputs": {
+					"stormsteel-bar": 1,
+					"thunder-cell": 1
+				},
+				"outputs": {
+					"tempest-capacitor": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "zenith-engine",
+				"name": "Zenith Engine",
+				"level": 90,
+				"ms": 9000,
+				"xp": 120,
+				"inputs": {
+					"celestine-ingot": 1,
+					"zenith-compass": 1
+				},
+				"outputs": {
+					"zenith-engine": 1
 				},
 				"rare": {
 					"item": "aether-crystal",
@@ -752,8 +1397,8 @@
 				"id": "gloam-thread",
 				"name": "Gloam Thread",
 				"level": 10,
-				"ms": 4500,
-				"xp": 14,
+				"ms": 4100,
+				"xp": 12,
 				"inputs": {
 					"aether": 50,
 					"sunpetal": 1
@@ -769,9 +1414,9 @@
 			{
 				"id": "star-thread",
 				"name": "Star Thread",
-				"level": 25,
-				"ms": 5500,
-				"xp": 25,
+				"level": 20,
+				"ms": 4700,
+				"xp": 20,
 				"inputs": {
 					"aether": 150,
 					"glowcap": 1
@@ -785,10 +1430,28 @@
 				}
 			},
 			{
+				"id": "moonlit-thread",
+				"name": "Moonlit Thread",
+				"level": 30,
+				"ms": 5300,
+				"xp": 29,
+				"inputs": {
+					"aether": 260,
+					"tidewort": 1
+				},
+				"outputs": {
+					"moonlit-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "veil-thread",
 				"name": "Veil Thread",
-				"level": 45,
-				"ms": 6500,
+				"level": 40,
+				"ms": 5900,
 				"xp": 40,
 				"inputs": {
 					"aether": 450,
@@ -803,17 +1466,89 @@
 				}
 			},
 			{
+				"id": "midnight-thread",
+				"name": "Midnight Thread",
+				"level": 50,
+				"ms": 6500,
+				"xp": 52,
+				"inputs": {
+					"aether": 760,
+					"nullshade": 1
+				},
+				"outputs": {
+					"midnight-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
 				"id": "eventide-thread",
 				"name": "Eventide Thread",
-				"level": 70,
-				"ms": 8000,
-				"xp": 65,
+				"level": 60,
+				"ms": 7100,
+				"xp": 66,
 				"inputs": {
 					"aether": 1300,
 					"aetherbloom": 1
 				},
 				"outputs": {
 					"eventide-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "aurora-thread",
+				"name": "Aurora Thread",
+				"level": 70,
+				"ms": 7700,
+				"xp": 82,
+				"inputs": {
+					"aether": 2100,
+					"firelily": 1
+				},
+				"outputs": {
+					"aurora-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "tempest-thread",
+				"name": "Tempest Thread",
+				"level": 80,
+				"ms": 8300,
+				"xp": 100,
+				"inputs": {
+					"aether": 3300,
+					"stormsage": 1
+				},
+				"outputs": {
+					"tempest-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "zenith-thread",
+				"name": "Zenith Thread",
+				"level": 90,
+				"ms": 9000,
+				"xp": 120,
+				"inputs": {
+					"aether": 5000,
+					"skylotus": 1
+				},
+				"outputs": {
+					"zenith-thread": 1
 				},
 				"rare": {
 					"item": "aether-crystal",
