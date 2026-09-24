@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 108 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 123 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -365,6 +365,33 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Code review fixes (2026-09-24)
+A review of the whole repo found save, purchase and correctness bugs; each fix is its own commit with a test.
+- **Saves are atomic.** `Game._write_slot()` writes `slot_N.tmp.json`, copies the old main file to the backup
+  only if it parses, then renames `.tmp` into place. Before, a crash mid-write left a broken main file, and the
+  next autosave copied it over the good backup. Load order is main, `.tmp`, backup. The no-re-roll rule is
+  unchanged (the rng state is still saved with every save). `tests/test_saves.gd` uses slot 99 only; the old
+  slot-rename test wrote the player's real slot 3.
+- **A Market buy names its stock window.** The stock changes every `rotation.hours`; a page showing the old stock
+  could buy index i of the new one (another item, another price). `Market.buy_offer`/`buy_featured` take the
+  window the page showed and refuse when it moved on; the screens refresh once when it does. `Market.buy()`
+  refuses a quantity of 0 or less instead of reporting "Bought 0×".
+- **Every sim roll uses the game's rng:** `Rng.shuffle()` replaces `Array.shuffle()` in trait inheritance.
+- **One time-away cap:** `GameState.offline_cap_hours()` (Dream Anchor + Pearl Hourglass), used by
+  `Offline.apply` and the pause menu, which showed the Anchor alone.
+- Pearls found while away reach Welcome Back; thorns that knock out an attacker end its multi-target ability;
+  bulk release reports Pearls like a single release.
+- UI: worker bubbles skip frames while the state is empty (the fade to the title); Genesis Pods forget picked
+  parents when the slot or save changes; the Expeditions log's "ago" times update every second without a rebuild.
+- **Lost clicks:** `Main` holds a `Game.changed` screen rebuild while the left mouse button is down and runs it
+  just after the release, so a capture or level-up can't free the button being clicked (found by the bug-test
+  benchmark on skill pages, pods, Works and the Market).
+- Robustness: options.cfg is written 0.4 s after the last change (and on quit), not on every slider tick; a
+  broken data file is reported with its line through `push_error`, which release builds keep (assert is
+  stripped); the test bridge's `new` only wipes slot 2 unless forced, and only slot 2 is renamed.
+- Tools and docs: `tools/check.sh` runs the tests with `--debug` and stdin closed; `docs/HANDOFF.md` describes the
+  flattened repo.
 
 ### No faint grey numbers (designer's request)
 - **Numbers are chips or coloured**, the way the Aether-Log's dex numbers are: `UI.chip` / `UI.count_chip`
