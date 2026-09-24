@@ -246,7 +246,7 @@ func _play_evolve(e: Dictionary) -> void:
 			dl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 			_caption.add_child(dl)
 		_pop_caption()
-		Sfx.play("hatch", 1.1))
+		Sfx.play("evolve"))
 
 
 # ---------------------------------------------------------------- shared

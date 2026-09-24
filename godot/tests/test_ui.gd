@@ -182,3 +182,24 @@ func test_action_cards_show_what_you_hold() -> void:
 	t.eq(sk._have_labels.filter(func(e): return e.id == a.rare.item)[0].label.text, "4", "counts update live")
 	main.free()
 	_teardown()
+
+
+## Runs every tween in the tree to its end, so a reveal reaches its sound cue within one test call.
+func _finish_tweens() -> void:
+	for i in 4:
+		for tw in t.get_tree().get_processed_tweens():
+			tw.custom_step(30.0)
+
+
+func test_evolution_plays_its_own_sound() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var c: Dictionary = Game.state.creatures.values()[0]
+	Sfx.last_played = ""
+	main._reveal._play_evolve({"creature": c.id, "species": c.species, "from": 1, "form": 2})
+	_finish_tweens()
+	t.eq(Sfx.last_played, "evolve", "the evolution reveal ends on the evolve sound")
+	t.ok(Sfx._streams.evolve.data.size() > Sfx._streams.hatch.data.size(), "evolve is a bigger sound than hatch")
+	main.free()
+	_teardown()
