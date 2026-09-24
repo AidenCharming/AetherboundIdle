@@ -87,7 +87,7 @@ func _fill_slots() -> void:
 	var levels: Array = Data.tuning.skills.slotLevels
 	var action := Skills.current_action(s, skill_id)
 	var auras := Skills.active_auras(s)
-	for i in levels.size():
+	for i in maxi(levels.size(), open):
 		var card := UI.panel("Card")
 		card.custom_minimum_size = Vector2(250, 214)
 		var cv := UI.vbox(6)
@@ -100,7 +100,7 @@ func _fill_slots() -> void:
 			var tv := UI.vbox(2)
 			tv.add_child(UI.label(Creatures.display_name(c), "H3"))
 			tv.add_child(UI.label("Lv %d · %s" % [int(c.level), Data.rarity(int(c.rarity)).name], "Faint", Data.rarity_color(int(c.rarity))))
-			var cd := Skills.worker_cooldown(c, skill_id, action, auras)
+			var cd := Skills.worker_cooldown(c, skill_id, action, auras, Skills.speed(s))
 			tv.add_child(UI.label("Every %s" % F.format_ms(cd), "Dim"))
 			var eff := Creatures.efficiency(c, skill_id)
 			if eff > 1.001:
@@ -140,6 +140,28 @@ func _fill_slots() -> void:
 			var l := UI.label("Opens at level %d" % int(levels[i]), "Dim")
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			cv.add_child(l)
+		_slots.add_child(card)
+	# past the fifth, slots are bought in the Market; offer the next one here once the five are open
+	var price := Market.next_slot_price(s, skill_id)
+	if price >= 0 and int(s.skills[skill_id].level) >= int(Market.cfg().extraSlots.needLevel):
+		var card := UI.panel("Card")
+		card.custom_minimum_size = Vector2(170, 214)
+		var cv := UI.vbox(8)
+		cv.alignment = BoxContainer.ALIGNMENT_CENTER
+		card.add_child(cv)
+		var ic := UI.icon(Data.ui_icon("work-slot"), 44)
+		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+		cv.add_child(ic)
+		var l := UI.label("Extra slot", "H3")
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		cv.add_child(l)
+		var amt := UI.amount("gold", price, price, 18)
+		amt.alignment = BoxContainer.ALIGNMENT_CENTER
+		cv.add_child(amt)
+		var b := UI.button("Buy", "Gold", func(): Modal.confirm("Buy a %s slot?" % _skill.name, "%s gold for one more work slot here, for good." % F.format_num(price), "Buy the slot", func(): Game.buy_slot(skill_id)))
+		b.disabled = Market.slot_check(s, skill_id) != ""
+		b.tooltip_text = Market.slot_check(s, skill_id)
+		cv.add_child(b)
 		_slots.add_child(card)
 
 

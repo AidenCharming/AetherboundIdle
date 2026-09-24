@@ -27,6 +27,7 @@ var default_hybrids: Dictionary = {} # "typeA+typeB" (sorted) -> species id
 var special_recipes: Dictionary = {} # "speciesA+speciesB" (sorted) -> recipe
 var special_list: Array = []
 var goals: Array = []
+var market: Dictionary = {}
 
 var _textures: Dictionary = {}
 var _opaque: Dictionary = {}
@@ -60,6 +61,7 @@ func load_all() -> void:
 	upgrades = _index(upgrade_list)
 	collection = _read("collection.json")
 	goals = _read("goals.json")
+	market = _read("market.json")
 	var recipes: Dictionary = _read("recipes.json")
 	default_hybrids = recipes.defaults
 	special_list = recipes.special

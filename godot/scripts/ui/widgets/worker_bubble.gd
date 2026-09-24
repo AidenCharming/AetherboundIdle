@@ -35,7 +35,7 @@ func _process(_d: float) -> void:
 	if c.is_empty():
 		return
 	var action := Skills.current_action(Game.state, skill_id)
-	var cd := Skills.worker_cooldown(c, skill_id, action, _auras())
+	var cd := Skills.worker_cooldown(c, skill_id, action, _auras(), Skills.speed(Game.state))
 	_frac = clampf(float(c.progress) / cd, 0.0, 1.0)
 	_stalled = c.get("stalled", false)
 	queue_redraw()

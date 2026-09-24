@@ -11,12 +11,15 @@ static func apply(s: Dictionary, elapsed_sec: float, rng: RandomNumberGenerator)
 	var before := snapshot(s)
 	var events := []
 	if used > 0.0:
+		# a Market boost that runs out while away counts for the share of the time it lasted
+		Market.offline_begin(s, used)
 		var segments := maxi(1, int(Data.tuning.offline.segments))
 		var slice := used / segments
 		for i in segments:
 			events.append_array(Skills.step(s, slice * 1000.0, rng, true))
 		Economy.step(s, used)
 		events.append_array(Expedition.offline(s, used * 1000.0, rng))
+		Market.offline_end(s, used)
 	s.awaySeconds = float(s.get("awaySeconds", 0.0)) + used
 	var summary := diff(s, before, events)
 	summary.elapsed = elapsed_sec

@@ -10,6 +10,8 @@ const SCREENS := {
 	"expeditions": preload("res://scripts/ui/screens/expedition_screen.gd"),
 	"aetherlog": preload("res://scripts/ui/screens/aetherlog_screen.gd"),
 	"inventory": preload("res://scripts/ui/screens/inventory_screen.gd"),
+	"market": preload("res://scripts/ui/screens/market_screen.gd"),
+	"eggmarket": preload("res://scripts/ui/screens/egg_market_screen.gd"),
 	"works": preload("res://scripts/ui/screens/works_screen.gd"),
 }
 
@@ -29,6 +31,8 @@ var _fade: ColorRect
 var _sky: SkyBackdrop
 var _rail_refresh := 0.0
 var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
+var _limited_flash := false   # a rare limited offer is in the Market: its badge pulses
+var _boosts_box: HBoxContainer
 
 
 func _ready() -> void:
@@ -180,7 +184,9 @@ func _fill_rail() -> void:
 	_section("Collection")
 	_nav_item("aetherlog", "", "Aether-Log", "aetherlog")
 	_section("Sanctum")
-	_nav_item("inventory", "", "Inventory & Market", "inventory")
+	_nav_item("inventory", "", "Inventory", "inventory")
+	_nav_item("market", "", "Market", "market")
+	_nav_item("eggmarket", "", "Egg Market", "egg-market")
 	_nav_item("works", "", "Sanctum Works", "works")
 	_refresh_rail()
 
@@ -255,6 +261,35 @@ func _refresh_rail() -> void:
 	var claim := Collection.claimable(s).size()
 	log_nav.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
 	log_nav.extra.add_theme_color_override("font_color", Palette.GOLD)
+	# the Market: a rare limited offer pulses in gold; fresh stock you haven't looked at says "new"
+	var mk: Dictionary = _nav_buttons["market:"]
+	var now := Game.now_sec()
+	_limited_flash = Market.has_limited(s, now)
+	if _limited_flash:
+		mk.extra.text = "limited!"
+		mk.extra.add_theme_color_override("font_color", Palette.GOLD)
+	else:
+		mk.extra.modulate.a = 1.0
+		mk.extra.text = "new" if int(Market.state(s).seenWindow) != Market.window(now) else ""
+		mk.extra.add_theme_color_override("font_color", Palette.AETHER)
+	_fill_boosts()
+
+
+## Running Market boosts in the top bar: each icon with its time left.
+func _fill_boosts() -> void:
+	if _boosts_box == null:
+		return
+	UI.clear(_boosts_box)
+	for b in Market.cfg().boosts.list:
+		var left := Market.boost_left(Game.state, b.id)
+		if left <= 0.0:
+			continue
+		var p := UI.panel("Pill")
+		p.tooltip_text = "%s: %s\n%s left" % [b.name, b.desc, F.format_seconds(left)]
+		p.mouse_filter = Control.MOUSE_FILTER_STOP
+		p.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: show_screen("market"))
+		p.add_child(UI.hbox(4, [UI.icon(Data.ui_icon(b.icon), 20), UI.label(F.format_seconds(left), "Small", Palette.AETHER)]))
+		_boosts_box.add_child(p)
 
 
 # ---------------------------------------------------------------- top bar
@@ -270,6 +305,8 @@ func _build_top_bar() -> Control:
 		bar.add_child(_top[k].panel)
 	_top.vessels.panel.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: show_screen("inventory"))
 	bar.add_child(UI.spacer())
+	_boosts_box = UI.hbox(6)
+	bar.add_child(_boosts_box)
 	_top.status = UI.label("", "Dim")
 	bar.add_child(_top.status)
 	var bell := UI.button("", "Ghost", _open_notifications, Data.ui_icon("bell"))
@@ -328,6 +365,8 @@ func _process(delta: float) -> void:
 	_top.meals.value.text = F.format_num(meals)
 	if _pending_flash and _nav_buttons.has("expeditions:"):
 		_nav_buttons["expeditions:"].extra.modulate.a = 0.55 + 0.45 * sin(Time.get_ticks_msec() / 180.0)
+	if _limited_flash and _nav_buttons.has("market:"):
+		_nav_buttons["market:"].extra.modulate.a = 0.55 + 0.45 * sin(Time.get_ticks_msec() / 180.0)
 	_rail_refresh -= delta
 	if _rail_refresh <= 0.0:
 		_rail_refresh = 1.0
@@ -339,7 +378,8 @@ func _process(delta: float) -> void:
 		_top.status.text = "%d working · %d perched" % [working, Economy.perched(s).size()]
 
 
-const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works"}
+const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works",
+	KEY_8: "market", KEY_9: "eggmarket"}
 
 
 func _unhandled_input(event: InputEvent) -> void:

@@ -465,6 +465,42 @@ func test_waiting_shinies_are_shown_first() -> void:
 	_teardown()
 
 
+## The Market's tabs, the Egg Market and the bulk-sell dialog all open, and buying from them works.
+func test_market_pages() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var s := Game.state
+	s.gold = 1e9
+	for i in 10:
+		Expedition.zone_state(s, Data.zone_list[i].id).cleared = true
+	main.show_screen("market")
+	var scr: Node = main._screen
+	for tab in ["stock", "vessels", "materials", "boosts", "slots"]:
+		scr.tab = tab
+		scr.refresh()
+		t.ok(scr._body.get_child_count() > 0, "the %s tab has content" % tab)
+	scr.tab = "vessels"
+	scr.refresh()
+	var buy := _find_button(scr, "Buy 1")
+	t.ok(buy != null and not buy.disabled, "a vessel to buy")
+	var before := GameState.count(s, "tinkerers-vessel")
+	buy.pressed.emit()
+	t.eq(GameState.count(s, "tinkerers-vessel"), before + 1.0, "bought a vessel")
+	t.ok(main._nav_buttons.has("market:") and main._nav_buttons.has("eggmarket:"), "both markets in the menu")
+	main.show_screen("eggmarket")
+	var egg := _find_button(main._screen, "Buy egg")
+	t.ok(egg != null and not egg.disabled, "an egg to buy")
+	egg.pressed.emit()
+	t.ok(s.pods.any(func(p): return not p.is_empty() and p.has("market")), "the egg is in a pod")
+	GameState.add_item(s, "oak-log", 40)
+	main.show_screen("inventory")
+	main._screen._bulk_sell()
+	t.ok(_find_button(_layer, "Sell") != null, "the bulk-sell dialog opens")
+	main.free()
+	_teardown()
+
+
 ## The Auto-bind tab shows each rarity's bind chance as a pill in that rarity's colour.
 func test_bind_chances_in_rarity_colours() -> void:
 	_setup()

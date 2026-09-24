@@ -1,0 +1,76 @@
+{
+	"_note": "Market rules (designer's): a thing sells back for a little less than it costs (buy = sell x markup), so crafting stays the cheaper way and buy-and-resell never pays. Stock and wares open up as islands are cleared.",
+	"markup": 1.25,
+	"buyCategories": ["log", "herb", "ore", "fish", "salvage", "bar", "meal", "component", "thread", "part", "vessel"],
+	"tierPerClear": 1,
+	"vesselClears": {
+		"tinkerers-vessel": 0,
+		"sturdy-vessel": 1,
+		"polished-vessel": 3,
+		"resonant-vessel": 5,
+		"luminescent-vessel": 6,
+		"gloaming-vessel": 7,
+		"prismatic-vessel": 8,
+		"emberheart-vessel": 9,
+		"stormglass-vessel": 9,
+		"celestial-vessel": 10
+	},
+	"extraSlots": {
+		"_note": "Work slots past the fifth, one skill at a time (design.md: an endgame gold sink). Needs the skill's five slots open first.",
+		"needLevel": 70,
+		"gold": [250000, 2000000]
+	},
+	"bulkSell": {
+		"keepOptions": [0, 10, 100, 1000],
+		"skipCategories": ["vessel", "rare", "treasure"]
+	},
+	"priceGrowth": 1.55,
+	"rotation": {
+		"hours": 4,
+		"offers": 4,
+		"perOffer": 3,
+		"limitedChance": 0.35,
+		"pool": [
+			{"kind": "materials", "weight": 4, "qty": [25, 60], "discount": 0.9},
+			{"kind": "vessels", "weight": 2, "qty": [5, 15], "discount": 0.9},
+			{"kind": "boost", "weight": 2, "discount": 0.75},
+			{"kind": "crystals", "weight": 2, "qty": [10, 20], "goldEach": 30}
+		],
+		"limited": [
+			{"id": "pearl", "name": "A single Aether Pearl", "weight": 2, "minClears": 8, "item": "aether-pearl", "qty": 1, "gold": 250000,
+				"blurb": "Pressed from the far islands' Aether. Spend it on Pearl upgrades in Sanctum Works."},
+			{"id": "shiny-egg", "name": "Shimmering egg", "weight": 1, "minClears": 2, "egg": {"shiny": true, "gradeUp": 0}, "priceMult": 8,
+				"blurb": "An egg with a shimmer in its shell. What hatches is always shiny."},
+			{"id": "grand-egg", "name": "Gilded egg", "weight": 2, "minClears": 1, "egg": {"shiny": false, "gradeUp": 1}, "priceMult": 3,
+				"blurb": "One grade above the best egg the Egg Market sells you today."},
+			{"id": "crystal-hoard", "name": "Crystal hoard", "weight": 3, "minClears": 0, "item": "aether-crystal", "qtyMult": 8, "goldEach": 22,
+				"blurb": "A crate of Aether Crystals at a collector's price. Shatter them in the Inventory."}
+		]
+	},
+	"boosts": {
+		"maxHours": 8,
+		"list": [
+			{"id": "aether-incense", "name": "Aether Incense", "icon": "boost-incense", "effect": "aether", "value": 0.5, "minutes": 60, "gold": 400,
+				"desc": "+50% Aether from perches and the Resonance Extractor."},
+			{"id": "battle-tonic", "name": "Battle Tonic", "icon": "boost-tonic", "effect": "partyXp", "value": 0.5, "minutes": 60, "gold": 300,
+				"desc": "+50% XP for the expedition party."},
+			{"id": "glimmer-lure", "name": "Glimmer Lure", "icon": "boost-lure", "effect": "wildRarity", "value": 1.0, "minutes": 30, "gold": 500,
+				"desc": "Wild Aetherlings rarer than Dim turn up twice as often."},
+			{"id": "tinkers-brew", "name": "Tinker's Brew", "icon": "boost-brew", "effect": "workSpeed", "value": 0.2, "minutes": 60, "gold": 600,
+				"desc": "Every worker finishes its actions 20% faster."}
+		]
+	},
+	"eggs": {
+		"_note": "Market eggs hold a random base Aetherling of one type you own. Grades set the lowest rarity; odds above it are rarityOdds. They never count toward the hatch pity.",
+		"rarityOdds": [70, 25, 5],
+		"grades": [
+			{"id": "common", "name": "Common", "floor": 1, "minClears": 0, "gold": 600, "minutes": 10},
+			{"id": "fine", "name": "Fine", "floor": 2, "minClears": 2, "gold": 6000, "minutes": 30},
+			{"id": "choice", "name": "Choice", "floor": 3, "minClears": 4, "gold": 40000, "minutes": 60},
+			{"id": "prime", "name": "Prime", "floor": 4, "minClears": 6, "gold": 200000, "minutes": 120},
+			{"id": "royal", "name": "Royal", "floor": 5, "minClears": 8, "gold": 900000, "minutes": 240},
+			{"id": "starlit", "name": "Starlit", "floor": 6, "minClears": 99, "gold": 3000000, "minutes": 360}
+		],
+		"featured": {"priceMult": 2.5, "gradeUp": 1}
+	}
+}

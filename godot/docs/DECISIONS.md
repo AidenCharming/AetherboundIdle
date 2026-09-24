@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 93 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 102 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -76,7 +76,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   `docs/art-prompts-icons.md` is regenerated. The designer's script lists whatever still needs painting
   after a pull.
 - **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for every icon
-  (143 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
+  (150 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
   the creature pipeline's rules (magenta key, green for pink and purple things, no glow words, everything opaque).
   `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
   `sprite_tools.py`, and installs them into `assets/icons/`. The game uses a PNG icon whenever one exists and the
@@ -302,11 +302,36 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (meals per run). They cost gold plus crafted parts, which gives Circuitry and Fabrication their purpose.
 - **Meals:** Cooking makes expedition food; the party eats one between waves when anyone is below 60%
   Health. This is Cooking's job in the economy.
-- **Vessel market:** Tinker's Vessels always buyable for gold, so a player can never be stuck without a
-  way to bind.
+- **The Market** (designer's request: the old shop only sold Tinker's Vessels), `data/market.json` and
+  `scripts/sim/market.gd`, on two pages (Market, Egg Market) next to the Inventory:
+  - **Prices:** the Market sells every material, part and vessel at sell value × 1.25, to the nearest gold and
+    always a gold more, so a thing sells back for a little less than it costs (the designer's rule: a small
+    gap, and crafting stays the cheaper way). Materials open a tier per island cleared; vessels have their own
+    unlocks. Tinker's Vessels are always for sale, so a player is never stuck without a way to bind. Any
+    item's detail panel in the Inventory can buy more of it.
+  - **Extra work slots** (design.md: an endgame gold sink): once a skill's five slots are open (level 70),
+    a sixth costs 250K gold and a seventh 2M, per skill.
+  - **Bulk selling** in the Inventory: this category (or everything but vessels and rare finds), up to a
+    tier, keeping 0/10/100/1000 of each. Any item can be locked from its detail panel to stay out of it.
+  - **Today's stock** rotates every 4 hours, the same for everyone watching that window (rolled from the
+    save's creation time and the window): four offers (discounted bundles of top-tier materials or vessels,
+    a boost at 25% off, a crate of Aether Crystals), each buyable 3 times. A 35% chance adds a rare
+    **limited** offer, one only, drawn with a running rainbow-gold frame and sparkles, its menu entry pulsing
+    "limited!": an Aether Pearl (250K, from 8 islands cleared), a Shimmering egg (always shiny), a Gilded
+    egg (a grade above the best on sale) or a Crystal hoard.
+  - **Boosts** start when bought and keep running offline (a boost that ends while away counts for its share
+    of the time): Aether Incense +50% Aether, Battle Tonic +50% party XP, Glimmer Lure makes rarities above
+    Dim twice as common, Tinker's Brew +20% work speed. 30–60 minutes a purchase, stacking to 8 hours;
+    prices grow ×1.55 per island cleared. They show in the top bar with their time left.
+  - **Market eggs** hold a random base Aetherling of a type you own, in grades that open with islands
+    cleared (Common Dim+ 600 gold, Fine Faint+ 6K, Choice Steady+ 40K, Prime Gleaming+ 200K, Royal
+    Luminous+ 900K; 70/25/5 odds from the floor up) and hatch in a Genesis Pod. They can hatch shiny at the
+    base chance but never count toward the shiny pity, so gold can't buy a shiny that way. A featured egg
+    (a named Aetherling a grade up, 2.5× the price, one only) changes with the stock.
+  - Gold prices for eggs, slots and the limited Pearl are first guesses: the month probe doesn't track gold.
 - **Sell prices follow two rules** (designer's, checked by `test_content.gd` `test_market_prices`):
-  anything the shop sells sells back for at most half its shop price, so buy-and-resell never pays
-  (Tinker's Vessel: buy 30, sell 12, was 5); and every crafted item sells for at least 1.25× its inputs,
+  anything the Market sells sells back for a little less than it costs (at least 75%, or a gold less for the
+  cheapest things), so buy-and-resell never pays; and every crafted item sells for at least 1.25× its inputs,
   so crafting and selling always beats selling the raw materials. The first pass broke the second rule:
   vessels sold for about half their inputs and circuitry parts and the Aether Lantern for barely more,
   so those were raised (Sturdy 15 → 50, Polished 40 → 110, Resonant 90 → 225, Luminescent 200 → 450,

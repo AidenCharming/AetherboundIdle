@@ -526,13 +526,63 @@ func buy_upgrade(id: String) -> void:
 	changed.emit()
 
 
-func buy_vessel(item_id: String, qty: int) -> void:
-	var err := Economy.buy_vessel(state, item_id, qty)
+# ---------------------------------------------------------------- the Market
+
+func _market_result(err: String, ok_text: String, icon: Texture2D) -> bool:
 	if err != "":
 		warn(err)
-	else:
-		Sfx.play("coin")
+		changed.emit()
+		return false
+	Sfx.play("coin")
+	if ok_text != "":
+		info(ok_text, icon)
 	changed.emit()
+	return true
+
+
+func market_buy(item_id: String, qty: int) -> bool:
+	return _market_result(Market.buy(state, item_id, qty), "Bought %s× %s" % [F.format_num(qty), Data.item_name(item_id)], Data.item_icon(item_id))
+
+
+func buy_slot(skill_id: String) -> bool:
+	var ok := _market_result(Market.buy_slot(state, skill_id), "", null)
+	if ok:
+		_notify("A new %s work slot opens" % Data.skills[skill_id].name, Data.ui_icon(skill_id), Palette.AETHER)
+	return ok
+
+
+func bulk_sell(cands: Dictionary) -> void:
+	var g := Market.bulk_sell(state, cands)
+	if g > 0:
+		Sfx.play("coin")
+		info("Sold for %s gold" % F.format_num(g), Data.ui_icon("gold"))
+	changed.emit()
+
+
+func toggle_item_lock(item_id: String) -> void:
+	Market.toggle_item_lock(state, item_id)
+	changed.emit()
+
+
+func buy_offer(index: int) -> bool:
+	var o: Dictionary = Market.stock(state, now_sec()).offers[index] if index < Market.stock(state, now_sec()).offers.size() else {}
+	var ok := _market_result(Market.buy_offer(state, index, now_sec(), rng), "", null)
+	if ok and o.get("limited", false):
+		Sfx.play("shiny_appear")
+		_notify("Snapped up: %s" % o.name, Data.ui_icon("market"), Palette.GOLD)
+	return ok
+
+
+func buy_boost(id: String) -> bool:
+	return _market_result(Market.buy_boost(state, id), "%s is working" % Market.boost_def(id).name, Data.ui_icon(Market.boost_def(id).icon))
+
+
+func buy_egg(type_id: String, grade: int) -> bool:
+	return _market_result(Market.buy_egg(state, type_id, grade, rng, now_sec()), "The egg is in a Genesis Pod", Data.ui_icon("pods"))
+
+
+func buy_featured_egg() -> bool:
+	return _market_result(Market.buy_featured(state, now_sec(), rng), "The featured egg is in a Genesis Pod", Data.ui_icon("pods"))
 
 
 func release(cid: String) -> void:

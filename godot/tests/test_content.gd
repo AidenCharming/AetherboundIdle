@@ -76,11 +76,14 @@ func test_special_recipes_are_cross_type() -> void:
 		t.eq(Data.species[r.result].kind, "special")
 
 
-## Market rules (designer's): nothing the shop sells can be sold back for as much as it costs (no buy-and-
-## resell loop), and crafting always adds value, so making something and selling it beats selling its inputs.
+## Market rules (designer's): everything the Market sells sells back for a little less than it costs (no buy-
+## and-resell loop, but not a big gap either), and crafting always adds value, so making something is cheaper
+## than buying it and making and selling beats selling the inputs.
 func test_market_prices() -> void:
-	for v in Data.tuning.shop.vessels:
-		t.ok(float(Data.items[v.item].sell) <= float(v.gold) * 0.5, "%s sells for at most half its shop price" % v.item)
+	for it in Market.catalog():
+		var buy := Market.buy_price(it.id)
+		# a little less: at least 75% back (the cheapest things round up to a whole gold, so a 1-gold gap is fine)
+		t.ok(int(it.sell) < buy and (float(it.sell) >= buy * 0.75 or buy - int(it.sell) <= 1), "%s sells for a little less than its price" % it.id)
 	for skill in Data.skill_list:
 		for a in skill.actions:
 			var inputs: Dictionary = a.get("inputs", {})

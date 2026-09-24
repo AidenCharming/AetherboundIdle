@@ -129,6 +129,48 @@ func _run() -> void:
 		OptionsPanel.open_modal()
 		await _wait(0.5)
 		await _shot("options")
+	if _want("market"):
+		await _market()
+
+
+## The Market's tabs (with a limited offer forced into today's stock), the Egg Market, running boosts in
+## the top bar, bulk selling and a bought work slot.
+func _market() -> void:
+	var s := Game.state
+	s.gold = 4.0e6
+	for i in 7:
+		Expedition.zone_state(s, Data.zone_list[i].id).cleared = true
+	var now := Game.now_sec()
+	var w := 0
+	while w < 400 and not Market.roll_stock(s, w).offers.any(func(o): return o.get("limited", false) and o.kind == "egg"):
+		w += 1
+	var st := Market.roll_stock(s, w)
+	st.window = Market.window(now)
+	s.market.stock = st
+	Market.add_boost(s, "aether-incense")
+	Market.add_boost(s, "glimmer-lure")
+	Game.changed.emit()
+	for tab in ["stock", "vessels", "materials", "boosts", "slots"]:
+		MarketScreen.tab = tab
+		Main.go("market")
+		Main.instance._screen.refresh()
+		await _wait(0.8)
+		await _shot("market_" + tab)
+		Main.go("sanctum")
+	Main.go("eggmarket")
+	await _wait(1.0)
+	await _shot("eggmarket")
+	Main.go("inventory")
+	await _wait(0.4)
+	Main.instance._screen._bulk_sell()
+	await _wait(0.4)
+	await _shot("inventory_bulk")
+	_close_modals()
+	Game.dev_skill_level("woodcutting", 70)
+	Market.buy_slot(s, "woodcutting")
+	Main.go("skill", "woodcutting")
+	await _wait(0.8)
+	await _shot("skill_extra_slot")
 
 
 ## Opens every dialog and tab once so script errors show up in the log.
@@ -208,7 +250,7 @@ func _smoke() -> void:
 	await _wait(0.3)
 	await _shot("smoke_inventory_item")
 	Game.sell("oak-log", 5)
-	Game.buy_vessel("tinkerers-vessel", 1)
+	Game.market_buy("tinkerers-vessel", 1)
 	Game.buy_upgrade("perches")
 	for i in 3:
 		Game.claim_goal()

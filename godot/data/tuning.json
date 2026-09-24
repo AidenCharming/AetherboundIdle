@@ -254,14 +254,6 @@
 		"awayThresholdSec": 60,
 		"segments": 40
 	},
-	"shop": {
-		"vessels": [
-			{
-				"item": "tinkerers-vessel",
-				"gold": 30
-			}
-		]
-	},
 	"save": {
 		"version": 1,
 		"autosaveSec": 20

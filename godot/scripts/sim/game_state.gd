@@ -43,6 +43,7 @@ static func new_game(seed_value: int = 0) -> Dictionary:
 		"settings": {"sfx": 0.7, "dev": false, "reduceMotion": false, "title": ""},
 		"goals": {"index": 0, "claimed": []},
 		"notices": [],
+		"market": Market.fresh_state(),
 	}
 	for skill in Data.skill_list:
 		s.skills[skill.id] = {"xp": 0.0, "level": 1, "action": skill.actions[0].id, "levelTimes": {}}
@@ -159,7 +160,7 @@ static func slot_count(s: Dictionary, skill_id: String) -> int:
 	for need in Data.tuning.skills.slotLevels:
 		if lv >= int(need):
 			n += 1
-	return n
+	return n + Market.extra_slots(s, skill_id)
 
 
 # ---------------------------------------------------------------- save migration

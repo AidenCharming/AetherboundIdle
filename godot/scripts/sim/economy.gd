@@ -1,7 +1,7 @@
 class_name Economy
 extends RefCounted
 ## Aether emission from perched (benched) creatures and the Resonance Extractor, selling, Sanctum Works
-## upgrades, the vessel shop and releasing creatures.
+## upgrades and releasing creatures. Buying lives in Market.
 
 
 ## Benched creatures that sit on a perch, rarest (highest emission) first.
@@ -23,7 +23,7 @@ static func bench_aether_per_min(s: Dictionary) -> float:
 
 
 static func aether_per_min(s: Dictionary) -> float:
-	return bench_aether_per_min(s) + GameState.upgrade_value(s, "extractor")
+	return (bench_aether_per_min(s) + GameState.upgrade_value(s, "extractor")) * (1.0 + Market.bonus(s, "aether"))
 
 
 ## Emission accrues continuously from dt, so online and offline can never drift apart.
@@ -70,16 +70,6 @@ static func buy_upgrade(s: Dictionary, id: String) -> String:
 	s.upgrades[id] = GameState.upgrade_level(s, id) + 1
 	GameState.sync_pods(s)
 	return ""
-
-
-static func buy_vessel(s: Dictionary, item_id: String, qty: int) -> String:
-	for v in Data.tuning.shop.vessels:
-		if v.item == item_id:
-			if not GameState.pay(s, {"gold": float(v.gold)}, qty):
-				return "Not enough gold."
-			GameState.add_item(s, item_id, qty)
-			return ""
-	return "Not for sale."
 
 
 static func release(s: Dictionary, c: Dictionary) -> int:

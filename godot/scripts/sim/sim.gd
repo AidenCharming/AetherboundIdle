@@ -10,5 +10,6 @@ static func step(s: Dictionary, dt_sec: float, rng: RandomNumberGenerator) -> Ar
 	var events := Skills.step(s, dt_sec * 1000.0, rng, false)
 	Economy.step(s, dt_sec)
 	events.append_array(Expedition.step(s, dt_sec * 1000.0, rng))
+	Market.tick(s, dt_sec)
 	s.playSeconds = float(s.playSeconds) + dt_sec
 	return events

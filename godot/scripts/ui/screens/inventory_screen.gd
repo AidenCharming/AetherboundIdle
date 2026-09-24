@@ -1,7 +1,7 @@
 class_name InventoryScreen
 extends Control
-## Inventory & Market: every item by category, with selling, shattering Aether Crystals, and the
-## vessel shop.
+## Inventory: every item by category, with selling (one item or in bulk), item locks, shattering Aether
+## Crystals, and buying more of anything the Market stocks.
 
 static var selected := ""
 static var category := ""
@@ -25,9 +25,11 @@ func _ready() -> void:
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(left)
 	var head := UI.hbox(10)
-	head.add_child(UI.header("Inventory & Market", "Sell what you don't need. Keep what the next tier needs.", Data.ui_icon("inventory")))
+	head.add_child(UI.header("Inventory", "Sell what you don't need. Keep what the next tier needs.", Data.ui_icon("inventory")))
+	head.add_child(UI.spacer())
 	_worth = UI.label("", "Dim")
 	head.add_child(_worth)
+	head.add_child(UI.button("Sell in bulk…", "Gold", _bulk_sell, Data.ui_icon("gold")))
 	left.add_child(head)
 	_cats = UI.flow(6, 6)
 	left.add_child(_cats)
@@ -40,7 +42,7 @@ func _ready() -> void:
 	_detail = UI.vbox(10)
 	dp.add_child(_detail)
 	right.add_child(dp)
-	right.add_child(_shop())
+	right.add_child(_market_links())
 	refresh()
 
 
@@ -85,6 +87,11 @@ func _fill_grid() -> void:
 		var ic := UI.icon(Data.item_icon(it.id), 58)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(ic)
+		if Market.is_locked(s, it.id):
+			var lk := UI.icon(Data.ui_icon("lock"), 18)
+			lk.position = Vector2(86, 6)
+			lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			b.add_child(lk)
 		var nl := UI.label(F.format_num(n), "Num")
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(nl)
@@ -115,6 +122,12 @@ func _fill_detail() -> void:
 	hv.add_child(UI.label("Tier %d · %s" % [int(it.tier), it.category.capitalize()], "Faint"))
 	hv.add_child(UI.label("You have %s" % F.format_num(n), "Dim"))
 	h.add_child(hv)
+	h.add_child(UI.spacer())
+	var locked := Market.is_locked(s, selected)
+	var lock_b := UI.button("Locked" if locked else "Lock", "ChipOn" if locked else "Chip", func(): Game.toggle_item_lock(selected), Data.ui_icon("lock"))
+	lock_b.tooltip_text = "Locked items are never sold in bulk."
+	lock_b.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+	h.add_child(lock_b)
 	_detail.add_child(h)
 	if it.has("desc"):
 		_detail.add_child(UI.wrap_label(it.desc, "Dim"))
@@ -141,6 +154,7 @@ func _fill_detail() -> void:
 		return
 	if int(it.sell) <= 0:
 		return
+	_buy_row(it)
 	var qty := SpinBox.new()
 	qty.min_value = 1
 	qty.max_value = n
@@ -158,20 +172,82 @@ func _fill_detail() -> void:
 	_detail.add_child(UI.label("%d gold each" % int(it.sell), "Faint"))
 
 
-func _shop() -> Control:
+## Buy more of this item from the Market, when it stocks it.
+func _buy_row(it: Dictionary) -> void:
+	if not Market.sells(it.id):
+		return
+	var s := Game.state
+	var price := Market.buy_price(it.id)
+	if not Market.for_sale(s, it.id):
+		var need := Market.unlock_clears(it.id)
+		_detail.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("The Market stocks it once you clear %s" % Data.zone_list[mini(need, Data.zone_list.size()) - 1].name, "Faint")]))
+		return
+	var row := UI.hbox(8, [UI.label("Buy", "Dim"), UI.amount("gold", price, price, 18), UI.label("each", "Faint"), UI.spacer()])
+	for n in [1, 10, 100]:
+		var b := UI.button("+%d" % n, "", func(): Game.market_buy(it.id, n))
+		b.disabled = float(s.gold) < price * n
+		b.tooltip_text = "%s gold" % F.format_num(price * n)
+		row.add_child(b)
+	_detail.add_child(row)
+
+
+## Sell many items at once: this category (or everything but vessels and rare finds), up to a tier, keeping
+## some of each. Locked items always stay.
+func _bulk_sell() -> void:
+	var v := UI.vbox(12)
+	var cat_name := "everything (but vessels and rare finds)"
+	for pair in CATEGORIES:
+		if pair[0] == category and category != "":
+			cat_name = pair[1].to_lower()
+	v.add_child(UI.wrap_label("Sells %s you have. Locked items always stay: lock one from its detail panel. Choose a category on the page first to sell only that." % cat_name, "Dim", 520))
+	var row := UI.hbox(8, [UI.label("Tiers up to", "Dim")])
+	var tier_ob := OptionButton.new()
+	tier_ob.add_item("Every tier", 0)
+	for t in range(1, 11):
+		tier_ob.add_item("Tier %d" % t, t)
+	row.add_child(tier_ob)
+	row.add_child(UI.label("Keep", "Dim"))
+	var keep_ob := OptionButton.new()
+	var keeps: Array = Market.cfg().bulkSell.keepOptions
+	for i in keeps.size():
+		keep_ob.add_item("%s of each" % F.format_num(int(keeps[i])) if int(keeps[i]) > 0 else "None", i)
+	keep_ob.selected = mini(1, keeps.size() - 1)
+	row.add_child(keep_ob)
+	v.add_child(row)
+	var preview := UI.label("", "H3")
+	v.add_child(preview)
+	var icons := UI.flow(4, 4)
+	v.add_child(icons)
+	var box := {}
+	var go := UI.button("Sell", "Gold")
+	var cands := func() -> Dictionary:
+		return Market.bulk_candidates(Game.state, category, tier_ob.get_selected_id(), int(keeps[keep_ob.selected]))
+	var upd := func(_i := 0):
+		var c: Dictionary = cands.call()
+		var n := 0
+		for id in c:
+			n += int(c[id])
+		preview.text = "%s items of %d kinds · %s gold" % [F.format_num(n), c.size(), F.format_num(Market.bulk_value(c))]
+		UI.clear(icons)
+		for id in c.keys().slice(0, 24):
+			var ic := UI.icon(Data.item_icon(id), 28)
+			ic.tooltip_text = "%s× %s" % [F.format_num(int(c[id])), Data.item_name(id)]
+			icons.add_child(ic)
+		go.disabled = c.is_empty()
+	tier_ob.item_selected.connect(upd)
+	keep_ob.item_selected.connect(upd)
+	upd.call()
+	go.pressed.connect(func():
+		box.m.close()
+		Game.bulk_sell(cands.call()))
+	v.add_child(go)
+	box.m = Modal.open(v, "Sell in bulk", 600)
+
+
+func _market_links() -> Control:
 	var v := UI.vbox(10)
-	v.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("gold"), 22), UI.label("Market", "H3")]))
-	v.add_child(UI.wrap_label("The travelling tinker always has basic vessels, so you're never stuck.", "Faint"))
-	for offer in Data.tuning.shop.vessels:
-		var it: Dictionary = Data.items[offer.item]
-		var h := UI.hbox(10)
-		h.add_child(UI.icon(Data.item_icon(it.id), 40))
-		var tv := UI.vbox(0)
-		tv.add_child(UI.label(it.name, "H3"))
-		tv.add_child(UI.amount("gold", float(offer.gold), float(offer.gold), 18))
-		h.add_child(tv)
-		h.add_child(UI.spacer())
-		h.add_child(UI.button("Buy 1", "", func(): Game.buy_vessel(it.id, 1)))
-		h.add_child(UI.button("Buy 5", "Gold", func(): Game.buy_vessel(it.id, 5)))
-		v.add_child(h)
+	v.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("market"), 22), UI.label("Market", "H3")]))
+	v.add_child(UI.wrap_label("Vessels, materials, boosts, extra work slots and a stock that changes every few hours. Eggs have a market of their own.", "Faint", 320))
+	v.add_child(UI.hbox(8, [UI.button("Open the Market", "Gold", func(): Main.go("market"), Data.ui_icon("market")),
+		UI.button("Egg Market", "", func(): Main.go("eggmarket"), Data.ui_icon("egg-market"))]))
 	return UI.panel("Glass", v)

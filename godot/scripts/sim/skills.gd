@@ -75,9 +75,15 @@ static func cooldown_reduction(c: Dictionary, skill_id: String, auras: Array) ->
 	return minf(Traits.cap("cooldown_reduction"), red)
 
 
-static func worker_cooldown(c: Dictionary, skill_id: String, action: Dictionary, auras: Array) -> float:
+## `speed` is the running work-speed boost (see speed()).
+static func worker_cooldown(c: Dictionary, skill_id: String, action: Dictionary, auras: Array, speed_mult := 1.0) -> float:
 	return F.cooldown_ms(float(action.ms), Creatures.efficiency(c, skill_id), int(c.level), int(c.rarity), Creatures.form_of(c),
-		cooldown_reduction(c, skill_id, auras))
+		cooldown_reduction(c, skill_id, auras)) / speed_mult
+
+
+## Every worker's speed multiplier from a running Market boost (Tinker's Brew).
+static func speed(s: Dictionary) -> float:
+	return 1.0 + Market.bonus(s, "workSpeed")
 
 
 # ---------------------------------------------------------------- stepping
@@ -87,13 +93,14 @@ static func step(s: Dictionary, dt_ms: float, rng: RandomNumberGenerator, offlin
 	if dt_ms <= 0.0:
 		return events
 	var auras := active_auras(s)
+	var sp := speed(s)
 	for skill in Data.skill_list:
 		var ws := GameState.workers(s, skill.id)
 		if ws.is_empty():
 			continue
 		var action := current_action(s, skill.id)
 		for c in ws:
-			var cd := worker_cooldown(c, skill.id, action, auras)
+			var cd := worker_cooldown(c, skill.id, action, auras, sp)
 			c.progress = float(c.progress) + dt_ms
 			var n := int(floor(c.progress / cd + 1e-9))
 			if n <= 0:
@@ -299,8 +306,8 @@ static func unassign(s: Dictionary, c: Dictionary) -> void:
 ## What a worker would make per hour on an action, reckoned as complete() rolls it: its cooldown, the product
 ## (with extra-output rolls, online) and secondary finds (rare drop, treasure and partner-element drops).
 ## The worker picker sorts by these.
-static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, auras: Array) -> Dictionary:
-	var cd := worker_cooldown(c, skill_id, action, auras)
+static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, auras: Array, sp := 1.0) -> Dictionary:
+	var cd := worker_cooldown(c, skill_id, action, auras, sp)
 	var per := 3600000.0 / cd
 	var qty := 0.0
 	for id in action.outputs:
@@ -317,6 +324,6 @@ static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, aura
 
 static func per_hour(s: Dictionary, c: Dictionary, skill_id: String) -> Dictionary:
 	var action := current_action(s, skill_id)
-	var cd := worker_cooldown(c, skill_id, action, active_auras(s))
+	var cd := worker_cooldown(c, skill_id, action, active_auras(s), speed(s))
 	var per := 3600000.0 / cd
 	return {"actions": per, "cooldown": cd, "xp": per * float(action.xp) * (1.0 + Traits.capped_self(c, "bonus_xp", skill_id))}

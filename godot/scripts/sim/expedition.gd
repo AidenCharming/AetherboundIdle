@@ -125,7 +125,12 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 ## the species as seen in the Aether-Log.
 static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var sp_id: String = Rng.weighted_key(rng, z.species)
-	var rarity := Rng.weighted_index(rng, z.rarityWeights) + 1
+	# a Glimmer Lure makes every rarity above Dim more common
+	var weights: Array = z.rarityWeights.duplicate()
+	var lure := Market.bonus(s, "wildRarity")
+	for i in range(1, weights.size()):
+		weights[i] = float(weights[i]) * (1.0 + lure)
+	var rarity := Rng.weighted_index(rng, weights) + 1
 	var level := rng.randi_range(int(z.levels[0]), int(z.levels[1]))
 	var sh: Dictionary = Data.tuning.shiny
 	var since := int(s.counters.encountersSinceShiny)
@@ -219,7 +224,7 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 	zs.kills = int(zs.kills) + 1
 	var xp := kill_xp(int(w.level), int(w.rarity))
 	for c in party:
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp")))
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
 		for e in cev:
 			if e.type == "evolved":
 				Collection.on_evolved(s, c)
@@ -370,7 +375,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	var boss: Dictionary = z.boss
 	var xp := kill_xp(int(boss.level), 3, true)
 	for c in _alive_party(s):
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp")))
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
 		for e in cev:
 			if e.type == "evolved":
 				Collection.on_evolved(s, c)
@@ -497,7 +502,7 @@ static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + n
 	for c in party:
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp")))
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
 		for e in cev:
 			if e.type == "evolved":
 				Collection.on_evolved(s, c)
