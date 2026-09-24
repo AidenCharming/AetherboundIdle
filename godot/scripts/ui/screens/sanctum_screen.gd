@@ -11,6 +11,11 @@ var _exp_box: VBoxContainer
 var _pods_box: VBoxContainer
 var _goal_box: VBoxContainer
 var _t := 0.0
+var _exp_status: Label
+var _exp_hp: Array = []
+var _exp_log: VBoxContainer
+var _exp_log_top := -1.0
+var _exp_key := ""
 
 
 func _ready() -> void:
@@ -173,30 +178,7 @@ func _fill_side() -> void:
 		e.tooltip_text = "Empty perch: any resting Aetherling sits here"
 		_perch_box.add_child(e)
 	_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
-	# expedition
-	UI.clear(_exp_box)
-	_exp_box.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("expeditions"), 24), UI.label("Expedition", "H3")]))
-	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
-		var b: Dictionary = s.expedition.battle
-		var z: Dictionary = Data.zones[b.zone]
-		var what := "Resting after a wipe" if b.phase == "rest" and not Combat.any_alive(b.allies) else "Wave %d of %d" % [int(b.wave), int(b.waves)]
-		_exp_box.add_child(UI.label("%s · %s" % [z.name, what], "Dim"))
-		var party := UI.hbox(6)
-		for f in b.allies:
-			var pv := UI.vbox(2)
-			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), 54)
-			por.bob = false
-			pv.add_child(por)
-			var hp := UI.bar(Palette.GOOD, 5)
-			hp.value = float(f.hp) / float(f.maxHp)
-			hp.custom_minimum_size.x = 54
-			pv.add_child(hp)
-			party.add_child(pv)
-		_exp_box.add_child(party)
-		_exp_box.add_child(UI.button("Watch the battle", "", func(): Main.go("expeditions")))
-	else:
-		_exp_box.add_child(UI.wrap_label("No expedition running. Wild Aetherlings can only be found on the islands.", "Faint"))
-		_exp_box.add_child(UI.button("Plan an expedition", "Primary", func(): Main.go("expeditions")))
+	_fill_expedition()
 	# pods
 	UI.clear(_pods_box)
 	_pods_box.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("pods"), 24), UI.label("Genesis Pods", "H3")]))
@@ -219,6 +201,84 @@ func _fill_side() -> void:
 		_pods_box.add_child(UI.button("Breed Aetherlings", "", func(): Main.go("pods")))
 
 
+## The expedition card: where the party is, their health and the newest log lines. It is kept live from
+## _process, so it follows the run while the player stays on the Sanctum.
+func _fill_expedition() -> void:
+	var s := Game.state
+	UI.clear(_exp_box)
+	_exp_hp.clear()
+	_exp_status = null
+	_exp_log = null
+	_exp_key = _expedition_key()
+	_exp_box.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("expeditions"), 24), UI.label("Expedition", "H3")]))
+	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
+		var b: Dictionary = s.expedition.battle
+		_exp_status = UI.label("", "Dim")
+		_exp_box.add_child(_exp_status)
+		var party := UI.hbox(6)
+		for f in b.allies:
+			var pv := UI.vbox(2)
+			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), 54)
+			por.bob = false
+			pv.add_child(por)
+			var hp := UI.bar(Palette.GOOD, 5)
+			hp.custom_minimum_size.x = 54
+			pv.add_child(hp)
+			_exp_hp.append(hp)
+			party.add_child(pv)
+		_exp_box.add_child(party)
+		_exp_log = UI.vbox(2)
+		_exp_box.add_child(_exp_log)
+		_exp_log_top = -1.0
+		_update_expedition()
+		_exp_box.add_child(UI.button("Watch the battle", "", func(): Main.go("expeditions")))
+	else:
+		_exp_box.add_child(UI.wrap_label("No expedition running. Wild Aetherlings can only be found on the islands.", "Faint"))
+		_exp_box.add_child(UI.button("Plan an expedition", "Primary", func(): Main.go("expeditions")))
+
+
+## What decides the card's layout: whether a run is going, where, and with how many fighters.
+func _expedition_key() -> String:
+	var s := Game.state
+	if not Expedition.is_running(s) or s.expedition.battle.is_empty():
+		return "idle"
+	return "%s|%d" % [s.expedition.battle.zone, s.expedition.battle.allies.size()]
+
+
+## Refreshes the live parts of the card: status line, health bars, the newest log lines.
+func _update_expedition() -> void:
+	if _expedition_key() != _exp_key:
+		_fill_expedition()
+		return
+	if _exp_status == null:
+		return
+	var b: Dictionary = Game.state.expedition.battle
+	var z: Dictionary = Data.zones[b.zone]
+	var what := ""
+	if b.phase == "rest" and not Combat.any_alive(b.allies):
+		what = "Resting after a wipe"
+	elif int(b.wave) >= int(b.waves):
+		what = "Boss: " + z.boss.name
+	else:
+		what = "Wave %d of %d" % [maxi(1, int(b.wave)), int(b.waves) - 1]
+	_exp_status.text = "%s · %s" % [z.name, what]
+	for i in mini(_exp_hp.size(), b.allies.size()):
+		var f: Dictionary = b.allies[i]
+		_exp_hp[i].value = float(f.hp) / maxf(1.0, float(f.maxHp))
+	var top: float = Game.battle_log[0].time if not Game.battle_log.is_empty() else 0.0
+	if top != _exp_log_top:
+		_exp_log_top = top
+		UI.clear(_exp_log)
+		for e in Game.battle_log.slice(0, 3):
+			var l := UI.label(e.text, "Faint", e.color)
+			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			l.custom_minimum_size.x = 40
+			l.tooltip_text = e.text
+			l.mouse_filter = Control.MOUSE_FILTER_PASS
+			_exp_log.add_child(l)
+
+
 func _process(delta: float) -> void:
 	_t += delta
 	if Game.state.is_empty():
@@ -230,6 +290,8 @@ func _process(delta: float) -> void:
 		st.xp.value = F.level_progress(F.skill_curve(), float(sk.xp), Data.tuning.skills.maxLevel)
 	if fmod(_t, 1.0) < delta:
 		_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(Game.state))
+	if fmod(_t, 0.25) < delta:
+		_update_expedition()
 
 
 func _on_event(e: Dictionary) -> void:
