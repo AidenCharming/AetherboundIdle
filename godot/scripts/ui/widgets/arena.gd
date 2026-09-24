@@ -258,14 +258,14 @@ func _on_event(e: Dictionary) -> void:
 				return
 			if motion and e.ability == "":
 				var dir := 1.0 if e.side == 0 else -1.0
-				var tw := create_tween()
+				var tw: Tween = att.root.create_tween()   # bound to the fighter, so it dies with it when the wave is rebuilt
 				tw.tween_property(att.root, "position", att.home + Vector2(26 * dir, -6), 0.08).set_trans(Tween.TRANS_QUAD)
 				tw.tween_property(att.root, "position", att.home, 0.14).set_trans(Tween.TRANS_QUAD)
 			var por: CreaturePortrait = def.portrait
-			var ft := create_tween()
+			var ft := por.create_tween()
 			ft.tween_method(func(v): por.set_flash(v), 0.8, 0.0, 0.18)
 			if motion:
-				var st := create_tween()
+				var st: Tween = def.root.create_tween()
 				st.tween_property(def.root, "position", def.home + Vector2(randf_range(-5, 5), randf_range(-3, 3)), 0.04)
 				st.tween_property(def.root, "position", def.home, 0.06)
 			if Options.get_value("damage_numbers"):
@@ -285,7 +285,7 @@ func _on_event(e: Dictionary) -> void:
 			if motion:
 				var por: Control = v.portrait
 				por.pivot_offset = por.size / 2.0
-				var tw := create_tween()
+				var tw := por.create_tween()
 				tw.tween_property(por, "scale", Vector2(1.12, 1.12), 0.1)
 				tw.tween_property(por, "scale", Vector2.ONE, 0.16)
 		"heal":
