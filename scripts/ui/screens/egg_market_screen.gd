@@ -8,6 +8,7 @@ var _body: VBoxContainer
 var _gold: Label
 var _pods: Label
 var _clock: Label
+var _window := -1   # the stock window on screen (see MarketScreen._window)
 
 
 func _ready() -> void:
@@ -35,6 +36,7 @@ func refresh() -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
+	_window = Market.window(Game.now_sec())
 	UI.clear(_body)
 	var best := Market.best_grade(s)
 	if grade < 0 or grade > best:
@@ -80,6 +82,9 @@ func _tick() -> void:
 		if p.is_empty():
 			free += 1
 	_pods.text = "%d of %d pods free" % [free, s.pods.size()]
+	if Market.window(Game.now_sec()) != _window:
+		_window = Market.window(Game.now_sec())
+		refresh.call_deferred()   # a new featured egg: show it before anything can be bought
 	if _clock and is_instance_valid(_clock):
 		_clock.text = "A new featured egg in %s" % F.format_seconds(Market.window_ends(Game.now_sec()) - Game.now_sec())
 
@@ -182,7 +187,7 @@ func _featured_card(f: Dictionary) -> Control:
 	var bv := UI.vbox(8)
 	bv.alignment = BoxContainer.ALIGNMENT_CENTER
 	bv.add_child(UI.amount("gold", float(f.gold), float(f.gold), 24))
-	var b := UI.button("Snapped up" if sold else "Buy now", "Gold", func(): Game.buy_featured_egg())
+	var b := UI.button("Snapped up" if sold else "Buy now", "Gold", func(): Game.buy_featured_egg(_window))
 	b.custom_minimum_size.x = 160
 	b.disabled = sold or float(s.gold) < float(f.gold) or Breeding.free_pod(s) < 0
 	if Breeding.free_pod(s) < 0 and not sold:

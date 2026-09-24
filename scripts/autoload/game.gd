@@ -595,9 +595,10 @@ func toggle_item_lock(item_id: String) -> void:
 	changed.emit()
 
 
-func buy_offer(index: int) -> bool:
+## `expect_window` is the stock window the screen showed (see Market.buy_offer).
+func buy_offer(index: int, expect_window := -1) -> bool:
 	var o: Dictionary = Market.stock(state, now_sec()).offers[index] if index < Market.stock(state, now_sec()).offers.size() else {}
-	var ok := _market_result(Market.buy_offer(state, index, now_sec(), rng), "", null)
+	var ok := _market_result(Market.buy_offer(state, index, now_sec(), rng, expect_window), "", null)
 	if ok and o.get("limited", false):
 		Sfx.play("shiny_appear")
 		_notify("Snapped up: %s" % o.name, Data.ui_icon("market"), Palette.GOLD)
@@ -612,8 +613,8 @@ func buy_egg(type_id: String, grade: int) -> bool:
 	return _market_result(Market.buy_egg(state, type_id, grade, rng, now_sec()), "The egg is in a Genesis Pod", Data.ui_icon("pods"))
 
 
-func buy_featured_egg() -> bool:
-	return _market_result(Market.buy_featured(state, now_sec(), rng), "The featured egg is in a Genesis Pod", Data.ui_icon("pods"))
+func buy_featured_egg(expect_window := -1) -> bool:
+	return _market_result(Market.buy_featured(state, now_sec(), rng, expect_window), "The featured egg is in a Genesis Pod", Data.ui_icon("pods"))
 
 
 func release(cid: String) -> void:

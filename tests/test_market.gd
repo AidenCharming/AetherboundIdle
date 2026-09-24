@@ -210,3 +210,25 @@ func test_market_eggs() -> void:
 	# a shiny-egg offer always hatches shiny
 	var e := Market.make_egg(s, "verdant", 0, true, rng, 0.0)
 	t.ok(bool(e.shiny))
+
+
+## A buy made from a page showing an old stock window buys nothing once the stock has changed, so index i can
+## never buy a different offer at a different price.
+func test_buying_from_a_changed_stock_buys_nothing() -> void:
+	var s := _game(1e9)
+	var rng := _rng()
+	var now := 10.0 * Market.window_seconds() + 5.0
+	var w := Market.window(now)
+	var later := now + Market.window_seconds()
+	var o: Dictionary = Market.stock(s, now).offers[0]
+	var left := int(o.left)
+	t.eq(Market.buy_offer(s, 0, later, rng, w), Market.STOCK_CHANGED, "an offer")
+	t.eq(float(s.gold), 1e9, "no gold taken")
+	t.eq(int(o.left), left, "the old offer is untouched")
+	var pods: Array = s.pods.duplicate(true)
+	var f: Dictionary = Market.stock(s, now).featured
+	t.eq(Market.buy_featured(s, later, rng, w), Market.STOCK_CHANGED, "the featured egg")
+	t.eq(float(s.gold), 1e9, "no gold taken for the egg")
+	t.eq(s.pods, pods, "no egg laid")
+	t.ok(f.is_empty() or int(f.left) == 1, "the old featured egg is still for sale")
+	t.eq(Market.buy_offer(s, 0, now, rng, w), "", "the same window still buys")

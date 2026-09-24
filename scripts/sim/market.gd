@@ -259,8 +259,14 @@ static func _limited(s: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	return o
 
 
-## Buys one of an offer from today's stock. Returns "" or a reason.
-static func buy_offer(s: Dictionary, index: int, now: float, rng: RandomNumberGenerator) -> String:
+const STOCK_CHANGED := "The stock has just changed. Take another look."
+
+
+## Buys one of an offer from today's stock. Returns "" or a reason. `expect_window` is the stock window the
+## player was looking at: when the stock has changed since, nothing is bought (index i may be another offer now).
+static func buy_offer(s: Dictionary, index: int, now: float, rng: RandomNumberGenerator, expect_window := -1) -> String:
+	if expect_window >= 0 and expect_window != window(now):
+		return STOCK_CHANGED
 	var st := stock(s, now)
 	if index < 0 or index >= st.offers.size():
 		return "That offer is gone."
@@ -459,7 +465,9 @@ static func _featured(s: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 		"gold": ceili(egg_price(grade) * float(f.priceMult)), "left": 1}
 
 
-static func buy_featured(s: Dictionary, now: float, rng: RandomNumberGenerator) -> String:
+static func buy_featured(s: Dictionary, now: float, rng: RandomNumberGenerator, expect_window := -1) -> String:
+	if expect_window >= 0 and expect_window != window(now):
+		return STOCK_CHANGED
 	var f: Dictionary = stock(s, now).featured
 	if f.is_empty() or int(f.left) <= 0:
 		return "Sold out."
