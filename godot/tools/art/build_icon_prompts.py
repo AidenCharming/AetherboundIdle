@@ -165,6 +165,11 @@ I("sturdy-vessel", "item", "Vessels", "m", ORB.format(body="made of thick pale-b
 I("polished-vessel", "item", "Vessels", "m", ORB.format(body="made of cyan glass with a polished silver cap and a silver band around its middle"))
 I("resonant-vessel", "item", "Vessels", "g", ORB.format(body="made of violet glass in an ornate silver frame, with two small tuning-fork prongs on its cap"))
 I("luminescent-vessel", "item", "Vessels", "m", ORB.format(body="made of pale-gold glass in an ornate gold filigree frame with a small crown-like cap") + " A small white star shape is painted in the centre.")
+I("gloaming-vessel", "item", "Vessels", "m", ORB.format(body="made of deep periwinkle-blue glass in a dark iron frame shaped like crescent moons, with a dark iron cap"))
+I("prismatic-vessel", "item", "Vessels", "m", ORB.format(body="made of clear aqua glass cut into flat facets like a gem, in a thin bright silver frame"))
+I("emberheart-vessel", "item", "Vessels", "m", ORB.format(body="made of warm orange glass in a black-iron frame, with bright orange crack lines painted on the glass like cooling lava"))
+I("stormglass-vessel", "item", "Vessels", "m", ORB.format(body="made of bright yellow glass in a brass frame, with a small zigzag lightning-bolt shape painted across the glass and a brass cap with a tiny lightning rod"))
+I("celestial-vessel", "item", "Vessels", "g", ORB.format(body="made of pearly ivory-white glass in a gold frame with small gold wings on either side and a gold cap topped by a tiny star"))
 
 # ----------------------------------------------------------------------------- parts (Fabrication) and Aether
 I("timber-frame", "item", "Parts", "m", "A small square wooden crate frame made of planks with crossed braces and dark iron corner brackets.")

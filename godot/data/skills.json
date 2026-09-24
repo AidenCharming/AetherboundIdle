@@ -1470,7 +1470,7 @@
 				"name": "Midnight Thread",
 				"level": 50,
 				"ms": 13000,
-				"xp": 120,
+				"xp": 100,
 				"inputs": {
 					"aether": 4,
 					"nullshade": 1
@@ -1488,7 +1488,7 @@
 				"name": "Eventide Thread",
 				"level": 60,
 				"ms": 14200,
-				"xp": 152,
+				"xp": 116,
 				"inputs": {
 					"aether": 6,
 					"aetherbloom": 1
@@ -1506,7 +1506,7 @@
 				"name": "Aurora Thread",
 				"level": 70,
 				"ms": 15400,
-				"xp": 189,
+				"xp": 136,
 				"inputs": {
 					"aether": 8,
 					"firelily": 1
@@ -1524,7 +1524,7 @@
 				"name": "Tempest Thread",
 				"level": 80,
 				"ms": 16600,
-				"xp": 230,
+				"xp": 166,
 				"inputs": {
 					"aether": 10,
 					"stormsage": 1
@@ -1542,7 +1542,7 @@
 				"name": "Zenith Thread",
 				"level": 90,
 				"ms": 18000,
-				"xp": 276,
+				"xp": 199,
 				"inputs": {
 					"aether": 12,
 					"skylotus": 1
@@ -1604,11 +1604,11 @@
 			{
 				"id": "resonant-vessel",
 				"name": "Resonant Vessel",
-				"level": 30,
-				"ms": 13000,
-				"xp": 87,
+				"level": 20,
+				"ms": 11500,
+				"xp": 66,
 				"inputs": {
-					"skysteel-bar": 1,
+					"tidesilver-bar": 1,
 					"star-thread": 1
 				},
 				"outputs": {
@@ -1622,15 +1622,105 @@
 			{
 				"id": "luminescent-vessel",
 				"name": "Luminescent Vessel",
-				"level": 55,
-				"ms": 16000,
-				"xp": 145,
+				"level": 30,
+				"ms": 13000,
+				"xp": 90,
 				"inputs": {
-					"aether-ingot": 1,
-					"veil-thread": 1
+					"skysteel-bar": 1,
+					"moonlit-thread": 1
 				},
 				"outputs": {
 					"luminescent-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "gloaming-vessel",
+				"name": "Gloaming Vessel",
+				"level": 40,
+				"ms": 14500,
+				"xp": 125,
+				"inputs": {
+					"nullsteel-bar": 1,
+					"veil-thread": 1
+				},
+				"outputs": {
+					"gloaming-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "prismatic-vessel",
+				"name": "Prismatic Vessel",
+				"level": 50,
+				"ms": 16000,
+				"xp": 170,
+				"inputs": {
+					"aether-ingot": 1,
+					"midnight-thread": 1
+				},
+				"outputs": {
+					"prismatic-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "emberheart-vessel",
+				"name": "Emberheart Vessel",
+				"level": 60,
+				"ms": 17500,
+				"xp": 230,
+				"inputs": {
+					"magmasteel-bar": 1,
+					"eventide-thread": 1
+				},
+				"outputs": {
+					"emberheart-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "stormglass-vessel",
+				"name": "Stormglass Vessel",
+				"level": 70,
+				"ms": 19000,
+				"xp": 300,
+				"inputs": {
+					"stormsteel-bar": 1,
+					"aurora-thread": 1
+				},
+				"outputs": {
+					"stormglass-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "celestial-vessel",
+				"name": "Celestial Vessel",
+				"level": 80,
+				"ms": 20500,
+				"xp": 380,
+				"inputs": {
+					"celestine-ingot": 1,
+					"tempest-thread": 1
+				},
+				"outputs": {
+					"celestial-vessel": 1
 				},
 				"rare": {
 					"item": "aether-crystal",
@@ -1725,7 +1815,7 @@
 				"name": "Aether Lantern",
 				"level": 70,
 				"ms": 16000,
-				"xp": 480,
+				"xp": 210,
 				"inputs": {
 					"yew-log": 2,
 					"starglass": 1,

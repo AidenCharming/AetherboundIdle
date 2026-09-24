@@ -1217,6 +1217,86 @@
 		"desc": "Binds a defeated wild Aetherling. Consumed on use."
 	},
 	{
+		"id": "gloaming-vessel",
+		"name": "Gloaming Vessel",
+		"tier": 6,
+		"category": "vessel",
+		"sell": 800,
+		"icon": {
+			"shape": "vessel",
+			"color": "#7d8bff"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.955
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "prismatic-vessel",
+		"name": "Prismatic Vessel",
+		"tier": 7,
+		"category": "vessel",
+		"sell": 1250,
+		"icon": {
+			"shape": "vessel",
+			"color": "#7fe8d8"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.965
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "emberheart-vessel",
+		"name": "Emberheart Vessel",
+		"tier": 8,
+		"category": "vessel",
+		"sell": 1900,
+		"icon": {
+			"shape": "vessel",
+			"color": "#ff8a4a"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.974
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "stormglass-vessel",
+		"name": "Stormglass Vessel",
+		"tier": 9,
+		"category": "vessel",
+		"sell": 2800,
+		"icon": {
+			"shape": "vessel",
+			"color": "#ffe45c"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.982
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "celestial-vessel",
+		"name": "Celestial Vessel",
+		"tier": 10,
+		"category": "vessel",
+		"sell": 4000,
+		"icon": {
+			"shape": "vessel",
+			"color": "#f4f0ff"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.99
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
 		"id": "timber-frame",
 		"name": "Timber Frame",
 		"tier": 2,

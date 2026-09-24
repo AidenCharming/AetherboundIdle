@@ -715,7 +715,7 @@
 		"bossLoot": {
 			"gold": 8000,
 			"items": {
-				"luminescent-vessel": 3,
+				"gloaming-vessel": 3,
 				"magmite": 21,
 				"magmasteel-bar": 6
 			}
@@ -820,7 +820,7 @@
 			"pearlChance": 0.0015,
 			"gold": 12000,
 			"items": {
-				"luminescent-vessel": 3,
+				"prismatic-vessel": 3,
 				"stormray": 23,
 				"stormsteel-bar": 6
 			}
@@ -928,7 +928,7 @@
 			"pearlChance": 0.004,
 			"gold": 20000,
 			"items": {
-				"luminescent-vessel": 5,
+				"emberheart-vessel": 5,
 				"zenith-compass": 25,
 				"celestine-ingot": 7,
 				"aether-crystal": 5

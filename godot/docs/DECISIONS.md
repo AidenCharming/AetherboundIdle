@@ -76,7 +76,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   `docs/art-prompts-icons.md` is regenerated. The designer's script lists whatever still needs painting
   after a pull.
 - **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for every icon
-  (138 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
+  (143 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
   the creature pipeline's rules (magenta key, green for pink and purple things, no glow words, everything opaque).
   `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
   `sprite_tools.py`, and installs them into `assets/icons/`. The game uses a PNG icon whenever one exists and the
@@ -490,10 +490,18 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   resting or releasing one is refused until the expedition is stopped. (At first a party change restarted
   the run, which let a new member join mid-boss and threw away the run in progress.) Moving the party to
   another island is still allowed: it is an explicit "abandon this run" action.
-- **Vessels: five tiers** (Tinker's, Sturdy, Polished, Resonant, Luminescent). Flimsy was dropped (weaker-
-  sounding than the starter) and Aetheric Matrix too (and "Aetheric" is on the banned-root list). Bind
-  chance = vessel base × falloff^(rarity − 1) × party bind bonus. Fabrication makes Tinker's and Sturdy;
-  Vessel Crafting (Void) makes the higher tiers.
+- **Vessels: ten tiers** (Tinker's, Sturdy, Polished, Resonant, Luminescent, then Gloaming, Prismatic,
+  Emberheart, Stormglass and Celestial, added at the designer's request so Vessel Crafting has a ladder like
+  the other skills). Flimsy was dropped (weaker-sounding than the starter) and Aetheric Matrix too (and
+  "Aetheric" is on the banned-root list). Bind chance = vessel base × falloff^(rarity − 1) × party bind
+  bonus; falloff climbs 0.75 → 0.99 up the tiers. Fabrication makes Tinker's and Sturdy; Vessel Crafting
+  (Void) makes Sturdy to Celestial at levels 1, 10, …, 80, each from the same-tier bar and the thread a
+  tier below. The last three islands' bosses drop Gloaming, Prismatic and Emberheart; Stormglass and
+  Celestial are crafted (or bought once every island is cleared). With the old ladder, Vessel Crafting sat
+  on the Luminescent recipe (Aether Ingot + Veil Thread) from level 55 and starved Fabrication's Aether
+  Lantern; spreading the demand made several skills faster, so the Aether Lantern went from 480 to 210 XP
+  and Aether-Weaving's top five threads were scaled down by about a quarter. The month probe has every
+  skill at 99 between day 26.8 and 31.1.
 - First capture of each type is free and guaranteed; shinies always get a throw, never flee, and wait in
   a pending list if no vessel is left; auto-bind has an on/off switch, a vessel choice, a minimum rarity
   and "always try species I don't own" (all from the reference), plus **"keep at most N per species"**
