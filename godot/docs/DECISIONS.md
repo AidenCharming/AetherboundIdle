@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 72 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 74 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -345,6 +345,14 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   line, one green line per trait bonus that does something on the current action, as the numbers the sim
   uses (double output, materials saved on crafting actions only, rare and treasure finds as the boost to
   their rate, XP, partner-element drops). `Skills.work_perks()` computes them; `Describe.work_perk()` words them.
+- **The worker picker ranks by what the job needs** (designer's request), with three buttons in place of
+  "Best fit":
+  - **Best output:** product per hour, counting speed and extra-output rolls. The picker opens on this one.
+  - **Best time:** time per task.
+  - **Best secondary:** rare drop, treasure and partner-element drops per hour.
+
+  Each card's note shows the figure being sorted by. `Skills.work_rates()` computes all three with the same
+  numbers `complete()` rolls. Party and parent pickers keep "Best fit".
 - **Overclocked** (ambiguous in the reference): +2% speed per completed action, up to +10%, reset when the
   creature is moved or its task changes.
 - Rare-drop and treasure traits multiply the base chance (`× (1 + 10 × bonus)`), so a Moderate trait
@@ -367,7 +375,7 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   list the reference hadn't written ("full gear list: ask the designer"). Worth adding later.
 - **Catalysts, awakening/stars, region unlocks with Aether:** listed as Aether sinks in the reference, not
   designed; the sinks here are breeding, attunement, egg speed-ups and thread weaving.
-- **Auto-assign best for skill** (roster tool). The worker picker sorts by best fit instead.
+- **Auto-assign best for skill** (roster tool). The worker picker ranks by output, time or secondary finds instead.
 - **Collection rewards like rarity-floor eggs and cosmetic frames**: rewards are Aether, gold, vessels,
   titles and recipe reveals.
 - **The web build's Electron wrapper** is not needed: Godot exports a native `.exe`.

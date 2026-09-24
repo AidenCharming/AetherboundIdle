@@ -154,8 +154,34 @@ func _pick(replace_id: String) -> void:
 				Game.bench(replace_id)
 			Game.assign(cid, skill_id),
 		func(c): return "Every %s here" % F.format_ms(Skills.worker_cooldown(c, skill_id, action, auras)),
-		"best",
-		func(c): return Skills.work_perks(c, skill_id, action).map(func(p): return Describe.work_perk(p)))
+		"output",
+		func(c): return Skills.work_perks(c, skill_id, action).map(func(p): return Describe.work_perk(p)),
+		_worker_sorts(action, auras))
+
+
+## The worker picker's rankings for this task: fastest, most product, most secondary finds.
+func _worker_sorts(action: Dictionary, auras: Array) -> Array:
+	var rates := {}   # creature id -> Skills.work_rates, worked out once per creature
+	var r := func(c: Dictionary) -> Dictionary:
+		if not rates.has(c.id):
+			rates[c.id] = Skills.work_rates(c, skill_id, action, auras)
+		return rates[c.id]
+	var out_name := Data.item_name(action.outputs.keys()[0])
+	var finds := []
+	for k in ["rare", "treasure"]:
+		if action.has(k):
+			finds.append(Data.item_name(action[k].item))
+	return [
+		{"id": "output", "label": "Best output", "tip": "Most %s per hour, counting speed and extra-output traits" % out_name,
+			"key": func(c): return r.call(c).output,
+			"note": func(c): return "%s %s/h" % [F.format_num(r.call(c).output), out_name]},
+		{"id": "time", "label": "Best time", "tip": "Shortest time per task",
+			"key": func(c): return -float(r.call(c).cooldown),
+			"note": func(c): return "Every %s here" % F.format_ms(r.call(c).cooldown)},
+		{"id": "secondary", "label": "Best secondary", "tip": "Most secondary finds per hour: %s" % ", ".join(finds + ["partner-element drops"]),
+			"key": func(c): return r.call(c).secondary,
+			"note": func(c): return "%s secondary finds/h" % F.format_num(r.call(c).secondary)},
+	]
 
 
 func _fill_actions() -> void:

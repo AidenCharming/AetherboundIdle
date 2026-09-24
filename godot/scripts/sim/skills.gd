@@ -296,6 +296,25 @@ static func unassign(s: Dictionary, c: Dictionary) -> void:
 
 
 ## Expected output per hour for one worker (for the UI).
+## What a worker would make per hour on an action, reckoned as complete() rolls it: its cooldown, the product
+## (with extra-output rolls, online) and secondary finds (rare drop, treasure and partner-element drops).
+## The worker picker sorts by these.
+static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, auras: Array) -> Dictionary:
+	var cd := worker_cooldown(c, skill_id, action, auras)
+	var per := 3600000.0 / cd
+	var qty := 0.0
+	for id in action.outputs:
+		qty += float(action.outputs[id])
+	var rare_scale: float = Data.tuning.skills.get("rareBonusScale", 10.0)
+	var finds := 0.0
+	for pair in [["rare", "rare_drop_chance"], ["treasure", "treasure_drop_chance"]]:
+		if action.has(pair[0]):
+			finds += float(action[pair[0]].chance) * (1.0 + rare_scale * Traits.capped_self(c, pair[1], skill_id))
+	for pd in partner_drops_for(c, skill_id, action):
+		finds += float(pd.chance)
+	return {"cooldown": cd, "output": per * qty * (1.0 + Traits.capped_self(c, "extra_output_chance", skill_id)), "secondary": per * finds}
+
+
 static func per_hour(s: Dictionary, c: Dictionary, skill_id: String) -> Dictionary:
 	var action := current_action(s, skill_id)
 	var cd := worker_cooldown(c, skill_id, action, active_auras(s))

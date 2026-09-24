@@ -244,3 +244,33 @@ func test_boss_fight_switches_to_boss_music_and_back() -> void:
 	t.eq(Music.wanted(), "sanctum")
 	main.free()
 	_teardown()
+
+
+func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var s := Game.state
+	var ids := {}
+	for pair in [["plain", []], ["swift", [{"id": "swift-worker", "s": "major"}]], ["bountiful", [{"id": "bountiful", "s": "major"}]], ["lucky", [{"id": "lucky", "s": "major"}]]]:
+		var c := Creatures.make(s, "sproutlet", 1, 1, false, pair[1], "test")
+		s.creatures[c.id] = c
+		ids[pair[0]] = c.id
+	main.show_screen("skill", "woodcutting")
+	main._screen._pick("")
+	var m: Modal = _open_modals().back()
+	var picker: CreaturePicker = m.find_children("*", "", true, false).filter(func(n): return n is CreaturePicker)[0]
+	var order := func() -> Array:
+		return picker._grid.get_children().filter(func(n): return n is CreatureCard).map(func(n): return n.cid)
+	t.ok(_find_button(m, "Best fit") == null, "the general Best fit button is replaced")
+	t.eq(picker._sort, "output", "opens on Best output")
+	var o: Array = order.call()
+	t.ok(o.find(ids.bountiful) < o.find(ids.plain) and o.find(ids.bountiful) < o.find(ids.lucky), "bountiful out-produces plain and lucky")
+	_find_button(m, "Best time").pressed.emit()
+	t.eq(order.call()[0], ids.swift, "the fastest first")
+	_find_button(m, "Best secondary").pressed.emit()
+	t.eq(order.call()[0], ids.lucky, "the luckiest first")
+	var first: CreatureCard = picker._grid.get_children().filter(func(n): return n is CreatureCard)[0]
+	t.ok(first.find_children("*", "Label", true, false).any(func(l): return "secondary finds/h" in l.text), "cards show the figure being sorted by")
+	main.free()
+	_teardown()

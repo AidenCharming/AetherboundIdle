@@ -222,3 +222,22 @@ func test_migration_keeps_creature_levels_across_a_curve_change() -> void:
 	t.eq(F.level_for_xp(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel), 12, "XP now matches it")
 	Creatures.add_xp(c, 1.0)
 	t.eq(int(c.level), 12, "and the next XP gain does not drop it")
+
+
+func test_work_rates_rank_speed_output_and_secondary_finds() -> void:
+	var s := GameState.new_game()
+	var chop: Dictionary = Data.actions.woodcutting["oak-log"]
+	var mk := func(traits: Array) -> Dictionary:
+		return Skills.work_rates(Creatures.make(s, "sproutlet", 1, 1, false, traits, "test"), "woodcutting", chop, [])
+	var plain: Dictionary = mk.call([])
+	var swift: Dictionary = mk.call([{"id": "swift-worker", "s": "major"}])
+	var bountiful: Dictionary = mk.call([{"id": "bountiful", "s": "major"}])
+	var lucky: Dictionary = mk.call([{"id": "lucky", "s": "major"}])
+	t.ok(swift.cooldown < plain.cooldown, "a faster worker")
+	t.ok(swift.output > plain.output and swift.secondary > plain.secondary, "speed raises everything per hour")
+	t.near(bountiful.cooldown, plain.cooldown, 0.001, "extra output doesn't change speed")
+	var per: float = 3600000.0 / plain.cooldown
+	t.near(bountiful.output - plain.output, per * float(chop.outputs.values()[0]) * Data.tuning.traitStrength.major, 0.01, "extra-output rolls add product")
+	t.near(lucky.output, plain.output, 0.001, "luck doesn't add product")
+	t.ok(lucky.secondary > plain.secondary * 2.0, "luck multiplies rare finds")
+	t.near(plain.secondary, 3600000.0 / plain.cooldown * float(chop.rare.chance), 0.001, "a plain worker finds rares at the base rate")
