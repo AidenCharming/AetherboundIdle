@@ -113,6 +113,16 @@ func test_offline_is_capped() -> void:
 	t.ok(summary.capped)
 
 
+## The Pearl Hourglass adds to the Dream Anchor's cap, and the pause menu's number is the one Offline.apply uses.
+func test_offline_cap_counts_the_pearl_hourglass() -> void:
+	var s := GameState.new_game()
+	var base := GameState.offline_cap_hours(s)
+	s.upgrades["pearl-hourglass"] = 2
+	var cap := GameState.offline_cap_hours(s)
+	t.eq(cap - base, 2.0 * float(Data.tuning.pearls.offlineHoursPerLevel), "two Hourglass levels")
+	t.near(float(Offline.apply(s, 1e9, _rng()).usedSeconds), cap * 3600.0, 0.01, "Offline.apply uses the same cap")
+
+
 func test_offline_crafting_chain_feeds_through_slices() -> void:
 	var s := GameState.new_game()
 	var miner := Creatures.make(s, "tuskcub", 3, 20, false, [], "test")

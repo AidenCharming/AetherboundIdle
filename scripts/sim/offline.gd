@@ -6,7 +6,7 @@ extends RefCounted
 
 
 static func apply(s: Dictionary, elapsed_sec: float, rng: RandomNumberGenerator) -> Dictionary:
-	var cap := (GameState.upgrade_value(s, "offline-cap") + float(Data.tuning.pearls.offlineHoursPerLevel) * GameState.pearl(s, "pearl-hourglass")) * 3600.0
+	var cap := GameState.offline_cap_hours(s) * 3600.0
 	var used := clampf(elapsed_sec, 0.0, cap)
 	var before := snapshot(s)
 	var events := []

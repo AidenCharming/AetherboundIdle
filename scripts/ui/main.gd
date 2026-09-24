@@ -408,7 +408,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func open_pause_menu() -> void:
 	var v := UI.vbox(10)
-	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.upgrade_value(Game.state, "offline-cap")), "Faint", 380))
+	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.offline_cap_hours(Game.state)), "Faint", 380))
 	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var add := func(text: String, variation: String, cb: Callable):
 		var b := UI.button(text, variation, cb)
