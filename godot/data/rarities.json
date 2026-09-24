@@ -2,7 +2,7 @@
 	{
 		"tier": 1,
 		"id": "dim",
-		"name": "Dim",
+		"name": "Dim", "fx": 0,
 		"color": "#9aa3b5",
 		"statMultiplier": 1.0,
 		"benchAetherPerMin": 2,
@@ -12,7 +12,7 @@
 	{
 		"tier": 2,
 		"id": "faint",
-		"name": "Faint",
+		"name": "Faint", "fx": 0,
 		"color": "#9fe0b4",
 		"statMultiplier": 1.3,
 		"benchAetherPerMin": 4,
@@ -22,7 +22,7 @@
 	{
 		"tier": 3,
 		"id": "steady",
-		"name": "Steady",
+		"name": "Steady", "fx": 0,
 		"color": "#62b6ff",
 		"statMultiplier": 1.65,
 		"benchAetherPerMin": 8,
@@ -32,7 +32,7 @@
 	{
 		"tier": 4,
 		"id": "gleaming",
-		"name": "Gleaming",
+		"name": "Gleaming", "fx": 0,
 		"color": "#3fd9c9",
 		"statMultiplier": 2.1,
 		"benchAetherPerMin": 16,
@@ -42,7 +42,7 @@
 	{
 		"tier": 5,
 		"id": "luminous",
-		"name": "Luminous",
+		"name": "Luminous", "fx": 1,
 		"color": "#ffd95e",
 		"statMultiplier": 2.7,
 		"benchAetherPerMin": 32,
@@ -52,7 +52,7 @@
 	{
 		"tier": 6,
 		"id": "radiant",
-		"name": "Radiant",
+		"name": "Radiant", "fx": 2,
 		"color": "#ffa24a",
 		"statMultiplier": 3.4,
 		"benchAetherPerMin": 64,
@@ -62,7 +62,7 @@
 	{
 		"tier": 7,
 		"id": "brilliant",
-		"name": "Brilliant",
+		"name": "Brilliant", "fx": 3,
 		"color": "#ff6f9c",
 		"statMultiplier": 4.3,
 		"benchAetherPerMin": 128,
@@ -72,7 +72,7 @@
 	{
 		"tier": 8,
 		"id": "resplendent",
-		"name": "Resplendent",
+		"name": "Resplendent", "fx": 4,
 		"color": "#c58bff",
 		"statMultiplier": 5.4,
 		"benchAetherPerMin": 256,
@@ -82,7 +82,7 @@
 	{
 		"tier": 9,
 		"id": "zenith",
-		"name": "Zenith",
+		"name": "Zenith", "fx": 5,
 		"color": "#fff6d6",
 		"statMultiplier": 6.8,
 		"benchAetherPerMin": 512,

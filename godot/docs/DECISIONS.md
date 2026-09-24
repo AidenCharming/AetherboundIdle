@@ -104,6 +104,12 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     rare wild Aetherling enters a fight (a rarity the island rolls at most `combat.rareAnnounceChance`,
     10%, of the time), a burst of light, a "Shiny!" or rarity word and a sound (`shiny_appear`, a glittering
     run; `rare_appear`, a bell chime) announce it once per wave.
+  - **Sprite and frame effects by rarity** (designer's request, no new art: all in `creature.gdshader`,
+    following each sprite's outline, set by `fx` in `data/rarities.json`). Luminous and Radiant get an
+    outline glow in their colour; Brilliant adds a band of light sweeping across the body; Resplendent's
+    glow pulses; Zenith has a rainbow edge, a soft rainbow sheen and motes rising around it. On the
+    portrait frame, lights orbit the rim for the top three tiers (one, two, three) and Zenith's whole rim
+    is a moving rainbow.
 - **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
   of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
   wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the
