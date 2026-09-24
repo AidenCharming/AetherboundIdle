@@ -550,3 +550,18 @@ func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
 	t.ok(is_instance_valid(claim) and not claim.is_queued_for_deletion(), "an unrelated change doesn't rebuild the card mid-click")
 	main.free()
 	_teardown()
+
+
+## During the fade back to the title the state is empty; a worker bubble on the open skill page must not read it.
+func test_worker_bubble_waits_out_an_empty_state() -> void:
+	_setup()
+	var keep := Game.state
+	var c: Dictionary = keep.creatures.values()[0]
+	var bubble := WorkerBubble.make(c, "woodcutting", 58)
+	_layer.add_child(bubble)
+	Game.state = {}
+	bubble._process(0.016)
+	t.ok(true, "no error with an empty state")
+	Game.state = keep
+	_teardown()
+
