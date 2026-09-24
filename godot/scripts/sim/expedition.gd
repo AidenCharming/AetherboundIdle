@@ -26,7 +26,17 @@ static func is_running(s: Dictionary) -> bool:
 
 # ---------------------------------------------------------------- party
 
+const PARTY_LOCKED := "The party is out on an expedition. Stop it to change the party."
+
+
+## The party is fixed for a whole expedition: members join, leave or swap only while it is stopped.
+static func party_locked(s: Dictionary) -> bool:
+	return is_running(s)
+
+
 static func set_party_member(s: Dictionary, slot: int, c: Dictionary) -> String:
+	if party_locked(s):
+		return PARTY_LOCKED
 	var party: Array = s.expedition.party
 	var size: int = Data.tuning.combat.partySize
 	if slot < 0 or slot >= size:

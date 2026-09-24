@@ -31,7 +31,8 @@ func _ready() -> void:
 
 
 func play(sound: String, pitch := 1.0) -> void:
-	if not _streams.has(sound):
+	# headless runs (tests, exports) have no audio output, and sounds left playing at exit show up as leaks
+	if not _streams.has(sound) or DisplayServer.get_name() == "headless":
 		return
 	for p in _players:
 		if not p.playing:

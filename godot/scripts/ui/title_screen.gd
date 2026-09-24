@@ -33,12 +33,14 @@ func _ready() -> void:
 	_overlay = Control.new()
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_overlay.z_index = 110
 	add_child(_overlay)
 	Modal.layer = _overlay
 	_fade = ColorRect.new()
 	_fade.color = Color(0, 0, 0, 1)
 	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.z_index = 130
 	add_child(_fade)
 	create_tween().tween_property(_fade, "color:a", 0.0, 0.8)
 	Music.play("title")

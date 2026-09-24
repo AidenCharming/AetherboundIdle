@@ -232,10 +232,24 @@ func _fill_detail() -> void:
 		pm.add_icon_item(Data.ui_icon(sk.id), "%s  (%d/%d slots)" % [sk.name, GameState.workers(Game.state, sk.id).size(), GameState.slot_count(Game.state, sk.id)], i)
 	pm.id_pressed.connect(func(i): Game.assign(c.id, eligible[i].id))
 	actions.add_child(assign)
-	if Creatures.job_kind(c) != "party":
-		actions.add_child(UI.button("Join the party", "", func(): _join_party(c)))
+	# the party is fixed while an expedition runs
+	var party_locked := Expedition.party_locked(Game.state)
+	var in_party := Creatures.job_kind(c) == "party"
+	if in_party and party_locked:
+		assign.disabled = true
+		assign.tooltip_text = Expedition.PARTY_LOCKED
+	if not in_party:
+		var join := UI.button("Join the party", "", func(): _join_party(c))
+		join.disabled = party_locked
+		if party_locked:
+			join.tooltip_text = Expedition.PARTY_LOCKED
+		actions.add_child(join)
 	if not Creatures.is_benched(c):
-		actions.add_child(UI.button("Rest", "", func(): Game.bench(c.id)))
+		var rest := UI.button("Rest", "", func(): Game.bench(c.id))
+		rest.disabled = in_party and party_locked
+		if rest.disabled:
+			rest.tooltip_text = Expedition.PARTY_LOCKED
+		actions.add_child(rest)
 	actions.add_child(UI.button("Unlock" if c.get("locked", false) else "Lock", "", func(): Game.toggle_lock(c.id), Data.ui_icon("lock")))
 	_detail.add_child(actions)
 	# ability

@@ -11,6 +11,7 @@ var _log: VBoxContainer
 var _controls: HBoxContainer
 var _sky: SkyBackdrop
 var _log_count := -1
+var _party_locked := false
 
 
 func setup(arg: String) -> void:
@@ -200,6 +201,10 @@ func _fill_right() -> void:
 	pv.add_child(UI.wrap_label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
 	var party := GameState.party(s)
 	var party_size: int = Data.tuning.combat.partySize
+	var locked := Expedition.party_locked(s)
+	_party_locked = locked
+	if locked:
+		pv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.wrap_label("Locked while the expedition runs. Stop it to change the party.", "Dim")]))
 	for i in party_size:
 		var h := UI.hbox(10)
 		if i < party.size():
@@ -214,13 +219,17 @@ func _fill_right() -> void:
 			cv.add_child(UI.label("HP %s · PWR %s · GRD %s" % [F.format_num(st.health), F.format_num(st.power), F.format_num(st.guard)], "Faint"))
 			h.add_child(cv)
 			h.add_child(UI.spacer())
-			h.add_child(UI.button("Swap", "Ghost", func(): _pick_party(i)))
-			h.add_child(UI.button("Remove", "Ghost", func(): Game.bench(c.id)))
-		else:
+			if not locked:
+				h.add_child(UI.button("Swap", "Ghost", func(): _pick_party(i)))
+				h.add_child(UI.button("Remove", "Ghost", func(): Game.bench(c.id)))
+		elif not locked:
 			var e := WorkerBubble.make({}, "woodcutting", 64)
 			h.add_child(e)
 			h.add_child(UI.button("Add an Aetherling", "", func(): _pick_party(i)))
-		pv.add_child(h)
+		if h.get_child_count() > 0:
+			pv.add_child(h)
+		else:
+			h.free()
 	_right.add_child(UI.panel("Glass", pv))
 	# supplies
 	var sv := UI.vbox(8)
@@ -332,6 +341,8 @@ func _process(_d: float) -> void:
 	if _preview.visible == running_here:
 		_fill_preview()
 		_fill_controls()
+	if Expedition.party_locked(s) != _party_locked:
+		_fill_right()  # a run ending on its own frees the party
 	_arena.visible = running_here
 	if Game.battle_log.size() != _log_count or (not Game.battle_log.is_empty() and _log.get_child_count() > 0 and _log.get_child(0).get_meta("t", 0.0) != Game.battle_log[0].time):
 		_log_count = Game.battle_log.size()

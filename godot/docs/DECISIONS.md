@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 56 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 59 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -261,6 +261,10 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
   boss *Stormcrest, the Relay Eagle*; the reference had "TBD"). **Islands open by beating the previous
   boss** instead of gear requirements (gear is not built).
 - A wiped party rests 20 seconds and tries again (the reference's "briefly exhausted").
+- **The party is locked while an expedition runs.** Adding, swapping, removing, putting a member to work,
+  resting or releasing one is refused until the expedition is stopped. (At first a party change restarted
+  the run, which let a new member join mid-boss and threw away the run in progress.) Moving the party to
+  another island is still allowed: it is an explicit "abandon this run" action.
 - **Vessels: five tiers** (Tinker's, Sturdy, Polished, Resonant, Luminescent). Flimsy was dropped (weaker-
   sounding than the starter) and Aetheric Matrix too (and "Aetheric" is on the banned-root list). Bind
   chance = vessel base × falloff^(rarity − 1) × party bind bonus. Fabrication makes Tinker's and Sturdy;

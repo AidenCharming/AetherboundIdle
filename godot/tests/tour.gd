@@ -93,6 +93,11 @@ func _run() -> void:
 		Main.go("expeditions")
 		await _wait(5.0)
 		await _shot("expeditions")
+		# a dialog over a live battle: the fighters must stay underneath it
+		Main.instance._open_notifications()
+		await _wait(0.4)
+		await _shot("expeditions_dialog")
+		_close_modals()
 	if _want("shinies"):
 		Main.go("nexus")
 		var scr: Node = Main.instance._screen

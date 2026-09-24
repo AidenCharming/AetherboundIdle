@@ -24,12 +24,12 @@ func _ready() -> void:
 		var suite: Object = script.new()
 		suite.set("t", self)
 		for m in suite.get_method_list():
-			var name: String = m.name
-			if not name.begins_with("test_"):
+			var test_name: String = m.name
+			if not test_name.begins_with("test_"):
 				continue
-			current = "%s::%s" % [f.get_basename(), name]
+			current = "%s::%s" % [f.get_basename(), test_name]
 			var before := failures.size()
-			suite.call(name)
+			suite.call(test_name)
 			total += 1
 			if failures.size() == before:
 				print("  ok    ", current)

@@ -55,7 +55,11 @@ func _ready() -> void:
 	_reveal_layer.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_reveal_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_reveal_layer)
+	# Controls draw by z_index before tree order, and the arena lifts its fighters and effects a few z levels,
+	# so the overlays sit well above anything a screen can raise (reveal < dialogs < toasts < fade).
+	_reveal_layer.z_index = 100
 	_overlay = Control.new()
+	_overlay.z_index = 110
 	_overlay.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_overlay.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_overlay)
@@ -71,6 +75,7 @@ func _ready() -> void:
 	toasts.offset_top = -400
 	toasts.offset_bottom = -22
 	toasts.alignment = BoxContainer.ALIGNMENT_END
+	toasts.z_index = 120
 	add_child(toasts)
 	_reveal = Reveal.new()
 	_reveal_layer.add_child(_reveal)
@@ -78,6 +83,7 @@ func _ready() -> void:
 	_fade.color = Color(0, 0, 0, 1)
 	_fade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_fade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_fade.z_index = 130
 	add_child(_fade)
 	create_tween().tween_property(_fade, "color:a", 0.0, 0.6)
 

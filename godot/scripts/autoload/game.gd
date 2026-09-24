@@ -346,8 +346,10 @@ func assign(cid: String, skill_id: String) -> bool:
 	if c.is_empty():
 		return false
 	if c.job.get("kind", "") == "party":
+		if Expedition.party_locked(state):
+			warn(Expedition.PARTY_LOCKED)
+			return false
 		Expedition.remove_from_party(state, c)
-		_restart_run_if_running()
 	var err := Skills.assign(state, c, skill_id)
 	if err != "":
 		warn(err)
@@ -361,10 +363,11 @@ func bench(cid: String) -> void:
 	var c := creature(cid)
 	if c.is_empty():
 		return
-	var was_party: bool = c.job.get("kind", "") == "party"
-	if was_party:
+	if c.job.get("kind", "") == "party":
+		if Expedition.party_locked(state):
+			warn(Expedition.PARTY_LOCKED)
+			return
 		Expedition.remove_from_party(state, c)
-		_restart_run_if_running()
 	else:
 		Skills.unassign(state, c)
 	changed.emit()
@@ -390,13 +393,8 @@ func set_party(party_slot: int, cid: String) -> void:
 	var err := Expedition.set_party_member(state, party_slot, c)
 	if err != "":
 		warn(err)
-	_restart_run_if_running()
+		return
 	changed.emit()
-
-
-func _restart_run_if_running() -> void:
-	if Expedition.is_running(state) and not GameState.party(state).is_empty():
-		Expedition.start(state, state.expedition.zone, rng)
 
 
 func start_expedition(zone_id: String) -> void:
@@ -498,13 +496,13 @@ func release(cid: String) -> void:
 	var c := creature(cid)
 	if c.is_empty():
 		return
-	var was_party: bool = c.job.get("kind", "") == "party"
+	if c.job.get("kind", "") == "party" and Expedition.party_locked(state):
+		warn(Expedition.PARTY_LOCKED)
+		return
 	var v := Economy.release(state, c)
 	if v < 0:
 		warn("Locked Aetherlings (and your last one) cannot be released.")
 		return
-	if was_party:
-		_restart_run_if_running()
 	info("Released. +%d Aether" % v, Data.ui_icon("aether"))
 	changed.emit()
 

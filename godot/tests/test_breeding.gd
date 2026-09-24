@@ -100,11 +100,11 @@ func test_inherited_traits_are_valid() -> void:
 	var a := _c(s, "eclipsa", 1, [{"id": "aether-drenched", "s": "major"}, {"id": "lucky", "s": "minor"}, {"id": "scholar", "s": "moderate"}])
 	var b := _c(s, "sproutlet", 1, [{"id": "green-thumb", "s": "moderate"}])
 	for i in 200:
-		var tr := Breeding.inherit(rng, a, b, ["verdant"])
-		t.ok(tr.size() <= 3)
-		var ids := tr.map(func(x): return x.id)
+		var got := Breeding.inherit(rng, a, b, ["verdant"])
+		t.ok(got.size() <= 3)
+		var ids := got.map(func(x): return x.id)
 		t.ok(not ("aether-drenched" in ids), "void-only trait never lands on a non-Void creature")
-		for x in tr:
+		for x in got:
 			t.ok(Data.traits.has(x.id) and x.s in Traits.STRENGTHS)
 
 

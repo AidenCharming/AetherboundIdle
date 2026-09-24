@@ -177,3 +177,22 @@ func test_autobind_stops_at_max_copies_unless_rarer() -> void:
 		Collection.on_owned(s, c)
 	t.ok(not Expedition.wants_bind(s, {"species": "buzzbud", "rarity": 2, "shiny": false}), "two already")
 	t.ok(Expedition.wants_bind(s, {"species": "buzzbud", "rarity": 3, "shiny": false}), "rarer than the best")
+
+
+func test_the_party_is_locked_while_a_run_is_going() -> void:
+	var s := _party_game([["emberfang", 6, 20]])
+	var extra := Creatures.make(s, "sproutlet", 1, 3, false, [], "test")
+	s.creatures[extra.id] = extra
+	var rng := _rng()
+	t.eq(Expedition.start(s, "whisperleaf-hollow", rng), "")
+	for i in 40:
+		Expedition.step(s, 250.0, rng)
+	var wave := int(s.expedition.battle.wave)
+	t.eq(Expedition.set_party_member(s, 1, extra), Expedition.PARTY_LOCKED, "adding is refused")
+	t.eq(Expedition.set_party_member(s, 0, extra), Expedition.PARTY_LOCKED, "swapping is refused")
+	t.eq(GameState.party(s).size(), 1)
+	t.ok(Creatures.is_benched(extra), "the newcomer stayed where it was")
+	t.eq(int(s.expedition.battle.wave), wave, "the run carried on")
+	Expedition.stop(s)
+	t.eq(Expedition.set_party_member(s, 1, extra), "", "free again once stopped")
+	t.eq(GameState.party(s).size(), 2)

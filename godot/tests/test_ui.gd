@@ -120,3 +120,42 @@ func test_nexus_rename_and_bulk_release_close() -> void:
 	t.ok(Game.state.creatures.size() < before, "released some")
 	main.free()
 	_teardown()
+
+
+func test_party_changes_are_refused_mid_run_without_restarting_it() -> void:
+	_setup()
+	var starter: Dictionary = Game.state.creatures.values()[0]
+	Game.dev_grant("sproutlet", 1, 1, false)
+	var other: Dictionary = Game.state.creatures.values().filter(func(c): return c.id != starter.id)[0]
+	Game.set_party(0, starter.id)
+	Game.start_expedition("whisperleaf-hollow")
+	for i in 40:
+		Expedition.step(Game.state, 250.0, Game.rng)
+	var battle: Dictionary = Game.state.expedition.battle
+	Game.set_party(1, other.id)
+	Game.bench(starter.id)
+	t.ok(not Game.assign(starter.id, "woodcutting"), "assigning a party member is refused")
+	Game.release(starter.id)
+	t.ok(Game.state.expedition.battle == battle, "the same run is still going")
+	t.eq(GameState.party(Game.state).size(), 1)
+	t.eq(Creatures.job_kind(starter), "party")
+	t.ok(Game.state.creatures.has(starter.id), "not released")
+	Game.stop_expedition()
+	Game.set_party(1, other.id)
+	t.eq(GameState.party(Game.state).size(), 2, "the party opens up once stopped")
+	_teardown()
+
+
+func test_dialogs_draw_above_the_battle() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("expeditions", "whisperleaf-hollow")
+	t.ok(main._content.find_children("*", "", true, false).any(func(n): return n is Arena), "the arena is on screen")
+	var arena_top := 0
+	for n in main._content.find_children("*", "", true, false):
+		if n is CanvasItem:
+			arena_top = maxi(arena_top, n.z_index)
+	t.ok(main._overlay.z_index > arena_top + 20, "overlay z %d vs screens %d" % [main._overlay.z_index, arena_top])
+	main.free()
+	_teardown()
