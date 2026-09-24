@@ -16,9 +16,9 @@
 		"celestial-vessel": 10
 	},
 	"extraSlots": {
-		"_note": "Work slots past the fifth, one skill at a time (design.md: an endgame gold sink). Needs the skill's five slots open first.",
+		"_note": "Work slots past the fifth, bought per skill up to ten (designer's request; design.md: an endgame gold sink). Needs the skill's five slots open first. One price per extra slot, rising.",
 		"needLevel": 70,
-		"gold": [250000, 2000000]
+		"gold": [250000, 750000, 2000000, 5000000, 12000000]
 	},
 	"bulkSell": {
 		"keepOptions": [0, 10, 100, 1000],

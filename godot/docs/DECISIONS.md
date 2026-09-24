@@ -310,7 +310,8 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     unlocks. Tinker's Vessels are always for sale, so a player is never stuck without a way to bind. Any
     item's detail panel in the Inventory can buy more of it.
   - **Extra work slots** (design.md: an endgame gold sink): once a skill's five slots are open (level 70),
-    a sixth costs 250K gold and a seventh 2M, per skill.
+    slots six to ten are bought per skill for 250K, 750K, 2M, 5M and 12M gold. Ten is the cap (designer's
+    request); the Sanctum's station cards show workers five to a row, so a full skill is two tidy rows.
   - **Bulk selling** in the Inventory: this category (or everything but vessels and rare finds), up to a
     tier, keeping 0/10/100/1000 of each. Any item can be locked from its detail panel to stay out of it.
   - **Today's stock** rotates every 4 hours, the same for everyone watching that window (rolled from the

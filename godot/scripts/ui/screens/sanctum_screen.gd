@@ -120,12 +120,20 @@ func refresh() -> void:
 		else:
 			st.sub.text = action.name
 			st.card.modulate = Color.WHITE
+		# up to five bubbles a row (bought slots make a second row); they shrink to fit a full row
+		var n := GameState.slot_count(s, id)
+		var cols := mini(n, 5)
+		var room := 272 - (36 if ws.size() > 0 else 0)
+		var px := clampi(int((room - 6 * (cols - 1)) / float(cols)), 34, 58)
+		var grid := UI.grid(maxi(1, cols), 6, 6)
+		grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		st.workers.add_child(grid)
 		for c in ws:
-			var b := WorkerBubble.make(c, id, 58)
-			st.workers.add_child(b)
+			var b := WorkerBubble.make(c, id, px)
+			grid.add_child(b)
 			st.bubbles[c.id] = b
-		for i in GameState.slot_count(s, id) - ws.size():
-			st.workers.add_child(WorkerBubble.make({}, id, 58))
+		for i in n - ws.size():
+			grid.add_child(WorkerBubble.make({}, id, px))
 		if ws.size() > 0:
 			st.workers.add_child(UI.spacer())
 			st.workers.add_child(UI.icon(Data.item_icon(action.outputs.keys()[0]), 30))

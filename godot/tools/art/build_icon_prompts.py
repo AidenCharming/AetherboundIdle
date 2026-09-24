@@ -165,11 +165,6 @@ I("sturdy-vessel", "item", "Vessels", "m", ORB.format(body="made of thick pale-b
 I("polished-vessel", "item", "Vessels", "m", ORB.format(body="made of cyan glass with a polished silver cap and a silver band around its middle"))
 I("resonant-vessel", "item", "Vessels", "g", ORB.format(body="made of violet glass in an ornate silver frame, with two small tuning-fork prongs on its cap"))
 I("luminescent-vessel", "item", "Vessels", "m", ORB.format(body="made of pale-gold glass in an ornate gold filigree frame with a small crown-like cap") + " A small white star shape is painted in the centre.")
-I("gloaming-vessel", "item", "Vessels", "m", ORB.format(body="made of deep periwinkle-blue glass in a dark iron frame shaped like crescent moons, with a dark iron cap"))
-I("prismatic-vessel", "item", "Vessels", "m", ORB.format(body="made of clear aqua glass cut into flat facets like a gem, in a thin bright silver frame"))
-I("emberheart-vessel", "item", "Vessels", "m", ORB.format(body="made of warm orange glass in a black-iron frame, with bright orange crack lines painted on the glass like cooling lava"))
-I("stormglass-vessel", "item", "Vessels", "m", ORB.format(body="made of bright yellow glass in a brass frame, with a small zigzag lightning-bolt shape painted across the glass and a brass cap with a tiny lightning rod"))
-I("celestial-vessel", "item", "Vessels", "g", ORB.format(body="made of pearly ivory-white glass in a gold frame with small gold wings on either side and a gold cap topped by a tiny star"))
 
 # ----------------------------------------------------------------------------- parts (Fabrication) and Aether
 I("timber-frame", "item", "Parts", "m", "A small square wooden crate frame made of planks with crossed braces and dark iron corner brackets.")
@@ -214,13 +209,6 @@ I("xp", "ui", "Stats", "m", "A plump five-pointed golden star with rounded point
 I("upgrade", "ui", "Markers", "m", "A chunky mint-green arrow pointing straight up.", view="facing the viewer")
 I("owned", "ui", "Markers", "m", "A round emerald-green badge with a thick cream rim and a chunky cream paw print in the middle.", view="facing the viewer", note="Marks species you already own: in an island's list of Aetherlings and on wild fighters' name tags in battle. Shown small (16–20 px), so keep the paw bold.")
 I("shiny", "ui", "Markers", "m", "Two chunky shapes side by side, each shaped like a plus sign with long pointed tips: exactly four points (up, down, left, right) joined by deeply inward-curved sides, a white highlight shape on each, a large pale-gold one and a small pale-cyan one.", view="facing the viewer")
-I("market", "ui", "Navigation", "m", "A small wooden market stall with a red-and-cream striped awning and a wooden counter with one gold coin on it.")
-I("egg-market", "ui", "Navigation", "m", "A round woven wicker basket holding three eggs side by side: a mint-green one, a pale-peach one and a taller pearly white one in the middle.")
-I("boost-incense", "ui", "Market", "g", "A small violet ceramic incense bowl with a wisp of lilac smoke curling up from it.", note="The Aether Incense boost (+Aether for an hour).")
-I("boost-tonic", "ui", "Market", "m", "A round glass potion bottle full of bright red liquid, with a cork stopper and a small white plus sign painted on the front.", note="The Battle Tonic boost (+party XP).")
-I("boost-lure", "ui", "Market", "m", "A golden teardrop-shaped fishing lure hanging from a short line, with a white four-pointed star shape painted on it.", note="The Glimmer Lure boost (rarer wild Aetherlings).")
-I("boost-brew", "ui", "Market", "m", "A chunky tan wooden tankard with a cream foam top and two small curls of steam above it.", note="Tinker's Brew boost (faster work).")
-I("work-slot", "ui", "Market", "m", "A rectangular brass plaque with two rivets at the top corners and a green plus sign in its cream centre.", view="facing the viewer", note="Buying an extra work slot for a skill.")
 I("vessel", "ui", "Markers", "m", "", same_as="items/tinkerers-vessel", note="The top bar's vessel counter uses the Tinker's Vessel icon.")
 I("meal", "ui", "Markers", "m", "", same_as="items/bubble-stew", note="The top bar's meal counter uses the stew icon.")
 

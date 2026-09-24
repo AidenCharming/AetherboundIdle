@@ -53,8 +53,9 @@ func test_extra_work_slots() -> void:
 	t.eq(GameState.slot_count(s, "woodcutting"), 1, "only that skill")
 	for i in 5:
 		Market.buy_slot(s, "mining")
-	t.eq(Market.extra_slots(s, "mining"), Market.cfg().extraSlots.gold.size(), "stops at the last price")
+	t.eq(GameState.slot_count(s, "mining"), 10, "capped at ten")
 	t.eq(Market.next_slot_price(s, "mining"), -1)
+	t.eq(Market.slot_check(s, "mining"), "Every extra slot is open.")
 
 
 func test_bulk_sell_keeps_locked_and_some_of_each() -> void:

@@ -17,6 +17,10 @@ decided and why) and `README.md` (how to run things).
   what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the
   designer's `D:\AI` art folders** (the cloud): the "approved" marks come from that folder and would be wiped.
   Add the prompt to the builder and let the designer's run regenerate the docs.
+- **While the designer works on art locally:** don't edit `tools/art/build_icon_prompts.py` or
+  `tools/make_icons.py` from the cloud. Put new prompts and placeholder drawings in
+  `tools/art/artnew_merge_me_on_pull.md` (say where each block goes) so a pull never conflicts; commit the
+  placeholder SVGs themselves as usual.
 
 ## Running things
 
@@ -57,7 +61,7 @@ shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in
   probe doesn't track gold. Check them against real play, and whether buying materials makes gathering
   feel pointless.
 - Vessels now have ten tiers; the five new ones (Gloaming, Prismatic, Emberheart, Stormglass, Celestial) and the
-  seven new Market icons need paintings.
+  seven new Market icons need paintings. Their prompts are in `tools/art/artnew_merge_me_on_pull.md`.
 
 - Aether Pearl drop rates are estimates from timed runs (3–7 a day at the end); check them in play.
 
