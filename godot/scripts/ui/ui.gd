@@ -180,7 +180,17 @@ static func scroll(child: Control, horizontal := false) -> ScrollContainer:
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	s.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	child.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	s.add_child(child)
+	# a gutter between the content and the scrollbar, only while the scrollbar shows
+	var gutter := MarginContainer.new()
+	gutter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gutter.size_flags_vertical = child.size_flags_vertical
+	gutter.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	gutter.add_child(child)
+	s.add_child(gutter)
+	var bar := s.get_v_scroll_bar()
+	var fit := func(): gutter.add_theme_constant_override("margin_right", 12 if bar.visible else 0)
+	bar.visibility_changed.connect(fit)
+	fit.call()
 	return s
 
 

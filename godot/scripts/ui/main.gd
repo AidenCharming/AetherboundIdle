@@ -279,7 +279,16 @@ func _build_top_bar() -> Control:
 	var menu := UI.button("", "Ghost", open_pause_menu, Data.ui_icon("settings"))
 	menu.tooltip_text = "Menu (Esc)"
 	bar.add_child(menu)
-	return m
+	# a darker band with a hairline under it separates the top bar from the page
+	var band := PanelContainer.new()
+	var sb := ThemeFactory.box(Color(0.02, 0.025, 0.07, 0.55), 0, 0, Palette.LINE, 0)
+	sb.border_width_bottom = 1
+	sb.border_color = Palette.LINE_STRONG
+	sb.shadow_color = Color(0, 0, 0.04, 0.35)
+	sb.shadow_size = 6
+	band.add_theme_stylebox_override("panel", sb)
+	band.add_child(m)
+	return band
 
 
 func _chip(icon_name: String, tip: String) -> Dictionary:
