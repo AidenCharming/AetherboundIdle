@@ -32,11 +32,18 @@ var values := {
 }
 
 var _focused := true
+var save_delay := 0.4   ## seconds of quiet before a change is written (a dragged slider changes every frame)
+var _save_timer: Timer
+var save_count := 0   ## writes of options.cfg so far (the tests check the debounce with it)
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_ensure_buses()
+	_save_timer = Timer.new()
+	_save_timer.one_shot = true
+	_save_timer.timeout.connect(save_options)
+	add_child(_save_timer)
 	load_options()
 	apply()
 
@@ -57,8 +64,20 @@ func get_value(key: String) -> Variant:
 func set_value(key: String, v: Variant) -> void:
 	values[key] = v
 	apply()
-	save_options()
+	_save_timer.start(save_delay)   # restarts on every change: one write once the player lets go
 	options_changed.emit()
+
+
+## True while a change waits for the debounce timer to write it.
+func save_pending() -> bool:
+	return _save_timer != null and not _save_timer.is_stopped()
+
+
+## Writes a waiting change now (on quit, so it isn't lost with the timer).
+func flush() -> void:
+	if save_pending():
+		_save_timer.stop()
+		save_options()
 
 
 func load_options() -> void:
@@ -71,6 +90,7 @@ func load_options() -> void:
 
 
 func save_options() -> void:
+	save_count += 1
 	var cfg := ConfigFile.new()
 	for k in values:
 		cfg.set_value("options", k, values[k])
@@ -127,6 +147,8 @@ func _notification(what: int) -> void:
 		NOTIFICATION_APPLICATION_FOCUS_IN:
 			_focused = true
 			apply()
+		NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_EXIT_TREE:
+			flush()   # the window is closing or a Quit button called get_tree().quit()
 
 
 ## Size of the screen the window is on (the fullscreen size).

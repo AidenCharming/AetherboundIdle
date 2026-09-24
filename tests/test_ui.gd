@@ -583,3 +583,19 @@ func test_pods_forget_the_parents_of_another_save() -> void:
 	t.eq(PodsScreen.parent_a, "", "parent A cleared")
 	t.eq(PodsScreen.parent_b, "", "parent B cleared")
 	_teardown()
+
+
+## Dragging a slider changes an option every frame; options.cfg is written once, after the changes stop.
+func test_option_changes_are_saved_once_after_they_stop() -> void:
+	var key := "music"
+	var was: float = Options.get_value(key)
+	var writes := Options.save_count
+	for i in 20:
+		Options.set_value(key, was)   # the same value, so the player's options.cfg ends up unchanged
+	t.eq(Options.save_count, writes, "nothing written while the changes keep coming")
+	t.ok(Options.save_pending(), "a write is waiting")
+	Options.flush()   # what the timer does when it runs (the runner can't wait for it)
+	t.eq(Options.save_count, writes + 1, "written once")
+	t.ok(not Options.save_pending(), "nothing left waiting")
+	Options.flush()
+	t.eq(Options.save_count, writes + 1, "and not again")
