@@ -261,7 +261,10 @@ func _fill_controls() -> void:
 			b.tooltip_text = "Choose a party on the right first."
 		_controls.add_child(b)
 	else:
-		_controls.add_child(UI.label("Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name, "Dim"))
+		var lk := UI.label("Locked", "Dim")
+		lk.tooltip_text = "Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name
+		lk.mouse_filter = Control.MOUSE_FILTER_PASS
+		_controls.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), lk]))
 	var rep := CheckButton.new()
 	rep.text = "Repeat"
 	rep.tooltip_text = "Start the next run by itself when one ends."
