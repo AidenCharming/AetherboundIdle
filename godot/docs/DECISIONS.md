@@ -115,7 +115,9 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   "N to bind!") and the expedition log filling the rest. Log lines are small cards with an icon (a portrait for
   captures), the text and how long ago, edged in the line's colour. Party, Auto-bind and Supplies sit under the
   battle as three tabs. The island list and the log column each fold to a slim strip (the battle widens), and the
-  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). Party members on a running expedition are no longer offered in the worker picker.
+  choice is remembered (`exp_zones_open`, `exp_log_open` in options.cfg). The run controls (Explore or Stop, Repeat) sit on the
+  tab row. The painted backdrop covers the arena resting on its bottom edge (a wide arena crops sky, never ground),
+  and the fighters' ground line follows the image as drawn, so they always stand on the painted ground. Party members on a running expedition are no longer offered in the worker picker.
 - **Welcome back** (designer's request): a headline with the time away, big tiles for Aether, gold, tasks and ready
   eggs, items as named cards, level-ups with before and after, highlights with icons, and captures grouped by kind
   with portraits (shinies first).
@@ -473,7 +475,7 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   creature. The **creature level cap is now 100** (was 60) so these islands have somewhere to go. Balance
   probe: a Gleaming party handles the Rift at 72, the Expanse needs Luminous, the Spire wants Radiant (or
   Luminous in the 90s). Four goals follow the old last boss goal.
-- A wiped party rests 20 seconds and tries again (the reference's "briefly exhausted").
+- A wiped party rests 10 seconds and tries again (the reference's "briefly exhausted"; 20 until the designer asked for 10).
 - **The party is locked while an expedition runs.** Adding, swapping, removing, putting a member to work,
   resting or releasing one is refused until the expedition is stopped. (At first a party change restarted
   the run, which let a new member join mid-boss and threw away the run in progress.) Moving the party to

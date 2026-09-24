@@ -27,10 +27,11 @@ const HORIZON_Y := 0.62
 func _ready() -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	# the painted backdrop is placed by _layout_backdrop: it covers the arena, but its bottom edge stays on the
+	# arena's bottom, so the painted ground is always where the fighters stand, however wide the arena gets
 	_backdrop = TextureRect.new()
-	_backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-	_backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_backdrop.stretch_mode = TextureRect.STRETCH_SCALE
 	_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_backdrop)
 	_ground = Control.new()
@@ -289,6 +290,29 @@ func _burst(at: Vector2, col: Color, strength: float) -> void:
 	tw.tween_callback(fx.queue_free)
 
 
+## Scales the backdrop to cover the arena, centred left to right and resting on the arena's bottom edge (a wide
+## arena crops sky, never ground).
+func _layout_backdrop() -> void:
+	var tex := _backdrop.texture
+	if tex == null:
+		_backdrop.position = Vector2.ZERO
+		_backdrop.size = size
+		return
+	var ts := Vector2(tex.get_size())
+	var k := maxf(size.x / ts.x, size.y / ts.y)
+	var drawn := ts * k
+	_backdrop.size = drawn
+	_backdrop.position = Vector2((size.x - drawn.x) / 2.0, size.y - drawn.y)
+
+
+## Where the fighters' feet go: {y, h} in arena pixels, h being the height the ground band scales with. A painted
+## backdrop has its ground at GROUND_Y of the image, wherever the image is drawn.
+func _ground_line() -> Dictionary:
+	if _backdrop.texture != null:
+		return {"y": _backdrop.position.y + GROUND_Y * _backdrop.size.y, "h": _backdrop.size.y}
+	return {"y": size.y * GROUND_Y, "h": size.y}
+
+
 func _clear() -> void:
 	for list in [_allies, _enemies]:
 		for f in list:
@@ -301,8 +325,10 @@ func _build(b: Dictionary) -> void:
 	_zone_type = Data.zones[b.zone].type
 	_zone_seed = float(hash(String(b.zone)) % 1000) / 37.0
 	_backdrop.texture = Data.zone_backdrop(b.zone)
+	_layout_backdrop()
 	_ground.queue_redraw()
 	var s := size
+	var ground := _ground_line()
 	for side in [0, 1]:
 		var list: Array = b.allies if side == 0 else b.enemies
 		var n := list.size()
@@ -331,7 +357,7 @@ func _build(b: Dictionary) -> void:
 			por.refresh()
 			# stand the visible art on the ground line: its lowest opaque pixel touches the feet line
 			var art := por.art_bounds()
-			var feet_y := s.y * (GROUND_Y - (BACK_ROW_RISE if back else 0.0))
+			var feet_y: float = ground.y - (ground.h * BACK_ROW_RISE if back else 0.0)
 			root.position = Vector2(x, feet_y - art.end.y)
 			var shadow := Control.new()
 			shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE

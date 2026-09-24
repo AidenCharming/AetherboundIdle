@@ -209,7 +209,7 @@
 		"voidHybridFraction": 0.5,
 		"variance": 0.1,
 		"waveGapMs": 1200,
-		"exhaustMs": 20000,
+		"exhaustMs": 10000,
 		"eatBelow": 0.6,
 		"partySize": 3,
 		"xpPerKill": {

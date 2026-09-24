@@ -10,6 +10,7 @@ var _right: VBoxContainer
 var _log: VBoxContainer
 var _log_top := -1.0
 var _bind: VBoxContainer
+var _tabs_box: HBoxContainer
 var _controls: HBoxContainer
 var _sky: SkyBackdrop
 var _log_count := -1
@@ -28,12 +29,12 @@ func _ready() -> void:
 	var s := Game.state
 	if zone_id == "":
 		zone_id = s.expedition.zone if s.expedition.zone != "" else Data.zone_list[0].id
-	var row := UI.hbox(16)
-	var m := UI.margin(row, 22, 10, 22, 18)
+	var row := UI.hbox(10)
+	var m := UI.margin(row, 12, 8, 12, 10)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
 	# zones: a list that folds to a slim strip (the choice is remembered in Options)
-	var zl := UI.vbox(10)
+	var zl := UI.vbox(8)
 	zl.custom_minimum_size.x = 268
 	var zh := UI.hbox(6)
 	zh.add_child(UI.header("Expeditions", "", Data.ui_icon("expeditions"), 38))
@@ -49,7 +50,7 @@ func _ready() -> void:
 	row.add_child(zstrip)
 	_folds.zones = [zl, zstrip]
 	# centre: arena + log
-	var mid := UI.vbox(12)
+	var mid := UI.vbox(8)
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(mid)
 	_arena_host = PanelContainer.new()
@@ -64,14 +65,21 @@ func _ready() -> void:
 	_arena_host.add_child(_arena)
 	_preview = UI.vbox(10)
 	_arena_host.add_child(UI.margin(_preview, 28, 22, 28, 22))
+	# under the battle: one panel with the tabs (Party, Auto-bind, Supplies) and the run controls on the same row
+	var bottom := UI.vbox(8)
+	var top := UI.hbox(8)
+	_tabs_box = UI.hbox(8)
+	top.add_child(_tabs_box)
+	top.add_child(UI.spacer())
 	_controls = UI.hbox(10)
-	mid.add_child(_controls)
-	# party, auto-bind and supplies sit under the battle as tabs
+	top.add_child(_controls)
+	bottom.add_child(top)
 	_bind = UI.vbox(8)
-	mid.add_child(UI.panel("Glass", _bind))
+	bottom.add_child(_bind)
+	mid.add_child(UI.panel("Glass", bottom))
 	# right: shinies waiting for a vessel, then the expedition log filling the column; it folds to a strip
-	var rcol := UI.vbox(12)
-	rcol.custom_minimum_size.x = 380
+	var rcol := UI.vbox(8)
+	rcol.custom_minimum_size.x = 340
 	row.add_child(rcol)
 	_right = UI.vbox(12)
 	rcol.add_child(_right)
@@ -242,10 +250,12 @@ func _fill_controls() -> void:
 	var z: Dictionary = Data.zones[zone_id]
 	var running: bool = Expedition.is_running(s)
 	if running and s.expedition.zone == zone_id:
-		_controls.add_child(UI.button("Stop the expedition", "Danger", func(): Game.stop_expedition()))
+		var stop := UI.button("Stop", "Danger", func(): Game.stop_expedition())
+		stop.tooltip_text = "Stop the expedition"
+		_controls.add_child(stop)
 	elif Expedition.zone_unlocked(s, zone_id):
-		var txt := "Explore %s" % z.name if not running else "Move the party to %s" % z.name
-		var b := UI.button(txt, "Primary", func(): Game.start_expedition(zone_id))
+		var b := UI.button("Explore" if not running else "Move here", "Primary", func(): Game.start_expedition(zone_id))
+		b.tooltip_text = ("Explore %s" if not running else "Move the party to %s") % z.name
 		b.disabled = GameState.party(s).is_empty()
 		if b.disabled:
 			b.tooltip_text = "Choose a party on the right first."
@@ -253,11 +263,11 @@ func _fill_controls() -> void:
 	else:
 		_controls.add_child(UI.label("Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name, "Dim"))
 	var rep := CheckButton.new()
-	rep.text = "Repeat runs automatically"
+	rep.text = "Repeat"
+	rep.tooltip_text = "Start the next run by itself when one ends."
 	rep.button_pressed = bool(s.expedition.autoRepeat)
 	rep.toggled.connect(func(on):
 		Game.state.expedition.autoRepeat = on)
-	_controls.add_child(UI.spacer())
 	_controls.add_child(rep)
 
 
@@ -363,13 +373,13 @@ func _party_tab() -> VBoxContainer:
 func _fill_bottom() -> void:
 	var s := Game.state
 	UI.clear(_bind)
-	var tabs := UI.hbox(8)
+	UI.clear(_tabs_box)
+	var tabs := _tabs_box
 	for pair in [["party", "Party", "power"], ["autobind", "Auto-bind", "vessel"], ["supplies", "Supplies", "meal"]]:
 		var b := UI.button(pair[1], "ChipOn" if _bottom_tab == pair[0] else "Chip", func():
 			_bottom_tab = pair[0]
 			_fill_bottom(), Data.ui_icon(pair[2]))
 		tabs.add_child(b)
-	_bind.add_child(tabs)
 	if _bottom_tab == "party":
 		_bind.add_child(_party_tab())
 		return
