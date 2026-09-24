@@ -58,6 +58,28 @@
 		}
 	},
 	{
+		"id": "herb-work",
+		"text": "Put an Aetherling to work in Herbalism",
+		"check": {
+			"kind": "working",
+			"skill": "herbalism"
+		},
+		"reward": {
+			"aether": 40
+		}
+	},
+	{
+		"id": "scav-work",
+		"text": "Send an Aetherling Scavenging (any Aetherling can)",
+		"check": {
+			"kind": "working",
+			"skill": "scavenging"
+		},
+		"reward": {
+			"gold": 30
+		}
+	},
+	{
 		"id": "vessel",
 		"text": "Make a Tinker's Vessel in Fabrication (any Aetherling can)",
 		"check": {
@@ -69,6 +91,30 @@
 			"items": {
 				"scrap": 5
 			}
+		}
+	},
+	{
+		"id": "mint",
+		"text": "Hold 20 Mintleaf",
+		"check": {
+			"kind": "item",
+			"item": "mintleaf",
+			"n": 20
+		},
+		"reward": {
+			"aether": 50
+		}
+	},
+	{
+		"id": "kills25",
+		"text": "Defeat 25 wild Aetherlings",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 25
+		},
+		"reward": {
+			"gold": 60
 		}
 	},
 	{
@@ -110,6 +156,19 @@
 		}
 	},
 	{
+		"id": "captures5",
+		"text": "Bind 5 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 5
+		},
+		"reward": {
+			"items": {
+				"tinkerers-vessel": 4
+			}
+		}
+	},
+	{
 		"id": "boss1",
 		"text": "Defeat Old Thicketroll at the end of Whisperleaf Hollow",
 		"check": {
@@ -131,6 +190,40 @@
 			"items": {
 				"copper-ore": 20
 			}
+		}
+	},
+	{
+		"id": "mine-work",
+		"text": "Put a Telluric Aetherling to work in Mining",
+		"check": {
+			"kind": "working",
+			"skill": "mining"
+		},
+		"reward": {
+			"aether": 150
+		}
+	},
+	{
+		"id": "frames",
+		"text": "Make 4 Timber Frames in Fabrication (Fabrication level 10)",
+		"check": {
+			"kind": "item",
+			"item": "timber-frame",
+			"n": 4
+		},
+		"reward": {
+			"gold": 150
+		}
+	},
+	{
+		"id": "creatures6",
+		"text": "Own 6 Aetherlings",
+		"check": {
+			"kind": "creatures",
+			"n": 6
+		},
+		"reward": {
+			"aether": 200
 		}
 	},
 	{
@@ -156,14 +249,59 @@
 		}
 	},
 	{
-		"id": "form2",
-		"text": "Evolve an Aetherling to its second form (level 20)",
+		"id": "herb20",
+		"text": "Reach Herbalism level 20",
 		"check": {
-			"kind": "form",
-			"n": 2
+			"kind": "skill_level",
+			"skill": "herbalism",
+			"n": 20
 		},
 		"reward": {
-			"aether": 500
+			"aether": 300
+		}
+	},
+	{
+		"id": "boss2",
+		"text": "Defeat Granitusk in the Fractured Quarry",
+		"check": {
+			"kind": "zone",
+			"zone": "fractured-quarry"
+		},
+		"reward": {
+			"gold": 600
+		}
+	},
+	{
+		"id": "pyric",
+		"text": "Bind your first Pyric Aetherling in the Smoldering Caldera",
+		"check": {
+			"kind": "own_type",
+			"type": "pyric"
+		},
+		"reward": {
+			"gold": 400
+		}
+	},
+	{
+		"id": "smith-work",
+		"text": "Put a Pyric Aetherling to work in Smithing",
+		"check": {
+			"kind": "working",
+			"skill": "smithing"
+		},
+		"reward": {
+			"aether": 300
+		}
+	},
+	{
+		"id": "cook-work",
+		"text": "Put a Pyric Aetherling to work in Cooking",
+		"check": {
+			"kind": "working",
+			"skill": "cooking"
+		},
+		"reward": {
+			"gold": 300
 		}
 	},
 	{
@@ -180,14 +318,47 @@
 		}
 	},
 	{
-		"id": "boss2",
-		"text": "Defeat Granitusk in the Fractured Quarry",
+		"id": "form2",
+		"text": "Evolve an Aetherling to its second form (level 20)",
+		"check": {
+			"kind": "form",
+			"n": 2
+		},
+		"reward": {
+			"aether": 500
+		}
+	},
+	{
+		"id": "boss3",
+		"text": "Defeat Ignis Prime in the Smoldering Caldera",
 		"check": {
 			"kind": "zone",
-			"zone": "fractured-quarry"
+			"zone": "smoldering-caldera"
+		},
+		"reward": {
+			"gold": 1500
+		}
+	},
+	{
+		"id": "aqueous",
+		"text": "Bind your first Aqueous Aetherling at Whispering Tides",
+		"check": {
+			"kind": "own_type",
+			"type": "aqueous"
 		},
 		"reward": {
 			"gold": 600
+		}
+	},
+	{
+		"id": "fish-work",
+		"text": "Put an Aqueous Aetherling to work in Fishing",
+		"check": {
+			"kind": "working",
+			"skill": "fishing"
+		},
+		"reward": {
+			"aether": 500
 		}
 	},
 	{
@@ -202,14 +373,38 @@
 		}
 	},
 	{
-		"id": "boss3",
-		"text": "Defeat Ignis Prime in the Smoldering Caldera",
+		"id": "total150",
+		"text": "Reach a total skill level of 150",
 		"check": {
-			"kind": "zone",
-			"zone": "smoldering-caldera"
+			"kind": "total_level",
+			"n": 150
 		},
 		"reward": {
-			"gold": 1500
+			"aether": 600
+		}
+	},
+	{
+		"id": "captures15",
+		"text": "Bind 15 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 15
+		},
+		"reward": {
+			"items": {
+				"sturdy-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "rarity3",
+		"text": "Own a Steady Aetherling (better eggs or luckier binds)",
+		"check": {
+			"kind": "rarity",
+			"n": 3
+		},
+		"reward": {
+			"aether": 400
 		}
 	},
 	{
@@ -226,6 +421,87 @@
 		}
 	},
 	{
+		"id": "voltaic",
+		"text": "Bind your first Voltaic Aetherling on the Thunderhum Steppe",
+		"check": {
+			"kind": "own_type",
+			"type": "voltaic"
+		},
+		"reward": {
+			"gold": 1000
+		}
+	},
+	{
+		"id": "circ-work",
+		"text": "Put a Voltaic Aetherling to work in Circuitry",
+		"check": {
+			"kind": "working",
+			"skill": "circuitry"
+		},
+		"reward": {
+			"aether": 800
+		}
+	},
+	{
+		"id": "upgrades3",
+		"text": "Build 3 upgrades in Sanctum Works",
+		"check": {
+			"kind": "upgrades",
+			"n": 3
+		},
+		"reward": {
+			"gold": 1000
+		}
+	},
+	{
+		"id": "species15",
+		"text": "Log 15 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 15
+		},
+		"reward": {
+			"items": {
+				"polished-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "slot3",
+		"text": "Open a third work slot in any skill (skill level 25)",
+		"check": {
+			"kind": "slots",
+			"n": 3
+		},
+		"reward": {
+			"aether": 1200
+		}
+	},
+	{
+		"id": "bred10",
+		"text": "Lay 10 eggs in the Genesis Pods",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 10
+		},
+		"reward": {
+			"aether": 1000
+		}
+	},
+	{
+		"id": "mine30",
+		"text": "Reach Mining level 30",
+		"check": {
+			"kind": "skill_level",
+			"skill": "mining",
+			"n": 30
+		},
+		"reward": {
+			"gold": 1500
+		}
+	},
+	{
 		"id": "boss5",
 		"text": "Defeat Stormcrest on the Thunderhum Steppe",
 		"check": {
@@ -237,6 +513,98 @@
 		}
 	},
 	{
+		"id": "void",
+		"text": "Bind your first Void Aetherling at Null Horizon",
+		"check": {
+			"kind": "own_type",
+			"type": "void"
+		},
+		"reward": {
+			"aether": 2000
+		}
+	},
+	{
+		"id": "weave-work",
+		"text": "Put a Void Aetherling to work in Aether-Weaving",
+		"check": {
+			"kind": "working",
+			"skill": "aether-weaving"
+		},
+		"reward": {
+			"gold": 1500
+		}
+	},
+	{
+		"id": "vcraft-work",
+		"text": "Put a Void Aetherling to work in Vessel Crafting",
+		"check": {
+			"kind": "working",
+			"skill": "vessel-crafting"
+		},
+		"reward": {
+			"aether": 1500
+		}
+	},
+	{
+		"id": "rarity4",
+		"text": "Own a Gleaming Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 4
+		},
+		"reward": {
+			"gold": 2000
+		}
+	},
+	{
+		"id": "total300",
+		"text": "Reach a total skill level of 300",
+		"check": {
+			"kind": "total_level",
+			"n": 300
+		},
+		"reward": {
+			"aether": 2500
+		}
+	},
+	{
+		"id": "hybrids3",
+		"text": "Discover 3 hybrids",
+		"check": {
+			"kind": "hybrids",
+			"n": 3
+		},
+		"reward": {
+			"items": {
+				"polished-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "lv30",
+		"text": "Raise an Aetherling to level 30",
+		"check": {
+			"kind": "creature_level",
+			"n": 30
+		},
+		"reward": {
+			"gold": 2500
+		}
+	},
+	{
+		"id": "captures30",
+		"text": "Bind 30 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 30
+		},
+		"reward": {
+			"items": {
+				"resonant-vessel": 3
+			}
+		}
+	},
+	{
 		"id": "boss6",
 		"text": "Defeat The Aetherial Apex at Null Horizon",
 		"check": {
@@ -245,6 +613,147 @@
 		},
 		"reward": {
 			"aether": 25000
+		}
+	},
+	{
+		"id": "kills500",
+		"text": "Defeat 500 wild Aetherlings",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 500
+		},
+		"reward": {
+			"gold": 4000
+		}
+	},
+	{
+		"id": "upgrades6",
+		"text": "Build 6 upgrades in Sanctum Works",
+		"check": {
+			"kind": "upgrades",
+			"n": 6
+		},
+		"reward": {
+			"aether": 5000
+		}
+	},
+	{
+		"id": "species20",
+		"text": "Log 20 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 20
+		},
+		"reward": {
+			"items": {
+				"resonant-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "all30",
+		"text": "Reach level 30 in every skill",
+		"check": {
+			"kind": "skills_at",
+			"level": 30,
+			"n": 11
+		},
+		"reward": {
+			"gold": 6000
+		}
+	},
+	{
+		"id": "form3",
+		"text": "Evolve an Aetherling to its final form (level 40)",
+		"check": {
+			"kind": "form",
+			"n": 3
+		},
+		"reward": {
+			"aether": 8000
+		}
+	},
+	{
+		"id": "rarity5",
+		"text": "Own a Luminous Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 5
+		},
+		"reward": {
+			"gold": 8000
+		}
+	},
+	{
+		"id": "slot4",
+		"text": "Open a fourth work slot in any skill (skill level 45)",
+		"check": {
+			"kind": "slots",
+			"n": 4
+		},
+		"reward": {
+			"aether": 10000
+		}
+	},
+	{
+		"id": "hatches15",
+		"text": "Hatch 15 eggs",
+		"check": {
+			"kind": "counter",
+			"counter": "hatches",
+			"n": 15
+		},
+		"reward": {
+			"items": {
+				"luminescent-vessel": 2
+			}
+		}
+	},
+	{
+		"id": "total500",
+		"text": "Reach a total skill level of 500",
+		"check": {
+			"kind": "total_level",
+			"n": 500
+		},
+		"reward": {
+			"gold": 12000
+		}
+	},
+	{
+		"id": "hybrids5",
+		"text": "Discover 5 hybrids",
+		"check": {
+			"kind": "hybrids",
+			"n": 5
+		},
+		"reward": {
+			"aether": 15000
+		}
+	},
+	{
+		"id": "resframe",
+		"text": "Make a Resonance Frame in Fabrication (level 45)",
+		"check": {
+			"kind": "item",
+			"item": "resonance-frame",
+			"n": 1
+		},
+		"reward": {
+			"gold": 10000
+		}
+	},
+	{
+		"id": "all50",
+		"text": "Reach level 50 in every skill",
+		"check": {
+			"kind": "skills_at",
+			"level": 50,
+			"n": 11
+		},
+		"reward": {
+			"aether": 20000
 		}
 	},
 	{
@@ -261,6 +770,75 @@
 		}
 	},
 	{
+		"id": "lv50",
+		"text": "Raise an Aetherling to level 50",
+		"check": {
+			"kind": "creature_level",
+			"n": 50
+		},
+		"reward": {
+			"gold": 20000
+		}
+	},
+	{
+		"id": "upgrades10",
+		"text": "Build 10 upgrades in Sanctum Works",
+		"check": {
+			"kind": "upgrades",
+			"n": 10
+		},
+		"reward": {
+			"aether": 25000
+		}
+	},
+	{
+		"id": "captures60",
+		"text": "Bind 60 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 60
+		},
+		"reward": {
+			"items": {
+				"luminescent-vessel": 4
+			}
+		}
+	},
+	{
+		"id": "rarity6",
+		"text": "Own a Radiant Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 6
+		},
+		"reward": {
+			"gold": 30000
+		}
+	},
+	{
+		"id": "species25",
+		"text": "Log 25 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 25
+		},
+		"reward": {
+			"aether": 35000
+		}
+	},
+	{
+		"id": "bosses25",
+		"text": "Defeat 25 island bosses",
+		"check": {
+			"kind": "counter",
+			"counter": "bossKills",
+			"n": 25
+		},
+		"reward": {
+			"gold": 35000
+		}
+	},
+	{
 		"id": "boss8",
 		"text": "Defeat Craterchomp in the Magmaglass Rift",
 		"check": {
@@ -272,6 +850,149 @@
 		}
 	},
 	{
+		"id": "hybrids8",
+		"text": "Discover 8 hybrids",
+		"check": {
+			"kind": "hybrids",
+			"n": 8
+		},
+		"reward": {
+			"items": {
+				"gloaming-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "total660",
+		"text": "Reach a total skill level of 660 (60 average)",
+		"check": {
+			"kind": "total_level",
+			"n": 660
+		},
+		"reward": {
+			"aether": 60000
+		}
+	},
+	{
+		"id": "slot5",
+		"text": "Open a fifth work slot in any skill (skill level 70)",
+		"check": {
+			"kind": "slots",
+			"n": 5
+		},
+		"reward": {
+			"gold": 60000
+		}
+	},
+	{
+		"id": "circ70",
+		"text": "Reach Circuitry level 70",
+		"check": {
+			"kind": "skill_level",
+			"skill": "circuitry",
+			"n": 70
+		},
+		"reward": {
+			"aether": 70000
+		}
+	},
+	{
+		"id": "lantern",
+		"text": "Make an Aether Lantern in Fabrication (level 70)",
+		"check": {
+			"kind": "item",
+			"item": "aether-lantern",
+			"n": 1
+		},
+		"reward": {
+			"gold": 70000
+		}
+	},
+	{
+		"id": "bred50",
+		"text": "Lay 50 eggs in the Genesis Pods",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 50
+		},
+		"reward": {
+			"aether": 80000
+		}
+	},
+	{
+		"id": "rarity7",
+		"text": "Own a Brilliant Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 7
+		},
+		"reward": {
+			"items": {
+				"prismatic-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "lv70",
+		"text": "Raise an Aetherling to level 70",
+		"check": {
+			"kind": "creature_level",
+			"n": 70
+		},
+		"reward": {
+			"gold": 90000
+		}
+	},
+	{
+		"id": "all70",
+		"text": "Reach level 70 in every skill",
+		"check": {
+			"kind": "skills_at",
+			"level": 70,
+			"n": 11
+		},
+		"reward": {
+			"aether": 100000
+		}
+	},
+	{
+		"id": "upgrades15",
+		"text": "Build 15 upgrades in Sanctum Works",
+		"check": {
+			"kind": "upgrades",
+			"n": 15
+		},
+		"reward": {
+			"gold": 100000
+		}
+	},
+	{
+		"id": "species30",
+		"text": "Log 30 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 30
+		},
+		"reward": {
+			"items": {
+				"prismatic-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "kills5000",
+		"text": "Defeat 5,000 wild Aetherlings",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 5000
+		},
+		"reward": {
+			"aether": 120000
+		}
+	},
+	{
 		"id": "boss9",
 		"text": "Defeat Brinesoul over the Stormsea Expanse",
 		"check": {
@@ -280,6 +1001,159 @@
 		},
 		"reward": {
 			"aether": 60000
+		}
+	},
+	{
+		"id": "hybrids10",
+		"text": "Discover 10 hybrids",
+		"check": {
+			"kind": "hybrids",
+			"n": 10
+		},
+		"reward": {
+			"items": {
+				"emberheart-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "captures150",
+		"text": "Bind 150 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 150
+		},
+		"reward": {
+			"gold": 150000
+		}
+	},
+	{
+		"id": "total880",
+		"text": "Reach a total skill level of 880 (80 average)",
+		"check": {
+			"kind": "total_level",
+			"n": 880
+		},
+		"reward": {
+			"aether": 180000
+		}
+	},
+	{
+		"id": "rarity8",
+		"text": "Own a Resplendent Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 8
+		},
+		"reward": {
+			"items": {
+				"emberheart-vessel": 5
+			}
+		}
+	},
+	{
+		"id": "lv80",
+		"text": "Raise an Aetherling to level 80",
+		"check": {
+			"kind": "creature_level",
+			"n": 80
+		},
+		"reward": {
+			"gold": 200000
+		}
+	},
+	{
+		"id": "stormglass",
+		"text": "Hold a Stormglass Vessel (Vessel Crafting level 70)",
+		"check": {
+			"kind": "item",
+			"item": "stormglass-vessel",
+			"n": 1
+		},
+		"reward": {
+			"aether": 220000
+		}
+	},
+	{
+		"id": "bosses100",
+		"text": "Defeat 100 island bosses",
+		"check": {
+			"kind": "counter",
+			"counter": "bossKills",
+			"n": 100
+		},
+		"reward": {
+			"gold": 250000
+		}
+	},
+	{
+		"id": "species35",
+		"text": "Log 35 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 35
+		},
+		"reward": {
+			"aether": 250000
+		}
+	},
+	{
+		"id": "total990",
+		"text": "Reach a total skill level of 990 (90 average)",
+		"check": {
+			"kind": "total_level",
+			"n": 990
+		},
+		"reward": {
+			"gold": 500000
+		}
+	},
+	{
+		"id": "hybrids15",
+		"text": "Discover all 15 hybrids",
+		"check": {
+			"kind": "hybrids",
+			"n": 15
+		},
+		"reward": {
+			"items": {
+				"stormglass-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "all90",
+		"text": "Reach level 90 in every skill",
+		"check": {
+			"kind": "skills_at",
+			"level": 90,
+			"n": 11
+		},
+		"reward": {
+			"aether": 300000
+		}
+	},
+	{
+		"id": "celestial",
+		"text": "Hold a Celestial Vessel (Vessel Crafting level 80)",
+		"check": {
+			"kind": "item",
+			"item": "celestial-vessel",
+			"n": 1
+		},
+		"reward": {
+			"gold": 300000
+		}
+	},
+	{
+		"id": "lv90",
+		"text": "Raise an Aetherling to level 90",
+		"check": {
+			"kind": "creature_level",
+			"n": 90
+		},
+		"reward": {
+			"aether": 350000
 		}
 	},
 	{
@@ -297,6 +1171,91 @@
 		}
 	},
 	{
+		"id": "rarity9",
+		"text": "Own a Zenith Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 9
+		},
+		"reward": {
+			"gold": 400000
+		}
+	},
+	{
+		"id": "first99",
+		"text": "Reach level 99 in any skill",
+		"check": {
+			"kind": "skills_at",
+			"level": 99,
+			"n": 1
+		},
+		"reward": {
+			"aether": 400000
+		}
+	},
+	{
+		"id": "hatches100",
+		"text": "Hatch 100 eggs",
+		"check": {
+			"kind": "counter",
+			"counter": "hatches",
+			"n": 100
+		},
+		"reward": {
+			"items": {
+				"celestial-vessel": 3
+			}
+		}
+	},
+	{
+		"id": "lv100",
+		"text": "Raise an Aetherling to level 100",
+		"check": {
+			"kind": "creature_level",
+			"n": 100
+		},
+		"reward": {
+			"aether": 500000
+		}
+	},
+	{
+		"id": "six99",
+		"text": "Reach level 99 in six skills",
+		"check": {
+			"kind": "skills_at",
+			"level": 99,
+			"n": 6
+		},
+		"reward": {
+			"gold": 750000
+		}
+	},
+	{
+		"id": "kills25k",
+		"text": "Defeat 25,000 wild Aetherlings",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 25000
+		},
+		"reward": {
+			"aether": 750000
+		}
+	},
+	{
+		"id": "captures400",
+		"text": "Bind 400 wild Aetherlings",
+		"check": {
+			"kind": "captures",
+			"n": 400
+		},
+		"reward": {
+			"items": {
+				"celestial-vessel": 5
+			}
+		}
+	},
+	{
 		"id": "special",
 		"text": "Discover a hidden special recipe",
 		"check": {
@@ -305,6 +1264,52 @@
 		},
 		"reward": {
 			"aether": 5000
+		}
+	},
+	{
+		"id": "species40",
+		"text": "Log 40 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 40
+		},
+		"reward": {
+			"aether": 800000
+		}
+	},
+	{
+		"id": "all99",
+		"text": "Master every skill: level 99 in all eleven",
+		"check": {
+			"kind": "skills_at",
+			"level": 99,
+			"n": 11
+		},
+		"reward": {
+			"aether": 1500000,
+			"gold": 1500000
+		}
+	},
+	{
+		"id": "specials3",
+		"text": "Discover 3 hidden special recipes",
+		"check": {
+			"kind": "specials",
+			"n": 3
+		},
+		"reward": {
+			"aether": 2000000
+		}
+	},
+	{
+		"id": "species50",
+		"text": "Log 50 species in the Aether-Log",
+		"check": {
+			"kind": "species",
+			"n": 50
+		},
+		"reward": {
+			"gold": 2500000
 		}
 	}
 ]

@@ -176,9 +176,58 @@ func test_goal_chain_advances() -> void:
 
 func test_every_goal_check_is_understood() -> void:
 	var s := GameState.new_game()
+	var seen := {}
+	t.ok(Data.goals.size() >= 100, "about a hundred goals over the month")
 	for g in Data.goals:
+		t.ok(not seen.has(g.id), "goal ids are unique: " + g.id)
+		seen[g.id] = true
+		var c: Dictionary = g.check
+		t.ok(c.kind in Goals.KINDS, "%s: known kind %s" % [g.id, c.kind])
 		var p := Goals.progress(s, g)
 		t.ok(p[1] >= 1, g.id)
+		if c.has("item"):
+			t.ok(Data.items.has(c.item), "%s: item %s" % [g.id, c.item])
+		if c.has("skill"):
+			t.ok(Data.skills.has(c.skill), "%s: skill %s" % [g.id, c.skill])
+		if c.has("zone"):
+			t.ok(Data.zones.has(c.zone), "%s: zone %s" % [g.id, c.zone])
+		if c.has("type"):
+			t.ok(Data.types.has(c.type), "%s: type %s" % [g.id, c.type])
+		for id in g.reward.get("items", {}):
+			t.ok(Data.items.has(id), "%s: reward %s" % [g.id, id])
+	for id in Goals.OLD_CHAIN:
+		t.ok(seen.has(id), "the old chain's goals are all still there: " + id)
+
+
+func test_old_saves_stay_on_their_goal() -> void:
+	var s := GameState.new_game()
+	s.goals = {"index": Goals.OLD_CHAIN.find("boss2"), "claimed": []}   # a save from the 26-goal chain
+	GameState.migrate(s)
+	t.eq(Goals.current(s).id, "boss2")
+	s.goals = {"index": Goals.OLD_CHAIN.size(), "claimed": []}   # finished the old chain
+	GameState.migrate(s)
+	t.eq(Goals.current(s).id, Data.goals[Goals.index_of("special") + 1].id)
+	s = GameState.new_game()
+	GameState.migrate(s)
+	t.eq(Goals.current(s).id, "work")
+	Skills.assign(s, s.creatures.values()[0], "woodcutting")
+	Goals.claim(s)
+	t.eq(s.goals.id, "logs")
+	GameState.migrate(s)
+	t.eq(Goals.current(s).id, "logs", "a save that knows its goal id keeps it")
+
+
+func test_new_goal_kinds_count_right() -> void:
+	var s := GameState.new_game()
+	var c: Dictionary = s.creatures.values()[0]
+	c.rarity = 4
+	c.level = 37
+	s.skills.woodcutting.level = 99
+	s.skills.mining.level = 50
+	t.eq(Goals.progress(s, {"check": {"kind": "rarity", "n": 5}}), [4, 5])
+	t.eq(Goals.progress(s, {"check": {"kind": "creature_level", "n": 30}}), [30, 30])
+	t.eq(Goals.progress(s, {"check": {"kind": "skills_at", "level": 50, "n": 3}}), [2, 3])
+	t.eq(Goals.progress(s, {"check": {"kind": "total_level", "n": 1000}}), [99 + 50 + 9, 1000])
 
 
 func test_better_materials_lift_the_odds_and_zenith_needs_the_top_tier() -> void:

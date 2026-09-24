@@ -199,6 +199,7 @@ static func migrate(s: Dictionary) -> Dictionary:
 	for id in s.items.keys():
 		if not Data.items.has(id):
 			s.items.erase(id)
+	Goals.migrate(s)
 	s.version = SAVE_VERSION
 	sync_pods(s)
 	return s

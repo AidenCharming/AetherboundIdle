@@ -52,7 +52,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   the running game (real mouse clicks and wheel, keys, pages, time skips, the save, errors, screenshots) through
   `tools/bridge.py`. Off unless started with `-- --bridge` on a debug build, localhost only, and it plays in save
   slot 2, named "Autoplay Slot". See `docs/TEST_BRIDGE.md`.
-- **Tests:** `tests/test_*.gd`, 103 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 105 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -356,6 +356,20 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Overseer Vance's goals: 26 → 112
+- **Why:** the designer asked for at least 100 missions over the month; the old chain ended after the bosses.
+- **Pacing:** ordered along the month probe's timeline (islands cleared on days 1-22, rarity caps, party levels,
+  skills 30/50/70/90/99 on days ~0.5/2.5/8/19/28), so a goal is rarely finished long before it comes up.
+  The chain opens every skill once its type is bound, then mixes skill totals, "every skill at N", rarities,
+  Aetherling levels, captures, kills, boss kills, eggs, hybrids, species, upgrades, slots and key crafts.
+  It ends on all eleven skills at 99, three special recipes and 50 species.
+- **Rewards** grow with the phase's Aether income (tens early, hundreds of thousands at the end) and hand out
+  vessels a tier ahead of what the player crafts.
+- **New check kinds** (`goals.gd`): `rarity` (best rarity owned), `creature_level` (highest level),
+  `total_level` (sum of skill levels), `skills_at` (skills at or above a level). No new systems.
+- **Saves:** the active goal's id is stored (`goals.id`); an old save's index is read against the old 26-goal
+  chain (`Goals.OLD_CHAIN`), so nobody jumps to a different goal. The Sanctum panel shows "N / 112".
 
 ### Creature names and descriptions
 - **Reviewed against the sprites** (designer's request): all 72 base forms were checked on contact sheets.
