@@ -45,6 +45,18 @@ static func icon(tex: Texture2D, size := 24) -> TextureRect:
 	return r
 
 
+## The "you own this species" badge. With `corner` (the size of the picture it sits on) it is placed on
+## that picture's bottom-right corner.
+static func owned_mark(size := 20, corner := Vector2.ZERO) -> TextureRect:
+	var r := icon(Data.ui_icon("owned"), size)
+	r.size = Vector2(size, size)
+	r.mouse_filter = Control.MOUSE_FILTER_STOP
+	r.tooltip_text = "You own this species"
+	if corner != Vector2.ZERO:
+		r.position = corner - Vector2(size, size) * 0.9
+	return r
+
+
 static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
 	var b := HBoxContainer.new()
 	b.add_theme_constant_override("separation", gap)

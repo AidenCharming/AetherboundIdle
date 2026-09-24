@@ -436,6 +436,15 @@ def ui_sparkle():
 <path d="M46 34 L49 43 L58 46 L49 49 L46 58 L43 49 L34 46 L43 43 Z" fill="#ffd8f5" {st(2.4)}/>"""
 
 
+def ui_owned():
+    # a green badge with a paw print: "this species is already in your Nexus"
+    return f"""<circle cx="32" cy="32" r="26" fill="#3fbf7f" {st()}/>
+<circle cx="32" cy="32" r="20" fill="none" stroke="#fff6e0" stroke-width="3"/>
+<ellipse cx="32" cy="38" rx="8" ry="7" fill="#fff6e0"/>
+<ellipse cx="21" cy="29" rx="3.6" ry="4.6" fill="#fff6e0"/><ellipse cx="43" cy="29" rx="3.6" ry="4.6" fill="#fff6e0"/>
+<ellipse cx="27" cy="21" rx="3.6" ry="4.6" fill="#fff6e0"/><ellipse cx="37" cy="21" rx="3.6" ry="4.6" fill="#fff6e0"/>"""
+
+
 UI = {'aether': ui_aether, 'gold': ui_gold, 'woodcutting': ui_axe, 'herbalism': lambda: leaf('#57cf8e', '#8fe8b4', '#2f9a62'),
       'mining': ui_pick, 'fishing': ui_rod, 'scavenging': ui_magnifier, 'smithing': ui_hammer, 'cooking': ui_pan,
       'circuitry': ui_bolt, 'aether-weaving': lambda: spool('#9d6bff', '#c5a8ff', '#6a3fd0'),
@@ -444,7 +453,7 @@ UI = {'aether': ui_aether, 'gold': ui_gold, 'woodcutting': ui_axe, 'herbalism': 
       'inventory': ui_bag, 'works': ui_cog, 'settings': lambda: gear('#8f98a6', '#c9d0da', '#5d6675'), 'bell': ui_bell,
       'lock': ui_lock, 'health': ui_heart, 'power': ui_sword, 'guard': ui_shield, 'time': ui_clock, 'xp': ui_star,
       'upgrade': ui_up, 'shiny': ui_sparkle, 'vessel': lambda: vessel('#c9a36a', '#e0c58f', '#8f6f3a'),
-      'meal': lambda: meal('#e0a36a', '#f0c49a', '#b07a42')}
+      'meal': lambda: meal('#e0a36a', '#f0c49a', '#b07a42'), 'owned': ui_owned}
 
 
 def svg(body):

@@ -48,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 79 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 80 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -83,7 +83,11 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   sprite so empty space under the art never lifts it, with a soft shadow at its feet and its name and health
   bars above its head (back-row name tags sit a step higher so neighbours don't overlap). Every fighter is
   sized for a full side of three, so a lone enemy is the same size as one of three, and each is kept a
-  small margin inside the backdrop. Bosses stay 1.45× bigger. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
+  small margin inside the backdrop. Bosses stay 1.45× bigger.
+- **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
+  of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
+  wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the
+  painted PNG exists, `tools/make_icons.py` draws a placeholder. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
   `docs/art-prompts-zones.md` (10 islands; `icon_runner.py --group zone`). Until one exists the game draws a
   landscape in the island's type colour: haze, two ranges of hills, open ground.
 - **Fonts:** Fredoka (headings; rounded, fits "cute stays cute") and Nunito (body). Both SIL Open Font

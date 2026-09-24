@@ -206,6 +206,7 @@ I("guard", "ui", "Stats", "m", "A kite-shaped shield in sky blue with a silver r
 I("time", "ui", "Stats", "m", "A small wooden hourglass with opaque frosted glass bulbs and pale golden sand.", view="facing the viewer")
 I("xp", "ui", "Stats", "m", "A plump five-pointed golden star with rounded points and a white highlight shape.", view="facing the viewer")
 I("upgrade", "ui", "Markers", "m", "A chunky mint-green arrow pointing straight up.", view="facing the viewer")
+I("owned", "ui", "Markers", "m", "A round emerald-green badge with a thick cream rim and a chunky cream paw print in the middle.", view="facing the viewer", note="Marks species you already own: in an island's list of Aetherlings and on wild fighters' name tags in battle. Shown small (16–20 px), so keep the paw bold.")
 I("shiny", "ui", "Markers", "m", "Two chunky four-pointed star shapes side by side, a large pale-gold one and a small pale-cyan one.", view="facing the viewer")
 I("vessel", "ui", "Markers", "m", "", same_as="items/tinkerers-vessel", note="The top bar's vessel counter uses the Tinker's Vessel icon.")
 I("meal", "ui", "Markers", "m", "", same_as="items/bubble-stew", note="The top bar's meal counter uses the stew icon.")

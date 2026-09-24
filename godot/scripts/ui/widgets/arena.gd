@@ -224,6 +224,14 @@ func _build(b: Dictionary) -> void:
 			nm.add_theme_font_size_override("font_size", 15 if boss else 12)
 			root.z_index = 0 if back else 1
 			add_child(root)
+			# a wild Aetherling whose species you already own gets the owned badge just left of its name
+			if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
+				var fs := nm.get_theme_font_size("font_size")
+				var w := nm.get_theme_font("font").get_string_size(nm.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+				var mark := UI.owned_mark(16)
+				mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
+				mark.position = Vector2(nm.position.x + (nm.size.x - minf(w, nm.size.x)) / 2.0 - 19.0, nm.position.y + 1.0)
+				root.add_child(mark)
 			var rec := {"root": root, "portrait": por, "hp": hp, "shield": sh, "home": root.position, "down": false}
 			(_allies if side == 0 else _enemies).append(rec)
 	var z: Dictionary = Data.zones[b.zone]

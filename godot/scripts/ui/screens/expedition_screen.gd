@@ -173,8 +173,9 @@ func _fill_preview() -> void:
 		var l := UI.label(Data.species[id].name if seen else "???", "Small")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(l)
-		var owned := Collection.is_owned(s, id)
-		var pl := UI.label("%s%s" % [F.pct(float(z.species[id]) / total), "  · owned" if owned else ""], "Faint")
+		if Collection.is_owned(s, id):
+			p.add_child(UI.owned_mark(26, Vector2(84, 84)))
+		var pl := UI.label(F.pct(float(z.species[id]) / total), "Faint")
 		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(pl)
 		natives.add_child(v)
