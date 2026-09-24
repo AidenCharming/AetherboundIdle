@@ -39,6 +39,16 @@ func backup_path(n: int) -> String:
 	return "user://slot_%d.bak.json" % n
 
 
+func tmp_path(n: int) -> String:
+	return "user://slot_%d.tmp.json" % n
+
+
+## Where a slot's save can be, in the order to try them. A .tmp only survives when a crash hit between
+## removing the main file and renaming .tmp into place, and then it is the newest good save.
+func _slot_paths(n: int) -> Array:
+	return [slot_path(n), tmp_path(n), backup_path(n)]
+
+
 ## Starts playing a save slot: loads it, or begins a new game there when it is empty or `fresh` is set.
 ## Applies offline progress and starts the clock.
 func start_slot(n: int, fresh := false) -> void:
@@ -238,20 +248,45 @@ func save_game() -> void:
 	var text := JSON.stringify(state)
 	if slot <= 0:
 		return
-	var path := slot_path(slot)
-	if FileAccess.file_exists(path):
-		DirAccess.copy_absolute(ProjectSettings.globalize_path(path), ProjectSettings.globalize_path(backup_path(slot)))
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f:
-		f.store_string(text)
-		f.close()
+	_write_slot(slot, text)
+
+
+## Writes a save without ever leaving a half-written main file: the text goes to .tmp first, the old main
+## file becomes the backup only if it is a readable save, then .tmp is renamed into place.
+func _write_slot(n: int, text: String) -> bool:
+	var main := ProjectSettings.globalize_path(slot_path(n))
+	var tmp := ProjectSettings.globalize_path(tmp_path(n))
+	var f := FileAccess.open(tmp_path(n), FileAccess.WRITE)
+	if f == null:
+		push_error("Could not write %s (%s)" % [tmp_path(n), error_string(FileAccess.get_open_error())])
+		return false
+	f.store_string(text)
+	f.close()
+	if FileAccess.file_exists(slot_path(n)) and _readable(slot_path(n)):
+		DirAccess.copy_absolute(main, ProjectSettings.globalize_path(backup_path(n)))
+	if FileAccess.file_exists(slot_path(n)):
+		DirAccess.remove_absolute(main)   # Windows can't rename over an existing file
+	return DirAccess.rename_absolute(tmp, main) == OK
+
+
+func _readable(path: String) -> bool:
+	var parsed: Variant = _parse_file(path)
+	return parsed is Dictionary and parsed.has("version")
+
+
+## The parsed contents of a save file, or null when it is missing or not valid JSON.
+func _parse_file(path: String) -> Variant:
+	if not FileAccess.file_exists(path):
+		return null
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) != OK:
+		return null
+	return json.data
 
 
 func load_game() -> bool:
-	for path in [slot_path(slot), backup_path(slot)]:
-		if not FileAccess.file_exists(path):
-			continue
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	for path in _slot_paths(slot):
+		var parsed: Variant = _parse_file(path)
 		if parsed is Dictionary and parsed.has("version"):
 			_adopt(parsed)
 			return true
@@ -296,10 +331,8 @@ func leave() -> void:
 
 ## A short description of a slot for the title screen, or {} when it is empty.
 func slot_info(n: int) -> Dictionary:
-	for path in [slot_path(n), backup_path(n)]:
-		if not FileAccess.file_exists(path):
-			continue
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	for path in _slot_paths(n):
+		var parsed: Variant = _parse_file(path)
 		if not (parsed is Dictionary) or not parsed.has("creatures"):
 			continue
 		var best := ""
@@ -327,21 +360,19 @@ func rename_slot(n: int, save_name: String) -> void:
 		state.saveName = save_name
 		save_game()
 		return
-	var path := slot_path(n)
-	if not FileAccess.file_exists(path):
-		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not (parsed is Dictionary):
+	var parsed: Variant = null
+	for path in _slot_paths(n):
+		parsed = _parse_file(path)
+		if parsed is Dictionary and parsed.has("version"):
+			break
+	if not (parsed is Dictionary and parsed.has("version")):
 		return
 	parsed.saveName = save_name
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f:
-		f.store_string(JSON.stringify(parsed))
-		f.close()
+	_write_slot(n, JSON.stringify(parsed))
 
 
 func delete_slot(n: int) -> void:
-	for path in [slot_path(n), backup_path(n)]:
+	for path in _slot_paths(n):
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
