@@ -565,3 +565,21 @@ func test_worker_bubble_waits_out_an_empty_state() -> void:
 	Game.state = keep
 	_teardown()
 
+
+## The parents picked in Genesis Pods belong to one save: another save opens the page with nothing picked.
+func test_pods_forget_the_parents_of_another_save() -> void:
+	_setup()
+	var scr: Node = preload("res://scripts/ui/screens/pods_screen.gd").new()
+	_layer.add_child(scr)
+	var starter: String = Game.state.creatures.keys()[0]
+	PodsScreen.parent_a = starter
+	PodsScreen.parent_b = starter
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, starter, "kept within the same save")
+	var other := GameState.new_game()
+	other.created = int(Game.state.created) + 1
+	Game.state = other
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, "", "parent A cleared")
+	t.eq(PodsScreen.parent_b, "", "parent B cleared")
+	_teardown()
