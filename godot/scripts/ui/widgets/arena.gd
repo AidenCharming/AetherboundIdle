@@ -11,12 +11,26 @@ var _fx: Control
 var _banner: Label
 var _status: Label
 var _ground: Control
+var _backdrop: TextureRect
 var _zone_type := "verdant"
+var _zone_seed := 0.0
+
+## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
+## row stands. Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
+const GROUND_Y := 0.84
+const BACK_ROW_RISE := 0.07
+const HORIZON_Y := 0.62
 
 
 func _ready() -> void:
 	clip_contents = true
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_backdrop = TextureRect.new()
+	_backdrop.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_backdrop.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_backdrop)
 	_ground = Control.new()
 	_ground.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	_ground.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -48,20 +62,44 @@ func _ready() -> void:
 func _draw_ground() -> void:
 	var s := size
 	var c := Data.type_color(_zone_type)
-	# a floating island platform under each side
-	for side in [0, 1]:
-		var cx := s.x * (0.27 if side == 0 else 0.73)
-		var cy := s.y * 0.72
-		var w := s.x * 0.36
-		var pts := PackedVector2Array()
-		for i in 25:
-			var a := PI * i / 24.0
-			pts.append(Vector2(cx + cos(a) * w / 2.0, cy + sin(a) * s.y * 0.2 * (1.0 if i % 3 else 0.8)))
-		_ground.draw_colored_polygon(pts, Color(0.1, 0.1, 0.2, 0.9))
-		_ground.draw_set_transform(Vector2(cx, cy), 0.0, Vector2(1.0, 0.18))
-		_ground.draw_circle(Vector2.ZERO, w / 2.0, Color(c.darkened(0.45), 0.95))
-		_ground.draw_arc(Vector2.ZERO, w / 2.0, 0, TAU, 64, Color(c, 0.7), 6.0, true)
+	var ground_top := s.y * (GROUND_Y - BACK_ROW_RISE - 0.05)
+	if _backdrop.texture:
+		# painted backdrop: only darken the bottom a little so names and bars stay readable
+		_grad_rect(Rect2(0, s.y * 0.55, s.x, s.y * 0.45), Color(0, 0, 0, 0.0), Color(0.02, 0.02, 0.06, 0.45))
+		return
+	# a drawn landscape in the zone's colour: haze on the horizon, two ranges of hills, then open ground
+	_grad_rect(Rect2(0, 0, s.x, s.y * HORIZON_Y), Color(c, 0.0), Color(c.darkened(0.3), 0.28))
+	_hills(s.y * HORIZON_Y, s.y * 0.16, Color(c.darkened(0.55), 0.85), 3.0, _zone_seed)
+	_hills(s.y * (HORIZON_Y + 0.06), s.y * 0.1, Color(c.darkened(0.7), 0.95), 5.0, _zone_seed + 4.0)
+	_grad_rect(Rect2(0, ground_top, s.x, s.y - ground_top), Color(c.darkened(0.62), 1.0), Color(c.darkened(0.82), 1.0))
+	_ground.draw_line(Vector2(0, ground_top), Vector2(s.x, ground_top), Color(c.lightened(0.1), 0.45), 2.0)
+	# scattered stones and tufts, fixed per island
+	for i in 26:
+		var fx := fposmod(sin((i + 1) * 12.9898 + _zone_seed) * 43758.5453, 1.0)
+		var fy := fposmod(sin((i + 1) * 78.233 + _zone_seed) * 12345.678, 1.0)
+		var y := ground_top + 8.0 + fy * (s.y - ground_top - 10.0)
+		var r := 2.0 + 5.0 * fy
+		_ground.draw_set_transform(Vector2(fx * s.x, y), 0.0, Vector2(1.0, 0.45))
+		_ground.draw_circle(Vector2.ZERO, r, Color(c.darkened(0.4), 0.55))
 		_ground.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+
+
+func _grad_rect(r: Rect2, top: Color, bottom: Color) -> void:
+	_ground.draw_polygon(PackedVector2Array([r.position, r.position + Vector2(r.size.x, 0), r.end, r.position + Vector2(0, r.size.y)]),
+		PackedColorArray([top, top, bottom, bottom]))
+
+
+func _hills(base_y: float, height: float, col: Color, freq: float, seed_value: float) -> void:
+	var s := size
+	var pts := PackedVector2Array([Vector2(0, s.y)])
+	var steps := 48
+	for i in steps + 1:
+		var x := s.x * i / float(steps)
+		var u := float(i) / steps
+		var h := 0.55 + 0.3 * sin(u * freq * TAU * 0.5 + seed_value) + 0.15 * sin(u * freq * TAU * 1.3 + seed_value * 2.1)
+		pts.append(Vector2(x, base_y - height * h))
+	pts.append(Vector2(s.x, s.y))
+	_ground.draw_colored_polygon(pts, col)
 
 
 func _process(_d: float) -> void:
@@ -93,6 +131,8 @@ func _clear() -> void:
 func _build(b: Dictionary) -> void:
 	_clear()
 	_zone_type = Data.zones[b.zone].type
+	_zone_seed = float(hash(String(b.zone)) % 1000) / 37.0
+	_backdrop.texture = Data.zone_backdrop(b.zone)
 	_ground.queue_redraw()
 	var s := size
 	for side in [0, 1]:
@@ -108,31 +148,50 @@ func _build(b: Dictionary) -> void:
 			var slot_x := side_w * (i + 0.5) / n
 			var x := (s.x * 0.04 + slot_x if side == 0 else s.x * 0.96 - slot_x) - px / 2.0
 			var back := (i % 2 == 1) if n > 1 else false
-			var y := s.y * 0.7 - px - (px * 0.22 if back else 0.0)
+			if back:
+				x += px * 0.05
+				px *= 0.9  # a little smaller further back, same centre
 			var root := Control.new()
 			root.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			root.size = Vector2(px, px + 44)
-			root.position = Vector2(x, y)
+			root.size = Vector2(px, px)
 			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), px)
 			por.plate = false
 			por.flip = side == 1
+			por.size = Vector2(px, px)
 			por.refresh()
+			# stand the visible art on the ground line: its lowest opaque pixel touches the feet line
+			var art := por.art_bounds()
+			var feet_y := s.y * (GROUND_Y - (BACK_ROW_RISE if back else 0.0))
+			root.position = Vector2(x, feet_y - art.end.y)
+			var shadow := Control.new()
+			shadow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			shadow.size = root.size
+			var sh_w := art.size.x * 0.42
+			var sh_at := Vector2(art.get_center().x, art.end.y)
+			shadow.draw.connect(func():
+				shadow.draw_set_transform(sh_at, 0.0, Vector2(1.0, 0.22))
+				for k in 3:
+					shadow.draw_circle(Vector2.ZERO, sh_w * (1.0 - k * 0.22), Color(0, 0, 0, 0.16))
+				shadow.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE))
+			root.add_child(shadow)
 			root.add_child(por)
+			# name and bars float just above the head
+			var head := art.position.y
 			var nm := UI.label("%s %d" % [f.name, int(f.level)], "Small", Data.rarity_color(int(f.rarity)).lightened(0.3) if side == 1 else Palette.TEXT)
 			nm.add_theme_color_override("font_outline_color", Palette.INK)
 			nm.add_theme_constant_override("outline_size", 5)
-			nm.position = Vector2(0, px + 2)
-			nm.size = Vector2(px, 18)
+			nm.position = Vector2(-20, head - 36)
+			nm.size = Vector2(px + 40, 18)
 			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			nm.clip_text = true
 			root.add_child(nm)
 			var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 8)
-			hp.position = Vector2(px * 0.1, px + 22)
-			hp.size = Vector2(px * 0.8, 8)
+			hp.position = Vector2(art.get_center().x - px * 0.35, head - 16)
+			hp.size = Vector2(px * 0.7, 8)
 			root.add_child(hp)
 			var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.85), 4)
-			sh.position = Vector2(px * 0.1, px + 32)
-			sh.size = Vector2(px * 0.8, 4)
+			sh.position = Vector2(art.get_center().x - px * 0.35, head - 7)
+			sh.size = Vector2(px * 0.7, 4)
 			root.add_child(sh)
 			nm.add_theme_font_size_override("font_size", 15 if boss else 12)
 			root.z_index = 0 if back else 1

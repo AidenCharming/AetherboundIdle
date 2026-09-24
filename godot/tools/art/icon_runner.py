@@ -1,4 +1,5 @@
-"""Icon runner for Aetherbound: generates, picks and installs the game's icons through ComfyUI.
+"""Icon runner for Aetherbound: generates, picks and installs the game's icons and island battle backdrops through
+ComfyUI (--group item, ui or zone).
 
 The icon counterpart of batch_runner.py. Icons have one stage (no forms), so this is a small wrapper: the ComfyUI
 calls and the text-to-image graph come from batch_runner.py, the cutout from sprite_tools.py (both in D:\\AI\\tools).
@@ -9,20 +10,21 @@ for batch_runner.py and sprite_tools.py in D:\\AI\\tools either way):
     python icon_runner.py <command> [options]
 
 Commands
-  status  [--group item|ui|all]                what is approved, how many candidates exist, what is still to do
-  run     [--group item|ui|all] [--only a,b] [--count 4] [--more] [--dry-run]
+  status  [--group item|ui|zone|all]                what is approved, how many candidates exist, what is still to do
+  run     [--group item|ui|zone|all] [--only a,b] [--count 4] [--more] [--dry-run]
           generates candidates with the text-to-image graph. Skips approved icons and icons that already have --count
           candidates. Resumable: rerun and it tops up. --more adds another --count. Builds a contact sheet at the end.
-  sheet   [--group item|ui|all] [--only a,b]    contact sheet of every candidate (numbered), D:\\AI\\icons\\sheets\\
-  pick    ID N [--group item|ui] [--force]      copies candidate N to D:\\AI\\icons\\approved\\items|ui\\<id>.png
-  fix     ID N --prompt "..." [--count 4] [--group item|ui]
+  sheet   [--group item|ui|zone|all] [--only a,b]    contact sheet of every candidate (numbered), D:\\AI\\icons\\sheets\\
+  pick    ID N [--group item|ui|zone] [--force]      copies candidate N to D:\\AI\\icons\\approved\\items|ui\\<id>.png
+  fix     ID N --prompt "..." [--count 4] [--group item|ui|zone]
           a targeted edit of candidate N through the edit graph, like batch_runner fix. Start the prompt with
           "The same icon as the reference image, with exactly the same ..., change only ...".
-  finish  [--group item|ui|all] [--only a,b] [--size 256] [--no-install]
+  finish  [--group item|ui|zone|all] [--only a,b] [--size 256] [--no-install]
           cuts out every approved icon (background measured from the border), writes it to D:\\AI\\icons\\cutouts\\, and
           copies it into the game at godot/assets/icons/items|ui/<id>.png (the game prefers a PNG over its SVG
           placeholder). Also writes the copy-only icons (same_as) and a sheet of the finished set over the game's dark
-          plate. Needs Pillow/numpy/scipy: relaunches under ComfyUI's Python if they are missing.
+          plate. Island backdrops (group zone) are not cut out: square-cropped to 1024 px, saved as JPEG and copied to
+          godot/assets/zones/<id>.jpg. Needs Pillow/numpy/scipy: relaunches under ComfyUI's Python if they are missing.
 
 Every generated image is logged to D:\\AI\\logs\\icon_generation_log.jsonl (prompt, seed, model, workflow), for the
 AI-art disclosure. Candidates: ComfyUI output\\cand_icons\\<group>\\<id>-c<N>_00001_.png.
@@ -94,8 +96,9 @@ def load_icons():
 
 
 def folder(group):
-    """The game's folder names: assets/icons/items and assets/icons/ui (same names under approved and cutouts)."""
-    return "items" if group == "item" else "ui"
+    """The game's folder names: assets/icons/items, assets/icons/ui and assets/zones (same names under approved and
+    cutouts)."""
+    return {"item": "items", "ui": "ui", "zone": "zones"}[group]
 
 
 def approved_path(icon):
@@ -161,7 +164,7 @@ def cmd_status(args):
             n = len(candidates(log, c))
             st = f"{n} cand" if n else "todo"
             cand, todo = cand + (1 if n else 0), todo + (0 if n else 1)
-        print(f"{c['id']:22}{c['group']:7}{c['key']:10}{st}")
+        print(f"{c['id']:22}{c['group']:7}{(c['key'] or '-'):10}{st}")
     print(f"\n{done} approved, {cand} with candidates waiting for a pick, {todo} not started.")
 
 
@@ -187,7 +190,7 @@ def cmd_run(args):
         print(f"  skip {cid}: {why}")
     if args.dry_run or not jobs:
         for c, first, n in jobs:
-            print(f"  would run {c['group']}/{c['id']}: candidates {first}-{first + n - 1}  key {c['key']}")
+            print(f"  would run {c['group']}/{c['id']}: candidates {first}-{first + n - 1}  key {c['key'] or '-'}")
         return
     br = _br()
     if not br.comfy_up():
@@ -337,9 +340,10 @@ def cmd_finish(args):
     from PIL import Image, ImageDraw
     icons = load_icons()
     made = []
+    zones = _finish_zones(icons, args)
     for c in select(icons, args):
         src = approved_path(c)
-        if not src.exists():
+        if not src.exists() or c["group"] == "zone":
             continue
         # bg_hex=None: measure the background from the border (the rendered key drifts per image, see batch_runner);
         # halo off (the prompts forbid glow); margin 0.04 so the icon fills its square
@@ -356,7 +360,8 @@ def cmd_finish(args):
                 shutil.copy2(src, dst)
                 made.append((c, dst))
     if not made:
-        print("Nothing approved yet.")
+        if not zones:
+            print("Nothing approved yet.")
         return
     if not args.no_install:
         if not (GODOT / "project.godot").exists():
@@ -388,17 +393,45 @@ def cmd_finish(args):
     print(f"QA images (icon over cyan) are next to the cutouts in {CUTOUTS}.")
 
 
+def _finish_zones(icons, args):
+    """Island backdrops are not cut out: centre-crop to a square, 1024 px, JPEG, straight into godot/assets/zones/."""
+    from PIL import Image
+    done = []
+    for c in select(icons, args):
+        src = approved_path(c)
+        if c["group"] != "zone" or not src.exists():
+            continue
+        im = Image.open(src).convert("RGB")
+        side = min(im.size)
+        left, top = (im.width - side) // 2, (im.height - side) // 2
+        im = im.crop((left, top, left + side, top + side)).resize((1024, 1024), Image.LANCZOS)
+        out = CUTOUTS / "zones" / f"{c['id']}.jpg"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        im.save(out, quality=90)
+        done.append((c, out))
+    if done and not args.no_install:
+        if not (GODOT / "project.godot").exists():
+            print(f"(not installing backdrops: {GODOT} is not the godot folder; set AETHERBOUND_GODOT)")
+        else:
+            dst_dir = GODOT / "assets" / "zones"
+            dst_dir.mkdir(parents=True, exist_ok=True)
+            for c, p in done:
+                shutil.copy2(p, dst_dir / p.name)
+            print(f"installed {len(done)} island backdrops into {dst_dir} (open the project in Godot to import them)")
+    return done
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
-    groups = ("item", "ui", "all")
+    groups = ("item", "ui", "zone", "all")
     s = sub.add_parser("status"); s.add_argument("--group", choices=groups, default="all"); s.add_argument("--only")
     s = sub.add_parser("run"); s.add_argument("--group", choices=groups, default="all"); s.add_argument("--only")
     s.add_argument("--count", type=int, default=4); s.add_argument("--more", action="store_true"); s.add_argument("--dry-run", action="store_true")
     s = sub.add_parser("sheet"); s.add_argument("--group", choices=groups, default="all"); s.add_argument("--only")
-    s = sub.add_parser("pick"); s.add_argument("id"); s.add_argument("n", type=int); s.add_argument("--group", choices=("item", "ui")); s.add_argument("--force", action="store_true")
+    s = sub.add_parser("pick"); s.add_argument("id"); s.add_argument("n", type=int); s.add_argument("--group", choices=("item", "ui", "zone")); s.add_argument("--force", action="store_true")
     s = sub.add_parser("fix"); s.add_argument("id"); s.add_argument("n", type=int); s.add_argument("--prompt", required=True)
-    s.add_argument("--count", type=int, default=4); s.add_argument("--group", choices=("item", "ui"))
+    s.add_argument("--count", type=int, default=4); s.add_argument("--group", choices=("item", "ui", "zone"))
     s = sub.add_parser("finish"); s.add_argument("--group", choices=groups, default="all"); s.add_argument("--only")
     s.add_argument("--size", type=int, default=256); s.add_argument("--no-install", action="store_true")
     a = p.parse_args()

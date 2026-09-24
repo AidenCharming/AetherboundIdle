@@ -29,6 +29,7 @@ var special_list: Array = []
 var goals: Array = []
 
 var _textures: Dictionary = {}
+var _opaque: Dictionary = {}
 
 
 func _init() -> void:
@@ -128,6 +129,33 @@ func texture(path: String) -> Texture2D:
 		tex = load(path)
 	_textures[path] = tex
 	return tex
+
+
+## The part of a texture that is not transparent, as a fraction of its size (cached). Used to stand creature
+## sprites on the ground no matter how much empty space their art has under the feet.
+func opaque_rect(tex: Texture2D) -> Rect2:
+	if tex == null:
+		return Rect2(0, 0, 1, 1)
+	var key := tex.resource_path if tex.resource_path != "" else str(tex.get_instance_id())
+	if _opaque.has(key):
+		return _opaque[key]
+	var r := Rect2(0, 0, 1, 1)
+	var img := tex.get_image()
+	if img:
+		if img.is_compressed():
+			img.decompress()
+		var used := img.get_used_rect()
+		if used.size.x > 0 and used.size.y > 0:
+			var sz := Vector2(img.get_width(), img.get_height())
+			r = Rect2(Vector2(used.position) / sz, Vector2(used.size) / sz)
+	_opaque[key] = r
+	return r
+
+
+## A zone's painted battle backdrop (assets/zones/<id>.jpg or .png), or null to use the drawn one.
+func zone_backdrop(zone_id: String) -> Texture2D:
+	var jpg := texture("res://assets/zones/%s.jpg" % zone_id)
+	return jpg if jpg else texture("res://assets/zones/%s.png" % zone_id)
 
 
 func item_icon(id: String) -> Texture2D:

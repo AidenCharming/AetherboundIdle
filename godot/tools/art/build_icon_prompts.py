@@ -1,5 +1,6 @@
-"""Builds godot/docs/art-prompts-icons.md and D:/AI/tools/icons.json from one data table: the prompts for every icon
-the game uses (60 item icons and 32 interface icons), for FLUX.2 [klein] in ComfyUI.
+"""Builds godot/docs/art-prompts-icons.md, godot/docs/art-prompts-zones.md and D:/AI/tools/icons.json from one data
+table: the prompts for every icon the game uses (60 item icons and 32 interface icons) and a battle backdrop for every
+expedition island, for FLUX.2 [klein] in ComfyUI.
 
 The icon counterpart of build_prompts.py (the creature sprites). Run with any Python 3:
     python build_icon_prompts.py
@@ -22,6 +23,7 @@ AI_ROOT = Path(os.environ.get("AETHERBOUND_AI", r"D:\AI"))
 if not GODOT.exists():
     GODOT = HERE.parents[1]  # running from godot/tools/art inside the repo
 DOC_OUT = GODOT / "docs" / "art-prompts-icons.md"
+ZONE_DOC_OUT = GODOT / "docs" / "art-prompts-zones.md"
 JSON_OUT = (AI_ROOT / "tools" / "icons.json") if (AI_ROOT / "tools").exists() else HERE / "icons.json"
 APPROVED_DIR = AI_ROOT / "icons" / "approved"
 
@@ -164,8 +166,70 @@ I("vessel", "ui", "Markers", "m", "", same_as="items/tinkerers-vessel", note="Th
 I("meal", "ui", "Markers", "m", "", same_as="items/bubble-stew", note="The top bar's meal counter uses the stew icon.")
 
 
+# ----------------------------------------------------------------------------- zones: battle backdrops
+def Z(id, scene, ground, distance, sky):
+    """A battle backdrop for an expedition island (-> assets/zones/<id>.jpg). No key colour: backdrops are not cut out.
+    scene: what the place is; ground: the flat stage the creatures stand on; distance: what fills the far left, right
+    and back; sky: the sky and light."""
+    ICONS.append(dict(id=id, group="zone", category="Battle backdrops", key=None, subject=scene, ground=ground,
+                      distance=distance, sky=sky, view="", same_as=None, note=""))
+
+
+Z("whisperleaf-hollow", "A mossy glade on a small floating island, ringed by tall soft-leaved trees.",
+  "short green moss with a few small ferns and tiny pale flowers",
+  "the trunks and leafy crowns of tall trees at the far left and right, more trees fading into blue dusk behind",
+  "a calm dusk sky of deep blue and soft teal with the first stars")
+Z("fractured-quarry", "A shattered stone quarry on a floating island.",
+  "flat dusty tan stone with a few scattered pebbles and thin cracks",
+  "cracked grey and tan rock terraces and broken stone pillars at the far left and right, split cliffs in the distance",
+  "a hazy amber evening sky")
+Z("smoldering-caldera", "A volcanic island inside a wide caldera.",
+  "flat dark basalt rock with thin cracks of warm orange lava",
+  "smoking stone vents at the far left and right and the jagged rim of a volcano in the distance",
+  "a smoky sky of deep red and ash orange")
+Z("whispering-tides", "The edge of a floating island where streams pour off into the sky as waterfalls.",
+  "a flat wet stone shore with shallow clear tide pools",
+  "tall waterfalls tumbling off cliff edges at the far left and right, small floating rocks with their own waterfalls in the distance",
+  "a cool evening sky of deep blue and sea green")
+Z("thunderhum-steppe", "A windswept grassy steppe high in the sky.",
+  "flat trampled yellow-green grass",
+  "tall swaying grass and weathered iron-grey rock spires at the far left and right, rolling grassland in the distance",
+  "a heavy storm sky of slate blue with a few thin lightning bolts far away")
+Z("null-horizon", "The edge of the world, where the sky folds in on itself.",
+  "flat dark violet stone with a few small pebbles hovering just above it",
+  "broken islands drifting at the far left and right, the horizon bending upward into a swirl in the distance",
+  "a deep indigo and violet sky full of stars and pale swirling nebula clouds")
+Z("verdigris-canopy", "An enormous ancient forest of giant trees growing on a floating island.",
+  "a wide flat platform of mossy roots, teal-green moss over old bark",
+  "huge arching roots and giant trunks with verdigris-green bark at the far left and right, hanging vines and more giant trunks in the distance",
+  "deep green light filtering down through a distant leaf canopy")
+Z("magmaglass-rift", "A rift in the sky where molten rock cools into black glass.",
+  "flat glossy black obsidian with thin seams of glowing orange molten rock",
+  "jagged black glass spires at the far left and right, falling embers and a wide rift of molten light in the distance",
+  "a dark red and charcoal sky")
+Z("stormsea-expanse", "A floating sea under a thunderstorm.",
+  "a flat wet rock shelf at the edge of the sea",
+  "dark churning waves and tall sea spray at the far left and right, water spouts far out at sea",
+  "heavy dark storm clouds with bright lightning bolts")
+Z("zenith-spire", "The top of an impossibly tall stone spire high above the clouds.",
+  "a flat circular platform of pale stone with carved star patterns",
+  "broken pale stone arches at the far left and right, a sea of clouds far below in the distance",
+  "a deep starry night sky with a large pale moon")
+
+
 # ----------------------------------------------------------------------------- prompt builder
+def zone_prompt(c):
+    return (f"A painted background for a side-view battle scene in a cute creature-collecting idle game, in a soft painterly digital "
+            f"illustration style with rich colour. {c['subject']} Seen from the side at eye level. The whole bottom third of the picture "
+            f"is flat open ground: {c['ground']}, an empty stage running straight across from edge to edge. Behind it, {c['distance']}; "
+            f"the horizon at about 60 percent of the height. Sky: {c['sky']}. Keep the middle of the picture open and uncluttered, and "
+            f"the colours slightly deep and muted so bright characters will stand out in front. Square format. No creatures, no animals, "
+            f"no people, no characters, no text, no letters, no numbers, no user interface, no border, no frame, no watermark.")
+
+
 def prompt(c):
+    if c["group"] == "zone":
+        return zone_prompt(c)
     n, h = KEYS[c["key"]]
     return (f"A single game icon for a cute creature-collecting idle game, in a soft painterly digital illustration style with clean thick "
             f"{OUTLINE} outlines, chunky cartoon proportions and vibrant saturated colours. {c['subject']} "
@@ -189,6 +253,10 @@ def validate():
             errs.append(f"duplicate {c['group']}/{c['id']}")
         ids.add(key)
         if c["same_as"]:
+            continue
+        if c["group"] == "zone":
+            if len(prompt(c).split()) > 200:
+                errs.append(f"{c['id']}: {len(prompt(c).split())} words (too long)")
             continue
         body = c["subject"]
         if BAD.search(body):
@@ -216,6 +284,14 @@ def validate():
             errs.append(f"item {missing} is in data/items.json but has no icon prompt")
         for extra in sorted(mine - game_items):
             errs.append(f"item {extra} has a prompt but is not in data/items.json")
+    zones_json = GODOT / "data" / "zones.json"
+    if zones_json.exists():
+        game_zones = {z["id"] for z in json.loads(zones_json.read_text(encoding="utf-8"))}
+        mine = {c["id"] for c in ICONS if c["group"] == "zone"}
+        for missing in sorted(game_zones - mine):
+            errs.append(f"zone {missing} is in data/zones.json but has no backdrop prompt")
+        for extra in sorted(mine - game_zones):
+            errs.append(f"zone {extra} has a prompt but is not in data/zones.json")
     ui_dir = GODOT / "assets" / "icons" / "ui"
     if ui_dir.exists():
         game_ui = {p.stem for p in ui_dir.glob("*.svg")}
@@ -226,7 +302,7 @@ def validate():
 
 
 def folder(group):
-    return "items" if group == "item" else "ui"
+    return {"item": "items", "ui": "ui", "zone": "zones"}[group]
 
 
 def approved(c):
@@ -235,21 +311,22 @@ def approved(c):
 
 # ----------------------------------------------------------------------------- outputs
 def md():
+    ICONS_ = [c for c in ICONS if c["group"] != "zone"]
     L = []
     a = L.append
-    gen = [c for c in ICONS if not c["same_as"]]
+    gen = [c for c in ICONS_ if not c["same_as"]]
     a("# Icon prompts (ready to paste)\n")
     a("Generated by `godot/tools/art/build_icon_prompts.py` (edit the table there, rerun, and this file and `D:\\AI\\tools\\icons.json` "
       "are rebuilt). The creature sprite prompts are the separate `docs/art-prompts.md` on `main`.\n")
     a("## What this covers\n")
     a(f"- **{len([c for c in gen if c['group'] == 'item'])} item icons**: every item in `godot/data/items.json` (logs, herbs, ores, fish, salvage, "
       "bars, meals, components, threads, vessels, parts, rare finds). Game file: `godot/assets/icons/items/<id>.png`.")
-    a(f"- **{len([c for c in ICONS if c['group'] == 'ui'])} interface icons**: currencies, the 11 skills, navigation, stats and markers. "
-      f"{len([c for c in ICONS if c['same_as']])} of them reuse an item icon (no generation). Game file: `godot/assets/icons/ui/<id>.png`.")
+    a(f"- **{len([c for c in ICONS_ if c['group'] == 'ui'])} interface icons**: currencies, the 11 skills, navigation, stats and markers. "
+      f"{len([c for c in ICONS_ if c['same_as']])} of them reuse an item icon (no generation). Game file: `godot/assets/icons/ui/<id>.png`.")
     a(f"- **{len(gen)} images to generate in total.**")
     a("- The game already has generated SVG placeholders for all of these, drawn in the same outlined style. **A PNG with the same name "
       "replaces the SVG automatically** (the game prefers `.png` when it exists), so icons can be swapped in one at a time.")
-    a("- **Not covered:** eggs (drawn by a shader in the game), zone backgrounds, and the hybrid creature sprites (those belong in the "
+    a("- **Not covered:** eggs (drawn by a shader in the game), the island battle backdrops (their own file, `docs/art-prompts-zones.md`), and the hybrid creature sprites (those belong in the "
       "creature pipeline, `build_prompts.py`).\n")
     a("## How to use these\n")
     a("One stage only (icons have no forms), with the **Flux.2 [Klein] 4B text-to-image** graph, **8 steps, CFG 1.0**, 1024x1024, "
@@ -282,7 +359,7 @@ def md():
     a("## Checklist\n")
     a("| # | Icon | Group | Category | Key | Status |")
     a("|---|---|---|---|---|---|")
-    for i, c in enumerate(ICONS, 1):
+    for i, c in enumerate(ICONS_, 1):
         if c["same_as"]:
             st = f"copy of `{c['same_as']}`"
         else:
@@ -290,13 +367,13 @@ def md():
         a(f"| {i} | `{c['id']}` | {c['group']} | {c['category']} | {KEYS[c['key']][0]} | {st} |")
     a("")
     cats = []
-    for c in ICONS:
+    for c in ICONS_:
         if (c["group"], c["category"]) not in cats:
             cats.append((c["group"], c["category"]))
     for grp, cat in cats:
         title = f"{'Item' if grp == 'item' else 'Interface'} icons: {cat}"
         a(f"## {title}\n")
-        for i, c in enumerate(ICONS, 1):
+        for i, c in enumerate(ICONS_, 1):
             if c["group"] != grp or c["category"] != cat:
                 continue
             n, h = KEYS[c["key"]]
@@ -316,6 +393,52 @@ def md():
     return "\n".join(L) + "\n"
 
 
+def md_zones():
+    Z_ = [c for c in ICONS if c["group"] == "zone"]
+    L = []
+    a = L.append
+    a("# Island backdrop prompts (ready to paste)\n")
+    a("Generated by `godot/tools/art/build_icon_prompts.py` together with the icon prompts (edit the zone table there, rerun, and this "
+      "file and `D:\\AI\\tools\\icons.json` are rebuilt). One painted backdrop per expedition island, shown behind the live battle.\n")
+    a("## What the game does with them\n")
+    a(f"- **{len(Z_)} backdrops**, one per island in `godot/data/zones.json`. Game file: `godot/assets/zones/<id>.jpg` (a `.png` works too). "
+      "Until a file exists the game draws a simple landscape in the island's type colour, so they can be added one at a time.")
+    a("- The battle view is roughly square, so the backdrops are **square (1024x1024)**; the game scales them to cover the view and trims "
+      "a little off the sides on wider windows.")
+    a("- **The ground line matters.** Creatures stand with their feet at **84 percent of the height** (front row) and **77 percent** (back "
+      "row), so the bottom third of each picture must be flat, open ground. The game darkens the lower half slightly for the name labels "
+      "and health bars. Reject candidates where the ground is tilted, cluttered, or ends above the bottom third.\n")
+    a("## How to use these\n")
+    a("The same **Flux.2 [Klein] 4B text-to-image** graph as the icons (8 steps, CFG 1.0, its default 1024x1024), through `icon_runner.py`:")
+    a("```\npython icon_runner.py run --group zone --count 4       4 candidates per island\n"
+      "python icon_runner.py sheet --group zone               contact sheet\n"
+      "python icon_runner.py pick whisperleaf-hollow 2         approve one (D:\\AI\\icons\\approved\\zones\\)\n"
+      "python icon_runner.py fix whisperleaf-hollow 2 --prompt \"...\"   targeted edit\n"
+      "python icon_runner.py finish --group zone              square-crop to 1024, save as JPEG and copy into godot/assets/zones/\n```")
+    a("No key colour and no cutout: backdrops are used as they are.\n")
+    a("**Picking checklist:**")
+    a("- Flat ground across the whole bottom third, level from edge to edge, with nothing standing on it in the middle.")
+    a("- No creatures, animals or people (models like to add a small figure; reject those).")
+    a("- Busy detail belongs at the far left and right and in the distance. The centre should be calm enough for three creatures a side.")
+    a("- Deep, slightly muted colour: the creatures are bright and outlined, and should pop in front. Very bright or white skies wash them out.")
+    a("- No text or frames. Seen from the side, not from above.\n")
+    a("## Checklist\n")
+    a("| # | Island | Status |")
+    a("|---|---|---|")
+    for i, c in enumerate(Z_, 1):
+        a(f"| {i} | `{c['id']}` | {'[x] approved' if approved(c) else '[ ]'} |")
+    a("")
+    for i, c in enumerate(Z_, 1):
+        a(f"## {i}. `{c['id']}`\n")
+        a(f"file: `D:\\AI\\icons\\approved\\zones\\{c['id']}.png` -> `godot/assets/zones/{c['id']}.jpg`\n")
+        a(f"```\n{prompt(c)}\n```\n")
+    a("## Records\n")
+    a("- These prompts and `D:\\AI\\logs\\icon_generation_log.jsonl` (every generated image with prompt, seed and model) are the AI-disclosure "
+      "record for the backdrops. Tool: ComfyUI on the designer's machine; model: FLUX.2 [klein] 4B distilled fp8 (Apache 2.0).")
+    a("- The drawn landscape the game shows until then is code (`scripts/ui/widgets/arena.gd`), not AI art.")
+    return "\n".join(L) + "\n"
+
+
 def main():
     errs = validate()
     if errs:
@@ -325,16 +448,20 @@ def main():
         sys.exit(1)
     DOC_OUT.parent.mkdir(parents=True, exist_ok=True)
     DOC_OUT.write_text(md(), encoding="utf-8")
+    ZONE_DOC_OUT.write_text(md_zones(), encoding="utf-8")
     data = []
     for c in ICONS:
-        d = dict(id=c["id"], group=c["group"], category=c["category"], key=KEYS[c["key"]][1], same_as=c["same_as"], note=c["note"])
+        d = dict(id=c["id"], group=c["group"], category=c["category"], key=KEYS[c["key"]][1] if c["key"] else None,
+                 same_as=c["same_as"], note=c["note"])
         if not c["same_as"]:
             d["prompt"] = prompt(c)
         data.append(d)
     JSON_OUT.write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
     gen = [c for c in ICONS if not c["same_as"]]
-    print(f"OK: {len(ICONS)} icons ({len(gen)} to generate, {len(ICONS) - len(gen)} copies)")
+    zones = len([c for c in ICONS if c["group"] == "zone"])
+    print(f"OK: {len(ICONS) - zones} icons ({len(gen) - zones} to generate, {len(ICONS) - len(gen)} copies) and {zones} island backdrops")
     print("wrote", DOC_OUT)
+    print("wrote", ZONE_DOC_OUT)
     print("wrote", JSON_OUT)
 
 

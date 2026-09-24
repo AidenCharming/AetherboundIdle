@@ -133,6 +133,20 @@ func _notification(what: int) -> void:
 		_layout()
 
 
+## Where the visible art sits inside this portrait at rest (no bob), in local pixels.
+func art_bounds() -> Rect2:
+	var s := size.x if size.x > 0 else custom_minimum_size.x
+	var k: float = FORM_SCALE[clampi(form, 1, 3) - 1] * (0.9 if plate else 1.0)
+	var art := s * k
+	var origin := Vector2((s - art) / 2.0, (s - art) / 2.0 + s * 0.02)
+	var tex := Data.creature_texture(species, form)
+	# the aether-blob placeholder fills about this much of its square
+	var r := Data.opaque_rect(tex) if tex else Rect2(0.14, 0.12, 0.72, 0.78)
+	if flip:
+		r.position.x = 1.0 - r.position.x - r.size.x
+	return Rect2(origin + r.position * art, r.size * art)
+
+
 func _layout() -> void:
 	if not _art:
 		return

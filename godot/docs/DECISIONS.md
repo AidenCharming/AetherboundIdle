@@ -65,6 +65,13 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
   `sprite_tools.py`, and installs them into `assets/icons/`. The game uses a PNG icon whenever one exists and the
   SVG placeholder otherwise. New PNGs import with mipmaps (a project import default), so they stay smooth at 24 px.
+- **Battle backdrops** (designer's request: fighters used to hover over two floating island ovals). The
+  battle is now a side-view stage: every fighter stands on one ground line (front row at 84% of the view's
+  height, back row at 77% and a little smaller), placed by the lowest opaque pixel of its sprite so empty
+  space under the art never lifts it, with a soft shadow at its feet and its name and health bars above its
+  head. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
+  `docs/art-prompts-zones.md` (10 islands; `icon_runner.py --group zone`). Until one exists the game draws a
+  landscape in the island's type colour: haze, two ranges of hills, open ground.
 - **Fonts:** Fredoka (headings; rounded, fits "cute stays cute") and Nunito (body). Both SIL Open Font
   License; licence files are next to them in `assets/fonts/`. They cover Latin only, so interface text
   avoids symbols outside that range.

@@ -83,6 +83,13 @@ python icon_runner.py finish            cut out approved icons and copy them int
 
 A `<id>.png` in `assets/icons/items/` or `assets/icons/ui/` replaces that icon's SVG placeholder automatically.
 
+## Island backdrops
+
+Each expedition island has a painted battle backdrop prompt in [`docs/art-prompts-zones.md`](docs/art-prompts-zones.md)
+(same builder and runner, `--group zone`). `finish --group zone` square-crops the approved picture to 1024 px and copies
+it to `assets/zones/<zone id>.jpg`. Until a file exists, the battle view draws a simple landscape in the island's
+colour. Creatures stand at 84% of the height (back row 77%), so the bottom third of a backdrop must be flat ground.
+
 ## Adding items
 
 Add the item to `data/items.json` with an `icon` entry (`{"shape": "ore", "color": "#d27a3c"}`; the
