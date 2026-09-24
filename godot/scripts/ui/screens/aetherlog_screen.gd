@@ -95,10 +95,10 @@ func _entry(sp: Dictionary) -> Control:
 	p.modulate.a = 1.0 if owned else (0.8 if seen else 0.45)
 	p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(p)
-	var name := UI.label(sp.name if seen else "???", "H3")
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name.clip_text = true
-	v.add_child(name)
+	var name_lbl := UI.label(sp.name if seen else "???", "H3")
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.clip_text = true
+	v.add_child(name_lbl)
 	# rarity dots and shiny star
 	var dots := Control.new()
 	dots.custom_minimum_size = Vector2(134, 12)

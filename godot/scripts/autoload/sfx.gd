@@ -30,12 +30,12 @@ func _ready() -> void:
 	_streams.whoosh = _render([[400, 0.0, 0.25, "noise", 0.12]])
 
 
-func play(name: String, pitch := 1.0) -> void:
-	if not _streams.has(name):
+func play(sound: String, pitch := 1.0) -> void:
+	if not _streams.has(sound):
 		return
 	for p in _players:
 		if not p.playing:
-			p.stream = _streams[name]
+			p.stream = _streams[sound]
 			p.pitch_scale = pitch
 			p.play()
 			return
@@ -54,10 +54,10 @@ func _render(notes: Array) -> AudioStreamWAV:
 	for n in notes:
 		var f: float = n[0]
 		var start := int(n[1] * RATE)
-		var len := int(n[2] * RATE)
-		for i in len:
+		var samples := int(n[2] * RATE)
+		for i in samples:
 			var t := float(i) / RATE
-			var env := minf(1.0, t / 0.008) * pow(1.0 - float(i) / len, 2.0)
+			var env := minf(1.0, t / 0.008) * pow(1.0 - float(i) / samples, 2.0)
 			var ph := fmod(t * f, 1.0)
 			var v := 0.0
 			match n[3]:

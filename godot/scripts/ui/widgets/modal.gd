@@ -81,14 +81,16 @@ static func confirm(title: String, text: String, yes_text: String, on_yes: Calla
 	v.add_child(UI.wrap_label(text, "Dim", 420))
 	var row := UI.hbox(10)
 	row.add_child(UI.spacer())
-	var m: Modal
-	row.add_child(UI.button("Cancel", "", func(): m.close()))
+	# Lambdas capture local variables by value when they are created, so the modal (opened after its buttons
+	# exist) is kept in a Dictionary, which the lambdas share by reference.
+	var box := {}
+	row.add_child(UI.button("Cancel", "", func(): box.m.close()))
 	row.add_child(UI.button(yes_text, "Danger" if danger else "Primary", func():
-		on_yes.call()
-		m.close()))
+		box.m.close()
+		on_yes.call()))
 	v.add_child(row)
-	m = open(v, title, 480)
-	return m
+	box.m = open(v, title, 480)
+	return box.m
 
 
 static func any_open() -> bool:

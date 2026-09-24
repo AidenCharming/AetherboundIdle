@@ -89,11 +89,11 @@ func _fill_grid() -> void:
 		var nl := UI.label(F.format_num(n), "Num")
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(nl)
-		var name := UI.label(it.name, "Faint")
-		name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name.clip_text = true
-		name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		v.add_child(name)
+		var name_lbl := UI.label(it.name, "Faint")
+		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		name_lbl.clip_text = true
+		name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		v.add_child(name_lbl)
 		b.add_child(v)
 		_grid.add_child(b)
 	if not any:

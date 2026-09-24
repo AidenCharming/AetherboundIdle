@@ -212,9 +212,9 @@ func _fill_side() -> void:
 			ev.tooltip_text = "Ready to hatch!" if Breeding.is_ready(egg, now) else "Hatches in " + F.format_seconds(Breeding.remaining(egg, now))
 			eggs.add_child(ev)
 	_pods_box.add_child(eggs)
-	var ready := Game.ready_eggs().size()
-	if ready > 0:
-		_pods_box.add_child(UI.button("Hatch %d egg%s" % [ready, "" if ready == 1 else "s"], "Gold", func(): Main.go("pods")))
+	var ready_count := Game.ready_eggs().size()
+	if ready_count > 0:
+		_pods_box.add_child(UI.button("Hatch %d egg%s" % [ready_count, "" if ready_count == 1 else "s"], "Gold", func(): Main.go("pods")))
 	else:
 		_pods_box.add_child(UI.button("Breed Aetherlings", "", func(): Main.go("pods")))
 

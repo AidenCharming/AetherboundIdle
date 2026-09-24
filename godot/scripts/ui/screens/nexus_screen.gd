@@ -249,9 +249,9 @@ func _fill_detail() -> void:
 	if c.traits.is_empty():
 		_detail.add_child(UI.label("No pool traits yet. Attunement can roll some.", "Faint"))
 	for t in c.traits:
-		var tr: Dictionary = Data.traits[t.id]
+		var trait_def: Dictionary = Data.traits[t.id]
 		var col: String = {"minor": "#a9aed6", "moderate": "#62b6ff", "major": "#ffd166"}[t.s]
-		_detail.add_child(UI.rich("[b]%s[/b] [color=%s](%s)[/color]\n%s" % [tr.name, col, t.s.capitalize(), Traits.describe(t.id, t.s)]))
+		_detail.add_child(UI.rich("[b]%s[/b] [color=%s](%s)[/color]\n%s" % [trait_def.name, col, t.s.capitalize(), Traits.describe(t.id, t.s)]))
 	var bottom := UI.hbox(8)
 	bottom.add_child(UI.button("Attune traits", "", func(): _attune(c)))
 	bottom.add_child(UI.spacer())
@@ -262,9 +262,9 @@ func _fill_detail() -> void:
 
 func _join_party(c: Dictionary) -> void:
 	var party: Array = Game.state.expedition.party
-	var size: int = Data.tuning.combat.partySize
-	if party.size() >= size:
-		Game.warn("The party is full (%d). Swap someone out on the Expeditions screen." % size)
+	var party_size: int = Data.tuning.combat.partySize
+	if party.size() >= party_size:
+		Game.warn("The party is full (%d). Swap someone out on the Expeditions screen." % party_size)
 		return
 	Game.set_party(party.size(), c.id)
 	Game.info("%s joined the expedition party" % Creatures.display_name(c))
@@ -277,20 +277,20 @@ func _rename(c: Dictionary) -> void:
 	le.placeholder_text = Data.form_name(c.species, Creatures.form_of(c))
 	le.max_length = 20
 	v.add_child(le)
-	var m: Modal
+	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var row := UI.hbox(8)
 	row.add_child(UI.button("Clear nickname", "Ghost", func():
-		Game.rename(c.id, "")
-		m.close()))
+		box.m.close()
+		Game.rename(c.id, "")))
 	row.add_child(UI.spacer())
 	row.add_child(UI.button("Save", "Primary", func():
-		Game.rename(c.id, le.text)
-		m.close()))
+		box.m.close()
+		Game.rename(c.id, le.text)))
 	v.add_child(row)
 	le.text_submitted.connect(func(t):
-		Game.rename(c.id, t)
-		m.close())
-	m = Modal.open(v, "Nickname", 420)
+		box.m.close()
+		Game.rename(c.id, t))
+	box.m = Modal.open(v, "Nickname", 420)
 	le.grab_focus.call_deferred()
 
 
@@ -305,7 +305,7 @@ func _bulk_release() -> void:
 	v.add_child(row)
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
-	var m: Modal
+	var box := {}
 	var go := UI.button("Release", "Danger")
 	var upd := func(_i := 0):
 		var list := Economy.bulk_release_candidates(Game.state, ob.selected + 1)
@@ -317,10 +317,10 @@ func _bulk_release() -> void:
 	ob.item_selected.connect(upd)
 	upd.call()
 	go.pressed.connect(func():
-		Game.bulk_release(ob.selected + 1)
-		m.close())
+		box.m.close()
+		Game.bulk_release(ob.selected + 1))
 	v.add_child(go)
-	m = Modal.open(v, "Bulk release", 580)
+	box.m = Modal.open(v, "Bulk release", 580)
 
 
 func _release(c: Dictionary) -> void:
@@ -336,7 +336,6 @@ func _release(c: Dictionary) -> void:
 func _attune(c: Dictionary) -> void:
 	var v := UI.vbox(12)
 	var locks := {}
-	var m: Modal
 	var body := UI.vbox(8)
 	v.add_child(UI.wrap_label("Attunement rerolls this Aetherling's pool traits with Aether. Lock up to two traits to keep them; each lock triples the cost. The signature trait never changes.", "Dim", 520))
 	v.add_child(body)
@@ -346,9 +345,9 @@ func _attune(c: Dictionary) -> void:
 		if cr.traits.is_empty():
 			body.add_child(UI.label("No pool traits yet.", "Faint"))
 		for t in cr.traits:
-			var tr: Dictionary = Data.traits[t.id]
+			var trait_def: Dictionary = Data.traits[t.id]
 			var cb := CheckButton.new()
-			cb.text = "%s (%s): %s" % [tr.name, t.s.capitalize(), Traits.describe(t.id, t.s)]
+			cb.text = "%s (%s): %s" % [trait_def.name, t.s.capitalize(), Traits.describe(t.id, t.s)]
 			cb.button_pressed = locks.has(t.id)
 			cb.toggled.connect(func(on):
 				if on:
@@ -375,5 +374,5 @@ func _attune(c: Dictionary) -> void:
 				fill_ref.call(fill_ref)))
 		body.add_child(row)
 	fill.call(fill)
-	m = Modal.open(v, "Attune %s" % Creatures.display_name(c), 620)
+	var m := Modal.open(v, "Attune %s" % Creatures.display_name(c), 620)
 	m.closed.connect(func(): _fill_detail())

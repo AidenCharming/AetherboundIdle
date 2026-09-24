@@ -45,17 +45,17 @@ static func icon(tex: Texture2D, size := 24) -> TextureRect:
 	return r
 
 
-static func hbox(sep := 10, children: Array = []) -> HBoxContainer:
+static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
 	var b := HBoxContainer.new()
-	b.add_theme_constant_override("separation", sep)
+	b.add_theme_constant_override("separation", gap)
 	for c in children:
 		b.add_child(c)
 	return b
 
 
-static func vbox(sep := 10, children: Array = []) -> VBoxContainer:
+static func vbox(gap := 10, children: Array = []) -> VBoxContainer:
 	var b := VBoxContainer.new()
-	b.add_theme_constant_override("separation", sep)
+	b.add_theme_constant_override("separation", gap)
 	for c in children:
 		b.add_child(c)
 	return b

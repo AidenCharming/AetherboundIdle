@@ -67,7 +67,7 @@ func load_all() -> void:
 		special_recipes[pair_key(r.parents[0], r.parents[1])] = r
 
 
-static func pair_key(a: String, b: String) -> String:
+func pair_key(a: String, b: String) -> String:
 	return a + "+" + b if a < b else b + "+" + a
 
 
@@ -136,8 +136,8 @@ func item_icon(id: String) -> Texture2D:
 	return _icon("res://assets/icons/items/" + id)
 
 
-func ui_icon(name: String) -> Texture2D:
-	return _icon("res://assets/icons/ui/" + name)
+func ui_icon(icon_name: String) -> Texture2D:
+	return _icon("res://assets/icons/ui/" + icon_name)
 
 
 ## A painted PNG icon (from the art pipeline, tools/art/icon_runner.py) wins over the generated SVG placeholder.

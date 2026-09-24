@@ -56,13 +56,13 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	por.bob = false
 	por.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(por)
-	var name := UI.label(Creatures.display_name(c), "H3")
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	name.clip_text = true
+	var name_lbl := UI.label(Creatures.display_name(c), "H3")
+	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	name_lbl.clip_text = true
 	if compact:
-		name.add_theme_font_size_override("font_size", 15)
-	v.add_child(name)
+		name_lbl.add_theme_font_size_override("font_size", 15)
+	v.add_child(name_lbl)
 	var r := UI.label(Data.rarity(int(c.rarity)).name, "Faint", Data.rarity_color(int(c.rarity)))
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(r)

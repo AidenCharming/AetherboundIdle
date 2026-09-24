@@ -188,11 +188,11 @@ func _hatch_caption(c: Dictionary, events: Array) -> void:
 		var nl := UI.label(tag, "H3", Palette.GOLD)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_caption.add_child(nl)
-	var name := UI.label(Data.form_name(c.species, 1), "Title")
-	name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	name.add_theme_color_override("font_outline_color", Palette.INK)
-	name.add_theme_constant_override("outline_size", 10)
-	_caption.add_child(name)
+	var title_lbl := UI.label(Data.form_name(c.species, 1), "Title")
+	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_lbl.add_theme_color_override("font_outline_color", Palette.INK)
+	title_lbl.add_theme_constant_override("outline_size", 10)
+	_caption.add_child(title_lbl)
 	var line := "%s%s · %s" % ["Shiny " if c.shiny else "", Data.rarity(int(c.rarity)).name, " / ".join(sp.types.map(func(t): return Data.types[t].name))]
 	var rl := UI.label(line, "H2", Data.rarity_color(int(c.rarity)))
 	rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -232,9 +232,9 @@ func _play_evolve(e: Dictionary) -> void:
 		var head := UI.label("EVOLUTION", "H3", Palette.AETHER)
 		head.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_caption.add_child(head)
-		var name := UI.label("%s became %s!" % [Data.form_name(e.species, int(e.from)), Data.form_name(e.species, int(e.form))], "H1")
-		name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		_caption.add_child(name)
+		var title_lbl := UI.label("%s became %s!" % [Data.form_name(e.species, int(e.from)), Data.form_name(e.species, int(e.form))], "H1")
+		title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_caption.add_child(title_lbl)
 		var desc: String = Data.species[e.species].forms[int(e.form) - 1].get("desc", "")
 		if desc != "":
 			var dl := UI.label(desc, "Dim")
@@ -268,7 +268,7 @@ func _burst(color: Color, rarity: int) -> void:
 		st.tween_property(host, "position", Vector2.ZERO, 0.04)
 
 
-func _show_creature(c: Dictionary, rc: Color) -> void:
+func _show_creature(c: Dictionary, _rc: Color) -> void:
 	var p := CreaturePortrait.of(c, 300)
 	p.plate = false
 	p.position = Vector2(-150, -150)

@@ -16,6 +16,11 @@ func _ready() -> void:
 		if not (f.begins_with("test_") and f.ends_with(".gd")) or f == "test_runner.gd":
 			continue
 		var script: GDScript = load("res://tests/" + f)
+		if script == null or not script.can_instantiate():
+			# a test file that does not compile is a failure, not a hang
+			failures.append("%s: does not compile" % f)
+			print("  FAIL  ", f, " (does not compile)")
+			continue
 		var suite: Object = script.new()
 		suite.set("t", self)
 		for m in suite.get_method_list():

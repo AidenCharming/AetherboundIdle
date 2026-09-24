@@ -144,10 +144,10 @@ func _build_rail() -> Control:
 	rail.add_child(v)
 	var logo := UI.hbox(8)
 	logo.add_child(UI.icon(Data.ui_icon("aether"), 30))
-	var name := UI.label("Aetherbound", "H2")
-	name.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
-	name.add_theme_constant_override("shadow_outline_size", 10)
-	logo.add_child(name)
+	var title_lbl := UI.label("Aetherbound", "H2")
+	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
+	title_lbl.add_theme_constant_override("shadow_outline_size", 10)
+	logo.add_child(title_lbl)
 	v.add_child(UI.margin(logo, 6, 8, 0, 10))
 	_rail_list = UI.vbox(2)
 	v.add_child(UI.scroll(_rail_list))
@@ -228,8 +228,8 @@ func _refresh_rail() -> void:
 		nb.icon.modulate.a = 1.0 if usable else 0.4
 		nb.button.tooltip_text = "" if usable else "Needs a %s Aetherling" % Data.types[skill.type].name
 	var pods: Dictionary = _nav_buttons["pods:"]
-	var ready := Game.ready_eggs().size()
-	pods.extra.text = "%d ready" % ready if ready > 0 else ""
+	var ready_count := Game.ready_eggs().size()
+	pods.extra.text = "%d ready_count" % ready_count if ready_count > 0 else ""
 	pods.extra.add_theme_color_override("font_color", Palette.GOLD)
 	var ex: Dictionary = _nav_buttons["expeditions:"]
 	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
@@ -237,10 +237,10 @@ func _refresh_rail() -> void:
 	else:
 		ex.extra.text = "%d waiting" % s.expedition.pending.size() if not s.expedition.pending.is_empty() else ""
 	ex.extra.add_theme_color_override("font_color", Palette.AETHER)
-	var log: Dictionary = _nav_buttons["aetherlog:"]
+	var log_nav: Dictionary = _nav_buttons["aetherlog:"]
 	var claim := Collection.claimable(s).size()
-	log.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
-	log.extra.add_theme_color_override("font_color", Palette.GOLD)
+	log_nav.extra.text = "%d reward%s" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
+	log_nav.extra.add_theme_color_override("font_color", Palette.GOLD)
 
 
 # ---------------------------------------------------------------- top bar
@@ -333,12 +333,12 @@ func _unhandled_input(event: InputEvent) -> void:
 func open_pause_menu() -> void:
 	var v := UI.vbox(10)
 	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.upgrade_value(Game.state, "offline-cap")), "Faint", 380))
-	var m: Modal
+	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var add := func(text: String, variation: String, cb: Callable):
 		var b := UI.button(text, variation, cb)
 		b.custom_minimum_size.y = 44
 		v.add_child(b)
-	add.call("Resume", "Primary", func(): m.close())
+	add.call("Resume", "Primary", func(): box.m.close())
 	add.call("Options", "", func(): OptionsPanel.open_modal())
 	add.call("Save now", "", func():
 		Game.save_game()
@@ -349,7 +349,7 @@ func open_pause_menu() -> void:
 	add.call("Save and return to title", "", func(): _leave(false))
 	if OS.get_name() != "Web":
 		add.call("Save and quit to desktop", "Ghost", func(): _leave(true))
-	m = Modal.open(v, "Slot %d" % Game.slot, 440)
+	box.m = Modal.open(v, "Slot %d" % Game.slot, 440)
 
 
 func _leave(quit: bool) -> void:
@@ -547,8 +547,8 @@ func _welcome() -> void:
 		+ "Put it to work chopping wood, send it exploring to bind new Aetherlings, and when you have a few, "
 		+ "breed them in the Genesis Pods for rarer ones.\n\nEverything keeps going while you're away.", "", 420))
 	v.add_child(h)
-	var m: Modal
+	var box := {}
 	v.add_child(UI.button("Let's start: open Woodcutting", "Primary", func():
-		m.close()
+		box.m.close()
 		show_screen("skill", "woodcutting")))
-	m = Modal.open(v, "A new Sanctum", 620, false)
+	box.m = Modal.open(v, "A new Sanctum", 620, false)

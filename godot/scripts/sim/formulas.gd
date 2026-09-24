@@ -113,10 +113,10 @@ static func format_seconds(sec: float, fractional := false) -> String:
 		return ("%.1fs" % sec) if fractional and sec < 10 else "%ds" % int(ceil(sec))
 	var s := int(sec)
 	if s < 3600:
-		return "%dm %02ds" % [s / 60, s % 60]
+		return "%dm %02ds" % [floori(s / 60.0), s % 60]
 	if s < 86400:
-		return "%dh %02dm" % [s / 3600, (s % 3600) / 60]
-	return "%dd %02dh" % [s / 86400, (s % 86400) / 3600]
+		return "%dh %02dm" % [floori(s / 3600.0), floori((s % 3600) / 60.0)]
+	return "%dd %02dh" % [floori(s / 86400.0), floori((s % 86400) / 3600.0)]
 
 
 static func format_num(v: float) -> String:
@@ -128,8 +128,8 @@ static func format_num(v: float) -> String:
 	while a >= 1000 and i < units.size() - 1:
 		a /= 1000.0
 		i += 1
-	var sign := "-" if v < 0 else ""
-	return sign + ("%.2f" % a if a < 10 else "%.1f" % a if a < 100 else "%d" % int(a)) + units[i]
+	var minus := "-" if v < 0 else ""
+	return minus + ("%.2f" % a if a < 10 else "%.1f" % a if a < 100 else "%d" % int(a)) + units[i]
 
 
 static func pct(v: float) -> String:
