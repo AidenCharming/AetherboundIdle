@@ -49,3 +49,41 @@ func test_a_loop_plays_the_chords_once_per_section_and_the_sections_differ() -> 
 func test_evolve_sound_exists_and_outlasts_hatch() -> void:
 	t.ok(Sfx._streams.has("evolve"))
 	t.ok(Sfx._streams.evolve.data.size() > Sfx._streams.hatch.data.size())
+
+
+## Switching screens quickly (sanctum → expeditions → sanctum inside one crossfade) must leave a track
+## playing: the first fade's stop call used to silence the player the second switch had just reused.
+func test_quick_switch_back_keeps_music_playing() -> void:
+	var saved := [Music._streams, Music._current, Music._wanted, Music._active]
+	var tone := func(hz: float) -> AudioStreamWAV:
+		var w := AudioStreamWAV.new()
+		w.format = AudioStreamWAV.FORMAT_16_BITS
+		w.mix_rate = 22050
+		var data := PackedByteArray()
+		data.resize(22050 * 2)
+		for i in 22050:
+			data.encode_s16(i * 2, int(sin(TAU * hz * i / 22050.0) * 8000.0))
+		w.data = data
+		w.loop_mode = AudioStreamWAV.LOOP_FORWARD
+		w.loop_end = 22050
+		return w
+	Music._streams = {"sanctum": tone.call(220.0), "expedition": tone.call(330.0)}
+	Music._current = ""
+	Music.play("sanctum")
+	Music.play("expedition")
+	Music.play("sanctum")   # back before the first fade has finished
+	for tw in Music.get_tree().get_processed_tweens():
+		tw.custom_step(30.0)
+	var active: AudioStreamPlayer = Music._players[Music._active]
+	var other: AudioStreamPlayer = Music._players[1 - Music._active]
+	t.eq(active.stream, Music._streams.sanctum, "the Sanctum track is on the active player")
+	t.ok(active.playing, "and it is still playing after every fade has run")
+	t.near(active.volume_db, 0.0, 0.01, "at full volume")
+	t.ok(not other.playing, "the track faded out has stopped")
+	for p in Music._players:
+		p.stop()
+		p.volume_db = -80.0
+	Music._streams = saved[0]
+	Music._current = saved[1]
+	Music._wanted = saved[2]
+	Music._active = saved[3]

@@ -30,7 +30,6 @@ func _ready() -> void:
 	row.add_child(left)
 	var head := UI.hbox(12)
 	head.add_child(UI.header("Nexus", "Every Aetherling you have. Resting ones sit on the perches and gather Aether.", Data.ui_icon("nexus")))
-	head.add_child(UI.spacer())
 	_count = UI.label("", "Dim")
 	head.add_child(_count)
 	head.add_child(UI.button("Bulk release", "", _bulk_release))

@@ -127,6 +127,13 @@ func _notification(what: int) -> void:
 			apply()
 
 
+## Size of the screen the window is on (the fullscreen size).
+func screen_size() -> Vector2i:
+	if DisplayServer.get_name() == "headless":
+		return Vector2i(1920, 1080)
+	return DisplayServer.screen_get_size(DisplayServer.window_get_current_screen())
+
+
 func refresh_rate_text() -> String:
 	if DisplayServer.get_name() == "headless":
 		return "unknown"

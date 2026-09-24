@@ -17,6 +17,18 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   GPUs and starts faster than Forward+.
 - **Base resolution 1600×900**, `canvas_items` stretch with `expand`, so it reflows from 1280×720 to 4K.
   Options has window mode, window size, VSync, a frame-rate cap and an interface scale.
+  - **2D transforms snap to whole pixels.** At 1920×1080 the UI is scaled 1.2×, and without snapping some
+    glyphs land on pixel edges (sharp) and others between them (soft), so text looked unevenly blurry.
+    Movement now steps in whole screen pixels.
+  - **Wrapping labels are measured again when the window changes size.** A wrapping label measured
+    before its container has given it a width reports a height of thousands of pixels. Switching to
+    fullscreen on Windows could make that stick, and the Options panel stretched off both ends of the
+    screen as a blank box. Modals re-measure on resize, the Options notes have a fixed width, and the
+    Display tab rebuilds a frame after the mode change. In fullscreen the Window size row shows the
+    screen's own size.
+  - **Nothing may widen a screen.** Screen header subtitles wrap instead of forcing a width (the Nexus
+    header once pushed the detail panel off the right edge), and zone card lines end in "…". A test
+    checks every screen's minimum width fits beside the sidebar at 1600.
 - **Content is JSON under `godot/data/`**, loaded once by the `Data` autoload; balance numbers are in
   `data/tuning.json`. Adding a species, item, action, zone, upgrade or goal is a data change.
 - **Speed:** a busy mid-game save (13 workers across every skill plus an expedition) resolves a full
@@ -36,7 +48,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 76 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 79 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -67,9 +79,11 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   SVG placeholder otherwise. New PNGs import with mipmaps (a project import default), so they stay smooth at 24 px.
 - **Battle backdrops** (designer's request: fighters used to hover over two floating island ovals). The
   battle is now a side-view stage: every fighter stands on one ground line (front row at 84% of the view's
-  height, back row at 77% and a little smaller), placed by the lowest opaque pixel of its sprite so empty
-  space under the art never lifts it, with a soft shadow at its feet and its name and health bars above its
-  head. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
+  height, back row only 3% higher, so each side reads as a line), placed by the lowest opaque pixel of its
+  sprite so empty space under the art never lifts it, with a soft shadow at its feet and its name and health
+  bars above its head (back-row name tags sit a step higher so neighbours don't overlap). Every fighter is
+  sized for a full side of three, so a lone enemy is the same size as one of three, and each is kept a
+  small margin inside the backdrop. Bosses stay 1.45× bigger. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
   `docs/art-prompts-zones.md` (10 islands; `icon_runner.py --group zone`). Until one exists the game draws a
   landscape in the island's type colour: haze, two ranges of hills, open ground.
 - **Fonts:** Fredoka (headings; rounded, fits "cute stays cute") and Nunito (body). Both SIL Open Font
@@ -97,7 +111,8 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   - **Boss switching:** the arena plays the boss track while a boss wave is fighting on screen. Victory, a
     wipe, stopping the run or switching to another island's page brings the expedition track back. It
     follows the battle state, not just the banner, so leaving mid-boss and coming back is handled.
-    `Music.play` does the usual 2-second crossfade.
+    `Music.play` does the usual 2-second crossfade. A new crossfade cancels the one still running, so
+    switching screens back and forth quickly can't stop the track that has just come back.
   - **Variation:** each loop plays its four chords four times, in an A / A2 / B / A form:
     - A2 fills the arpeggio's rests with soft ghost notes and ends on a rising run.
     - B turns the arpeggio upside down an octave higher. On a track with a lead, the lead sings the top line
@@ -295,6 +310,15 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     for curve fitting.
   - **Result:** every skill reaches 99 between day 28.5 and day 33. Islands are first cleared on days
     1, 1, 1, 2, 3, 5, 5, 7, 11 and about 24, with the party at level 98–100 by day 30.
+  - **The first boss is a wall, not a formality.** Play-testing showed Old Thicketroll falling to a
+    level 2–4 party (one Faint, two Dim). Early on, levels add little (level 1 to 8 is about +40% power),
+    so an island's gate is its boss's strength against the party's rarity. Old Thicketroll's multipliers
+    went up by 1.3× (health 3.1, power 1.24, guard 1.3). An all-Dim party now loses at levels 1–4, wins
+    2 fights in 8 at level 5 and 6 in 8 at levels 6–7. A Faint in the party helps a little; an all-Faint
+    party still wins early. Fractured Quarry already had this shape (Dim needs about level 14–18 against
+    its level-16 boss, all-Faint wins from about 10), so it is unchanged. The month probe's `_combat`
+    rounds party levels down to multiples of 3, which is why the level-4 target had really been tested
+    at level 3.
 - **Skill XP curve** `1.0 × level³ × 1.028^(level−1)`, and **creature XP curve** `8.45 × level^3.3 × 1.014^(level−1)`.
   Both were fitted to the target timeline from the probe's measured XP rates.
   - **Skills:** the old skill curve (`10 × level² × 1.06^(level−1)`) was quick in the middle and slow at the

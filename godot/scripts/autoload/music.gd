@@ -41,6 +41,7 @@ var _players: Array[AudioStreamPlayer] = []
 var _active := 0
 var _wanted := ""
 var _current := ""
+var _fade: Tween
 var _thread: Thread
 var _mutex := Mutex.new()
 var _delay: AudioEffectDelay
@@ -157,11 +158,17 @@ func play(track: String) -> void:
 	nu.stream = stream
 	nu.volume_db = -40.0
 	nu.play()
-	var tw := create_tween().set_parallel(true)
-	tw.tween_property(nu, "volume_db", 0.0, FADE_SEC).set_trans(Tween.TRANS_SINE)
+	# A quick switch back and forth must not let the previous fade finish: its stop callback would silence
+	# the player that has just been reused for the new track.
+	if _fade and _fade.is_valid():
+		_fade.kill()
+	_fade = create_tween().set_parallel(true)
+	_fade.tween_property(nu, "volume_db", 0.0, FADE_SEC).set_trans(Tween.TRANS_SINE)
 	if old.playing:
-		tw.tween_property(old, "volume_db", -60.0, FADE_SEC).set_trans(Tween.TRANS_SINE)
-		tw.chain().tween_callback(old.stop)
+		_fade.tween_property(old, "volume_db", -60.0, FADE_SEC).set_trans(Tween.TRANS_SINE)
+		_fade.chain().tween_callback(func():
+			if _players[_active] != old:
+				old.stop())
 
 
 ## The track a screen last asked for (it may still be rendering).

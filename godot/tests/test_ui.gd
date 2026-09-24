@@ -274,3 +274,60 @@ func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
 	t.ok(first.find_children("*", "Label", true, false).any(func(l): return "secondary finds/h" in l.text), "cards show the figure being sorted by")
 	main.free()
 	_teardown()
+
+
+## Every screen fits the 1600-wide base layout next to the sidebar. A long header once made the Nexus's left
+## column so wide that its detail panel was pushed off the right edge.
+func test_screens_fit_the_base_width() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var s := Game.state
+	for sp in ["brambletrundle", "mossgear", "sproutlet"]:
+		var c := Creatures.make(s, sp, 2, 4, false, [], "test")
+		s.creatures[c.id] = c
+	var rail: Control = main.get_child(1).get_child(0)
+	var rail_w := rail.get_combined_minimum_size().x
+	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["nexus", s.creatures.keys()[0]], ["pods", ""],
+			["expeditions", "fractured-quarry"], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
+		main.show_screen(screen[0], screen[1])
+		var widest := 0.0
+		for c in main._screen.get_children():
+			if c is Control:
+				widest = maxf(widest, c.get_combined_minimum_size().x)
+		t.ok(rail_w + widest <= 1600.0, "%s needs %d px beside a %d px sidebar" % [screen[0], widest, rail_w])
+	main.free()
+	_teardown()
+
+
+## A lone enemy is drawn at the same size as each of three allies: sprites keep one size all run long.
+func test_arena_fighters_keep_one_size() -> void:
+	_setup()
+	var s := Game.state
+	var slot := 0
+	for sp in ["brambletrundle", "mossgear", "sproutlet"]:
+		var c := Creatures.make(s, sp, 1, 3, false, [], "test")
+		s.creatures[c.id] = c
+		Expedition.set_party_member(s, slot, c)
+		slot += 1
+	var rng := RandomNumberGenerator.new()
+	Expedition.start(s, "whisperleaf-hollow", rng)
+	var b: Dictionary = s.expedition.battle
+	for i in 200:   # walk to the first wave
+		if not b.enemies.is_empty():
+			break
+		Expedition.step(s, 250.0, rng)
+		b = s.expedition.battle
+	t.ok(not b.enemies.is_empty(), "a wave has appeared")
+	b.enemies = [b.enemies[0]]
+	var arena := Arena.new()
+	_layer.add_child(arena)
+	arena.size = Vector2(510, 585)
+	arena._build(b)
+	var ally: Vector2 = arena._allies[0].portrait.size
+	var foe: Vector2 = arena._enemies[0].portrait.size
+	t.eq(arena._allies.size(), 3)
+	t.near(foe.x, ally.x, 0.5, "one enemy (%d px) is as big as one of three allies (%d px)" % [foe.x, ally.x])
+	for f in arena._allies:
+		t.near(f.portrait.size.x, ally.x, 0.5, "front and back row the same size")
+	_teardown()

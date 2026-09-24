@@ -92,22 +92,57 @@ func _fill_zones() -> void:
 		v.offset_bottom = -10
 		card.add_child(v)
 		var h := UI.hbox(8)
-		h.add_child(UI.label(z.name, "H3"))
-		h.add_child(UI.spacer())
+		h.add_child(_fit(UI.label(z.name, "H3")))
 		h.add_child(UI.type_badge(z.type, true))
 		v.add_child(h)
-		v.add_child(UI.label("Levels %d–%d · Boss: %s" % [int(z.levels[0]), int(z.levels[1]), z.boss.name], "Faint"))
-		var status := ""
-		if not unlocked:
-			status = "Locked: defeat %s first" % Data.zones[z.unlockAfter].boss.name
-		elif zs.cleared:
-			status = "Cleared · %d runs" % int(zs.runs)
-		else:
-			status = "Best: wave %d" % int(zs.bestWave) if int(zs.bestWave) > 0 else "Unexplored"
-		v.add_child(UI.label(status, "Small", Palette.GOOD if zs.cleared else (Palette.TEXT_FAINT if not unlocked else Palette.AETHER)))
+		v.add_child(_fit(UI.label("Levels %d–%d · Boss: %s" % [int(z.levels[0]), int(z.levels[1]), z.boss.name], "Faint")))
+		card.tooltip_text = "%s\nLevels %d–%d · Boss: %s" % [z.name, int(z.levels[0]), int(z.levels[1]), z.boss.name]
+		var fill := Control.new()
+		fill.size_flags_vertical = Control.SIZE_EXPAND_FILL
+		fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		v.add_child(fill)
+		v.add_child(_zone_status(z, zs, unlocked))
 		if not unlocked:
 			card.modulate.a = 0.5
 		_zones.add_child(card)
+
+
+## Lets a card label shrink to the card, ending in "…", instead of spilling past its right edge.
+func _fit(l: Label) -> Label:
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.custom_minimum_size.x = 40
+	return l
+
+
+## The bottom line of a zone card: a small dot and a word on where the player stands.
+func _zone_status(z: Dictionary, zs: Dictionary, unlocked: bool) -> HBoxContainer:
+	var text := ""
+	var col := Palette.TEXT_DIM
+	var dot := Palette.TEXT_FAINT
+	var hollow := false
+	if not unlocked:
+		text = "Locked · defeat %s first" % Data.zones[z.unlockAfter].boss.name
+		col = Palette.TEXT_FAINT
+	elif zs.cleared:
+		text = "Cleared · %d %s" % [int(zs.runs), "run" if int(zs.runs) == 1 else "runs"]
+		col = Palette.GOOD
+		dot = Palette.GOOD
+	elif int(zs.bestWave) > 0:
+		text = "Reached wave %d of %d" % [int(zs.bestWave), int(z.waves)]
+		dot = Palette.AETHER
+	else:
+		text = "Not explored yet"
+		dot = Palette.AETHER
+		hollow = true
+	var d := Panel.new()
+	d.custom_minimum_size = Vector2(8, 8)
+	d.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	d.add_theme_stylebox_override("panel", ThemeFactory.box(Color(dot, 0.0) if hollow else dot, 99, 2 if hollow else 0, dot, 0))
+	var h := UI.hbox(7, [d, _fit(UI.label(text, "Faint", col))])
+	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return h
 
 
 func _fill_preview() -> void:

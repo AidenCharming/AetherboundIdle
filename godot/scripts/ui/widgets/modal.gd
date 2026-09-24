@@ -60,6 +60,24 @@ func _build(content: Control, title: String, width: float, close_button: bool) -
 	panel.resized.connect(func(): panel.pivot_offset = panel.size / 2.0)
 
 
+func _ready() -> void:
+	get_viewport().size_changed.connect(func(): _remeasure.call_deferred())
+
+
+## A wrapping label measured while the window is changing mode can keep a stale height of thousands of
+## pixels, which stretches the panel off both ends of the screen. Measure them again once the size settles.
+func _remeasure() -> void:
+	if not is_inside_tree() or is_queued_for_deletion():
+		return
+	var stack: Array[Node] = [panel]
+	while not stack.is_empty():
+		var n: Node = stack.pop_back()
+		if n is Label and n.autowrap_mode != TextServer.AUTOWRAP_OFF:
+			n.update_minimum_size()
+		stack.append_array(n.get_children())
+	panel.update_minimum_size()
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not locked:
 		get_viewport().set_input_as_handled()

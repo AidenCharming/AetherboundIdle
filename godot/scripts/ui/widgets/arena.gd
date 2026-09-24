@@ -17,9 +17,9 @@ var _zone_seed := 0.0
 var _boss_music := false   # the boss track is playing because of this arena
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
-## row stands. Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
+## row stands (a slight stagger, so each side reads as one line). Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
 const GROUND_Y := 0.84
-const BACK_ROW_RISE := 0.07
+const BACK_ROW_RISE := 0.03
 const HORIZON_Y := 0.62
 
 
@@ -63,7 +63,7 @@ func _ready() -> void:
 func _draw_ground() -> void:
 	var s := size
 	var c := Data.type_color(_zone_type)
-	var ground_top := s.y * (GROUND_Y - BACK_ROW_RISE - 0.05)
+	var ground_top := s.y * (GROUND_Y - 0.12)
 	if _backdrop.texture:
 		# painted backdrop: only darken the bottom a little so names and bars stay readable
 		_grad_rect(Rect2(0, s.y * 0.55, s.x, s.y * 0.45), Color(0, 0, 0, 0.0), Color(0.02, 0.02, 0.06, 0.45))
@@ -162,9 +162,11 @@ func _build(b: Dictionary) -> void:
 	for side in [0, 1]:
 		var list: Array = b.allies if side == 0 else b.enemies
 		var n := list.size()
-		# a staggered formation that fits the side's half of the arena
+		# a slightly staggered line that fits the side's half of the arena. Every fighter is sized for a full
+		# side, so a lone enemy is drawn at the same size as one of three.
 		var side_w := s.x * 0.44
-		var base_px := clampf(minf(side_w / (n * 0.78 + 0.35), s.y * 0.34), 64.0, 150.0)
+		var full := maxi(maxi(int(Data.tuning.combat.partySize), 3), maxi(b.allies.size(), b.enemies.size()))
+		var base_px := clampf(minf(side_w / (full * 0.78 + 0.35), s.y * 0.34), 64.0, 150.0)
 		for i in n:
 			var f: Dictionary = list[i]
 			var boss: bool = f.get("boss", false)
@@ -172,9 +174,9 @@ func _build(b: Dictionary) -> void:
 			var slot_x := side_w * (i + 0.5) / n
 			var x := (s.x * 0.04 + slot_x if side == 0 else s.x * 0.96 - slot_x) - px / 2.0
 			var back := (i % 2 == 1) if n > 1 else false
-			if back:
-				x += px * 0.05
-				px *= 0.9  # a little smaller further back, same centre
+			# keep the fighter, its name and its bars inside the backdrop, with a small margin
+			var edge := s.x * 0.02 + 20.0
+			x = clampf(x, edge, maxf(edge, s.x - edge - px))
 			var root := Control.new()
 			root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			root.size = Vector2(px, px)
@@ -204,10 +206,12 @@ func _build(b: Dictionary) -> void:
 			var nm := UI.label("%s %d" % [f.name, int(f.level)], "Small", Data.rarity_color(int(f.rarity)).lightened(0.3) if side == 1 else Palette.TEXT)
 			nm.add_theme_color_override("font_outline_color", Palette.INK)
 			nm.add_theme_constant_override("outline_size", 5)
-			nm.position = Vector2(-20, head - 36)
+			# the fighters stand almost in a line, so back-row name tags sit a step higher to stay readable
+			var tag_rise := 17.0 if back else 0.0
+			nm.position = Vector2(-20, head - 36 - tag_rise)
 			nm.size = Vector2(px + 40, 18)
 			nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			nm.clip_text = true
+			nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 			root.add_child(nm)
 			var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 8)
 			hp.position = Vector2(art.get_center().x - px * 0.35, head - 16)

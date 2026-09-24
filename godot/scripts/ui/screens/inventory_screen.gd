@@ -26,7 +26,6 @@ func _ready() -> void:
 	row.add_child(left)
 	var head := UI.hbox(10)
 	head.add_child(UI.header("Inventory & Market", "Sell what you don't need. Keep what the next tier needs.", Data.ui_icon("inventory")))
-	head.add_child(UI.spacer())
 	_worth = UI.label("", "Dim")
 	head.add_child(_worth)
 	left.add_child(head)

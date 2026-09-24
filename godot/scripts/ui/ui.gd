@@ -230,7 +230,12 @@ static func header(title: String, sub := "", tex: Texture2D = null, size := 44) 
 	var v := vbox(0)
 	v.add_child(label(title, "H1"))
 	if sub != "":
-		v.add_child(label(sub, "Dim"))
+		# wraps rather than widening the screen: a long subtitle must not push a side panel off screen
+		var sl := wrap_label(sub, "Dim")
+		sl.custom_minimum_size.x = 260
+		v.add_child(sl)
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(v)
 	return h
 

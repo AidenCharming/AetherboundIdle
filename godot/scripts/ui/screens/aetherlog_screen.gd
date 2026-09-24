@@ -17,7 +17,6 @@ func _ready() -> void:
 	add_child(m)
 	var head := UI.hbox(12)
 	head.add_child(UI.header("Aether-Log", "Everything you have found, and a few hints about what you haven't.", Data.ui_icon("aetherlog")))
-	head.add_child(UI.spacer())
 	_completion = UI.label("", "H1", Palette.GOLD)
 	head.add_child(_completion)
 	v.add_child(head)
