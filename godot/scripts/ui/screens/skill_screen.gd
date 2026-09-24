@@ -153,7 +153,9 @@ func _pick(replace_id: String) -> void:
 			if replace_id != "":
 				Game.bench(replace_id)
 			Game.assign(cid, skill_id),
-		func(c): return "Every %s here" % F.format_ms(Skills.worker_cooldown(c, skill_id, action, auras)))
+		func(c): return "Every %s here" % F.format_ms(Skills.worker_cooldown(c, skill_id, action, auras)),
+		"best",
+		func(c): return Skills.work_perks(c, skill_id, action).map(func(p): return Describe.work_perk(p)))
 
 
 func _fill_actions() -> void:

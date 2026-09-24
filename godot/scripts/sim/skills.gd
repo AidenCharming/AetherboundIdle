@@ -168,13 +168,11 @@ static func complete(s: Dictionary, c: Dictionary, skill_id: String, action: Dic
 			GameState.add_item(s, action.treasure.item, k)
 			gained[action.treasure.item] = gained.get(action.treasure.item, 0) + k
 			events.append({"type": "rare_drop", "skill": skill_id, "item": action.treasure.item, "qty": k, "creature": c.id})
-	for pd in Traits.partner_drops(c, skill_id):
+	for pd in partner_drops_for(c, skill_id, action):
 		var k := Rng.binomial(rng, n, pd.chance)
 		if k > 0:
-			var id := element_item(pd.type, int(Data.items[action.outputs.keys()[0]].tier))
-			if id != "":
-				GameState.add_item(s, id, k)
-				gained[id] = gained.get(id, 0) + k
+			GameState.add_item(s, pd.item, k)
+			gained[pd.item] = gained.get(pd.item, 0) + k
 	if action.has("gold"):
 		var g := int(action.gold) * n
 		GameState.add_item(s, "gold", g)
@@ -194,6 +192,46 @@ static func complete(s: Dictionary, c: Dictionary, skill_id: String, action: Dic
 
 
 ## The item of an element type at a tier (partner-element drops), or the nearest lower tier.
+## A worker's trait bonuses on this action, as the numbers complete() actually uses (capped), for the UI:
+## [{key, value}] plus {key: "partner_element_drop_chance", value, type} per partner drop. Speed is left
+## out (it shows as the cooldown), and so is anything that does nothing on this action.
+static func work_perks(c: Dictionary, skill_id: String, action: Dictionary) -> Array:
+	var out := []
+	var extra := Traits.capped_self(c, "extra_output_chance", skill_id)
+	if extra > 0.0:
+		out.append({"key": "extra_output_chance", "value": extra})
+	var away := minf(Traits.cap("extra_output_chance"), Traits.self_mod(c, "extra_output_chance", skill_id)
+		+ Traits.self_mod(c, "offline_extra_output_chance", skill_id)) - extra
+	if away > 0.0:
+		out.append({"key": "offline_extra_output_chance", "value": away})
+	if not action.get("inputs", {}).is_empty():
+		var save := Traits.capped_self(c, "save_material_chance", skill_id)
+		if save > 0.0:
+			out.append({"key": "save_material_chance", "value": save})
+	var rare_scale: float = Data.tuning.skills.get("rareBonusScale", 10.0)
+	for pair in [["rare", "rare_drop_chance"], ["treasure", "treasure_drop_chance"]]:
+		if action.has(pair[0]):
+			var v := Traits.capped_self(c, pair[1], skill_id)
+			if v > 0.0:
+				out.append({"key": pair[1], "value": rare_scale * v, "item": action[pair[0]].item})
+	var xp := Traits.capped_self(c, "bonus_xp", skill_id)
+	if xp > 0.0:
+		out.append({"key": "bonus_xp", "value": xp})
+	for pd in partner_drops_for(c, skill_id, action):
+		out.append({"key": "partner_element_drop_chance", "value": pd.chance, "item": pd.item})
+	return out
+
+
+## Partner-element drops this worker would roll on this action: [{item, chance}].
+static func partner_drops_for(c: Dictionary, skill_id: String, action: Dictionary) -> Array:
+	var out := []
+	for pd in Traits.partner_drops(c, skill_id):
+		var id := element_item(pd.type, int(Data.items[action.outputs.keys()[0]].tier))
+		if id != "":
+			out.append({"item": id, "chance": pd.chance})
+	return out
+
+
 static func element_item(type_id: String, tier: int) -> String:
 	var best := ""
 	var best_tier := 0

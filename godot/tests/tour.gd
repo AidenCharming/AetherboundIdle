@@ -88,6 +88,14 @@ func _run() -> void:
 		Main.go(screen[0], screen[1])
 		await _wait(1.2)
 		await _shot(name)
+	if _want("picker"):
+		# the worker picker lists each creature's trait bonuses for the job
+		Main.go("skill", "woodcutting")
+		await _wait(0.4)
+		Main.instance._screen._pick("")
+		await _wait(0.4)
+		await _shot("picker")
+		_close_modals()
 	if _want("expeditions"):
 		Game.start_expedition("fractured-quarry")
 		Main.go("expeditions")

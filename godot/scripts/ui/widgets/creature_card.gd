@@ -75,6 +75,24 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	tooltip_text = "%s · %s %s" % [Creatures.display_name(c), Data.rarity(int(c.rarity)).name, Data.species[c.species].name]
 
 
+## Extra lines under the card (trait bonuses for a job, in the worker picker). The card grows to fit; every
+## card in such a picker gets this call, so they share the wider size even with no lines.
+func add_perks(lines: Array) -> void:
+	custom_minimum_size.x = maxf(custom_minimum_size.x, 176.0)
+	if lines.is_empty():
+		return
+	var v: VBoxContainer = get_child(0)
+	for line in lines:
+		var l := UI.label(line, "Small", Palette.GOOD)
+		l.add_theme_font_size_override("font_size", 12)
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		l.clip_text = true
+		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		v.add_child(l)
+	custom_minimum_size.y += 18.0 * lines.size() + 4.0
+	tooltip_text += "\n" + "\n".join(lines)
+
+
 static func status_text(c: Dictionary) -> String:
 	match Creatures.job_kind(c):
 		"skill":

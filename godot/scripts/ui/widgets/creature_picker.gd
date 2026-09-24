@@ -5,6 +5,7 @@ extends VBoxContainer
 
 var _filter: Callable
 var _note: Callable
+var _perks: Callable
 var _on_pick: Callable
 var _grid: HFlowContainer
 var _sort := "best"
@@ -14,10 +15,13 @@ var _exclude_busy := false
 var _busy_btn: Button
 
 
-static func pick(title: String, filter: Callable, on_pick: Callable, note: Callable = Callable(), sort := "best") -> Modal:
+## `perks` (optional) returns lines of what a creature brings to this job, listed on its card.
+static func pick(title: String, filter: Callable, on_pick: Callable, note: Callable = Callable(), sort := "best",
+		perks: Callable = Callable()) -> Modal:
 	var p := CreaturePicker.new()
 	p._filter = filter
 	p._note = note
+	p._perks = perks
 	p._on_pick = on_pick
 	p._sort = sort
 	p._build()
@@ -83,6 +87,8 @@ func _fill() -> void:
 	for c in list:
 		var note: String = _note.call(c) if _note.is_valid() else ""
 		var card := CreatureCard.make(c, false, note)
+		if _perks.is_valid():
+			card.add_perks(_perks.call(c))
 		card.picked.connect(func(id):
 			_on_pick.call(id)
 			_modal.close())

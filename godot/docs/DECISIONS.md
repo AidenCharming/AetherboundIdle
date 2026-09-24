@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 62 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 63 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -291,6 +291,10 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
   with these defaults it binds a few dozen.
 
 ### Traits
+- **The worker picker shows what each creature brings to the job** (designer's request): under the speed
+  line, one green line per trait bonus that does something on the current action, as the numbers the sim
+  uses (double output, materials saved on crafting actions only, rare and treasure finds as the boost to
+  their rate, XP, partner-element drops). `Skills.work_perks()` computes them; `Describe.work_perk()` words them.
 - **Overclocked** (ambiguous in the reference): +2% speed per completed action, up to +10%, reset when the
   creature is moved or its task changes.
 - Rare-drop and treasure traits multiply the base chance (`× (1 + 10 × bonus)`), so a Moderate trait

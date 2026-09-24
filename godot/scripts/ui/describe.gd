@@ -25,3 +25,25 @@ static func ability(ab: Dictionary) -> String:
 		"thorns":
 			return "Shields itself and reflects part of the damage it takes."
 	return ""
+
+
+## One short line per work perk from Skills.work_perks(), e.g. "+50% rare finds". Kept short:
+## the picker cards show one line each.
+static func work_perk(perk: Dictionary) -> String:
+	var pct := F.pct(perk.value)
+	match perk.key:
+		"extra_output_chance":
+			return "%s double output" % pct
+		"offline_extra_output_chance":
+			return "+%s double output away" % pct
+		"save_material_chance":
+			return "%s save materials" % pct
+		"rare_drop_chance":
+			return "+%s rare finds" % pct
+		"treasure_drop_chance":
+			return "+%s treasure finds" % pct
+		"bonus_xp":
+			return "+%s XP" % pct
+		"partner_element_drop_chance":
+			return "%s extra %s" % [pct, Data.item_name(perk.item)]
+	return ""

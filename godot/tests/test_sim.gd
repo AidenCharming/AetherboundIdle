@@ -193,3 +193,20 @@ func test_a_new_rarity_is_a_log_entry_of_its_own() -> void:
 	t.eq(Collection.progress(s, "rarities"), 2)
 	t.eq(Collection.on_owned(s, Creatures.make(s, "buzzbud", 2, 1, false, [], "test")).filter(func(e): return e.type == "rarity_logged").size(), 0, "a second Faint is not")
 	t.ok(Collection.rarity_reward(5) > Collection.rarity_reward(2), "rarer entries pay more")
+
+
+func test_work_perks_list_only_what_helps_here() -> void:
+	var s := GameState.new_game()
+	var c := Creatures.make(s, "sproutlet", 1, 1, false, [{"id": "lucky", "s": "minor"}, {"id": "resourceful", "s": "major"}], "test")
+	var chop: Dictionary = Data.actions.woodcutting["oak-log"]
+	var perks := Skills.work_perks(c, "woodcutting", chop)
+	var keys := perks.map(func(p): return p.key)
+	t.ok("rare_drop_chance" in keys, "lucky shows on an action with a rare find")
+	t.ok(not ("save_material_chance" in keys), "saving materials means nothing on a gathering action")
+	var rare: Dictionary = perks.filter(func(p): return p.key == "rare_drop_chance")[0]
+	t.near(rare.value, 0.05 * float(Data.tuning.skills.get("rareBonusScale", 10.0)), 0.001, "shown as the real boost to the rare-find rate")
+	var bar: Dictionary = Data.actions.smithing["copper-bar"]
+	var sm := Skills.work_perks(c, "smithing", bar).map(func(p): return p.key)
+	t.ok("save_material_chance" in sm, "resourceful shows on a crafting action")
+	for p in perks:
+		t.ok(Describe.work_perk(p) != "", "every perk has a line")
