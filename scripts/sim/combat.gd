@@ -217,6 +217,8 @@ static func _use_ability(own: Array, foe: Array, side: int, i: int, rng: RandomN
 		"multi-target-damage":
 			events.append({"type": "ability", "side": side, "index": i, "ability": ab.id})
 			for t in foe.size():
+				if not f.alive:
+					break   # thorns from an earlier target knocked the attacker out
 				if foe[t].alive:
 					_hit(f, foe[t], side, i, t, pw * cb.multiTargetFraction, ab.damageType, ab.id, rng, events)
 		"heal-instant", "heal-over-time":

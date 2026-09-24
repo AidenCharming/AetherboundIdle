@@ -239,3 +239,23 @@ func test_one_run_is_a_fraction_of_a_level() -> void:
 		ms += 250.0
 	t.ok(int(lead.level) <= 13, "level %d after one run from 12" % int(lead.level))
 	t.ok(float(lead.xp) > F.xp_for_level(F.creature_curve(), 12, Data.tuning.creature.maxLevel), "but it did earn XP")
+
+
+## Thorns that knock out an attacker mid-way through a multi-target ability stop it: nothing more is hit.
+func test_thorns_stop_a_multi_target_ability() -> void:
+	var ab_id := ""
+	for id in Data.abilities:
+		if Data.abilities[id].effect == "multi-target-damage":
+			ab_id = id
+			break
+	var att := Combat.wild("sproutlet", 10, 1, false, {}, "", ab_id)
+	att.hp = 1.0
+	var foes := []
+	for i in 3:
+		foes.append(Combat.wild("sproutlet", 10, 1, false, {"health": 100.0}))
+	foes[0].thornsT = 5000.0
+	var events := []
+	Combat._use_ability([att], foes, 0, 0, _rng(), events)
+	var hits := events.filter(func(e): return e.type == "hit" and e.side == 0 and e.from == 0)
+	t.eq(hits.size(), 1, "only the thorned target was hit")
+	t.ok(not att.alive, "the attacker went down")
