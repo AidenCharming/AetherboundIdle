@@ -60,13 +60,13 @@ func refresh() -> void:
 	var tex := Data.creature_texture(species, form)
 	_mat = ShaderMaterial.new()
 	if tex:
-		var tr := TextureRect.new()
-		tr.texture = tex
-		tr.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		tr.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		tr.flip_h = flip
+		var rect := TextureRect.new()
+		rect.texture = tex
+		rect.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		rect.flip_h = flip
 		_mat.shader = CREATURE_SHADER
-		_art = tr
+		_art = rect
 	else:
 		var cr := ColorRect.new()
 		_mat.shader = BLOB_SHADER
@@ -179,8 +179,8 @@ func _draw_twinkles(on: Control) -> void:
 		var a := sin(ph * PI)
 		if a <= 0.05:
 			continue
-		var seed: float = float(i) * 2.3 + _phase + floor(_twinkle_t * 0.55 + i * 0.25 + _phase) * 1.7
-		var pos := Vector2(0.18 + 0.64 * fposmod(sin(seed * 12.9) * 43.7, 1.0), 0.12 + 0.6 * fposmod(sin(seed * 78.2) * 17.3, 1.0)) * s
+		var sd: float = float(i) * 2.3 + _phase + floor(_twinkle_t * 0.55 + i * 0.25 + _phase) * 1.7
+		var pos := Vector2(0.18 + 0.64 * fposmod(sin(sd * 12.9) * 43.7, 1.0), 0.12 + 0.6 * fposmod(sin(sd * 78.2) * 17.3, 1.0)) * s
 		var r := s * 0.05 * a
 		var c := Color(col, a)
 		on.draw_polygon(PackedVector2Array([pos + Vector2(0, -r), pos + Vector2(r * 0.22, -r * 0.22), pos + Vector2(r, 0), pos + Vector2(r * 0.22, r * 0.22),

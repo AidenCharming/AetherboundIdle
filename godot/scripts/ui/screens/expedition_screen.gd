@@ -199,8 +199,8 @@ func _fill_right() -> void:
 	pv.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("power"), 22), UI.label("Party", "H3")]))
 	pv.add_child(UI.wrap_label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
 	var party := GameState.party(s)
-	var size: int = Data.tuning.combat.partySize
-	for i in size:
+	var party_size: int = Data.tuning.combat.partySize
+	for i in party_size:
 		var h := UI.hbox(10)
 		if i < party.size():
 			var c: Dictionary = party[i]

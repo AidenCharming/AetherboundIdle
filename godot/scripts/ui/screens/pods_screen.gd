@@ -81,18 +81,17 @@ func _fill_bench() -> void:
 	mid.add_child(outs)
 	# tiers
 	_bench.add_child(UI.sep())
-	var tr := UI.hbox(10)
-	tr.add_child(UI.label("Materials", "H3"))
+	var tier_row := UI.hbox(10)
+	tier_row.add_child(UI.label("Materials", "H3"))
 	for t in range(1, 6):
-		var cost := Breeding.cost(a, b, t)
-		var ok := GameState.can_afford(s, cost)
+		var ok := GameState.can_afford(s, Breeding.cost(a, b, t))
 		var btn := UI.button("Tier %d · up to %s" % [t, Data.rarity(Breeding.ceiling(t)).name], "ChipOn" if t == tier else "Chip")
 		btn.add_theme_color_override("font_color", Palette.TEXT if ok else Palette.TEXT_FAINT)
 		btn.pressed.connect(func():
 			tier = t
 			_fill_bench())
-		tr.add_child(btn)
-	_bench.add_child(tr)
+		tier_row.add_child(btn)
+	_bench.add_child(tier_row)
 	var cost := Breeding.cost(a, b, tier)
 	var cr := UI.hbox(14)
 	cr.add_child(UI.label("Cost", "Faint"))
@@ -212,10 +211,9 @@ func _fill_pods() -> void:
 	var s := Game.state
 	UI.clear(_pods)
 	_pod_views.clear()
-	var now := Game.now_sec()
-	var ready := Game.ready_eggs()
-	if ready.size() >= 2:
-		var all := UI.button("Hatch all %d" % ready.size(), "Gold", func():
+	var ready_list := Game.ready_eggs()
+	if ready_list.size() >= 2:
+		var all := UI.button("Hatch all %d" % ready_list.size(), "Gold", func():
 			for i in Game.ready_eggs():
 				Game.hatch(i))
 		all.custom_minimum_size = Vector2(180, 200)
@@ -298,7 +296,7 @@ func _process(_d: float) -> void:
 			pv.button.text = "Speed up · %d Aether" % Breeding.speed_up_cost(egg, now)
 			pv.button.theme_type_variation = ""
 	if Engine.get_process_frames() % 60 == 0:
-		var ready := Game.ready_eggs().size()
+		var ready_count := Game.ready_eggs().size()
 		var shown := _pod_views.filter(func(pv): return pv.label.text == "Ready!").size()
-		if ready != shown:
+		if ready_count != shown:
 			_fill_pods()

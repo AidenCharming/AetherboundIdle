@@ -157,7 +157,6 @@ func _handle(events: Array) -> void:
 				var a: Dictionary = Data.actions[e.skill][e.action]
 				_notify("Unlocked: %s" % a.name, Data.item_icon(a.outputs.keys()[0]), Palette.AETHER)
 			"evolved":
-				var c := GameState.creature(state, e.creature)
 				_notify("%s evolved into %s!" % [Data.form_name(e.species, e.from), Data.form_name(e.species, e.form)], Data.ui_icon("shiny"), Palette.GOLD)
 				reveal_requested.emit("evolve", e)
 				structural = true
@@ -386,9 +385,9 @@ func set_action(skill_id: String, action_id: String) -> void:
 
 # ---------------------------------------------------------------- actions: expeditions
 
-func set_party(slot: int, cid: String) -> void:
+func set_party(party_slot: int, cid: String) -> void:
 	var c := creature(cid) if cid != "" else {}
-	var err := Expedition.set_party_member(state, slot, c)
+	var err := Expedition.set_party_member(state, party_slot, c)
 	if err != "":
 		warn(err)
 	_restart_run_if_running()

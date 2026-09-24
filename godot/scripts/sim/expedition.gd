@@ -78,7 +78,7 @@ static func stop(s: Dictionary) -> void:
 	s.expedition.battle = {}
 
 
-static func _new_run(s: Dictionary, rng: RandomNumberGenerator) -> void:
+static func _new_run(s: Dictionary, _rng: RandomNumberGenerator) -> void:
 	var z: Dictionary = Data.zones[s.expedition.zone]
 	var party := GameState.party(s)
 	var allies := party.map(func(c): return Combat.ally(c))
@@ -239,7 +239,7 @@ static func choose_vessel(s: Dictionary, w: Dictionary) -> String:
 	return want if GameState.count(s, want) >= 1 else ""
 
 
-static func bind_chance(s: Dictionary, vessel_id: String, rarity: int, party: Array) -> float:
+static func bind_chance(_s: Dictionary, vessel_id: String, rarity: int, party: Array) -> float:
 	var v: Dictionary = Data.items[vessel_id].vessel
 	var bonus := minf(Traits.cap("bind_rate"), Traits.party_mod(party, "bind_rate"))
 	return clampf(float(v.base) * pow(float(v.falloff), rarity - 1) * (1.0 + bonus), 0.0, 0.98)
@@ -372,7 +372,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 				events.append({"type": "zone_unlocked", "zone": other.id})
 		if z.has("firstClearCreature"):
 			var fc: Dictionary = z.firstClearCreature
-			var pool := Data.species_list.filter(func(sp): return sp.kind == "base" and sp.types[0] in fc.types)
+			var pool := Data.species_list.filter(func(x): return x.kind == "base" and x.types[0] in fc.types)
 			var sp: Dictionary = Rng.pick(rng, pool)
 			_bind(s, {"species": sp.id, "level": int(boss.level) - 10, "rarity": int(fc.rarity), "shiny": false}, rng, events, "boss")
 

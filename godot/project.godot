@@ -38,6 +38,12 @@ window/subwindows/embed_subwindows=true
 common/snap_controls_to_pixels=true
 theme/default_font_antialiasing=1
 
+[importer_defaults]
+
+texture={
+"mipmaps/generate": true
+}
+
 [rendering]
 
 renderer/rendering_method="gl_compatibility"

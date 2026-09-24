@@ -107,7 +107,7 @@ func _apply_display() -> void:
 			res = Vector2i(mini(res.x, screen.size.x), mini(res.y, screen.size.y))
 			if DisplayServer.window_get_size() != res:
 				DisplayServer.window_set_size(res)
-				DisplayServer.window_set_position(screen.position + (screen.size - res) / 2)
+				DisplayServer.window_set_position(screen.position + Vector2i(Vector2(screen.size - res) * 0.5))
 		1:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		2:

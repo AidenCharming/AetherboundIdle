@@ -142,7 +142,7 @@ static func claim(s: Dictionary, track_id: String, index: int, rng: RandomNumber
 	if r.has("title") and not (r.title in s.collection.titles):
 		s.collection.titles.append(r.title)
 	for i in int(r.get("revealRecipe", 0)):
-		var hidden := Data.special_list.filter(func(rec): return not (rec.result in s.collection.recipes) and not (rec.result in s.collection.revealed))
+		var hidden := Data.special_list.filter(func(x): return not (x.result in s.collection.recipes) and not (x.result in s.collection.revealed))
 		if hidden.is_empty():
 			break
 		var rec: Dictionary = Rng.pick(rng, hidden)

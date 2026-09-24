@@ -48,37 +48,37 @@ func _exit_tree() -> void:
 ## only the very first launch spends a few seconds synthesising.
 func _render_all() -> void:
 	DirAccess.make_dir_recursive_absolute("user://music")
-	for name in ["title", "sanctum", "expedition"]:
-		var path := "user://music/%s-%d.pcm" % [name, hash(str(TRACKS[name]) + str(RATE))]
+	for track in ["title", "sanctum", "expedition"]:
+		var path := "user://music/%s-%d.pcm" % [track, hash(str(TRACKS[track]) + str(RATE))]
 		var stream: AudioStreamWAV
 		if FileAccess.file_exists(path):
 			stream = _wav(FileAccess.get_file_as_bytes(path))
 		else:
-			stream = _render(TRACKS[name])
+			stream = _render(TRACKS[track])
 			var f := FileAccess.open(path, FileAccess.WRITE)
 			if f:
 				f.store_buffer(stream.data)
 				f.close()
 		_mutex.lock()
-		_streams[name] = stream
+		_streams[track] = stream
 		_mutex.unlock()
-		call_deferred("_on_rendered", name)
+		call_deferred("_on_rendered", track)
 
 
-func _on_rendered(name: String) -> void:
-	if name == _wanted and _current != name:
-		play(name)
+func _on_rendered(track: String) -> void:
+	if track == _wanted and _current != track:
+		play(track)
 
 
 ## Crossfades to a track. Safe to call before it has rendered: it starts as soon as it is ready.
-func play(name: String) -> void:
-	_wanted = name
+func play(track: String) -> void:
+	_wanted = track
 	_mutex.lock()
-	var stream: AudioStreamWAV = _streams.get(name)
+	var stream: AudioStreamWAV = _streams.get(track)
 	_mutex.unlock()
-	if stream == null or _current == name:
+	if stream == null or _current == track:
 		return
-	_current = name
+	_current = track
 	var old := _players[_active]
 	_active = 1 - _active
 	var nu := _players[_active]
@@ -145,7 +145,7 @@ func _render(t: Dictionary) -> AudioStreamWAV:
 
 
 func _wav(bytes: PackedByteArray) -> AudioStreamWAV:
-	var n := bytes.size() / 2
+	var n := bytes.size() >> 1
 	var w := AudioStreamWAV.new()
 	w.format = AudioStreamWAV.FORMAT_16_BITS
 	w.mix_rate = RATE

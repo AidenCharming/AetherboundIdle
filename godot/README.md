@@ -67,6 +67,22 @@ Drop `<species id>-f1.png`, `-f2.png` and `-f3.png` (512×512, transparent) into
 open the project in the editor. Any species with a file uses it; the rest show the aether-blob
 placeholder. The ids are in `data/species.json`, and `docs/DECISIONS.md` lists the ones still missing.
 
+## Painted icons (FLUX.2 in ComfyUI)
+
+Every item and interface icon has a ready-to-paste prompt in [`docs/art-prompts-icons.md`](docs/art-prompts-icons.md),
+built by `tools/art/build_icon_prompts.py` (edit its table and rerun). `tools/art/icon_runner.py` runs them through
+ComfyUI with the same graphs as the creature pipeline and uses its `batch_runner.py` and `sprite_tools.py` from
+`D:\AI\tools`:
+
+```
+python build_icon_prompts.py            writes the prompt doc and D:\AI\tools\icons.json
+python icon_runner.py run --count 4     candidates for every icon (resumable)
+python icon_runner.py pick oak-log 3    approve one
+python icon_runner.py finish            cut out approved icons and copy them into assets/icons/
+```
+
+A `<id>.png` in `assets/icons/items/` or `assets/icons/ui/` replaces that icon's SVG placeholder automatically.
+
 ## Adding items
 
 Add the item to `data/items.json` with an `icon` entry (`{"shape": "ore", "color": "#d27a3c"}`; the

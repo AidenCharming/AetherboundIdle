@@ -67,7 +67,7 @@ func load_all() -> void:
 		special_recipes[pair_key(r.parents[0], r.parents[1])] = r
 
 
-static func pair_key(a: String, b: String) -> String:
+func pair_key(a: String, b: String) -> String:
 	return a + "+" + b if a < b else b + "+" + a
 
 
@@ -133,11 +133,21 @@ func texture(path: String) -> Texture2D:
 func item_icon(id: String) -> Texture2D:
 	if id == "aether" or id == "gold":
 		return ui_icon(id)
-	return texture("res://assets/icons/items/%s.svg" % id)
+	return _icon("res://assets/icons/items/" + id)
 
 
-func ui_icon(name: String) -> Texture2D:
-	return texture("res://assets/icons/ui/%s.svg" % name)
+func ui_icon(icon_name: String) -> Texture2D:
+	return _icon("res://assets/icons/ui/" + icon_name)
+
+
+## A painted PNG icon (from the art pipeline, tools/art/icon_runner.py) wins over the generated SVG placeholder.
+func _icon(base: String) -> Texture2D:
+	var png := base + ".png"
+	if _textures.has(png) or ResourceLoader.exists(png):
+		var tex := texture(png)
+		if tex:
+			return tex
+	return texture(base + ".svg")
 
 
 ## The sprite for a species and form: res://assets/creatures/<id>-f<form>.png (or the file named by the
