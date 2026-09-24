@@ -66,6 +66,7 @@ shiny chance, and Aether Pearls (the endgame currency with six Pearl upgrades in
 - Whether work XP should be raised.
 - Hybrid art: 135 sprites; the game shows a placeholder blob until then. FLUX prompts could be written.
 - Gear stays out (it would upset the balance).
+- Cosmetics: `docs/cosmetics.md` lists hats and other ideas to choose from; nothing is built yet.
 
 ## Ideas worth doing next
 
