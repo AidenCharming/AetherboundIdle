@@ -14,7 +14,9 @@ decided and why) and `README.md` (how to run things).
   push to `godot-rebuild`.
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
-  what still needs painting.
+  what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the
+  designer's `D:\AI` art folders** (the cloud): the "approved" marks come from that folder and would be wiped.
+  Add the prompt to the builder and let the designer's run regenerate the docs.
 
 ## Running things
 
