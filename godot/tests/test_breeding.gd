@@ -36,7 +36,7 @@ func test_rarity_odds_sum_to_one_and_respect_the_ceiling() -> void:
 	var s := GameState.new_game()
 	var a := _c(s, "sproutlet", 1)
 	var b := _c(s, "sproutlet", 1)
-	for tier in range(1, 6):
+	for tier in range(1, Breeding.tier_count() + 1):
 		var odds := Breeding.rarity_odds(a, b, tier)
 		var sum := 0.0
 		var top := 0
@@ -160,3 +160,24 @@ func test_every_goal_check_is_understood() -> void:
 	for g in Data.goals:
 		var p := Goals.progress(s, g)
 		t.ok(p[1] >= 1, g.id)
+
+
+func test_better_materials_lift_the_odds_and_zenith_needs_the_top_tier() -> void:
+	var s := GameState.new_game()
+	var mean := func(odds: Array) -> float:
+		var m := 0.0
+		for i in odds.size():
+			m += odds[i] * (i + 1)
+		return m
+	var a := _c(s, "sproutlet", 2)
+	var b := _c(s, "sproutlet", 2)
+	for tier in range(2, Breeding.tier_count() + 1):
+		t.ok(mean.call(Breeding.rarity_odds(a, b, tier)) > mean.call(Breeding.rarity_odds(a, b, tier - 1)) - 1e-9,
+			"tier %d is at least as good as tier %d" % [tier, tier - 1])
+	t.eq(Breeding.ceiling(Breeding.tier_count()), Data.max_rarity(), "the top tier reaches the top rarity")
+	for tier in range(1, Breeding.tier_count()):
+		t.ok(Breeding.ceiling(tier) < Data.max_rarity(), "only the top tier's ceiling is the top rarity (tier %d)" % tier)
+	var r8a := _c(s, "sproutlet", 8)
+	var r8b := _c(s, "sproutlet", 8)
+	var z: float = Breeding.rarity_odds(r8a, r8b, Breeding.tier_count())[Data.max_rarity() - 1]
+	t.ok(z > 0.35 and z < 0.7, "two top-but-one parents on the top tier: about a coin flip (%.2f)" % z)

@@ -108,36 +108,57 @@
 	"breeding": {
 		"aetherCost": [
 			100,
-			400,
-			1600,
-			6400,
-			25600
+			250,
+			600,
+			1400,
+			3200,
+			7000,
+			15000,
+			32000,
+			65000,
+			130000
 		],
 		"materialQty": 5,
 		"ceilingByTier": [
 			2,
 			3,
+			3,
+			4,
+			4,
 			5,
+			6,
 			7,
+			8,
 			9
 		],
 		"stepWeight": 0.18,
+		"centreLiftPerTier": 0.05,
 		"mutationPlusOne": 0.15,
 		"mutationPlusTwo": 0.025,
 		"topTierMutationMult": 0.5,
 		"hatchMinutes": [
 			2,
-			8,
-			30,
+			5,
+			10,
+			20,
+			35,
+			60,
 			90,
-			240
+			150,
+			240,
+			360
 		],
 		"speedUpAetherPerMinute": [
 			3,
+			4,
 			6,
-			12,
+			9,
+			13,
+			18,
 			25,
-			50
+			35,
+			50,
+			70
 		],
 		"inheritChance": 0.4,
 		"traitMutationChance": 0.05,

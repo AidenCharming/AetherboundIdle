@@ -302,20 +302,30 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   creature's own type is 3× as likely; Void-only traits only on Void creatures and at Moderate minimum.
   Offspring inherit each parent trait with 40% chance (strength can drift one step), fill up with fresh
   rolls if nothing passed down, and have a 5% chance of one extra mutation trait. All in `tuning.json`.
-- **Rarity:** the materials' tier sets the ceiling (tiers 1–5 → Faint, Steady, Luminous, Brilliant,
-  Zenith). The odds centre on the parents' average rarity and fall off by `stepWeight` (0.18) for each tier
-  away from it, never below the weaker parent. Then the two mutation rolls (+1 at 15%, +2 at 2.5%, halved
-  for the top two tiers) can pass the ceiling. The full odds are shown before laying. With tier 1
-  materials: Dim + Dim → Faint 25%; Dim + Faint → Faint 49%, Steady 9%; Faint + Faint → never Dim, Steady
-  15%. (First version: the odds started at the *rounded-down* average with a 0.45 falloff, so Dim + Dim
-  gave Faint 36% and Dim + Faint was exactly the same as Dim + Dim. Designer feedback: too generous for
-  two Dims, and a rarer parent must help.)
+- **Rarity:** the materials' tier sets the ceiling. There are ten egg tiers, one per material tier (the
+  designer asked whether five was enough; it wasn't once materials went to ten). Tiers 1–10 cap at Faint,
+  Steady, Steady, Gleaming, Gleaming, Luminous, Radiant, Brilliant, Resplendent and Zenith, so the rarest
+  eggs need the late islands' materials.
+  - **Odds:** they centre on the parents' average rarity and fall off by `stepWeight` (0.18) for each tier
+    away from it, never below the weaker parent. Each tier above the first lifts that centre by
+    `centreLiftPerTier` (0.05 of a rarity step), so a tier sharing its ceiling with the one below still has
+    better odds.
+  - **Mutation:** two rolls (+1 at 15%, +2 at 2.5%, halved for the top two rarities) can pass the ceiling.
+    The full odds are shown before laying.
+  - **Examples:** with tier 1 materials, Dim + Dim → Faint 25%; Dim + Faint → Faint 49%, Steady 9%;
+    Faint + Faint → never Dim, Steady 15%. Two Resplendents on tier 10 → Zenith about half the time.
+  - **Climb:** a player who always breeds their best pair on the cheapest tier that can beat it needs about
+    30 eggs from Dim to a first Zenith (10–90%: 20–43). So the real pace is set by when each material tier
+    opens and by Aether, not by luck.
+  - **History:** the first version started the odds at the *rounded-down* average with a 0.45 falloff, so
+    Dim + Dim gave Faint 36% and Dim + Faint was exactly the same as Dim + Dim. Designer feedback: too
+    generous for two Dims, and a rarer parent must help.
 - **Materials:** 5 per parent of that parent's element at the chosen tier (logs, ores, bars, fish,
-  components, threads) plus Aether 100 → 25,600. The reference's special Void-offspring rule is
+  components, threads) plus Aether 100 → 130,000. The reference's special Void-offspring rule is
   simplified: Void just needs threads.
 - **Hybrid parents breed true** (a hybrid × anything gives one of the two parents' species), same-type
   pairs give one of the two parents, and the reference's rare "sibling species" is not built (no content).
-- **Eggs:** 2 minutes to 4 hours by tier, sped up with Aether; the shell glow shows the true rarity 75% of
+- **Eggs:** 2 minutes to 6 hours by tier, sped up with Aether; the shell glow shows the true rarity 75% of
   the time and a neighbouring tier otherwise ("sometimes misleading").
 
 ### Expeditions and combat

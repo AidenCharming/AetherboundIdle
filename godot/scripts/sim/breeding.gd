@@ -41,6 +41,11 @@ static func cost(a: Dictionary, b: Dictionary, tier: int) -> Dictionary:
 	return c
 
 
+## How many material tiers eggs can be laid at (one per material tier).
+static func tier_count() -> int:
+	return Data.tuning.breeding.ceilingByTier.size()
+
+
 static func ceiling(tier: int) -> int:
 	return int(Data.tuning.breeding.ceilingByTier[tier - 1])
 
@@ -51,14 +56,16 @@ static func mutation_bonus(a: Dictionary, b: Dictionary) -> float:
 
 ## Probability of each rarity tier (index 0 = Dim). Resource tier sets the ceiling; the odds centre on the
 ## parents' average rarity, falling off by `stepWeight` per tier away from it (so a Dim + Faint pair sits
-## halfway between two Dims and two Faints), and never go below the weaker parent. Then two separate
-## mutation rolls can push past the ceiling.
+## halfway between two Dims and two Faints), and never go below the weaker parent. Better materials lift
+## the centre by `centreLiftPerTier` per tier above the first, so a tier that shares its ceiling with the
+## one below still has better odds. Then two separate mutation rolls can push past the ceiling.
 static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
 	var br: Dictionary = Data.tuning.breeding
 	var top := Data.max_rarity()
 	var ceil_r := ceiling(tier)
 	var lowest := mini(mini(int(a.rarity), int(b.rarity)), ceil_r)
-	var centre := minf((float(a.rarity) + float(b.rarity)) / 2.0, float(ceil_r))
+	var lift := float(br.get("centreLiftPerTier", 0.0)) * (tier - 1)
+	var centre := minf((float(a.rarity) + float(b.rarity)) / 2.0 + lift, float(ceil_r))
 	var base := []
 	var total := 0.0
 	for k in range(lowest, ceil_r + 1):

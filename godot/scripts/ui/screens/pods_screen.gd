@@ -81,9 +81,9 @@ func _fill_bench() -> void:
 	mid.add_child(outs)
 	# tiers
 	_bench.add_child(UI.sep())
-	var tier_row := UI.hbox(10)
-	tier_row.add_child(UI.label("Materials", "H3"))
-	for t in range(1, 6):
+	_bench.add_child(UI.label("Materials", "H3"))
+	var tier_row := UI.flow(8, 8)
+	for t in range(1, Breeding.tier_count() + 1):
 		var ok := GameState.can_afford(s, Breeding.cost(a, b, t))
 		var btn := UI.button("Tier %d · up to %s" % [t, Data.rarity(Breeding.ceiling(t)).name], "ChipOn" if t == tier else "Chip")
 		btn.add_theme_color_override("font_color", Palette.TEXT if ok else Palette.TEXT_FAINT)

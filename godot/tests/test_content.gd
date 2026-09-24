@@ -54,7 +54,7 @@ func test_items_have_icons() -> void:
 
 func test_breeding_materials_exist_for_every_type_and_tier() -> void:
 	for ty in Data.type_list:
-		for tier in range(1, 6):
+		for tier in range(1, Breeding.tier_count() + 1):
 			t.ok(Breeding.material(ty.id, tier) != "", "%s tier %d" % [ty.id, tier])
 
 
