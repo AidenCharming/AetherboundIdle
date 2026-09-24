@@ -159,6 +159,8 @@ func _layout() -> void:
 
 
 func _process(delta: float) -> void:
+	if plate and not silhouette and Data.rarity_animated(rarity) and is_visible_in_tree():
+		queue_redraw()
 	if shiny and not silhouette and is_visible_in_tree() and _glints:
 		_twinkle_t += delta
 		_glints.queue_redraw()
@@ -211,7 +213,7 @@ func _draw_plate() -> void:
 	# rarity glow: soft rings outside the plate
 	var glow: float = Data.rarity(rarity).glow * glow_scale if not silhouette else 0.0
 	if glow > 0.0:
-		var rc := Data.rarity_color(rarity)
+		var rc := Data.rarity_color_live(rarity)
 		for i in 6:
 			var rr := r + s * 0.012 * (i + 1)
 			draw_circle(c, rr, Color(rc, 0.07 * glow * (1.0 - i / 6.0)))
@@ -221,4 +223,12 @@ func _draw_plate() -> void:
 		draw_circle(c - Vector2(0, r * 0.12 * i / 5.0), r * (0.95 - i * 0.12), Color(type_c, 0.035))
 	draw_arc(c, r, 0, TAU, 64, Color(type_c, 0.85), maxf(2.0, s * 0.022), true)
 	if not silhouette and rarity > 1:
-		draw_arc(c, r + s * 0.02, -PI * 0.85, -PI * 0.15, 32, Color(Data.rarity_color(rarity), 0.9), maxf(1.5, s * 0.014), true)
+		draw_arc(c, r + s * 0.02, -PI * 0.85, -PI * 0.15, 32, Color(Data.rarity_color_live(rarity), 0.9), maxf(1.5, s * 0.014), true)
+	# rarity pips (one per tier) along the bottom of the rim, so the tier can be counted, not just colour-read
+	if not silhouette and s >= 44.0:
+		var pr := clampf(s * 0.024, 2.2, 5.0)
+		var n := rarity
+		var step_a := (pr * 2.3) / r
+		for i in n:
+			var a := PI / 2.0 + (float(i) - float(n - 1) / 2.0) * step_a
+			UI.draw_pips(self, c + Vector2(cos(a), sin(a)) * r, 1, pr, Data.rarity_color_live(rarity))

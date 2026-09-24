@@ -33,7 +33,7 @@
 		"tier": 4,
 		"id": "gleaming",
 		"name": "Gleaming",
-		"color": "#66e3a0",
+		"color": "#3fd9c9",
 		"statMultiplier": 2.1,
 		"benchAetherPerMin": 16,
 		"glow": 0.375,

@@ -14,7 +14,8 @@ var _ground: Control
 var _backdrop: TextureRect
 var _zone_type := "verdant"
 var _zone_seed := 0.0
-var _boss_music := false   # the boss track is playing because of this arena
+var _boss_music := false
+var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced   # the boss track is playing because of this arena
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
 ## row stands (a slight stagger, so each side reads as one line). Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
@@ -184,7 +185,11 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(mark)
-	var nm := UI.label(f.name, "Small", Palette.TEXT)
+	if bool(f.get("shiny", false)):
+		var sm := UI.icon(Data.ui_icon("shiny"), 14)
+		sm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		row.add_child(sm)
+	var nm := UI.label(f.name, "Small", Color("ffe9a8") if bool(f.get("shiny", false)) else Palette.TEXT)
 	nm.add_theme_font_size_override("font_size", 14 if boss else 12)
 	nm.clip_text = true
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -218,7 +223,70 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	bars_row.add_child(bars)
 	v.add_child(bars_row)
 	panel.custom_minimum_size.x = width
-	return {"panel": panel, "hp": hp, "shield": sh}
+	# rarity pips sit on the plate's top edge, one per tier
+	var pips := Control.new()
+	pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var tier := int(f.rarity)
+	pips.draw.connect(func(): UI.draw_pips(pips, Vector2.ZERO, tier, 3.2, Data.rarity_color_live(tier)))
+	return {"panel": panel, "hp": hp, "shield": sh, "pips": pips, "sb": sb, "tier": tier, "boss": boss}
+
+
+## A shiny or a rare wild Aetherling entering the fight gets a sound, a burst of light and a word over its
+## head, once per wave. "Rare" means a rarity this island rolls at most `combat.rareAnnounceChance` of the time.
+func _announce(b: Dictionary) -> void:
+	var key := "%s|%d|%d" % [b.zone, int(b.wave), int(Game.state.expedition.zones.get(b.zone, {}).get("runs", 0))]
+	if key == _announced:
+		return
+	_announced = key
+	var z: Dictionary = Data.zones[b.zone]
+	var weights: Array = z.rarityWeights
+	var total := 0.0
+	for w in weights:
+		total += float(w)
+	var sound := ""
+	for i in _enemies.size():
+		var f: Dictionary = b.enemies[i]
+		if f.get("boss", false):
+			continue
+		var r := int(f.rarity)
+		var share := float(weights[r - 1]) / total if r - 1 < weights.size() else 0.0
+		var rare := r > 1 and share <= float(Data.tuning.combat.get("rareAnnounceChance", 0.1))
+		if not (f.shiny or rare):
+			continue
+		var v: Dictionary = _enemies[i]
+		var col: Color = Color(CreaturePortrait.shiny_palette(f.species).light) if f.shiny else Data.rarity_color(r)
+		var centre: Vector2 = v.root.position + v.root.size * 0.5
+		_burst(centre, col, 1.4 if f.shiny else 1.0)
+		FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 10.0),
+			"Shiny!" if f.shiny else Data.rarity(r).name + "!", col, Data.ui_icon("shiny") if f.shiny else null, 17, 34.0, true)
+		sound = "shiny_appear" if f.shiny else (sound if sound != "" else "rare_appear")
+	if sound != "":
+		Sfx.play(sound)
+
+
+## An expanding ring of light with short rays, fading out.
+func _burst(at: Vector2, col: Color, strength: float) -> void:
+	var fx := Control.new()
+	fx.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	fx.position = at
+	fx.z_index = 8
+	_fx.add_child(fx)
+	var state := {"k": 0.0}
+	fx.draw.connect(func():
+		var k: float = state.k
+		var a := 1.0 - k
+		var r := 20.0 + 70.0 * k * strength
+		fx.draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(col, 0.8 * a), 3.0 + 3.0 * a, true)
+		fx.draw_circle(Vector2.ZERO, r * 0.6, Color(col, 0.18 * a))
+		for i in 10:
+			var ang := TAU * i / 10.0 + k * 0.6
+			var d := Vector2(cos(ang), sin(ang))
+			fx.draw_line(d * r * 0.75, d * (r * 1.15 + 10.0), Color(col.lightened(0.3), 0.7 * a), 2.0, true))
+	var tw := fx.create_tween()
+	tw.tween_method(func(k: float):
+		state.k = k
+		fx.queue_redraw(), 0.0, 1.0, 0.9 if Options.get_value("reduce_motion") == false else 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	tw.tween_callback(fx.queue_free)
 
 
 func _clear() -> void:
@@ -292,9 +360,12 @@ func _build(b: Dictionary) -> void:
 			# centred over the art, but never past the arena's edges
 			var plate_x := clampf(root.position.x + art.get_center().x - plate_w / 2.0, 4.0, s.x - 4.0 - plate_w)
 			np.panel.position = Vector2(plate_x - root.position.x, top)
+			root.add_child(np.pips)
+			np.pips.position = np.panel.position + Vector2(plate_w / 2.0, 0)
 			var rec := {"root": root, "portrait": por, "hp": np.hp, "shield": np.shield, "home": root.position, "down": false,
-				"tag_top": top}
+				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss}
 			(_allies if side == 0 else _enemies).append(rec)
+	_announce(b)
 	var z: Dictionary = Data.zones[b.zone]
 	if int(b.wave) >= int(b.waves):
 		_show_banner("BOSS: " + z.boss.name, Palette.GOLD)
@@ -320,6 +391,10 @@ func _update(b: Dictionary) -> void:
 			var f: Dictionary = list[i]
 			var v: Dictionary = views[i]
 			v.hp.value = float(f.hp) / maxf(1.0, float(f.maxHp))
+			if Data.rarity_animated(int(v.get("tier", 1))):
+				v.pips.queue_redraw()
+				if not v.boss:
+					v.sb.border_color = Color(Data.rarity_color_live(int(v.tier)), 0.9)
 			v.shield.value = clampf(float(f.shield) / maxf(1.0, float(f.maxHp)), 0.0, 1.0)
 			v.shield.modulate.a = 1.0 if float(f.shield) > 0.5 else 0.0   # keeps its space, so the plate never jumps
 			if not f.alive and not v.down:

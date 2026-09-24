@@ -57,6 +57,17 @@ static func owned_mark(size := 20, corner := Vector2.ZERO) -> TextureRect:
 	return r
 
 
+## Draws rarity pips: `n` small diamonds with a dark outline, centred on `at`, laid along `dir`.
+static func draw_pips(ci: CanvasItem, at: Vector2, n: int, r: float, col: Color, dir := Vector2.RIGHT) -> void:
+	var step := r * 2.3
+	for i in n:
+		var p := at + dir * (float(i) - float(n - 1) / 2.0) * step
+		var o := r + maxf(1.0, r * 0.35)
+		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -o), p + Vector2(o, 0), p + Vector2(0, o), p + Vector2(-o, 0)]), Palette.INK)
+		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0)]), col)
+		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r * 0.45, -r * 0.1), p + Vector2(0, -r * 0.2)]), Color(1, 1, 1, 0.55))
+
+
 static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
 	var b := HBoxContainer.new()
 	b.add_theme_constant_override("separation", gap)

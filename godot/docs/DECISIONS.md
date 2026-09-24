@@ -96,6 +96,14 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     level chip in the rarity colour, the health bar, and a shield bar that appears only while a shield holds.
     Front-row plates sit over the head, back-row plates a step higher, and every plate stays inside the
     arena. Ability names float up from above the plate instead of through it.
+  - **Telling rarity and shinies apart in battle** (designer's request): rarity pips, one small diamond per
+    tier, sit on the nameplate's top edge and along the bottom of every portrait rim, so the tier can be
+    counted, not just read from its colour. The top tiers' colours move: Zenith cycles a soft rainbow,
+    Resplendent and Brilliant pulse (`Data.rarity_color_live`). Gleaming moved from green to teal so it
+    no longer looks like Faint. A shiny's nameplate has the shiny mark and a gold name. When a shiny or a
+    rare wild Aetherling enters a fight (a rarity the island rolls at most `combat.rareAnnounceChance`,
+    10%, of the time), a burst of light, a "Shiny!" or rarity word and a sound (`shiny_appear`, a glittering
+    run; `rare_appear`, a bell chime) announce it once per wave.
 - **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
   of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
   wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the

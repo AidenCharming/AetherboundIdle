@@ -48,6 +48,11 @@ func _ready() -> void:
 	_streams.cast_aqueous = _render([[330, 0.0, 0.1, "sine", 0.3, 880, "drop"], [440, 0.07, 0.1, "sine", 0.28, 1100, "drop"], [660, 0.14, 0.14, "sine", 0.26, 1500, "drop"]])
 	_streams.cast_voltaic = _render([[880, 0.0, 0.05, "square", 0.12], [1320, 0.05, 0.05, "square", 0.12], [1760, 0.1, 0.05, "square", 0.12], [2640, 0.15, 0.1, "square", 0.1], [60, 0.0, 0.08, "noise", 0.18]])
 	_streams.cast_void = _render([[196, 0.0, 0.35, "sine", 0.26, 392], [203, 0.0, 0.35, "sine", 0.2, 380], [98, 0.1, 0.3, "tri", 0.2]])
+	# a shiny enters: a quick glittering run up two octaves with a shimmer on top
+	_streams.shiny_appear = _render([[1047, 0.0, 0.12, "sine", 0.24], [1319, 0.05, 0.12, "sine", 0.24], [1568, 0.1, 0.12, "sine", 0.24],
+		[2093, 0.15, 0.3, "sine", 0.26], [2637, 0.2, 0.4, "sine", 0.16], [3136, 0.26, 0.45, "sine", 0.12], [1568, 0.15, 0.5, "tri", 0.1, 3136]])
+	# a rare one enters: a two-note bell chime
+	_streams.rare_appear = _render([[784, 0.0, 0.4, "sine", 0.3], [1568, 0.0, 0.3, "sine", 0.08], [1175, 0.12, 0.5, "sine", 0.28], [2350, 0.12, 0.35, "sine", 0.07]])
 	# a super-effective hit adds a bright ping on top
 	_streams.strong = _render([[1568, 0.0, 0.12, "sine", 0.22], [2349, 0.03, 0.14, "sine", 0.16]])
 	_streams.whoosh = _render([[400, 0.0, 0.25, "noise", 0.12]])

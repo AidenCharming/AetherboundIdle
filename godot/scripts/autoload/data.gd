@@ -106,6 +106,23 @@ func rarity_color(tier: int) -> Color:
 	return Color(rarity(tier).color)
 
 
+## The rarity colour as it should look right now: the top tiers are animated. Zenith cycles through a
+## soft rainbow, Resplendent and Brilliant pulse between their colour and a lighter one.
+func rarity_color_live(tier: int) -> Color:
+	var c := rarity_color(tier)
+	var t := Time.get_ticks_msec() / 1000.0
+	if tier >= max_rarity():
+		return Color.from_hsv(fmod(t * 0.18, 1.0), 0.38, 1.0)
+	if tier >= max_rarity() - 2:
+		return c.lerp(c.lightened(0.45), 0.5 + 0.5 * sin(t * 3.0))
+	return c
+
+
+## Rarity tiers whose colour moves (they need redrawing every frame).
+func rarity_animated(tier: int) -> bool:
+	return tier >= max_rarity() - 2
+
+
 func item_name(id: String) -> String:
 	if id == "aether":
 		return "Aether"
