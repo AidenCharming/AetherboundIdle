@@ -33,6 +33,8 @@ var _rail_refresh := 0.0
 var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
 var _limited_flash := false   # a rare limited offer is in the Market: its badge pulses
 var _boosts_box: HBoxContainer
+var _mouse_held := false        # the left button is down: rebuilding now could free the button being clicked
+var _refresh_waiting := false   # a Game.changed came while it was down; the screen rebuilds on release
 
 
 func _ready() -> void:
@@ -143,9 +145,26 @@ func show_screen(screen: String, arg := "") -> void:
 
 
 func _on_changed() -> void:
+	# A capture or level-up mid-click used to rebuild the screen between mouse down and up, freeing the button
+	# and losing the click. While the button is held, the rebuild waits for the release.
+	if _mouse_held:
+		_refresh_waiting = true
+	else:
+		_refresh_screen()
+	_refresh_rail()
+
+
+func _refresh_screen() -> void:
+	_refresh_waiting = false
 	if _screen and _screen.has_method("refresh"):
 		_screen.refresh()
-	_refresh_rail()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_mouse_held = event.pressed
+		if not event.pressed and _refresh_waiting:
+			_refresh_screen.call_deferred()   # after the release has reached (and clicked) the button
 
 
 func _build_rail() -> Control:
@@ -360,6 +379,10 @@ func _update_bell() -> void:
 func _process(delta: float) -> void:
 	if Game.state.is_empty():
 		return
+	if _mouse_held and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_mouse_held = false   # released where this window never saw it (focus lost mid-click)
+		if _refresh_waiting:
+			_refresh_screen()
 	var s := Game.state
 	_top.aether.value.text = F.format_num(float(s.aether))
 	_top.aether.sub.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))

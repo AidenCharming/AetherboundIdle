@@ -89,9 +89,10 @@ What its first runs found and fixed:
 - Bridge fixes: clicks pick an exact match that's scrolled out of view before a visible partial match; only the
   top dialog's buttons are listed; a button counts as visible only when its centre is in its scroll area.
 
-Still open (bigger than a quick fix): the same "rebuild everything on `Game.changed`" pattern is used by most
-screens (skill pages, pods, Works, Market), so a click there can be lost the same way during a busy expedition.
-Rebuilding only the parts that changed would fix it for good.
+- **Clicks lost on the other screens** (skill pages, pods, Works, Market, which rebuild on every `Game.changed`):
+  fixed in `Main`. While the left mouse button is held, a `Game.changed` only marks the screen as owed a rebuild;
+  it runs just after the release (deferred, so the click lands on the button first). Rebuilding only the parts
+  that changed would still be nicer for performance, but clicks are no longer lost.
 
 ## Not yet seen or heard in the real game (check these first)
 

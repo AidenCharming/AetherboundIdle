@@ -599,3 +599,45 @@ func test_option_changes_are_saved_once_after_they_stop() -> void:
 	t.ok(not Options.save_pending(), "nothing left waiting")
 	Options.flush()
 	t.eq(Options.save_count, writes + 1, "and not again")
+
+
+## A capture or level-up while the mouse button is down must not rebuild the screen under the click (the button
+## would be freed between press and release and the click lost). The rebuild waits for the release.
+func test_screen_waits_for_the_mouse_before_rebuilding() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var screens := ["skill", "pods", "works", "market"]
+	for scr_id in screens:
+		main.show_screen(scr_id, "woodcutting" if scr_id == "skill" else "")
+		var btn := _first_button(main._screen)
+		t.ok(btn != null, "%s has a button" % scr_id)
+		if btn == null:
+			continue
+		var down := InputEventMouseButton.new()
+		down.button_index = MOUSE_BUTTON_LEFT
+		down.pressed = true
+		main._input(down)
+		Game.changed.emit()
+		t.ok(btn.is_inside_tree() and not btn.is_queued_for_deletion(), "%s: the button survives a change mid-click" % scr_id)
+		var up := InputEventMouseButton.new()
+		up.button_index = MOUSE_BUTTON_LEFT
+		up.pressed = false
+		main._input(up)
+		t.ok(main._refresh_waiting, "%s: the rebuild is still owed until after the release" % scr_id)
+		main._refresh_screen()
+		t.ok(not main._refresh_waiting, "%s: and then done" % scr_id)
+		Game.changed.emit()
+		t.ok(not btn.is_inside_tree(), "%s: with the button up, a change rebuilds at once" % scr_id)
+	main.free()
+	_teardown()
+
+
+func _first_button(root: Node) -> Button:
+	if root is Button and root.visible:
+		return root
+	for c in root.get_children():
+		var b := _first_button(c)
+		if b:
+			return b
+	return null
