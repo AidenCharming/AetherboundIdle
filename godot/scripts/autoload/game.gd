@@ -163,6 +163,9 @@ func _handle(events: Array) -> void:
 			"discovered":
 				var sp: Dictionary = Data.species[e.species]
 				_notify("New in the Aether-Log: %s  (+%d Aether)" % [sp.name, int(e.reward.aether)], Data.ui_icon("aetherlog"), Palette.AETHER)
+			"rarity_logged":
+				_notify("New in the Aether-Log: %s %s  (+%d Aether)" % [Data.rarity(e.rarity).name, Data.species[e.species].name, int(e.aether)],
+					Data.ui_icon("aetherlog"), Data.rarity_color(e.rarity))
 			"captured":
 				_notify("Bound %s %s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, "  (shiny!)" if e.shiny else ""],
 					Data.ui_icon("vessel"), Data.rarity_color(e.rarity))

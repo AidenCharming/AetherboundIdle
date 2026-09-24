@@ -58,6 +58,15 @@ func refresh() -> void:
 
 func _dex() -> void:
 	var s := Game.state
+	# every collection track at a glance; each counts toward the completion figure
+	var stats := UI.flow(10, 8)
+	for t in Data.collection.tracks:
+		var p := Collection.progress(s, t.id)
+		var total := Collection.total(t.id)
+		var chip := UI.panel("Inset", UI.hbox(8, [UI.label(t.name, "Dim"), UI.label("%d / %d" % [p, total], "Num")]))
+		chip.tooltip_text = t.blurb
+		stats.add_child(chip)
+	_body.add_child(stats)
 	for group in [["base", "Wild species"], ["hybrid", "Hybrids"], ["special", "Secret hybrids"]]:
 		var list := Data.species_list.filter(func(sp): return sp.kind == group[0])
 		var owned := list.filter(func(sp): return Collection.is_owned(s, sp.id)).size()

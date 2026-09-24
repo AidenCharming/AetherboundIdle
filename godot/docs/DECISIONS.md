@@ -36,7 +36,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 59 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 61 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -173,7 +173,10 @@ A creature-collecting idle game in five loops that feed each other:
 4. **Grow the Sanctum.** Resting Aetherlings on perches make Aether; gold and crafted parts build Sanctum
    Works upgrades (pods, perches, an Aether extractor, longer offline time, more meals per run).
 5. **Collect.** The Aether-Log tracks species, forms, recipes, rarities and shinies, with milestone rewards
-   and titles; secret recipes show a hint until found.
+   and titles; secret recipes show a hint until found. Every rarity of every species is its own entry:
+   owning a species at a rarity you have not had before is announced ("New in the Aether-Log: Faint
+   Buzzbud") and pays 5 × 2^(rarity − 1) Aether (Faint 10 … Zenith 1,280; `collection.json` `newRarity`).
+   The Creaturedex opens with a strip of all five tracks' counts (designer's request).
 
 Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, each paying a small reward.
 
@@ -241,9 +244,13 @@ Onboarding is a chain of 22 goals from "Overseer Vance" on the Sanctum screen, e
   Offspring inherit each parent trait with 40% chance (strength can drift one step), fill up with fresh
   rolls if nothing passed down, and have a 5% chance of one extra mutation trait. All in `tuning.json`.
 - **Rarity:** the materials' tier sets the ceiling (tiers 1–5 → Faint, Steady, Luminous, Brilliant,
-  Zenith); the parents' average rarity sets where the odds start, falling off geometrically toward the
-  ceiling; then the two mutation rolls (+1 at 15%, +2 at 2.5%, halved for the top two tiers) can pass it.
-  The full odds are shown before laying.
+  Zenith). The odds centre on the parents' average rarity and fall off by `stepWeight` (0.18) for each tier
+  away from it, never below the weaker parent. Then the two mutation rolls (+1 at 15%, +2 at 2.5%, halved
+  for the top two tiers) can pass the ceiling. The full odds are shown before laying. With tier 1
+  materials: Dim + Dim → Faint 25%; Dim + Faint → Faint 49%, Steady 9%; Faint + Faint → never Dim, Steady
+  15%. (First version: the odds started at the *rounded-down* average with a 0.45 falloff, so Dim + Dim
+  gave Faint 36% and Dim + Faint was exactly the same as Dim + Dim. Designer feedback: too generous for
+  two Dims, and a rarer parent must help.)
 - **Materials:** 5 per parent of that parent's element at the chosen tier (logs, ores, bars, fish,
   components, threads) plus Aether 100 → 25,600. The reference's special Void-offspring rule is
   simplified: Void just needs threads.

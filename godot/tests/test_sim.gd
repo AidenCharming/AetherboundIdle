@@ -174,3 +174,22 @@ func test_binomial_is_sane() -> void:
 	for i in 200:
 		total += Rng.binomial(rng, 1000, 0.1)
 	t.near(total / 200.0, 100.0, 5.0)
+
+
+func test_a_new_rarity_is_a_log_entry_of_its_own() -> void:
+	var s := GameState.new_game()
+	s.creatures.clear()
+	s.collection.species.clear()
+	var dim := Creatures.make(s, "buzzbud", 1, 1, false, [], "test")
+	var ev1 := Collection.on_owned(s, dim)
+	t.ok(ev1.any(func(e): return e.type == "discovered"), "the first one is the discovery")
+	t.ok(not ev1.any(func(e): return e.type == "rarity_logged"), "not also a rarity entry")
+	var aether0 := float(s.aether)
+	var faint := Creatures.make(s, "buzzbud", 2, 1, false, [], "test")
+	var ev2 := Collection.on_owned(s, faint)
+	var logged := ev2.filter(func(e): return e.type == "rarity_logged")
+	t.eq(logged.size(), 1, "a Faint after a Dim is a new entry")
+	t.near(float(s.aether) - aether0, Collection.rarity_reward(2), 0.01, "with its Aether")
+	t.eq(Collection.progress(s, "rarities"), 2)
+	t.eq(Collection.on_owned(s, Creatures.make(s, "buzzbud", 2, 1, false, [], "test")).filter(func(e): return e.type == "rarity_logged").size(), 0, "a second Faint is not")
+	t.ok(Collection.rarity_reward(5) > Collection.rarity_reward(2), "rarer entries pay more")

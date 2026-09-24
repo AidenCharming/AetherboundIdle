@@ -132,7 +132,7 @@
 		},
 		{
 			"id": "rarities",
-			"name": "Rarity tiers seen",
+			"name": "Rarities collected",
 			"blurb": "Own each species at each rarity.",
 			"milestones": [
 				{
@@ -224,5 +224,9 @@
 			"aether": 200,
 			"gold": 150
 		}
+	},
+	"newRarity": {
+		"aether": 5,
+		"growth": 2.0
 	}
 }

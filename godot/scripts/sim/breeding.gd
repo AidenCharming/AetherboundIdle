@@ -49,17 +49,20 @@ static func mutation_bonus(a: Dictionary, b: Dictionary) -> float:
 	return minf(Traits.cap("mutation_odds"), Traits.self_mod(a, "mutation_odds") + Traits.self_mod(b, "mutation_odds"))
 
 
-## Probability of each rarity tier (index 0 = Dim). Resource tier sets the ceiling; the parents' rarity
-## sets where the odds start; then two separate mutation rolls can push past the ceiling.
+## Probability of each rarity tier (index 0 = Dim). Resource tier sets the ceiling; the odds centre on the
+## parents' average rarity, falling off by `stepWeight` per tier away from it (so a Dim + Faint pair sits
+## halfway between two Dims and two Faints), and never go below the weaker parent. Then two separate
+## mutation rolls can push past the ceiling.
 static func rarity_odds(a: Dictionary, b: Dictionary, tier: int) -> Array:
 	var br: Dictionary = Data.tuning.breeding
 	var top := Data.max_rarity()
 	var ceil_r := ceiling(tier)
-	var start := clampi(int(floor((int(a.rarity) + int(b.rarity)) / 2.0)), 1, ceil_r)
+	var lowest := mini(mini(int(a.rarity), int(b.rarity)), ceil_r)
+	var centre := minf((float(a.rarity) + float(b.rarity)) / 2.0, float(ceil_r))
 	var base := []
 	var total := 0.0
-	for k in range(start, ceil_r + 1):
-		var w := pow(float(br.stepWeight), k - start)
+	for k in range(lowest, ceil_r + 1):
+		var w := pow(float(br.stepWeight), absf(k - centre))
 		base.append([k, w])
 		total += w
 	var bonus := mutation_bonus(a, b)

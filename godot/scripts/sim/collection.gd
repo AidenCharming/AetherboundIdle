@@ -27,11 +27,22 @@ static func on_owned(s: Dictionary, c: Dictionary) -> Array:
 		if not (f in entry.forms):
 			entry.forms.append(f)
 	if not (int(c.rarity) in entry.rarities):
+		# a new rarity of a species already in the log is a log entry of its own (the first one is the discovery)
+		if not entry.rarities.is_empty():
+			var aether := rarity_reward(int(c.rarity))
+			GameState.add_item(s, "aether", aether)
+			events.append({"type": "rarity_logged", "species": sp_id, "rarity": int(c.rarity), "aether": aether})
 		entry.rarities.append(int(c.rarity))
 	if c.shiny and not entry.shiny:
 		entry.shiny = true
 		events.append({"type": "shiny_logged", "species": sp_id})
 	return events
+
+
+## Aether for owning a species at a rarity you had not owned it at before.
+static func rarity_reward(rarity: int) -> float:
+	var nr: Dictionary = Data.collection.newRarity
+	return roundf(float(nr.aether) * pow(float(nr.growth), rarity - 1))
 
 
 static func on_evolved(s: Dictionary, c: Dictionary) -> void:

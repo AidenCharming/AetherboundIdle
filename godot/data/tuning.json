@@ -120,7 +120,7 @@
 			7,
 			9
 		],
-		"stepWeight": 0.45,
+		"stepWeight": 0.18,
 		"mutationPlusOne": 0.15,
 		"mutationPlusTwo": 0.025,
 		"topTierMutationMult": 0.5,

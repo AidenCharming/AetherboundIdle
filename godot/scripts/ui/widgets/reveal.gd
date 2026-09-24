@@ -188,6 +188,10 @@ func _hatch_caption(c: Dictionary, events: Array) -> void:
 		var nl := UI.label(tag, "H3", Palette.GOLD)
 		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_caption.add_child(nl)
+	elif events.any(func(e): return e.type == "rarity_logged"):
+		var new_rl := UI.label("NEW RARITY: " + Data.rarity(int(c.rarity)).name.to_upper(), "H3", Data.rarity_color(int(c.rarity)))
+		new_rl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		_caption.add_child(new_rl)
 	var title_lbl := UI.label(Data.form_name(c.species, 1), "Title")
 	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_lbl.add_theme_color_override("font_outline_color", Palette.INK)
