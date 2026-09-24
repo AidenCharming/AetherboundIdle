@@ -75,7 +75,7 @@ func _build_menu() -> void:
 		var info := Game.slot_info(last)
 		var cont := _menu_button("Continue", "Primary", func(): _start(last, false))
 		col.add_child(cont)
-		col.add_child(UI.margin(UI.label("Slot %d · %s played · last seen %s" % [last, F.format_seconds(info.playSeconds), _ago(info.lastSeen)], "Faint"), 6, -4, 0, 6))
+		col.add_child(UI.margin(UI.label("%s · %s played · last seen %s" % [_slot_title(last, info), F.format_seconds(info.playSeconds), _ago(info.lastSeen)], "Faint"), 6, -4, 0, 6))
 	col.add_child(_menu_button("New Game", "" if last > 0 else "Primary", func(): _slots_modal("new")))
 	col.add_child(_menu_button("Load Game", "", func(): _slots_modal("load")))
 	col.add_child(_menu_button("Options", "", func(): OptionsPanel.open_modal()))
@@ -131,7 +131,7 @@ func _fill_slots(row: HBoxContainer, mode: String, m: Modal) -> void:
 		card.custom_minimum_size = Vector2(320, 330)
 		var v := UI.vbox(8)
 		card.add_child(v)
-		v.add_child(UI.label("Slot %d" % n, "H2"))
+		v.add_child(UI.label(_slot_title(n, info), "H2"))
 		if info.is_empty():
 			v.add_child(UI.label("Empty", "Dim"))
 			v.add_child(UI.spacer(true))
@@ -154,11 +154,40 @@ func _fill_slots(row: HBoxContainer, mode: String, m: Modal) -> void:
 			else:
 				v.add_child(UI.button("Overwrite with a new game", "Danger", func():
 					Modal.confirm("Overwrite slot %d?" % n, "This deletes the game in slot %d for good and starts over." % n, "Overwrite", func(): _start(n, true), true)))
+			v.add_child(UI.button("Rename", "Ghost", func(): _rename_slot(n, info, row, mode, m)))
 			v.add_child(UI.button("Delete", "Ghost", func():
 				Modal.confirm("Delete slot %d?" % n, "The save in slot %d will be gone for good." % n, "Delete", func():
 					Game.delete_slot(n)
 					_fill_slots(row, mode, m), true)))
 		row.add_child(card)
+
+
+## "Dev Save (slot 2)" when the player named the slot, otherwise "Slot 2".
+func _slot_title(n: int, info: Dictionary) -> String:
+	var nm: String = info.get("name", "")
+	return "%s (slot %d)" % [nm, n] if nm != "" else "Slot %d" % n
+
+
+func _rename_slot(n: int, info: Dictionary, row: HBoxContainer, mode: String, slots_modal: Modal) -> void:
+	var v := UI.vbox(12)
+	var le := LineEdit.new()
+	le.text = info.get("name", "")
+	le.placeholder_text = "Slot %d" % n
+	le.max_length = 24
+	v.add_child(le)
+	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
+	var apply := func(t: String):
+		box.m.close()
+		Game.rename_slot(n, t)
+		_fill_slots(row, mode, slots_modal)
+	var r := UI.hbox(8)
+	r.add_child(UI.button("Clear name", "Ghost", func(): apply.call("")))
+	r.add_child(UI.spacer())
+	r.add_child(UI.button("Save", "Primary", func(): apply.call(le.text)))
+	v.add_child(r)
+	le.text_submitted.connect(func(t): apply.call(t))
+	box.m = Modal.open(v, "Name this save", 420)
+	le.grab_focus.call_deferred()
 
 
 func _start(n: int, fresh: bool) -> void:

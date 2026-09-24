@@ -296,8 +296,28 @@ func slot_info(n: int) -> Dictionary:
 		return {"lastSeen": float(parsed.get("lastSeen", 0)), "playSeconds": float(parsed.get("playSeconds", 0)),
 			"creatures": parsed.creatures.size(), "species": parsed.get("collection", {}).get("species", {}).size(),
 			"aether": float(parsed.get("aether", 0)), "bestSkill": best, "bestLevel": best_level, "zones": zones_cleared,
-			"title": parsed.get("settings", {}).get("title", "")}
+			"title": parsed.get("settings", {}).get("title", ""), "name": str(parsed.get("saveName", ""))}
 	return {}
+
+
+## Gives a save slot a name of the player's choosing ("" clears it). Works on a slot that is not loaded.
+func rename_slot(n: int, save_name: String) -> void:
+	save_name = save_name.strip_edges().left(24)
+	if n == slot and not state.is_empty():
+		state.saveName = save_name
+		save_game()
+		return
+	var path := slot_path(n)
+	if not FileAccess.file_exists(path):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	if not (parsed is Dictionary):
+		return
+	parsed.saveName = save_name
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f:
+		f.store_string(JSON.stringify(parsed))
+		f.close()
 
 
 func delete_slot(n: int) -> void:

@@ -5,6 +5,8 @@ ones, and breed rarer and hybrid forms. Godot 4.7 rebuild of the web version on 
 
 What changed from the web version's design, and why: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
+See `docs/HANDOFF.md` for where things stand and what to check first.
+
 ## Open and run
 
 1. Install **Godot 4.7** (the standard build, not .NET): <https://godotengine.org/download>. It is a
