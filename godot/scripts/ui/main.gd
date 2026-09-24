@@ -493,64 +493,166 @@ func _show_summary(s: Dictionary) -> void:
 	Game.last_offline_summary = {}
 	if float(s.get("usedSeconds", 0.0)) < 60.0:
 		return
-	var v := UI.vbox(12)
-	var line := "You were away for %s." % F.format_seconds(s.elapsed)
-	if s.capped:
-		line += " Your Sanctum worked for the first %s (raise that with the Dream Anchor in Sanctum Works)." % F.format_seconds(s.usedSeconds)
-	v.add_child(UI.wrap_label(line, "Dim", 560))
-	var cur := UI.hbox(24)
+	var root := UI.vbox(16)
+	# headline: how long, and whether the Sanctum worked the whole time
+	var head := UI.vbox(2)
+	head.add_child(UI.label("You were away for %s" % F.format_seconds(s.elapsed), "H1"))
+	head.add_child(UI.wrap_label("Your Sanctum kept working the whole time." if not s.capped else
+		"Your Sanctum worked for the first %s. Build the Dream Anchor in Sanctum Works to cover longer." % F.format_seconds(s.usedSeconds), "Dim", 820))
+	root.add_child(head)
+	# big tiles: Aether, gold, tasks
+	var tiles := UI.hbox(12)
 	if s.aether > 0.5:
-		cur.add_child(UI.amount("aether", s.aether))
+		tiles.add_child(_summary_tile(Data.ui_icon("aether"), F.format_num(s.aether), "Aether", Palette.AETHER))
 	if s.gold > 0.5:
-		cur.add_child(UI.amount("gold", s.gold))
+		tiles.add_child(_summary_tile(Data.ui_icon("gold"), F.format_num(s.gold), "Gold", Palette.GOLD))
 	if s.actions > 0:
-		cur.add_child(UI.label("%s tasks finished" % F.format_num(s.actions), "Dim"))
-	v.add_child(cur)
+		tiles.add_child(_summary_tile(Data.ui_icon("works"), F.format_num(s.actions), "Tasks finished", Palette.TEXT))
+	var eggs := Game.ready_eggs().size()
+	if eggs > 0:
+		tiles.add_child(_summary_tile(Data.ui_icon("pods"), str(eggs), "Eggs ready", Palette.GOOD))
+	root.add_child(tiles)
+	var cols := UI.hbox(18)
+	root.add_child(cols)
+	# left: what was made and used
+	var left := UI.vbox(10)
+	left.custom_minimum_size.x = 440
+	cols.add_child(left)
 	if not s.gained.is_empty():
-		v.add_child(UI.label("Gathered and crafted", "H3"))
-		var f := UI.flow(14, 6)
+		left.add_child(UI.label("Gathered and crafted", "H3"))
+		var g := GridContainer.new()
+		g.columns = 3
+		g.add_theme_constant_override("h_separation", 8)
+		g.add_theme_constant_override("v_separation", 8)
 		var ids: Array = s.gained.keys()
 		ids.sort_custom(func(a, b): return s.gained[a] > s.gained[b])
 		for id in ids:
-			f.add_child(UI.amount(id, s.gained[id]))
-		v.add_child(f)
+			g.add_child(_summary_item(id, s.gained[id], Palette.TEXT))
+		left.add_child(g)
 	if not s.used.is_empty():
-		v.add_child(UI.label("Used up", "H3"))
-		var f2 := UI.flow(14, 6)
+		left.add_child(UI.label("Used up", "H3"))
+		var g2 := GridContainer.new()
+		g2.columns = 3
+		g2.add_theme_constant_override("h_separation", 8)
+		g2.add_theme_constant_override("v_separation", 8)
 		for id in s.used:
-			f2.add_child(UI.amount(id, s.used[id]))
-		v.add_child(f2)
+			g2.add_child(_summary_item(id, s.used[id], Palette.TEXT_DIM, "-"))
+		left.add_child(g2)
+	# right: level-ups and highlights
+	var right := UI.vbox(10)
+	right.custom_minimum_size.x = 380
+	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(right)
 	if not s.levels.is_empty():
-		v.add_child(UI.label("Skill levels", "H3"))
+		right.add_child(UI.label("Level ups", "H3"))
 		for id in s.levels:
-			v.add_child(UI.stat_line(id, "%s: %d, now %d" % [Data.skills[id].name, s.levels[id][0], s.levels[id][1]]))
-	var notable := []
+			var lv: Array = s.levels[id]
+			var row := UI.hbox(10)
+			row.add_child(UI.icon(Data.ui_icon(id), 28))
+			row.add_child(UI.label(Data.skills[id].name, ""))
+			row.add_child(UI.spacer())
+			row.add_child(UI.label(str(int(lv[0])), "Faint"))
+			row.add_child(UI.label("→", "Faint"))
+			row.add_child(UI.label(str(int(lv[1])), "Num", Palette.GOOD))
+			row.add_child(UI.chip("+%d" % (int(lv[1]) - int(lv[0])), Palette.GOOD))
+			right.add_child(UI.panel("Inset", row))
+	# captures grouped (4× Faint Buzzbud), then the other moments, each with an icon
+	var caught := {}
+	var order := []
+	var moments := []
 	for e in s.events:
 		match e.type:
 			"captured":
-				notable.append("Bound a %s %s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else ""])
+				var key := "%s|%d|%s" % [e.species, int(e.rarity), str(e.shiny)]
+				if not caught.has(key):
+					caught[key] = {"species": e.species, "rarity": int(e.rarity), "shiny": bool(e.shiny), "n": 0}
+					order.append(key)
+				caught[key].n += 1
 			"evolved":
-				notable.append("%s evolved into %s" % [Data.form_name(e.species, e.from), Data.form_name(e.species, e.form)])
+				moments.append([Data.ui_icon("upgrade"), "%s evolved into %s" % [Data.form_name(e.species, e.from), Data.form_name(e.species, e.form)], Palette.AETHER])
 			"boss_defeated":
 				if e.first:
-					notable.append("Defeated %s for the first time" % Data.zones[e.zone].boss.name)
+					moments.append([Data.ui_icon("expeditions"), "Defeated %s for the first time" % Data.zones[e.zone].boss.name, Palette.GOLD])
 			"zone_unlocked":
-				notable.append("Unlocked %s" % Data.zones[e.zone].name)
+				moments.append([Data.ui_icon("expeditions"), "Unlocked %s" % Data.zones[e.zone].name, Palette.GOLD])
 			"slot_unlocked":
-				notable.append("A new %s slot opened" % Data.skills[e.skill].name)
-	if not notable.is_empty():
-		v.add_child(UI.label("Highlights", "H3"))
-		var shown := notable.slice(0, 12)
-		for n in shown:
-			v.add_child(UI.label("•  " + n, "Dim"))
-		if notable.size() > shown.size():
-			v.add_child(UI.label("…and %d more" % (notable.size() - shown.size()), "Faint"))
-	var eggs := Game.ready_eggs().size()
+				moments.append([Data.ui_icon(e.skill), "A new %s slot opened" % Data.skills[e.skill].name, Palette.TEXT])
+			"pearl":
+				moments.append([Data.item_icon("aether-pearl"), "+%d Aether Pearl (%s)" % [int(e.amount), e.why], Color("f1e6ff")])
+	if not moments.is_empty():
+		right.add_child(UI.label("Highlights", "H3"))
+		for m in moments.slice(0, 8):
+			right.add_child(UI.hbox(8, [UI.icon(m[0], 22), UI.wrap_label(m[1], "", 300)]))
+			right.get_child(right.get_child_count() - 1).get_child(1).add_theme_color_override("font_color", m[2])
+		if moments.size() > 8:
+			right.add_child(UI.label("…and %d more" % (moments.size() - 8), "Faint"))
+	if not order.is_empty():
+		order.sort_custom(func(a, b): return [caught[a].shiny, caught[a].rarity, caught[a].n] > [caught[b].shiny, caught[b].rarity, caught[b].n])
+		var total := 0
+		for k in order:
+			total += int(caught[k].n)
+		right.add_child(UI.hbox(8, [UI.label("Bound", "H3"), UI.chip("%d Aetherlings" % total, Palette.AETHER)]))
+		var bf := UI.flow(8, 8)
+		for k in order.slice(0, 12):
+			var c: Dictionary = caught[k]
+			var cell := UI.hbox(6)
+			var por := CreaturePortrait.make(c.species, 1, c.rarity, c.shiny, 44)
+			por.bob = false
+			cell.add_child(por)
+			var cv := UI.vbox(0)
+			cv.add_child(UI.label("%d×  %s" % [int(c.n), Data.species[c.species].name], "Small", Palette.TEXT))
+			cv.add_child(UI.label(("Shiny " if c.shiny else "") + Data.rarity(c.rarity).name, "Small", Palette.GOLD if c.shiny else Data.rarity_color(c.rarity)))
+			cell.add_child(cv)
+			bf.add_child(UI.panel("Inset", cell))
+		right.add_child(bf)
+		if order.size() > 12:
+			right.add_child(UI.label("…and %d more kinds" % (order.size() - 12), "Faint"))
+	# actions
+	var box := {}   # the modal, for the buttons (lambdas capture locals by value)
+	var act := UI.hbox(10)
+	act.add_child(UI.spacer())
 	if eggs > 0:
-		v.add_child(UI.button("%d egg%s ready to hatch" % [eggs, "" if eggs == 1 else "s"], "Gold", func(): show_screen("pods")))
-	var sc := UI.scroll(v)
-	sc.custom_minimum_size = Vector2(620, mini(560, 200 + s.gained.size() * 12 + notable.size() * 26))
-	Modal.open(sc, "Welcome back", 680)
+		act.add_child(UI.button("%d egg%s ready to hatch" % [eggs, "" if eggs == 1 else "s"], "Gold", func():
+			box.m.close()
+			show_screen("pods")))
+	act.add_child(UI.button("Continue", "Primary", func(): box.m.close()))
+	root.add_child(act)
+	var sc := UI.scroll(root)
+	# tall enough for the longer column, up to what fits on screen (then it scrolls)
+	var left_h: int = ceili(s.gained.size() / 3.0) * 66 + (40 + ceili(s.used.size() / 3.0) * 66 if not s.used.is_empty() else 0)
+	var right_h: int = s.levels.size() * 54 + (40 + mini(moments.size(), 8) * 34 if not moments.is_empty() else 0) + (44 + ceili(mini(order.size(), 12) / 3.0) * 62 if not order.is_empty() else 0)
+	sc.custom_minimum_size = Vector2(880, clampi(260 + maxi(left_h, right_h), 320, 660))
+	box.m = Modal.open(sc, "Welcome back", 940)
+
+
+## A big number tile for the welcome-back summary.
+func _summary_tile(tex: Texture2D, value: String, caption: String, col: Color) -> PanelContainer:
+	var h := UI.hbox(12)
+	h.add_child(UI.icon(tex, 38))
+	var v := UI.vbox(0)
+	var big := UI.label(value, "H1", col)
+	v.add_child(big)
+	v.add_child(UI.label(caption, "Faint"))
+	h.add_child(v)
+	var p := UI.panel("Inset", h)
+	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	return p
+
+
+## One item in the summary: icon, amount and name.
+func _summary_item(id: String, qty: float, col: Color, sign := "+") -> PanelContainer:
+	var h := UI.hbox(8)
+	h.add_child(UI.icon(Data.item_icon(id) if Data.items.has(id) else Data.ui_icon(id), 30))
+	var v := UI.vbox(0)
+	v.add_child(UI.label(sign + F.format_num(qty), "Num", col))
+	var nm := UI.label(Data.item_name(id), "Faint")
+	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	nm.custom_minimum_size.x = 80
+	v.add_child(nm)
+	h.add_child(v)
+	var p := UI.panel("Inset", h)
+	p.custom_minimum_size.x = 140
+	return p
 
 
 func _welcome() -> void:
