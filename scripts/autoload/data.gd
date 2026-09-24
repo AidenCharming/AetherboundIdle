@@ -76,9 +76,13 @@ func pair_key(a: String, b: String) -> String:
 
 func _read(file: String) -> Variant:
 	var text := FileAccess.get_file_as_string(DATA_DIR + file)
-	var parsed: Variant = JSON.parse_string(text)
-	assert(parsed != null, "Could not parse " + file)
-	return parsed
+	# a JSON instance says where a parse failed; push_error still reports it in a release build, where assert is gone
+	var json := JSON.new()
+	if json.parse(text) != OK:
+		push_error("Could not parse %s%s, line %d: %s" % [DATA_DIR, file, json.get_error_line(), json.get_error_message()])
+		assert(false)
+		return null
+	return json.data
 
 
 func _index(list: Array) -> Dictionary:
