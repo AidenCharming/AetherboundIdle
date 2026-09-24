@@ -1,0 +1,2201 @@
+[
+	{
+		"id": "sproutlet",
+		"name": "Sproutlet",
+		"kind": "base",
+		"types": [
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Sproutlet",
+				"desc": "Tiny glowing leafy quadruped with a sapling on its head."
+			},
+			{
+				"name": "Timberhorn",
+				"desc": "Sturdy bark-armored quadruped with wooden antler buds."
+			},
+			{
+				"name": "Lumbercrown",
+				"desc": "Majestic forest beast with a glowing canopy of antlers."
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "overgrowth",
+		"ability": "leaf-shield",
+		"sprite": "sproutlet"
+	},
+	{
+		"id": "brambletrundle",
+		"name": "Brambletrundle",
+		"kind": "base",
+		"types": [
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Brambletrundle",
+				"desc": "Chaotic rolling ball of thorny vines and glowing bolts."
+			},
+			{
+				"name": "Briarburl",
+				"desc": "Bigger, sturdier mossy tumbleweed golem: a vine ball around a wooden core, with moss, small white flowers, bark arms and clawed feet."
+			},
+			{
+				"name": "Thicketroll",
+				"desc": "Ancient, hulking, gentle wood-and-vine giant with tree-trunk arms and legs and a small kind face."
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "briar-patch",
+		"ability": "thorn-roll",
+		"sprite": "brambletrundle"
+	},
+	{
+		"id": "mossgear",
+		"name": "Mossgear",
+		"kind": "base",
+		"types": [
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Mossgear",
+				"desc": "Fuzzy green cog-shaped sphere."
+			},
+			{
+				"name": "Mosscrank",
+				"desc": "Bipedal mossy mechanism."
+			},
+			{
+				"name": "Mossbastion",
+				"desc": "Gentle lumbering botanical machine with emerald aura."
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"herbalism"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "lubricated-joints",
+		"ability": "soothing-spores",
+		"sprite": "mossgear"
+	},
+	{
+		"id": "buzzbud",
+		"name": "Buzzbud",
+		"kind": "base",
+		"types": [
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Buzzbud",
+				"desc": "Small fuzzy pollinator bee holding a closed flower bud."
+			},
+			{
+				"name": "Pollenwing",
+				"desc": "Bigger bee with two pairs of wings and the bud now in bloom."
+			},
+			{
+				"name": "Bloomqueen",
+				"desc": "Grand flower-crowned queen bee with four ornate wings."
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"herbalism"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "pollinator",
+		"ability": "rotor-gust",
+		"sprite": "buzzbud"
+	},
+	{
+		"id": "quakemaw",
+		"name": "Quakemaw",
+		"kind": "base",
+		"types": [
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Quakemaw",
+				"desc": "Stout jaw-heavy lizard with a glowing throat."
+			},
+			{
+				"name": "Faultjaw",
+				"desc": "Armored reptile with shovel underbite."
+			},
+			{
+				"name": "Craterchomp",
+				"desc": "Friendly earth-dragon with crystal teeth."
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "deep-excavator",
+		"ability": "stone-crunch",
+		"sprite": "quakemaw"
+	},
+	{
+		"id": "geodecore",
+		"name": "Geodecore",
+		"kind": "base",
+		"types": [
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Geodecore",
+				"desc": "Floating hollow stone orb with humming crystal."
+			},
+			{
+				"name": "Crystalheart",
+				"desc": "Faceted floating crystal creature, amber light."
+			},
+			{
+				"name": "Prismpulse",
+				"desc": "Orbiting stones around a bright crystal nucleus."
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "resonant-frequency",
+		"ability": "crystal-barrier",
+		"sprite": "geodecore"
+	},
+	{
+		"id": "pebblescoot",
+		"name": "Pebblescoot",
+		"kind": "base",
+		"types": [
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Pebblescoot",
+				"desc": "Skittish shale-carapace beetle."
+			},
+			{
+				"name": "Shalestride",
+				"desc": "Multi-legged excavator."
+			},
+			{
+				"name": "Bedrockbound",
+				"desc": "Gentle plated centipede giant."
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "rhythmic-tunnels",
+		"ability": "shell-bash",
+		"sprite": "pebblescoot"
+	},
+	{
+		"id": "tuskcub",
+		"name": "Tuskcub",
+		"kind": "base",
+		"types": [
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Tuskcub",
+				"desc": "Playful boar with tiny crystal tusks."
+			},
+			{
+				"name": "Ridgecrest",
+				"desc": "Sturdy boar with mineral armor."
+			},
+			{
+				"name": "Summitspike",
+				"desc": "Proud woolly mineral beast with crystal spikes."
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "mineral-diviner",
+		"ability": "tusk-charge",
+		"sprite": "tuskcub"
+	},
+	{
+		"id": "emberfang",
+		"name": "Emberfang",
+		"kind": "base",
+		"types": [
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Emberfang",
+				"desc": "Fire-maned kitten with bright teeth."
+			},
+			{
+				"name": "Smolderbite",
+				"desc": "Sleek ash-coated feline."
+			},
+			{
+				"name": "Emberroar",
+				"desc": "Regal blazing tiger."
+			}
+		],
+		"primarySkill": "smithing",
+		"coveredSkills": [
+			"smithing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "searing-bite",
+		"ability": "searing-swipe",
+		"sprite": "emberfang"
+	},
+	{
+		"id": "cinderpup",
+		"name": "Cinderpup",
+		"kind": "base",
+		"types": [
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Cinderpup",
+				"desc": "Hyperactive hound with a spark tail."
+			},
+			{
+				"name": "Cinderbark",
+				"desc": "Bouncy fiery dog leaving embers."
+			},
+			{
+				"name": "Cinderhowl",
+				"desc": "Majestic hound howling glowing ash."
+			}
+		],
+		"primarySkill": "smithing",
+		"coveredSkills": [
+			"smithing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "eager-fetcher",
+		"ability": "happy-bark",
+		"sprite": "cinderpup"
+	},
+	{
+		"id": "roastbelly",
+		"name": "Roastbelly",
+		"kind": "base",
+		"types": [
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Roastbelly",
+				"desc": "Round sleepy salamander with a warm belly."
+			},
+			{
+				"name": "Oventummy",
+				"desc": "Chubby waddler with a belly window showing fire."
+			},
+			{
+				"name": "Smolderplump",
+				"desc": "Massive affectionate salamander radiating cozy heat."
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"cooking"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "slow-cooker",
+		"ability": "heat-sink",
+		"sprite": "roastbelly"
+	},
+	{
+		"id": "charwhisk",
+		"name": "Charwhisk",
+		"kind": "base",
+		"types": [
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Charwhisk",
+				"desc": "Bird with a tail that stirs coals."
+			},
+			{
+				"name": "Coalstir",
+				"desc": "Crane-like bird with metallic legs."
+			},
+			{
+				"name": "Hearthblend",
+				"desc": "Fire-peacock with glowing culinary-tool feathers."
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"cooking"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "culinary-flow",
+		"ability": "cinder-gust",
+		"sprite": "charwhisk"
+	},
+	{
+		"id": "dewdrop",
+		"name": "Dewdrop",
+		"kind": "base",
+		"types": [
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Dewdrop",
+				"desc": "Gelatinous water orb."
+			},
+			{
+				"name": "Rillstream",
+				"desc": "Serpentine water elemental with silver bands."
+			},
+			{
+				"name": "Tideflow",
+				"desc": "Serene looping water spirit."
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "pure-filter",
+		"ability": "purifying-splash",
+		"sprite": "dewdrop"
+	},
+	{
+		"id": "puddlescoop",
+		"name": "Puddlescoop",
+		"kind": "base",
+		"types": [
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Puddlescoop",
+				"desc": "Bucket-headed amphibian."
+			},
+			{
+				"name": "Basincatch",
+				"desc": "Turtle with a basin of water on its back."
+			},
+			{
+				"name": "Lakehaul",
+				"desc": "Gentle giant carrying a small pond."
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "wide-net",
+		"ability": "bucket-block",
+		"sprite": "puddlescoop"
+	},
+	{
+		"id": "frothsprite",
+		"name": "Frothsprite",
+		"kind": "base",
+		"types": [
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Frothsprite",
+				"desc": "Bubbly seafoam spirit that giggles."
+			},
+			{
+				"name": "Foamspirit",
+				"desc": "Misty elemental riding tiny waves."
+			},
+			{
+				"name": "Brinesoul",
+				"desc": "Radiant airy figure of seafoam."
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "sea-breeze",
+		"ability": "mist-veil",
+		"sprite": "frothsprite"
+	},
+	{
+		"id": "splashfin",
+		"name": "Splashfin",
+		"kind": "base",
+		"types": [
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Splashfin",
+				"desc": "Curious robotic fish."
+			},
+			{
+				"name": "Wavegill",
+				"desc": "Sleek mechanical dolphin."
+			},
+			{
+				"name": "Tidetail",
+				"desc": "Mechanical whale making gentle whirlpools."
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "deep-diver",
+		"ability": "hydro-jet",
+		"sprite": "splashfin"
+	},
+	{
+		"id": "voltfluff",
+		"name": "Voltfluff",
+		"kind": "base",
+		"types": [
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Voltfluff",
+				"desc": "Pomeranian-like ball of static."
+			},
+			{
+				"name": "Staticfleece",
+				"desc": "Electrified sheepdog in crackling wool."
+			},
+			{
+				"name": "Arcwool",
+				"desc": "Majestic fluffy canine discharging harmless arcs."
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "static-cling",
+		"ability": "static-shock",
+		"sprite": "voltfluff"
+	},
+	{
+		"id": "joulebug",
+		"name": "Joulebug",
+		"kind": "base",
+		"types": [
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Joulebug",
+				"desc": "Tiny glowing insect."
+			},
+			{
+				"name": "Ohmroach",
+				"desc": "Metallic beetle with conductive antennae."
+			},
+			{
+				"name": "Wattbeetle",
+				"desc": "Friendly scarab like a walking battery."
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "high-voltage",
+		"ability": "capacitor-shell",
+		"sprite": "joulebug"
+	},
+	{
+		"id": "plasmaplug",
+		"name": "Plasmaplug",
+		"kind": "base",
+		"types": [
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Plasmaplug",
+				"desc": "Snake with a pronged tail it chases."
+			},
+			{
+				"name": "Ionjack",
+				"desc": "Insulated serpent."
+			},
+			{
+				"name": "Surgeport",
+				"desc": "Gentle cobra with a socket-hub hood."
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "daisy-chain",
+		"ability": "arc-strike",
+		"sprite": "plasmaplug"
+	},
+	{
+		"id": "coilchirp",
+		"name": "Coilchirp",
+		"kind": "base",
+		"types": [
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Coilchirp",
+				"desc": "Metallic bird wrapped in copper wire."
+			},
+			{
+				"name": "Wirebeak",
+				"desc": "Conductive singing avian."
+			},
+			{
+				"name": "Gridtrill",
+				"desc": "Electric eagle."
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "overclocked",
+		"ability": "sonic-zap",
+		"sprite": "coilchirp"
+	},
+	{
+		"id": "eclipsa",
+		"name": "Eclipsa",
+		"kind": "base",
+		"types": [
+			"void"
+		],
+		"forms": [
+			{
+				"name": "Eclipsa",
+				"desc": "Silent floating dark disk with a soft rim."
+			},
+			{
+				"name": "Umbrax",
+				"desc": "Crescent shadow entity."
+			},
+			{
+				"name": "Penumbrum",
+				"desc": "Multi-ringed dark body bending light."
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "void-resonance",
+		"ability": "dark-eclipse",
+		"sprite": "eclipsa"
+	},
+	{
+		"id": "riftsneak",
+		"name": "Riftsneak",
+		"kind": "base",
+		"types": [
+			"void"
+		],
+		"forms": [
+			{
+				"name": "Riftsneak",
+				"desc": "Shy shadowy biped peeking from portals."
+			},
+			{
+				"name": "Nullprowl",
+				"desc": "Sleek cat-like shadow."
+			},
+			{
+				"name": "Gloamstalk",
+				"desc": "Elegant starry void panther."
+			}
+		],
+		"primarySkill": "vessel-crafting",
+		"coveredSkills": [
+			"vessel-crafting"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "spatial-pocket",
+		"ability": "shadow-strike",
+		"sprite": "riftsneak"
+	},
+	{
+		"id": "hushflutter",
+		"name": "Hushflutter",
+		"kind": "base",
+		"types": [
+			"void"
+		],
+		"forms": [
+			{
+				"name": "Hushflutter",
+				"desc": "Dark-energy moth with starry wingtips."
+			},
+			{
+				"name": "Hushglide",
+				"desc": "Floating manta ray of twilight."
+			},
+			{
+				"name": "Silentwing",
+				"desc": "Four-winged phantom glider."
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "silent-weaver",
+		"ability": "void-breeze",
+		"sprite": "hushflutter"
+	},
+	{
+		"id": "netherpod",
+		"name": "Netherpod",
+		"kind": "base",
+		"types": [
+			"void"
+		],
+		"forms": [
+			{
+				"name": "Netherpod",
+				"desc": "Dark metallic chrysalis with inner starlight."
+			},
+			{
+				"name": "Chasmshell",
+				"desc": "Floating nautilus of condensed void."
+			},
+			{
+				"name": "Astralcarapace",
+				"desc": "Slow void-tortoise carrying a tiny nebula."
+			}
+		],
+		"primarySkill": "vessel-crafting",
+		"coveredSkills": [
+			"vessel-crafting"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "starlight-infusion",
+		"ability": "nebula-shell",
+		"sprite": "netherpod"
+	},
+	{
+		"id": "ashwood",
+		"name": "Ashwood",
+		"kind": "hybrid",
+		"types": [
+			"verdant",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Ashwood"
+			},
+			{
+				"name": "Emberbark"
+			},
+			{
+				"name": "Hearthtrunk"
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "kindled-sap",
+		"ability": "sylvan-heat",
+		"sprite": null
+	},
+	{
+		"id": "brambletide",
+		"name": "Brambletide",
+		"kind": "hybrid",
+		"types": [
+			"verdant",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Brambletide"
+			},
+			{
+				"name": "Briarripple"
+			},
+			{
+				"name": "Thicketwave"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "verdant-current",
+		"ability": "briar-wash",
+		"sprite": null
+	},
+	{
+		"id": "sproutfault",
+		"name": "Sproutfault",
+		"kind": "hybrid",
+		"types": [
+			"verdant",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Sproutfault"
+			},
+			{
+				"name": "Timbershale"
+			},
+			{
+				"name": "Lumbercrag"
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "rooted-vein",
+		"ability": "earth-spike",
+		"sprite": null
+	},
+	{
+		"id": "mosscoil",
+		"name": "Mosscoil",
+		"kind": "hybrid",
+		"types": [
+			"verdant",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Mosscoil"
+			},
+			{
+				"name": "Mossfuse"
+			},
+			{
+				"name": "Canopygrid"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "static-leaf",
+		"ability": "static-sprout",
+		"sprite": null
+	},
+	{
+		"id": "mudskulker",
+		"name": "Mudskulker",
+		"kind": "hybrid",
+		"types": [
+			"telluric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Mudskulker"
+			},
+			{
+				"name": "Shaleflow"
+			},
+			{
+				"name": "Bedrocktide"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"mining",
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "silt-filter",
+		"ability": "silt-cannon",
+		"sprite": null
+	},
+	{
+		"id": "quakeforge",
+		"name": "Quakeforge",
+		"kind": "hybrid",
+		"types": [
+			"telluric",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Quakeforge"
+			},
+			{
+				"name": "Slagfist"
+			},
+			{
+				"name": "Craterhearth"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "tectonic-heat",
+		"ability": "magma-slam",
+		"sprite": null
+	},
+	{
+		"id": "geodegrid",
+		"name": "Geodegrid",
+		"kind": "hybrid",
+		"types": [
+			"telluric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Geodegrid"
+			},
+			{
+				"name": "Crystalwire"
+			},
+			{
+				"name": "Prismvolt"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "conductive-vein",
+		"ability": "facet-ward",
+		"sprite": null
+	},
+	{
+		"id": "cinderbasin",
+		"name": "Cinderbasin",
+		"kind": "hybrid",
+		"types": [
+			"pyric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Cinderbasin"
+			},
+			{
+				"name": "Steamrill"
+			},
+			{
+				"name": "Kettlebrine"
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"cooking",
+			"smithing",
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "steaming-catch",
+		"ability": "warm-tides",
+		"sprite": null
+	},
+	{
+		"id": "embersurge",
+		"name": "Embersurge",
+		"kind": "hybrid",
+		"types": [
+			"pyric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Embersurge"
+			},
+			{
+				"name": "Blazearc"
+			},
+			{
+				"name": "Infernodynamo"
+			}
+		],
+		"primarySkill": "smithing",
+		"coveredSkills": [
+			"smithing",
+			"cooking",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "thermal-loop",
+		"ability": "voltaic-fang",
+		"sprite": null
+	},
+	{
+		"id": "brinecore",
+		"name": "Brinecore",
+		"kind": "hybrid",
+		"types": [
+			"aqueous",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Brinecore"
+			},
+			{
+				"name": "Rillarc"
+			},
+			{
+				"name": "Tidebolt"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing",
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "galvanized-hook",
+		"ability": "hydro-shock",
+		"sprite": null
+	},
+	{
+		"id": "eclipseed",
+		"name": "Eclipseed",
+		"kind": "hybrid",
+		"types": [
+			"void",
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Eclipseed"
+			},
+			{
+				"name": "Starsap"
+			},
+			{
+				"name": "Nightbloom"
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "twilight-root",
+		"ability": "twilight-bough",
+		"sprite": null
+	},
+	{
+		"id": "nullshale",
+		"name": "Nullshale",
+		"kind": "hybrid",
+		"types": [
+			"void",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Nullshale"
+			},
+			{
+				"name": "Riftrock"
+			},
+			{
+				"name": "Abysscrag"
+			}
+		],
+		"primarySkill": "vessel-crafting",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "void-ore",
+		"ability": "void-fang",
+		"sprite": null
+	},
+	{
+		"id": "gloamforge",
+		"name": "Gloamforge",
+		"kind": "hybrid",
+		"types": [
+			"void",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Gloamforge"
+			},
+			{
+				"name": "Muteember"
+			},
+			{
+				"name": "Hushkiln"
+			}
+		],
+		"primarySkill": "vessel-crafting",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "dark-ash",
+		"ability": "obsidian-shroud",
+		"sprite": null
+	},
+	{
+		"id": "hushflow",
+		"name": "Hushflow",
+		"kind": "hybrid",
+		"types": [
+			"void",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Hushflow"
+			},
+			{
+				"name": "Nullstream"
+			},
+			{
+				"name": "Riftcurrent"
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "twilight-tide",
+		"ability": "twilight-mend",
+		"sprite": null
+	},
+	{
+		"id": "gridrift",
+		"name": "Gridrift",
+		"kind": "hybrid",
+		"types": [
+			"void",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Gridrift"
+			},
+			{
+				"name": "Corewire"
+			},
+			{
+				"name": "Lodestar"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "singularity-glow",
+		"ability": "arc-storm",
+		"sprite": null
+	},
+	{
+		"id": "sorrelcliff",
+		"name": "Sorrelcliff",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Sorrelcliff",
+				"desc": "A young mountain goat with a sorrel-brown coat and small stone-flecked horns, sure-footed among loose scree."
+			},
+			{
+				"name": "Fernscarp"
+			},
+			{
+				"name": "Highhorn"
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"mining"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "sure-footing",
+		"ability": "mountain-stance",
+		"sprite": null,
+		"animal": "a mountain goat"
+	},
+	{
+		"id": "hazelslate",
+		"name": "Hazelslate",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Hazelslate",
+				"desc": "A slow, mossy tortoise whose shell is layered like flat grey slate, dotted with tiny hazel-brown flecks."
+			},
+			{
+				"name": "Mossflint"
+			},
+			{
+				"name": "Grovepeak"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "slow-seam",
+		"ability": "stone-bulwark",
+		"sprite": null,
+		"animal": "a tortoise"
+	},
+	{
+		"id": "brackensear",
+		"name": "Brackensear",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Brackensear",
+				"desc": "A small hedgehog rolled into a ball of dry bracken fronds, with a faint warm glow between its curled spines."
+			},
+			{
+				"name": "Thornkiln"
+			},
+			{
+				"name": "Scaldhearth"
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "bristle-puff",
+		"ability": "scald-curl",
+		"sprite": null,
+		"animal": "a hedgehog"
+	},
+	{
+		"id": "yarrowflare",
+		"name": "Yarrowflare",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Yarrowflare",
+				"desc": "A tiny sunbird with yarrow-white feathers and a throat that glows like a low ember."
+			},
+			{
+				"name": "Bloomember"
+			},
+			{
+				"name": "Petalblaze"
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"herbalism",
+			"woodcutting",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "nectar-focus",
+		"ability": "sun-sip",
+		"sprite": null,
+		"animal": "a sunbird"
+	},
+	{
+		"id": "sedgestilt",
+		"name": "Sedgestilt",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Sedgestilt",
+				"desc": "A slender heron standing on reed-thin legs in a bed of tall sedge grass."
+			},
+			{
+				"name": "Reedcurrent"
+			},
+			{
+				"name": "Willowmire"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "still-water",
+		"ability": "reed-spear",
+		"sprite": null,
+		"animal": "a heron"
+	},
+	{
+		"id": "rowanboulder",
+		"name": "Rowanboulder",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Rowanboulder",
+				"desc": "A sleek river otter with a rowan-red sheen to its fur, sunning itself on a smooth wet boulder."
+			},
+			{
+				"name": "Fernbrook"
+			},
+			{
+				"name": "Alderfalls"
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "slick-coat",
+		"ability": "river-roll",
+		"sprite": null,
+		"animal": "an otter"
+	},
+	{
+		"id": "ivyflux",
+		"name": "Ivyflux",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Ivyflux",
+				"desc": "A quick dragonfly with wings veined in trailing ivy and a faint crackle following each turn."
+			},
+			{
+				"name": "Vinespark"
+			},
+			{
+				"name": "Leafcharge"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "jolt-wing",
+		"ability": "copper-dart",
+		"sprite": null,
+		"animal": "a dragonfly"
+	},
+	{
+		"id": "burrbolt",
+		"name": "Burrbolt",
+		"kind": "special",
+		"types": [
+			"verdant",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Burrbolt",
+				"desc": "A bright-eyed squirrel with a coat of clinging burrs that spark faintly when it leaps."
+			},
+			{
+				"name": "Quillspark"
+			},
+			{
+				"name": "Quillstatic"
+			}
+		],
+		"primarySkill": "woodcutting",
+		"coveredSkills": [
+			"woodcutting",
+			"herbalism",
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "nut-hoard",
+		"ability": "acorn-volley",
+		"sprite": null,
+		"animal": "a squirrel"
+	},
+	{
+		"id": "cliffscorch",
+		"name": "Cliffscorch",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Cliffscorch",
+				"desc": "A stone-plated scorpion whose pincers glow faint orange at the tips, like scorched rock cooling."
+			},
+			{
+				"name": "Sunspire"
+			},
+			{
+				"name": "Blazingpeak"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "fast-claws",
+		"ability": "magma-lance",
+		"sprite": null,
+		"animal": "a scorpion"
+	},
+	{
+		"id": "nettlemesa",
+		"name": "Nettlemesa",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Nettlemesa",
+				"desc": "A horned lizard the color of sun-baked mesa clay, its spines tipped with a dull, stubborn heat."
+			},
+			{
+				"name": "Spurmesa"
+			},
+			{
+				"name": "Spinehearth"
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"cooking",
+			"smithing",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "spined-hide",
+		"ability": "sunbaked-bastion",
+		"sprite": null,
+		"animal": "a horned lizard"
+	},
+	{
+		"id": "gravelnip",
+		"name": "Gravelnip",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Gravelnip",
+				"desc": "A slate-grey crab with a teal-veined shell, one oversized claw, and a tiny puddle glinting in a hollow of its shell."
+			},
+			{
+				"name": "Reefpincer"
+			},
+			{
+				"name": "Boulderclaw"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "shell-hoard",
+		"ability": "barnacle-bulwark",
+		"sprite": null,
+		"animal": "a crab"
+	},
+	{
+		"id": "ripplesnap",
+		"name": "Ripplesnap",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Ripplesnap",
+				"desc": "A broad-snouted crocodile in mottled stone and marsh green, with a ridged back and a glint of quartz between its teeth."
+			},
+			{
+				"name": "Slatesnout"
+			},
+			{
+				"name": "Ridgehide"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "patient-gnaw",
+		"ability": "torrent-roll",
+		"sprite": null,
+		"animal": "a crocodile"
+	},
+	{
+		"id": "cairnflit",
+		"name": "Cairnflit",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Cairnflit",
+				"desc": "A round-eared bat with dusky wings edged in copper thread and a small quartz chime glowing at its throat."
+			},
+			{
+				"name": "Pumiceglide"
+			},
+			{
+				"name": "Fluxwing"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "cave-tuner",
+		"ability": "echo-screech",
+		"sprite": null,
+		"animal": "a bat"
+	},
+	{
+		"id": "flintlamb",
+		"name": "Flintlamb",
+		"kind": "special",
+		"types": [
+			"telluric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Flintlamb",
+				"desc": "A stocky ram with spiral horns of banded stone and a curly cream fleece that crackles faintly at the tips."
+			},
+			{
+				"name": "Ampcurl"
+			},
+			{
+				"name": "Mesahorn"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"mining",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "iron-skull",
+		"ability": "flock-rally",
+		"sprite": null,
+		"animal": "a ram"
+	},
+	{
+		"id": "coralpeep",
+		"name": "Coralpeep",
+		"kind": "special",
+		"types": [
+			"pyric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Coralpeep",
+				"desc": "A rosy flamingo whose long neck shades to orange at the tips, wading on thin legs with a ruffle of warm-lit plumes."
+			},
+			{
+				"name": "Flarewade"
+			},
+			{
+				"name": "Pyreplume"
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"cooking",
+			"smithing",
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "careful-skimmer",
+		"ability": "plume-flurry",
+		"sprite": null,
+		"animal": "a flamingo"
+	},
+	{
+		"id": "drizzlenub",
+		"name": "Drizzlenub",
+		"kind": "special",
+		"types": [
+			"pyric",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Drizzlenub",
+				"desc": "A round, unbothered capybara with damp chestnut fur, a faint steam curl over its head, and a warm orange glow beneath its belly."
+			},
+			{
+				"name": "Brooksoak"
+			},
+			{
+				"name": "Lavabask"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "unbothered",
+		"ability": "bathhouse-balm",
+		"sprite": null,
+		"animal": "a capybara"
+	},
+	{
+		"id": "coalgrub",
+		"name": "Coalgrub",
+		"kind": "special",
+		"types": [
+			"pyric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Coalgrub",
+				"desc": "A dark-shelled firefly whose belly lamp burns amber and flickers with a thin blue line."
+			},
+			{
+				"name": "Arcflicker"
+			},
+			{
+				"name": "Blazefly"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry",
+			"smithing",
+			"cooking"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "beacon-lure",
+		"ability": "lantern-glow",
+		"sprite": null,
+		"animal": "a firefly"
+	},
+	{
+		"id": "boltkit",
+		"name": "Boltkit",
+		"kind": "special",
+		"types": [
+			"pyric",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Boltkit",
+				"desc": "A russet fox with a bushy tail tipped in bright orange and a thick ruff that puffs up when it is excited."
+			},
+			{
+				"name": "Brandtail"
+			},
+			{
+				"name": "Scorchfox"
+			}
+		],
+		"primarySkill": "smithing",
+		"coveredSkills": [
+			"smithing",
+			"cooking",
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "sly-temper",
+		"ability": "brush-fire",
+		"sprite": null,
+		"animal": "a fox"
+	},
+	{
+		"id": "eddyelver",
+		"name": "Eddyelver",
+		"kind": "special",
+		"types": [
+			"aqueous",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Eddyelver",
+				"desc": "A long silver eel with a rust-orange underside and pale blue bands running the length of its body."
+			},
+			{
+				"name": "Kelpeel"
+			},
+			{
+				"name": "Dynamoeel"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"circuitry",
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "charged-wake",
+		"ability": "galvanic-lash",
+		"sprite": null,
+		"animal": "an eel"
+	},
+	{
+		"id": "sprayfledge",
+		"name": "Sprayfledge",
+		"kind": "special",
+		"types": [
+			"aqueous",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Sprayfledge",
+				"desc": "A compact kingfisher with a cobalt back, an amber chest, a long dark beak, and thin copper pinstripes on its wings."
+			},
+			{
+				"name": "Pulsedart"
+			},
+			{
+				"name": "Voltfisher"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"fishing",
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "sharp-study",
+		"ability": "dive-lance",
+		"sprite": null,
+		"animal": "a kingfisher"
+	},
+	{
+		"id": "murkroot",
+		"name": "Murkroot",
+		"kind": "special",
+		"types": [
+			"void",
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Murkroot",
+				"desc": "A small dark-furred mole with pale root-like whiskers, pushing tunnels through loose black soil."
+			},
+			{
+				"name": "Palevine"
+			},
+			{
+				"name": "Loamgrove"
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "loose-soil",
+		"ability": "root-snare",
+		"sprite": null,
+		"animal": "a mole"
+	},
+	{
+		"id": "duskbloom",
+		"name": "Duskbloom",
+		"kind": "special",
+		"types": [
+			"void",
+			"verdant"
+		],
+		"forms": [
+			{
+				"name": "Duskbloom",
+				"desc": "A pale hare that moves fastest right at dusk, nibbling flowers that close as it passes."
+			},
+			{
+				"name": "Wanevine"
+			},
+			{
+				"name": "Waneflower"
+			}
+		],
+		"primarySkill": "herbalism",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"woodcutting",
+			"herbalism"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "fading-light",
+		"ability": "quick-nibble",
+		"sprite": null,
+		"animal": "a hare"
+	},
+	{
+		"id": "riftshale",
+		"name": "Riftshale",
+		"kind": "special",
+		"types": [
+			"void",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Riftshale",
+				"desc": "A stocky badger with slate-grey fur and claws that seem to swallow the light around them."
+			},
+			{
+				"name": "Chasmclaw"
+			},
+			{
+				"name": "Gravelgrit"
+			}
+		],
+		"primarySkill": "vessel-crafting",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"mining"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "guard",
+		"signatureTrait": "hidden-seam",
+		"ability": "claw-rend",
+		"sprite": null,
+		"animal": "a badger"
+	},
+	{
+		"id": "nethershale",
+		"name": "Nethershale",
+		"kind": "special",
+		"types": [
+			"void",
+			"telluric"
+		],
+		"forms": [
+			{
+				"name": "Nethershale",
+				"desc": "A small armored armadillo whose plates look chiseled from dark, unpolished stone."
+			},
+			{
+				"name": "Grimplate"
+			},
+			{
+				"name": "Grimstone"
+			}
+		],
+		"primarySkill": "mining",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"mining"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "guard",
+		"signatureTrait": "rolling-plate",
+		"ability": "plated-ward",
+		"sprite": null,
+		"animal": "an armadillo"
+	},
+	{
+		"id": "wraithcoal",
+		"name": "Wraithcoal",
+		"kind": "special",
+		"types": [
+			"void",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Wraithcoal",
+				"desc": "A dark vulture with ash-grey feathers and eyes like two dying coals."
+			},
+			{
+				"name": "Ashgloam"
+			},
+			{
+				"name": "Ashplume"
+			}
+		],
+		"primarySkill": "smithing",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "old-coals",
+		"ability": "ashen-dive",
+		"sprite": null,
+		"animal": "a vulture"
+	},
+	{
+		"id": "duskflare",
+		"name": "Duskflare",
+		"kind": "special",
+		"types": [
+			"void",
+			"pyric"
+		],
+		"forms": [
+			{
+				"name": "Duskflare",
+				"desc": "A lean jackal with a warm rust coat, trotting low along the last light of evening."
+			},
+			{
+				"name": "Wanescorch"
+			},
+			{
+				"name": "Sunflare"
+			}
+		],
+		"primarySkill": "cooking",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"cooking",
+			"smithing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "warm-den",
+		"ability": "char-nip",
+		"sprite": null,
+		"animal": "a jackal"
+	},
+	{
+		"id": "murkmire",
+		"name": "Murkmire",
+		"kind": "special",
+		"types": [
+			"void",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Murkmire",
+				"desc": "A translucent jellyfish drifting just beneath the surface, faintly dark at its core."
+			},
+			{
+				"name": "Murkveil"
+			},
+			{
+				"name": "Sootveil"
+			}
+		],
+		"primarySkill": "fishing",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"fishing"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "health",
+		"signatureTrait": "drift-net",
+		"ability": "drift-lash",
+		"sprite": null,
+		"animal": "a jellyfish"
+	},
+	{
+		"id": "hollowstream",
+		"name": "Hollowstream",
+		"kind": "special",
+		"types": [
+			"void",
+			"aqueous"
+		],
+		"forms": [
+			{
+				"name": "Hollowstream",
+				"desc": "A pale, near-transparent newt gliding through still, shadowed water."
+			},
+			{
+				"name": "Hollowbrook"
+			},
+			{
+				"name": "Palepool"
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"fishing"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "health",
+		"signatureTrait": "careful-weave",
+		"ability": "calm-pool",
+		"sprite": null,
+		"animal": "a newt"
+	},
+	{
+		"id": "wraithwire",
+		"name": "Wraithwire",
+		"kind": "special",
+		"types": [
+			"void",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Wraithwire",
+				"desc": "A slender mantis whose limbs crackle faintly at each joint, dark against the light."
+			},
+			{
+				"name": "Wanewire"
+			},
+			{
+				"name": "Faintpulse"
+			}
+		],
+		"primarySkill": "circuitry",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"circuitry"
+		],
+		"secondaryAptitude": "scavenging",
+		"statLean": "power",
+		"signatureTrait": "amp-focus",
+		"ability": "volt-slash",
+		"sprite": null,
+		"animal": "a mantis"
+	},
+	{
+		"id": "duskvolt",
+		"name": "Duskvolt",
+		"kind": "special",
+		"types": [
+			"void",
+			"voltaic"
+		],
+		"forms": [
+			{
+				"name": "Duskvolt",
+				"desc": "A slim dark spider whose web faintly sparks whenever something brushes it."
+			},
+			{
+				"name": "Wanecoil"
+			},
+			{
+				"name": "Faintweb"
+			}
+		],
+		"primarySkill": "aether-weaving",
+		"coveredSkills": [
+			"aether-weaving",
+			"vessel-crafting",
+			"circuitry"
+		],
+		"secondaryAptitude": "fabrication",
+		"statLean": "power",
+		"signatureTrait": "spark-loom",
+		"ability": "volt-snap",
+		"sprite": null,
+		"animal": "a spider"
+	}
+]

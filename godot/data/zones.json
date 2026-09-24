@@ -1,0 +1,509 @@
+[
+	{
+		"id": "whisperleaf-hollow",
+		"name": "Whisperleaf Hollow",
+		"type": "verdant",
+		"levels": [
+			1,
+			5
+		],
+		"waves": 5,
+		"enemiesPerWave": [
+			1,
+			1,
+			1,
+			2
+		],
+		"enemyMult": 0.62,
+		"rarityWeights": [
+			80,
+			17,
+			3
+		],
+		"species": {
+			"sproutlet": 3,
+			"brambletrundle": 3,
+			"mossgear": 2,
+			"buzzbud": 2
+		},
+		"blurb": "A mossy island ringed by whispering trees. A gentle place to start.",
+		"boss": {
+			"name": "Old Thicketroll",
+			"model": "brambletrundle",
+			"form": 3,
+			"type": "verdant",
+			"level": 7,
+			"ability": "thorn-roll",
+			"lean": "guard",
+			"mult": {
+				"health": 4.0,
+				"power": 1.15,
+				"guard": 1.2
+			}
+		},
+		"loot": [
+			{
+				"item": "oak-log",
+				"chance": 0.5,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "mintleaf",
+				"chance": 0.4,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "scrap",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			}
+		],
+		"gold": [
+			2,
+			5
+		],
+		"bossLoot": {
+			"gold": 60,
+			"items": {
+				"tinkerers-vessel": 2,
+				"willow-log": 5
+			}
+		},
+		"unlockAfter": null
+	},
+	{
+		"id": "fractured-quarry",
+		"name": "Fractured Quarry",
+		"type": "telluric",
+		"levels": [
+			6,
+			14
+		],
+		"waves": 6,
+		"enemiesPerWave": [
+			1,
+			1,
+			2,
+			2
+		],
+		"enemyMult": 0.72,
+		"rarityWeights": [
+			70,
+			22,
+			7,
+			1
+		],
+		"species": {
+			"quakemaw": 2,
+			"geodecore": 2,
+			"pebblescoot": 3,
+			"tuskcub": 3
+		},
+		"blurb": "A shattered stone island where the rock still grinds and shifts.",
+		"boss": {
+			"name": "Granitusk, the Stone-Cracker",
+			"model": "tuskcub",
+			"form": 3,
+			"type": "telluric",
+			"level": 16,
+			"ability": "tusk-charge",
+			"lean": "power",
+			"mult": {
+				"health": 4.5,
+				"power": 1.25,
+				"guard": 1.25
+			}
+		},
+		"loot": [
+			{
+				"item": "copper-ore",
+				"chance": 0.5,
+				"qty": [
+					1,
+					3
+				]
+			},
+			{
+				"item": "iron-ore",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "scrap",
+				"chance": 0.3,
+				"qty": [
+					1,
+					3
+				]
+			}
+		],
+		"gold": [
+			4,
+			9
+		],
+		"bossLoot": {
+			"gold": 180,
+			"items": {
+				"sturdy-vessel": 2,
+				"iron-ore": 10
+			}
+		},
+		"unlockAfter": "whisperleaf-hollow"
+	},
+	{
+		"id": "smoldering-caldera",
+		"name": "Smoldering Caldera",
+		"type": "pyric",
+		"levels": [
+			15,
+			25
+		],
+		"waves": 6,
+		"enemiesPerWave": [
+			1,
+			2,
+			2,
+			3
+		],
+		"enemyMult": 0.78,
+		"rarityWeights": [
+			60,
+			26,
+			10,
+			3,
+			1
+		],
+		"species": {
+			"emberfang": 2,
+			"cinderpup": 3,
+			"roastbelly": 3,
+			"charwhisk": 2
+		},
+		"blurb": "A volcanic island of warm vents and glowing ash-fields.",
+		"boss": {
+			"name": "Ignis Prime",
+			"model": "emberfang",
+			"form": 3,
+			"type": "pyric",
+			"level": 27,
+			"ability": "searing-swipe",
+			"lean": "power",
+			"mult": {
+				"health": 5.0,
+				"power": 1.3,
+				"guard": 1.2
+			}
+		},
+		"loot": [
+			{
+				"item": "sunstone",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "maple-log",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "spring",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			}
+		],
+		"gold": [
+			7,
+			15
+		],
+		"bossLoot": {
+			"gold": 450,
+			"items": {
+				"sturdy-vessel": 3,
+				"sunstone": 10
+			}
+		},
+		"unlockAfter": "fractured-quarry"
+	},
+	{
+		"id": "whispering-tides",
+		"name": "Whispering Tides",
+		"type": "aqueous",
+		"levels": [
+			26,
+			36
+		],
+		"waves": 7,
+		"enemiesPerWave": [
+			1,
+			2,
+			2,
+			3
+		],
+		"enemyMult": 0.82,
+		"rarityWeights": [
+			52,
+			28,
+			13,
+			5,
+			2
+		],
+		"species": {
+			"dewdrop": 3,
+			"puddlescoop": 3,
+			"frothsprite": 2,
+			"splashfin": 2
+		},
+		"blurb": "Sky-streams pour off this island in endless waterfalls.",
+		"boss": {
+			"name": "Leviathan Core",
+			"model": "splashfin",
+			"form": 3,
+			"type": "aqueous",
+			"level": 38,
+			"ability": "hydro-jet",
+			"lean": "health",
+			"mult": {
+				"health": 5.5,
+				"power": 1.3,
+				"guard": 1.3
+			}
+		},
+		"loot": [
+			{
+				"item": "bubblepuff",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "glowcap",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "glass-lens",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			}
+		],
+		"gold": [
+			10,
+			22
+		],
+		"bossLoot": {
+			"gold": 900,
+			"items": {
+				"polished-vessel": 3,
+				"lanternfish": 8
+			}
+		},
+		"unlockAfter": "smoldering-caldera"
+	},
+	{
+		"id": "thunderhum-steppe",
+		"name": "Thunderhum Steppe",
+		"type": "voltaic",
+		"levels": [
+			37,
+			47
+		],
+		"waves": 7,
+		"enemiesPerWave": [
+			2,
+			2,
+			3
+		],
+		"enemyMult": 0.86,
+		"rarityWeights": [
+			45,
+			30,
+			15,
+			7,
+			2,
+			1
+		],
+		"species": {
+			"voltfluff": 3,
+			"joulebug": 3,
+			"plasmaplug": 2,
+			"coilchirp": 2
+		},
+		"blurb": "Grass that crackles underfoot, and a sky that never stops rumbling.",
+		"boss": {
+			"name": "Stormcrest, the Relay Eagle",
+			"model": "coilchirp",
+			"form": 3,
+			"type": "voltaic",
+			"level": 49,
+			"ability": "sonic-zap",
+			"lean": "power",
+			"mult": {
+				"health": 6.0,
+				"power": 1.35,
+				"guard": 1.3
+			}
+		},
+		"loot": [
+			{
+				"item": "skyquartz",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "yew-log",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "clockwork-heart",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			}
+		],
+		"gold": [
+			14,
+			30
+		],
+		"bossLoot": {
+			"gold": 1600,
+			"items": {
+				"polished-vessel": 4,
+				"skyquartz": 10
+			}
+		},
+		"unlockAfter": "whispering-tides"
+	},
+	{
+		"id": "null-horizon",
+		"name": "Null Horizon",
+		"type": "void",
+		"levels": [
+			48,
+			58
+		],
+		"waves": 8,
+		"enemiesPerWave": [
+			2,
+			2,
+			3
+		],
+		"enemyMult": 0.9,
+		"rarityWeights": [
+			40,
+			30,
+			16,
+			8,
+			4,
+			2
+		],
+		"species": {
+			"eclipsa": 1,
+			"riftsneak": 1,
+			"hushflutter": 1,
+			"netherpod": 1,
+			"quakemaw": 2,
+			"emberfang": 2,
+			"splashfin": 2,
+			"plasmaplug": 2,
+			"brambletrundle": 2,
+			"charwhisk": 2
+		},
+		"blurb": "The edge of the map, where the sky folds in on itself. Void Aetherlings drift here.",
+		"boss": {
+			"name": "The Aetherial Apex",
+			"model": "eclipsa",
+			"form": 3,
+			"type": "void",
+			"level": 60,
+			"ability": "dark-eclipse",
+			"lean": "guard",
+			"mult": {
+				"health": 7.0,
+				"power": 1.4,
+				"guard": 1.35
+			}
+		},
+		"loot": [
+			{
+				"item": "aetherite",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "starglass",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "aether-crystal",
+				"chance": 0.1,
+				"qty": [
+					1,
+					1
+				]
+			}
+		],
+		"gold": [
+			20,
+			45
+		],
+		"bossLoot": {
+			"gold": 3000,
+			"items": {
+				"resonant-vessel": 3,
+				"aetherite": 12
+			}
+		},
+		"firstClearCreature": {
+			"types": [
+				"void"
+			],
+			"rarity": 3
+		},
+		"unlockAfter": "thunderhum-steppe"
+	}
+]

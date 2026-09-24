@@ -1,0 +1,95 @@
+class_name Economy
+extends RefCounted
+## Aether emission from perched (benched) creatures and the Resonance Extractor, selling, Sanctum Works
+## upgrades, the vessel shop and releasing creatures.
+
+
+## Benched creatures that sit on a perch, rarest (highest emission) first.
+static func perched(s: Dictionary) -> Array:
+	var benched: Array = s.creatures.values().filter(func(c): return Creatures.is_benched(c))
+	benched.sort_custom(func(a, b):
+		var ra := Creatures.bench_rate_per_min(a)
+		var rb := Creatures.bench_rate_per_min(b)
+		return ra > rb if ra != rb else a.id < b.id)
+	var n := int(GameState.upgrade_value(s, "perches"))
+	return benched.slice(0, n)
+
+
+static func bench_aether_per_min(s: Dictionary) -> float:
+	var total := 0.0
+	for c in perched(s):
+		total += Creatures.bench_rate_per_min(c)
+	return total
+
+
+static func aether_per_min(s: Dictionary) -> float:
+	return bench_aether_per_min(s) + GameState.upgrade_value(s, "extractor")
+
+
+## Emission accrues continuously from dt, so online and offline can never drift apart.
+static func step(s: Dictionary, dt_sec: float) -> float:
+	var gain := aether_per_min(s) * dt_sec / 60.0
+	s.aether = float(s.aether) + gain
+	return gain
+
+
+static func sell(s: Dictionary, id: String, qty: int) -> int:
+	qty = mini(qty, int(GameState.count(s, id)))
+	if qty <= 0 or not Data.items.has(id):
+		return 0
+	var gold := int(Data.items[id].sell) * qty
+	GameState.add_item(s, id, -qty)
+	GameState.add_item(s, "gold", gold)
+	return gold
+
+
+## Aether Crystals turn into Aether.
+static func shatter(s: Dictionary, id: String, qty: int) -> float:
+	var it: Dictionary = Data.items.get(id, {})
+	qty = mini(qty, int(GameState.count(s, id)))
+	if qty <= 0 or not it.has("aether"):
+		return 0.0
+	GameState.add_item(s, id, -qty)
+	var gain := float(it.aether) * qty
+	GameState.add_item(s, "aether", gain)
+	return gain
+
+
+static func next_upgrade(s: Dictionary, id: String) -> Dictionary:
+	var u: Dictionary = Data.upgrades[id]
+	var lv := GameState.upgrade_level(s, id)
+	return u.levels[lv] if lv < u.levels.size() else {}
+
+
+static func buy_upgrade(s: Dictionary, id: String) -> String:
+	var nxt := next_upgrade(s, id)
+	if nxt.is_empty():
+		return "Already at the highest level."
+	if not GameState.pay(s, nxt.cost):
+		return "Not enough materials."
+	s.upgrades[id] = GameState.upgrade_level(s, id) + 1
+	GameState.sync_pods(s)
+	return ""
+
+
+static func buy_vessel(s: Dictionary, item_id: String, qty: int) -> String:
+	for v in Data.tuning.shop.vessels:
+		if v.item == item_id:
+			if not GameState.pay(s, {"gold": float(v.gold)}, qty):
+				return "Not enough gold."
+			GameState.add_item(s, item_id, qty)
+			return ""
+	return "Not for sale."
+
+
+static func release(s: Dictionary, c: Dictionary) -> int:
+	if c.get("locked", false):
+		return -1
+	if s.creatures.size() <= 1:
+		return -1
+	var value := Creatures.release_value(c)
+	Skills.unassign(s, c)
+	s.creatures.erase(c.id)
+	GameState.add_item(s, "aether", value)
+	s.counters.released = int(s.counters.released) + 1
+	return value

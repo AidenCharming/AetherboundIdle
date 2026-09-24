@@ -1,0 +1,50 @@
+[
+	{
+		"id": "verdant",
+		"name": "Verdant",
+		"element": "Nature",
+		"color": "#5fcf6a",
+		"beats": "telluric",
+		"shinyHue": 150
+	},
+	{
+		"id": "telluric",
+		"name": "Telluric",
+		"element": "Stone",
+		"color": "#b08a6e",
+		"beats": "voltaic",
+		"shinyHue": 150
+	},
+	{
+		"id": "pyric",
+		"name": "Pyric",
+		"element": "Flame",
+		"color": "#ff8f3a",
+		"beats": "verdant",
+		"shinyHue": 150
+	},
+	{
+		"id": "aqueous",
+		"name": "Aqueous",
+		"element": "Water",
+		"color": "#44a6ff",
+		"beats": "pyric",
+		"shinyHue": 150
+	},
+	{
+		"id": "voltaic",
+		"name": "Voltaic",
+		"element": "Electric",
+		"color": "#ffd43b",
+		"beats": "aqueous",
+		"shinyHue": 150
+	},
+	{
+		"id": "void",
+		"name": "Void",
+		"element": "Aether",
+		"color": "#9d6bff",
+		"beats": null,
+		"shinyHue": 270
+	}
+]

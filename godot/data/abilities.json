@@ -1,0 +1,485 @@
+[
+	{
+		"id": "leaf-shield",
+		"name": "Leaf Shield",
+		"effect": "shield-party",
+		"damageType": "verdant",
+		"tempo": "standard"
+	},
+	{
+		"id": "thorn-roll",
+		"name": "Thorn Roll",
+		"effect": "thorns",
+		"damageType": "verdant",
+		"tempo": "standard"
+	},
+	{
+		"id": "soothing-spores",
+		"name": "Soothing Spores",
+		"effect": "heal-instant",
+		"damageType": "verdant",
+		"tempo": "quick"
+	},
+	{
+		"id": "rotor-gust",
+		"name": "Rotor Gust",
+		"effect": "single-target-damage",
+		"damageType": "verdant",
+		"tempo": "standard"
+	},
+	{
+		"id": "stone-crunch",
+		"name": "Stone Crunch",
+		"effect": "single-target-damage",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "crystal-barrier",
+		"name": "Crystal Barrier",
+		"effect": "buff-guard",
+		"damageType": "telluric",
+		"tempo": "standard"
+	},
+	{
+		"id": "shell-bash",
+		"name": "Shell Bash",
+		"effect": "single-target-damage",
+		"damageType": "telluric",
+		"tempo": "quick"
+	},
+	{
+		"id": "tusk-charge",
+		"name": "Tusk Charge",
+		"effect": "single-target-damage",
+		"damageType": "telluric",
+		"tempo": "standard"
+	},
+	{
+		"id": "searing-swipe",
+		"name": "Searing Swipe",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "happy-bark",
+		"name": "Happy Bark",
+		"effect": "buff-power",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "heat-sink",
+		"name": "Heat Sink",
+		"effect": "multi-target-damage",
+		"damageType": "pyric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "cinder-gust",
+		"name": "Cinder Gust",
+		"effect": "multi-target-damage",
+		"damageType": "pyric",
+		"tempo": "standard"
+	},
+	{
+		"id": "purifying-splash",
+		"name": "Purifying Splash",
+		"effect": "heal-instant",
+		"damageType": "aqueous",
+		"tempo": "quick"
+	},
+	{
+		"id": "bucket-block",
+		"name": "Bucket Block",
+		"effect": "shield-self",
+		"damageType": "aqueous",
+		"tempo": "heavy"
+	},
+	{
+		"id": "mist-veil",
+		"name": "Mist Veil",
+		"effect": "shield-party",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "hydro-jet",
+		"name": "Hydro Jet",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "static-shock",
+		"name": "Static Shock",
+		"effect": "single-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "capacitor-shell",
+		"name": "Capacitor Shell",
+		"effect": "shield-self",
+		"damageType": "voltaic",
+		"tempo": "standard"
+	},
+	{
+		"id": "arc-strike",
+		"name": "Arc Strike",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "heavy"
+	},
+	{
+		"id": "sonic-zap",
+		"name": "Sonic Zap",
+		"effect": "single-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "dark-eclipse",
+		"name": "Dark Eclipse",
+		"effect": "shield-party",
+		"damageType": "void",
+		"tempo": "heavy"
+	},
+	{
+		"id": "shadow-strike",
+		"name": "Shadow Strike",
+		"effect": "single-target-damage",
+		"damageType": "void",
+		"tempo": "quick"
+	},
+	{
+		"id": "void-breeze",
+		"name": "Void Breeze",
+		"effect": "heal-over-time",
+		"damageType": "void",
+		"tempo": "standard"
+	},
+	{
+		"id": "nebula-shell",
+		"name": "Nebula Shell",
+		"effect": "shield-party",
+		"damageType": "void",
+		"tempo": "heavy"
+	},
+	{
+		"id": "sylvan-heat",
+		"name": "Sylvan Heat",
+		"effect": "multi-target-damage",
+		"damageType": "pyric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "briar-wash",
+		"name": "Briar Wash",
+		"effect": "heal-instant",
+		"damageType": "aqueous",
+		"tempo": "quick"
+	},
+	{
+		"id": "earth-spike",
+		"name": "Earth Spike",
+		"effect": "single-target-damage",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "static-sprout",
+		"name": "Static Sprout",
+		"effect": "single-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "silt-cannon",
+		"name": "Silt Cannon",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "magma-slam",
+		"name": "Magma Slam",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "facet-ward",
+		"name": "Facet Ward",
+		"effect": "buff-guard",
+		"damageType": "telluric",
+		"tempo": "standard"
+	},
+	{
+		"id": "warm-tides",
+		"name": "Warm Tides",
+		"effect": "heal-instant",
+		"damageType": "aqueous",
+		"tempo": "quick"
+	},
+	{
+		"id": "voltaic-fang",
+		"name": "Voltaic Fang",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "heavy"
+	},
+	{
+		"id": "hydro-shock",
+		"name": "Hydro Shock",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "twilight-bough",
+		"name": "Twilight Bough",
+		"effect": "shield-party",
+		"damageType": "verdant",
+		"tempo": "standard"
+	},
+	{
+		"id": "void-fang",
+		"name": "Void Fang",
+		"effect": "single-target-damage",
+		"damageType": "void",
+		"tempo": "quick"
+	},
+	{
+		"id": "obsidian-shroud",
+		"name": "Obsidian Shroud",
+		"effect": "shield-party",
+		"damageType": "void",
+		"tempo": "heavy"
+	},
+	{
+		"id": "twilight-mend",
+		"name": "Twilight Mend",
+		"effect": "heal-over-time",
+		"damageType": "void",
+		"tempo": "standard"
+	},
+	{
+		"id": "arc-storm",
+		"name": "Arc Storm",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "heavy"
+	},
+	{
+		"id": "mountain-stance",
+		"name": "Mountain Stance",
+		"effect": "buff-guard",
+		"damageType": "telluric",
+		"tempo": "standard"
+	},
+	{
+		"id": "stone-bulwark",
+		"name": "Stone Bulwark",
+		"effect": "buff-guard",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "scald-curl",
+		"name": "Scald Curl",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "sun-sip",
+		"name": "Sun Sip",
+		"effect": "heal-instant",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "reed-spear",
+		"name": "Reed Spear",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "river-roll",
+		"name": "River Roll",
+		"effect": "multi-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "copper-dart",
+		"name": "Copper Dart",
+		"effect": "single-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "acorn-volley",
+		"name": "Acorn Volley",
+		"effect": "multi-target-damage",
+		"damageType": "verdant",
+		"tempo": "quick"
+	},
+	{
+		"id": "magma-lance",
+		"name": "Magma Lance",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "standard"
+	},
+	{
+		"id": "sunbaked-bastion",
+		"name": "Sunbaked Bastion",
+		"effect": "shield-self",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "barnacle-bulwark",
+		"name": "Barnacle Bulwark",
+		"effect": "shield-party",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "torrent-roll",
+		"name": "Torrent Roll",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "heavy"
+	},
+	{
+		"id": "echo-screech",
+		"name": "Echo Screech",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "flock-rally",
+		"name": "Flock Rally",
+		"effect": "buff-guard",
+		"damageType": "telluric",
+		"tempo": "standard"
+	},
+	{
+		"id": "plume-flurry",
+		"name": "Plume Flurry",
+		"effect": "multi-target-damage",
+		"damageType": "pyric",
+		"tempo": "standard"
+	},
+	{
+		"id": "bathhouse-balm",
+		"name": "Bathhouse Balm",
+		"effect": "heal-instant",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "lantern-glow",
+		"name": "Lantern Glow",
+		"effect": "heal-over-time",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "brush-fire",
+		"name": "Brush Fire",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "galvanic-lash",
+		"name": "Galvanic Lash",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "heavy"
+	},
+	{
+		"id": "dive-lance",
+		"name": "Dive Lance",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "quick"
+	},
+	{
+		"id": "root-snare",
+		"name": "Root Snare",
+		"effect": "single-target-damage",
+		"damageType": "verdant",
+		"tempo": "standard"
+	},
+	{
+		"id": "quick-nibble",
+		"name": "Quick Nibble",
+		"effect": "single-target-damage",
+		"damageType": "verdant",
+		"tempo": "quick"
+	},
+	{
+		"id": "claw-rend",
+		"name": "Claw Rend",
+		"effect": "single-target-damage",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "plated-ward",
+		"name": "Plated Ward",
+		"effect": "shield-self",
+		"damageType": "telluric",
+		"tempo": "heavy"
+	},
+	{
+		"id": "ashen-dive",
+		"name": "Ashen Dive",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "quick"
+	},
+	{
+		"id": "char-nip",
+		"name": "Char Nip",
+		"effect": "single-target-damage",
+		"damageType": "pyric",
+		"tempo": "standard"
+	},
+	{
+		"id": "drift-lash",
+		"name": "Drift Lash",
+		"effect": "single-target-damage",
+		"damageType": "aqueous",
+		"tempo": "standard"
+	},
+	{
+		"id": "calm-pool",
+		"name": "Calm Pool",
+		"effect": "shield-party",
+		"damageType": "aqueous",
+		"tempo": "quick"
+	},
+	{
+		"id": "volt-slash",
+		"name": "Volt Slash",
+		"effect": "single-target-damage",
+		"damageType": "voltaic",
+		"tempo": "quick"
+	},
+	{
+		"id": "volt-snap",
+		"name": "Volt Snap",
+		"effect": "multi-target-damage",
+		"damageType": "voltaic",
+		"tempo": "standard"
+	}
+]

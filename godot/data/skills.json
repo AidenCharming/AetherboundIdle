@@ -1,0 +1,1009 @@
+[
+	{
+		"id": "woodcutting",
+		"name": "Woodcutting",
+		"icon": "1fa93",
+		"type": "verdant",
+		"kind": "gathering",
+		"blurb": "Fell trees across the islands for logs.",
+		"actions": [
+			{
+				"id": "oak-log",
+				"name": "Oak Tree",
+				"level": 1,
+				"ms": 3000,
+				"xp": 5,
+				"outputs": {
+					"oak-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "willow-log",
+				"name": "Willow Tree",
+				"level": 10,
+				"ms": 4000,
+				"xp": 10,
+				"outputs": {
+					"willow-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "maple-log",
+				"name": "Maple Tree",
+				"level": 25,
+				"ms": 5000,
+				"xp": 18,
+				"outputs": {
+					"maple-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "yew-log",
+				"name": "Yew Tree",
+				"level": 45,
+				"ms": 6000,
+				"xp": 30,
+				"outputs": {
+					"yew-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "starbark-log",
+				"name": "Starbark Tree",
+				"level": 70,
+				"ms": 7500,
+				"xp": 50,
+				"outputs": {
+					"starbark-log": 1
+				},
+				"rare": {
+					"item": "seedcache",
+					"chance": 0.01
+				}
+			}
+		]
+	},
+	{
+		"id": "herbalism",
+		"name": "Herbalism",
+		"icon": "1f33f",
+		"type": "verdant",
+		"kind": "gathering",
+		"blurb": "Tend the island gardens for herbs and blossoms.",
+		"actions": [
+			{
+				"id": "mintleaf",
+				"name": "Mint Patch",
+				"level": 1,
+				"ms": 3000,
+				"xp": 5,
+				"outputs": {
+					"mintleaf": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "sunpetal",
+				"name": "Sunpetal Bed",
+				"level": 10,
+				"ms": 4000,
+				"xp": 10,
+				"outputs": {
+					"sunpetal": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "glowcap",
+				"name": "Glowcap Ring",
+				"level": 25,
+				"ms": 5000,
+				"xp": 18,
+				"outputs": {
+					"glowcap": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "dreamroot",
+				"name": "Dreamroot Hollow",
+				"level": 45,
+				"ms": 6000,
+				"xp": 30,
+				"outputs": {
+					"dreamroot": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "aetherbloom",
+				"name": "Aetherbloom Garden",
+				"level": 70,
+				"ms": 7500,
+				"xp": 50,
+				"outputs": {
+					"aetherbloom": 1
+				},
+				"rare": {
+					"item": "lucky-clover",
+					"chance": 0.01
+				}
+			}
+		]
+	},
+	{
+		"id": "mining",
+		"name": "Mining",
+		"icon": "26cf",
+		"type": "telluric",
+		"kind": "gathering",
+		"blurb": "Dig ore and crystal out of the floating rock.",
+		"actions": [
+			{
+				"id": "copper-ore",
+				"name": "Copper Vein",
+				"level": 1,
+				"ms": 3000,
+				"xp": 5,
+				"outputs": {
+					"copper-ore": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "iron-ore",
+				"name": "Iron Vein",
+				"level": 10,
+				"ms": 4000,
+				"xp": 10,
+				"outputs": {
+					"iron-ore": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "sunstone",
+				"name": "Sunstone Seam",
+				"level": 25,
+				"ms": 5000,
+				"xp": 18,
+				"outputs": {
+					"sunstone": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "skyquartz",
+				"name": "Skyquartz Cluster",
+				"level": 45,
+				"ms": 6000,
+				"xp": 30,
+				"outputs": {
+					"skyquartz": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			},
+			{
+				"id": "aetherite",
+				"name": "Aetherite Core",
+				"level": 70,
+				"ms": 7500,
+				"xp": 50,
+				"outputs": {
+					"aetherite": 1
+				},
+				"rare": {
+					"item": "heartgeode",
+					"chance": 0.01
+				}
+			}
+		]
+	},
+	{
+		"id": "fishing",
+		"name": "Fishing",
+		"icon": "1f3a3",
+		"type": "aqueous",
+		"kind": "gathering",
+		"blurb": "Cast into the sky-streams. Sometimes treasure bites.",
+		"actions": [
+			{
+				"id": "minnow",
+				"name": "Minnow Shallows",
+				"level": 1,
+				"ms": 3000,
+				"xp": 5,
+				"outputs": {
+					"minnow": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "sunfish",
+				"name": "Sunfish Pool",
+				"level": 10,
+				"ms": 4000,
+				"xp": 10,
+				"outputs": {
+					"sunfish": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "bubblepuff",
+				"name": "Bubblepuff Reef",
+				"level": 25,
+				"ms": 5000,
+				"xp": 18,
+				"outputs": {
+					"bubblepuff": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "lanternfish",
+				"name": "Lantern Deep",
+				"level": 45,
+				"ms": 6000,
+				"xp": 30,
+				"outputs": {
+					"lanternfish": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			},
+			{
+				"id": "starfin",
+				"name": "Starfin Current",
+				"level": 70,
+				"ms": 7500,
+				"xp": 50,
+				"outputs": {
+					"starfin": 1
+				},
+				"rare": {
+					"item": "moonpearl",
+					"chance": 0.01
+				},
+				"treasure": {
+					"item": "sunken-trinket",
+					"chance": 0.004
+				}
+			}
+		]
+	},
+	{
+		"id": "scavenging",
+		"name": "Scavenging",
+		"icon": "1f50d",
+		"type": null,
+		"kind": "gathering",
+		"blurb": "Any Aetherling can rummage for salvage and loose coins.",
+		"actions": [
+			{
+				"id": "scrap",
+				"name": "Junk Heap",
+				"level": 1,
+				"ms": 3000,
+				"xp": 5,
+				"outputs": {
+					"scrap": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 1
+			},
+			{
+				"id": "spring",
+				"name": "Broken Carts",
+				"level": 10,
+				"ms": 4000,
+				"xp": 10,
+				"outputs": {
+					"spring": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 2
+			},
+			{
+				"id": "glass-lens",
+				"name": "Old Observatory",
+				"level": 25,
+				"ms": 5000,
+				"xp": 18,
+				"outputs": {
+					"glass-lens": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 4
+			},
+			{
+				"id": "clockwork-heart",
+				"name": "Clocktower Ruin",
+				"level": 45,
+				"ms": 6000,
+				"xp": 30,
+				"outputs": {
+					"clockwork-heart": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 7
+			},
+			{
+				"id": "starglass",
+				"name": "Fallen Star Site",
+				"level": 70,
+				"ms": 7500,
+				"xp": 50,
+				"outputs": {
+					"starglass": 1
+				},
+				"rare": {
+					"item": "tinkers-cache",
+					"chance": 0.01
+				},
+				"gold": 12
+			}
+		]
+	},
+	{
+		"id": "smithing",
+		"name": "Smithing",
+		"icon": "1f528",
+		"type": "pyric",
+		"kind": "crafting",
+		"blurb": "Smelt ore into bars. Higher bars need logs for the fire.",
+		"actions": [
+			{
+				"id": "copper-bar",
+				"name": "Copper Bar",
+				"level": 1,
+				"ms": 3500,
+				"xp": 7,
+				"inputs": {
+					"copper-ore": 2
+				},
+				"outputs": {
+					"copper-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "iron-bar",
+				"name": "Iron Bar",
+				"level": 10,
+				"ms": 4500,
+				"xp": 14,
+				"inputs": {
+					"iron-ore": 2,
+					"oak-log": 1
+				},
+				"outputs": {
+					"iron-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "sunsteel-bar",
+				"name": "Sunsteel Bar",
+				"level": 25,
+				"ms": 5500,
+				"xp": 25,
+				"inputs": {
+					"sunstone": 2,
+					"willow-log": 1
+				},
+				"outputs": {
+					"sunsteel-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "skysteel-bar",
+				"name": "Skysteel Bar",
+				"level": 45,
+				"ms": 6500,
+				"xp": 40,
+				"inputs": {
+					"skyquartz": 2,
+					"maple-log": 1
+				},
+				"outputs": {
+					"skysteel-bar": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "aether-ingot",
+				"name": "Aether Ingot",
+				"level": 70,
+				"ms": 8000,
+				"xp": 65,
+				"inputs": {
+					"aetherite": 2,
+					"yew-log": 1
+				},
+				"outputs": {
+					"aether-ingot": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	},
+	{
+		"id": "cooking",
+		"name": "Cooking",
+		"icon": "1f373",
+		"type": "pyric",
+		"kind": "crafting",
+		"blurb": "Cook expedition food. Meals heal your party between waves.",
+		"actions": [
+			{
+				"id": "grilled-minnow",
+				"name": "Grilled Minnow",
+				"level": 1,
+				"ms": 3000,
+				"xp": 6,
+				"inputs": {
+					"minnow": 1
+				},
+				"outputs": {
+					"grilled-minnow": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "herb-sunfish",
+				"name": "Herbed Sunfish",
+				"level": 10,
+				"ms": 4500,
+				"xp": 14,
+				"inputs": {
+					"sunfish": 1,
+					"mintleaf": 1
+				},
+				"outputs": {
+					"herb-sunfish": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "bubble-stew",
+				"name": "Bubblepuff Stew",
+				"level": 25,
+				"ms": 5500,
+				"xp": 25,
+				"inputs": {
+					"bubblepuff": 1,
+					"sunpetal": 1
+				},
+				"outputs": {
+					"bubble-stew": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "lantern-roll",
+				"name": "Lantern Roll",
+				"level": 45,
+				"ms": 6500,
+				"xp": 40,
+				"inputs": {
+					"lanternfish": 1,
+					"glowcap": 1
+				},
+				"outputs": {
+					"lantern-roll": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "starfin-feast",
+				"name": "Starfin Feast",
+				"level": 70,
+				"ms": 8000,
+				"xp": 65,
+				"inputs": {
+					"starfin": 1,
+					"dreamroot": 1
+				},
+				"outputs": {
+					"starfin-feast": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	},
+	{
+		"id": "circuitry",
+		"name": "Circuitry",
+		"icon": "26a1",
+		"type": "voltaic",
+		"kind": "crafting",
+		"blurb": "Wire bars and salvage into components for Sanctum works.",
+		"actions": [
+			{
+				"id": "copper-coil",
+				"name": "Copper Coil",
+				"level": 1,
+				"ms": 3500,
+				"xp": 7,
+				"inputs": {
+					"copper-bar": 1,
+					"scrap": 1
+				},
+				"outputs": {
+					"copper-coil": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "iron-capacitor",
+				"name": "Iron Capacitor",
+				"level": 10,
+				"ms": 4500,
+				"xp": 14,
+				"inputs": {
+					"iron-bar": 1,
+					"spring": 1
+				},
+				"outputs": {
+					"iron-capacitor": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "sun-resonator",
+				"name": "Sun Resonator",
+				"level": 25,
+				"ms": 5500,
+				"xp": 25,
+				"inputs": {
+					"sunsteel-bar": 1,
+					"glass-lens": 1
+				},
+				"outputs": {
+					"sun-resonator": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "sky-relay",
+				"name": "Sky Relay",
+				"level": 45,
+				"ms": 6500,
+				"xp": 40,
+				"inputs": {
+					"skysteel-bar": 1,
+					"clockwork-heart": 1
+				},
+				"outputs": {
+					"sky-relay": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "aether-dynamo",
+				"name": "Aether Dynamo",
+				"level": 70,
+				"ms": 8000,
+				"xp": 65,
+				"inputs": {
+					"aether-ingot": 1,
+					"starglass": 1
+				},
+				"outputs": {
+					"aether-dynamo": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	},
+	{
+		"id": "aether-weaving",
+		"name": "Aether-Weaving",
+		"icon": "1f9f5",
+		"type": "void",
+		"kind": "crafting",
+		"blurb": "Spin raw Aether and herbs into thread. Void breeding needs it.",
+		"actions": [
+			{
+				"id": "dusk-thread",
+				"name": "Dusk Thread",
+				"level": 1,
+				"ms": 3500,
+				"xp": 7,
+				"inputs": {
+					"aether": 15,
+					"mintleaf": 1
+				},
+				"outputs": {
+					"dusk-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "gloam-thread",
+				"name": "Gloam Thread",
+				"level": 10,
+				"ms": 4500,
+				"xp": 14,
+				"inputs": {
+					"aether": 50,
+					"sunpetal": 1
+				},
+				"outputs": {
+					"gloam-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "star-thread",
+				"name": "Star Thread",
+				"level": 25,
+				"ms": 5500,
+				"xp": 25,
+				"inputs": {
+					"aether": 150,
+					"glowcap": 1
+				},
+				"outputs": {
+					"star-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "veil-thread",
+				"name": "Veil Thread",
+				"level": 45,
+				"ms": 6500,
+				"xp": 40,
+				"inputs": {
+					"aether": 450,
+					"dreamroot": 1
+				},
+				"outputs": {
+					"veil-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "eventide-thread",
+				"name": "Eventide Thread",
+				"level": 70,
+				"ms": 8000,
+				"xp": 65,
+				"inputs": {
+					"aether": 1300,
+					"aetherbloom": 1
+				},
+				"outputs": {
+					"eventide-thread": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	},
+	{
+		"id": "vessel-crafting",
+		"name": "Vessel Crafting",
+		"icon": "1f3fa",
+		"type": "void",
+		"kind": "crafting",
+		"blurb": "Craft the better Aether Vessels.",
+		"actions": [
+			{
+				"id": "sturdy-vessel",
+				"name": "Sturdy Vessel",
+				"level": 1,
+				"ms": 4000,
+				"xp": 8,
+				"inputs": {
+					"iron-bar": 1,
+					"dusk-thread": 1
+				},
+				"outputs": {
+					"sturdy-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "polished-vessel",
+				"name": "Polished Vessel",
+				"level": 10,
+				"ms": 5000,
+				"xp": 16,
+				"inputs": {
+					"sunsteel-bar": 1,
+					"gloam-thread": 1
+				},
+				"outputs": {
+					"polished-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "resonant-vessel",
+				"name": "Resonant Vessel",
+				"level": 30,
+				"ms": 6500,
+				"xp": 30,
+				"inputs": {
+					"skysteel-bar": 1,
+					"star-thread": 1
+				},
+				"outputs": {
+					"resonant-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "luminescent-vessel",
+				"name": "Luminescent Vessel",
+				"level": 55,
+				"ms": 8000,
+				"xp": 50,
+				"inputs": {
+					"aether-ingot": 1,
+					"veil-thread": 1
+				},
+				"outputs": {
+					"luminescent-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	},
+	{
+		"id": "fabrication",
+		"name": "Fabrication",
+		"icon": "1f527",
+		"type": null,
+		"kind": "crafting",
+		"blurb": "Any Aetherling can build basic vessels and Sanctum parts.",
+		"actions": [
+			{
+				"id": "tinkerers-vessel",
+				"name": "Tinker's Vessel",
+				"level": 1,
+				"ms": 3500,
+				"xp": 7,
+				"inputs": {
+					"oak-log": 1,
+					"scrap": 1
+				},
+				"outputs": {
+					"tinkerers-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "timber-frame",
+				"name": "Timber Frame",
+				"level": 10,
+				"ms": 4500,
+				"xp": 14,
+				"inputs": {
+					"willow-log": 3,
+					"scrap": 2
+				},
+				"outputs": {
+					"timber-frame": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "sturdy-vessel",
+				"name": "Sturdy Vessel",
+				"level": 25,
+				"ms": 5500,
+				"xp": 25,
+				"inputs": {
+					"iron-bar": 1,
+					"spring": 1
+				},
+				"outputs": {
+					"sturdy-vessel": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "resonance-frame",
+				"name": "Resonance Frame",
+				"level": 45,
+				"ms": 6500,
+				"xp": 40,
+				"inputs": {
+					"maple-log": 2,
+					"sunsteel-bar": 1,
+					"glass-lens": 1
+				},
+				"outputs": {
+					"resonance-frame": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			},
+			{
+				"id": "aether-lantern",
+				"name": "Aether Lantern",
+				"level": 70,
+				"ms": 8000,
+				"xp": 65,
+				"inputs": {
+					"yew-log": 2,
+					"starglass": 1,
+					"aether-ingot": 1
+				},
+				"outputs": {
+					"aether-lantern": 1
+				},
+				"rare": {
+					"item": "aether-crystal",
+					"chance": 0.005
+				}
+			}
+		]
+	}
+]

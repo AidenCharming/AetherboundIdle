@@ -1,0 +1,239 @@
+{
+	"creature": {
+		"maxLevel": 60,
+		"formLevels": [
+			1,
+			20,
+			40
+		],
+		"formStatMult": [
+			1.0,
+			1.2,
+			1.4
+		],
+		"baseStats": {
+			"health": 60,
+			"power": 12,
+			"guard": 8
+		},
+		"leaned": 1.25,
+		"other": 0.9,
+		"statPerLevel": 0.06,
+		"xpCurve": {
+			"base": 40,
+			"growth": 1.13
+		},
+		"workXpShare": 0.5,
+		"maxPoolTraits": 3
+	},
+	"skills": {
+		"maxLevel": 99,
+		"xpCurve": {
+			"base": 100,
+			"growth": 1.12
+		},
+		"slotLevels": [
+			1,
+			15,
+			30,
+			50,
+			75
+		],
+		"secondaryAptitudeBonus": 0.15,
+		"hybridOffPrimaryEfficiency": 0.6,
+		"specialistBonus": 0.1
+	},
+	"cooldown": {
+		"floorFraction": 0.25,
+		"levelTerm": 0.012,
+		"rarityTerm": 0.08,
+		"formTerm": [
+			0,
+			0.08,
+			0.16
+		]
+	},
+	"traitStrength": {
+		"minor": 0.05,
+		"moderate": 0.1,
+		"major": 0.2
+	},
+	"caps": {
+		"extra_output_chance": 0.5,
+		"offline_extra_output_chance": 0.5,
+		"save_material_chance": 0.5,
+		"cooldown_reduction": 0.5,
+		"bonus_xp": 0.5,
+		"rare_drop_chance": 0.5,
+		"treasure_drop_chance": 0.5,
+		"bench_aether_emission": 1.0,
+		"bind_rate": 0.5,
+		"free_bind_attempts": 3,
+		"hatch_time_reduction": 0.5,
+		"mutation_odds": 0.03,
+		"attunement_cost_reduction": 0.5,
+		"bonus_health": 0.5,
+		"bonus_power": 0.5,
+		"bonus_guard": 0.5,
+		"ability_cooldown_reduction": 0.5,
+		"bonus_combat_xp": 0.5,
+		"partner_element_drop_chance": 0.5
+	},
+	"overclocked": {
+		"perStack": 0.02,
+		"maxStacks": 5
+	},
+	"poolTraits": {
+		"countWeights": [
+			35,
+			40,
+			20,
+			5
+		],
+		"strengthWeights": {
+			"minor": 65,
+			"moderate": 28,
+			"major": 7
+		},
+		"typeAffinityMult": 3,
+		"attunementCountWeights": [
+			0,
+			50,
+			35,
+			15
+		]
+	},
+	"breeding": {
+		"aetherCost": [
+			100,
+			400,
+			1600,
+			6400,
+			25600
+		],
+		"materialQty": 5,
+		"ceilingByTier": [
+			2,
+			3,
+			5,
+			7,
+			9
+		],
+		"stepWeight": 0.45,
+		"mutationPlusOne": 0.15,
+		"mutationPlusTwo": 0.025,
+		"topTierMutationMult": 0.5,
+		"hatchMinutes": [
+			2,
+			8,
+			30,
+			90,
+			240
+		],
+		"speedUpAetherPerMinute": [
+			3,
+			6,
+			12,
+			25,
+			50
+		],
+		"inheritChance": 0.4,
+		"traitMutationChance": 0.05,
+		"shellTruthChance": 0.75
+	},
+	"shiny": {
+		"encounterRate": 0.002,
+		"encounterPityStart": 400,
+		"encounterPityFull": 900,
+		"hatchRate": 0.005,
+		"hatchPityStart": 150,
+		"hatchPityFull": 300,
+		"statBonus": 0.02
+	},
+	"attunement": {
+		"baseCost": 60,
+		"rarityGrowth": 1.8,
+		"lockMult": [
+			1,
+			3,
+			9
+		],
+		"maxLocks": 2
+	},
+	"combat": {
+		"baseAttackMs": 2400,
+		"minAttackMs": 700,
+		"wheelStrong": 1.5,
+		"wheelWeak": 0.75,
+		"voidDealt": 1.25,
+		"voidTaken": 0.75,
+		"voidHybridFraction": 0.5,
+		"variance": 0.1,
+		"waveGapMs": 1200,
+		"exhaustMs": 20000,
+		"eatBelow": 0.6,
+		"partySize": 3,
+		"xpPerKill": {
+			"base": 6,
+			"exp": 1.15
+		},
+		"bossXpMult": 6,
+		"rarityXpPerTier": 0.25,
+		"tempo": {
+			"quick": {
+				"cooldownMs": 5000,
+				"power": 1.4
+			},
+			"standard": {
+				"cooldownMs": 9000,
+				"power": 2.3
+			},
+			"heavy": {
+				"cooldownMs": 15000,
+				"power": 3.8
+			}
+		},
+		"multiTargetFraction": 0.6,
+		"healFraction": 0.1,
+		"hotSeconds": 5,
+		"buffFraction": 0.12,
+		"buffMs": 8000,
+		"shieldFraction": 0.1,
+		"selfShieldMult": 2.0,
+		"thornsReflect": 0.3,
+		"thornsMs": 8000,
+		"bossWaveLabel": "Boss",
+		"offlineFullRuns": 30,
+		"offlineStepMs": 250
+	},
+	"aether": {
+		"startingAether": 50,
+		"startingGold": 0
+	},
+	"offline": {
+		"awayThresholdSec": 60,
+		"segments": 40
+	},
+	"shop": {
+		"vessels": [
+			{
+				"item": "tinkerers-vessel",
+				"gold": 30
+			}
+		]
+	},
+	"save": {
+		"version": 1,
+		"autosaveSec": 20
+	},
+	"start": {
+		"creature": {
+			"species": "sproutlet",
+			"rarity": 1,
+			"level": 1
+		},
+		"items": {
+			"tinkerers-vessel": 5
+		}
+	}
+}

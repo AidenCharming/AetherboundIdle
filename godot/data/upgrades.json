@@ -1,0 +1,225 @@
+[
+	{
+		"id": "genesis-pods",
+		"name": "Genesis Pods",
+		"icon": "1f95a",
+		"blurb": "Incubators. Each pod holds one egg.",
+		"stat": "pods",
+		"base": 2,
+		"levels": [
+			{
+				"value": 3,
+				"cost": {
+					"gold": 400,
+					"timber-frame": 4
+				}
+			},
+			{
+				"value": 4,
+				"cost": {
+					"gold": 2000,
+					"iron-capacitor": 10
+				}
+			},
+			{
+				"value": 5,
+				"cost": {
+					"gold": 8000,
+					"sun-resonator": 10,
+					"resonance-frame": 2
+				}
+			},
+			{
+				"value": 6,
+				"cost": {
+					"gold": 30000,
+					"sky-relay": 10,
+					"aether-lantern": 1
+				}
+			}
+		]
+	},
+	{
+		"id": "perches",
+		"name": "Nexus Perches",
+		"icon": "1f33f",
+		"blurb": "Benched Aetherlings on a perch emit Aether. The rarest benched ones perch first.",
+		"stat": "perches",
+		"base": 4,
+		"levels": [
+			{
+				"value": 6,
+				"cost": {
+					"gold": 150,
+					"oak-log": 20
+				}
+			},
+			{
+				"value": 8,
+				"cost": {
+					"gold": 600,
+					"timber-frame": 3
+				}
+			},
+			{
+				"value": 10,
+				"cost": {
+					"gold": 2000,
+					"copper-coil": 10
+				}
+			},
+			{
+				"value": 12,
+				"cost": {
+					"gold": 6000,
+					"iron-capacitor": 12
+				}
+			},
+			{
+				"value": 14,
+				"cost": {
+					"gold": 15000,
+					"resonance-frame": 3
+				}
+			},
+			{
+				"value": 16,
+				"cost": {
+					"gold": 40000,
+					"aether-lantern": 2
+				}
+			}
+		]
+	},
+	{
+		"id": "extractor",
+		"name": "Resonance Extractor",
+		"icon": "1f4a0",
+		"blurb": "Pulls Aether straight out of the island. Aether per minute.",
+		"stat": "extractorAetherPerMin",
+		"base": 0,
+		"levels": [
+			{
+				"value": 5,
+				"cost": {
+					"gold": 300,
+					"copper-coil": 8
+				}
+			},
+			{
+				"value": 15,
+				"cost": {
+					"gold": 1200,
+					"copper-coil": 20,
+					"timber-frame": 4
+				}
+			},
+			{
+				"value": 35,
+				"cost": {
+					"gold": 4000,
+					"iron-capacitor": 15
+				}
+			},
+			{
+				"value": 75,
+				"cost": {
+					"gold": 10000,
+					"sun-resonator": 15
+				}
+			},
+			{
+				"value": 150,
+				"cost": {
+					"gold": 25000,
+					"sun-resonator": 25,
+					"resonance-frame": 3
+				}
+			},
+			{
+				"value": 300,
+				"cost": {
+					"gold": 60000,
+					"sky-relay": 20
+				}
+			},
+			{
+				"value": 600,
+				"cost": {
+					"gold": 150000,
+					"aether-dynamo": 15,
+					"aether-lantern": 2
+				}
+			}
+		]
+	},
+	{
+		"id": "offline-cap",
+		"name": "Dream Anchor",
+		"icon": "1f319",
+		"blurb": "How long your Sanctum keeps working while you are away (hours).",
+		"stat": "offlineCapHours",
+		"base": 12,
+		"levels": [
+			{
+				"value": 16,
+				"cost": {
+					"gold": 1500,
+					"timber-frame": 6
+				}
+			},
+			{
+				"value": 20,
+				"cost": {
+					"gold": 8000,
+					"iron-capacitor": 12
+				}
+			},
+			{
+				"value": 24,
+				"cost": {
+					"gold": 30000,
+					"resonance-frame": 4
+				}
+			}
+		]
+	},
+	{
+		"id": "supply-crates",
+		"name": "Supply Crates",
+		"icon": "1f4e6",
+		"blurb": "Meals your expedition party can eat per run.",
+		"stat": "mealsPerRun",
+		"base": 3,
+		"levels": [
+			{
+				"value": 5,
+				"cost": {
+					"gold": 250,
+					"timber-frame": 2
+				}
+			},
+			{
+				"value": 8,
+				"cost": {
+					"gold": 1500,
+					"copper-coil": 10
+				}
+			},
+			{
+				"value": 12,
+				"cost": {
+					"gold": 6000,
+					"iron-capacitor": 10
+				}
+			},
+			{
+				"value": 20,
+				"cost": {
+					"gold": 20000,
+					"resonance-frame": 2
+				}
+			}
+		]
+	}
+]

@@ -1,0 +1,47 @@
+; Engine configuration file.
+; Godot 4.7 (GL Compatibility renderer). Open this folder in the Godot editor, or run
+; `godot --path godot` from the repo root.
+
+config_version=5
+
+[application]
+
+config/name="Aetherbound Idle"
+config/description="A creature-collecting idle game. Collect Aetherlings, put them to work, breed rarer forms and explore the islands."
+config/version="0.2.0"
+run/main_scene="res://scenes/title.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+config/icon="res://icon.svg"
+boot_splash/bg_color=Color(0.043, 0.051, 0.114, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+Options="*res://scripts/autoload/options.gd"
+Data="*res://scripts/autoload/data.gd"
+Sfx="*res://scripts/autoload/sfx.gd"
+Music="*res://scripts/autoload/music.gd"
+Game="*res://scripts/autoload/game.gd"
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/size/window_width_override=1600
+window/size/window_height_override=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/subwindows/embed_subwindows=true
+
+[gui]
+
+common/snap_controls_to_pixels=true
+theme/default_font_antialiasing=1
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=3
+environment/defaults/default_clear_color=Color(0.043, 0.051, 0.114, 1)
+2d/snap/snap_2d_transforms_to_pixel=false

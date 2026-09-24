@@ -1,0 +1,228 @@
+{
+	"tracks": [
+		{
+			"id": "species",
+			"name": "Species discovered",
+			"blurb": "Own a species at least once.",
+			"milestones": [
+				{
+					"at": 5,
+					"reward": {
+						"aether": 150,
+						"items": {
+							"tinkerers-vessel": 5
+						}
+					}
+				},
+				{
+					"at": 10,
+					"reward": {
+						"aether": 400,
+						"gold": 300
+					}
+				},
+				{
+					"at": 25,
+					"reward": {
+						"aether": 1500,
+						"items": {
+							"sturdy-vessel": 5
+						}
+					}
+				},
+				{
+					"at": 40,
+					"reward": {
+						"aether": 5000,
+						"gold": 5000
+					}
+				},
+				{
+					"at": 55,
+					"reward": {
+						"aether": 15000,
+						"items": {
+							"resonant-vessel": 5
+						}
+					}
+				},
+				{
+					"at": "all",
+					"reward": {
+						"aether": 50000,
+						"title": "The Architect"
+					}
+				}
+			]
+		},
+		{
+			"id": "forms",
+			"name": "Forms unlocked",
+			"blurb": "Reach Form 2 or Form 3 on any species.",
+			"milestones": [
+				{
+					"at": 3,
+					"reward": {
+						"aether": 200
+					}
+				},
+				{
+					"at": 10,
+					"reward": {
+						"aether": 800,
+						"gold": 500
+					}
+				},
+				{
+					"at": 25,
+					"reward": {
+						"aether": 3000
+					}
+				},
+				{
+					"at": 60,
+					"reward": {
+						"aether": 12000,
+						"gold": 10000
+					}
+				},
+				{
+					"at": "all",
+					"reward": {
+						"aether": 40000,
+						"title": "Shepherd of Forms"
+					}
+				}
+			]
+		},
+		{
+			"id": "recipes",
+			"name": "Recipes discovered",
+			"blurb": "Hatch a hybrid for the first time. Special recipes are hidden.",
+			"milestones": [
+				{
+					"at": 3,
+					"reward": {
+						"aether": 400,
+						"revealRecipe": 1
+					}
+				},
+				{
+					"at": 10,
+					"reward": {
+						"aether": 2000,
+						"revealRecipe": 1
+					}
+				},
+				{
+					"at": 25,
+					"reward": {
+						"aether": 8000,
+						"revealRecipe": 2
+					}
+				},
+				{
+					"at": "all",
+					"reward": {
+						"aether": 40000,
+						"title": "Grand Geneticist"
+					}
+				}
+			]
+		},
+		{
+			"id": "rarities",
+			"name": "Rarity tiers seen",
+			"blurb": "Own each species at each rarity.",
+			"milestones": [
+				{
+					"at": 10,
+					"reward": {
+						"aether": 300
+					}
+				},
+				{
+					"at": 25,
+					"reward": {
+						"aether": 1000,
+						"items": {
+							"sturdy-vessel": 3
+						}
+					}
+				},
+				{
+					"at": 60,
+					"reward": {
+						"aether": 4000
+					}
+				},
+				{
+					"at": 120,
+					"reward": {
+						"aether": 12000,
+						"gold": 8000
+					}
+				},
+				{
+					"at": 250,
+					"reward": {
+						"aether": 40000
+					}
+				},
+				{
+					"at": "all",
+					"reward": {
+						"aether": 200000,
+						"title": "Keeper of Light"
+					}
+				}
+			]
+		},
+		{
+			"id": "shinies",
+			"name": "Shinies collected",
+			"blurb": "Own a shiny of a species.",
+			"milestones": [
+				{
+					"at": 1,
+					"reward": {
+						"aether": 1000
+					}
+				},
+				{
+					"at": 5,
+					"reward": {
+						"aether": 5000
+					}
+				},
+				{
+					"at": 15,
+					"reward": {
+						"aether": 20000
+					}
+				},
+				{
+					"at": "all",
+					"reward": {
+						"aether": 250000,
+						"title": "Glimmerborn"
+					}
+				}
+			]
+		}
+	],
+	"discovery": {
+		"base": {
+			"aether": 25,
+			"gold": 20
+		},
+		"hybrid": {
+			"aether": 80,
+			"gold": 60
+		},
+		"special": {
+			"aether": 200,
+			"gold": 150
+		}
+	}
+}

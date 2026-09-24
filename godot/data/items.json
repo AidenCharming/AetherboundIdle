@@ -1,0 +1,738 @@
+[
+	{
+		"id": "oak-log",
+		"name": "Oak Log",
+		"tier": 1,
+		"category": "log",
+		"sell": 2,
+		"icon": {
+			"shape": "log",
+			"color": "#b9854f"
+		},
+		"element": "verdant"
+	},
+	{
+		"id": "willow-log",
+		"name": "Willow Log",
+		"tier": 2,
+		"category": "log",
+		"sell": 5,
+		"icon": {
+			"shape": "log",
+			"color": "#9bb863"
+		},
+		"element": "verdant"
+	},
+	{
+		"id": "maple-log",
+		"name": "Maple Log",
+		"tier": 3,
+		"category": "log",
+		"sell": 12,
+		"icon": {
+			"shape": "log",
+			"color": "#d9623b"
+		},
+		"element": "verdant"
+	},
+	{
+		"id": "yew-log",
+		"name": "Yew Log",
+		"tier": 4,
+		"category": "log",
+		"sell": 26,
+		"icon": {
+			"shape": "log",
+			"color": "#8a64b8"
+		},
+		"element": "verdant"
+	},
+	{
+		"id": "starbark-log",
+		"name": "Starbark Log",
+		"tier": 5,
+		"category": "log",
+		"sell": 55,
+		"icon": {
+			"shape": "log",
+			"color": "#4f7de0"
+		},
+		"element": "verdant"
+	},
+	{
+		"id": "seedcache",
+		"name": "Verdant Seedcache",
+		"tier": 3,
+		"category": "rare",
+		"sell": 60,
+		"icon": {
+			"shape": "seed",
+			"color": "#d8a13c"
+		},
+		"desc": "A squirrel-sized hoard of glowing seeds. Worth a fair bit to collectors."
+	},
+	{
+		"id": "mintleaf",
+		"name": "Mintleaf",
+		"tier": 1,
+		"category": "herb",
+		"sell": 2,
+		"icon": {
+			"shape": "leaf",
+			"color": "#57cf8e"
+		}
+	},
+	{
+		"id": "sunpetal",
+		"name": "Sunpetal",
+		"tier": 2,
+		"category": "herb",
+		"sell": 5,
+		"icon": {
+			"shape": "flower",
+			"color": "#f6c945"
+		}
+	},
+	{
+		"id": "glowcap",
+		"name": "Glowcap",
+		"tier": 3,
+		"category": "herb",
+		"sell": 12,
+		"icon": {
+			"shape": "mushroom",
+			"color": "#4fd6d0"
+		}
+	},
+	{
+		"id": "dreamroot",
+		"name": "Dreamroot",
+		"tier": 4,
+		"category": "herb",
+		"sell": 26,
+		"icon": {
+			"shape": "sprout",
+			"color": "#a98cf0"
+		}
+	},
+	{
+		"id": "aetherbloom",
+		"name": "Aetherbloom",
+		"tier": 5,
+		"category": "herb",
+		"sell": 55,
+		"icon": {
+			"shape": "flower",
+			"color": "#d27dff"
+		}
+	},
+	{
+		"id": "lucky-clover",
+		"name": "Lucky Clover",
+		"tier": 3,
+		"category": "rare",
+		"sell": 60,
+		"icon": {
+			"shape": "clover",
+			"color": "#37b85a"
+		},
+		"desc": "Four leaves, one wish. Sells well."
+	},
+	{
+		"id": "copper-ore",
+		"name": "Copper Ore",
+		"tier": 1,
+		"category": "ore",
+		"sell": 3,
+		"icon": {
+			"shape": "ore",
+			"color": "#d27a3c"
+		},
+		"element": "telluric"
+	},
+	{
+		"id": "iron-ore",
+		"name": "Iron Ore",
+		"tier": 2,
+		"category": "ore",
+		"sell": 6,
+		"icon": {
+			"shape": "ore",
+			"color": "#8f98a6"
+		},
+		"element": "telluric"
+	},
+	{
+		"id": "sunstone",
+		"name": "Sunstone",
+		"tier": 3,
+		"category": "ore",
+		"sell": 14,
+		"icon": {
+			"shape": "gem",
+			"color": "#ffab2e"
+		},
+		"element": "telluric"
+	},
+	{
+		"id": "skyquartz",
+		"name": "Skyquartz",
+		"tier": 4,
+		"category": "ore",
+		"sell": 28,
+		"icon": {
+			"shape": "gem",
+			"color": "#62cff5"
+		},
+		"element": "telluric"
+	},
+	{
+		"id": "aetherite",
+		"name": "Aetherite",
+		"tier": 5,
+		"category": "ore",
+		"sell": 58,
+		"icon": {
+			"shape": "gem",
+			"color": "#b98bff"
+		},
+		"element": "telluric"
+	},
+	{
+		"id": "heartgeode",
+		"name": "Heartgeode",
+		"tier": 3,
+		"category": "rare",
+		"sell": 70,
+		"icon": {
+			"shape": "geode",
+			"color": "#ef5fa7"
+		},
+		"desc": "Crack it and it hums. Collectors pay well."
+	},
+	{
+		"id": "minnow",
+		"name": "Minnow",
+		"tier": 1,
+		"category": "fish",
+		"sell": 3,
+		"icon": {
+			"shape": "fish",
+			"color": "#a7c0d0"
+		},
+		"element": "aqueous"
+	},
+	{
+		"id": "sunfish",
+		"name": "Sunfish",
+		"tier": 2,
+		"category": "fish",
+		"sell": 6,
+		"icon": {
+			"shape": "fish",
+			"color": "#f3b43a"
+		},
+		"element": "aqueous"
+	},
+	{
+		"id": "bubblepuff",
+		"name": "Bubblepuff",
+		"tier": 3,
+		"category": "fish",
+		"sell": 14,
+		"icon": {
+			"shape": "puffer",
+			"color": "#eed27e"
+		},
+		"element": "aqueous"
+	},
+	{
+		"id": "lanternfish",
+		"name": "Lanternfish",
+		"tier": 4,
+		"category": "fish",
+		"sell": 28,
+		"icon": {
+			"shape": "fish",
+			"color": "#4fd1c5"
+		},
+		"element": "aqueous"
+	},
+	{
+		"id": "starfin",
+		"name": "Starfin",
+		"tier": 5,
+		"category": "fish",
+		"sell": 58,
+		"icon": {
+			"shape": "fish",
+			"color": "#7c8cff"
+		},
+		"element": "aqueous"
+	},
+	{
+		"id": "moonpearl",
+		"name": "Moonpearl",
+		"tier": 3,
+		"category": "rare",
+		"sell": 70,
+		"icon": {
+			"shape": "pearl",
+			"color": "#e9e2ff"
+		},
+		"desc": "A rare catch that glows faintly at night."
+	},
+	{
+		"id": "sunken-trinket",
+		"name": "Sunken Trinket",
+		"tier": 3,
+		"category": "treasure",
+		"sell": 110,
+		"icon": {
+			"shape": "chest",
+			"color": "#d0a13f"
+		},
+		"desc": "Treasure hauled up from the deep. Sell it for a tidy sum."
+	},
+	{
+		"id": "scrap",
+		"name": "Scrap",
+		"tier": 1,
+		"category": "salvage",
+		"sell": 2,
+		"icon": {
+			"shape": "gear",
+			"color": "#a3acb8"
+		}
+	},
+	{
+		"id": "spring",
+		"name": "Spring",
+		"tier": 2,
+		"category": "salvage",
+		"sell": 5,
+		"icon": {
+			"shape": "spring",
+			"color": "#c9d0da"
+		}
+	},
+	{
+		"id": "glass-lens",
+		"name": "Glass Lens",
+		"tier": 3,
+		"category": "salvage",
+		"sell": 12,
+		"icon": {
+			"shape": "lens",
+			"color": "#9fe6ff"
+		}
+	},
+	{
+		"id": "clockwork-heart",
+		"name": "Clockwork Heart",
+		"tier": 4,
+		"category": "salvage",
+		"sell": 26,
+		"icon": {
+			"shape": "gear",
+			"color": "#e0a84e"
+		}
+	},
+	{
+		"id": "starglass",
+		"name": "Starglass",
+		"tier": 5,
+		"category": "salvage",
+		"sell": 55,
+		"icon": {
+			"shape": "shard",
+			"color": "#cfa6ff"
+		}
+	},
+	{
+		"id": "tinkers-cache",
+		"name": "Tinker's Cache",
+		"tier": 3,
+		"category": "rare",
+		"sell": 65,
+		"icon": {
+			"shape": "chest",
+			"color": "#8e9fb5"
+		},
+		"desc": "Somebody hid this. Now it is yours."
+	},
+	{
+		"id": "copper-bar",
+		"name": "Copper Bar",
+		"tier": 1,
+		"category": "bar",
+		"sell": 10,
+		"icon": {
+			"shape": "ingot",
+			"color": "#d27a3c"
+		},
+		"element": "pyric"
+	},
+	{
+		"id": "iron-bar",
+		"name": "Iron Bar",
+		"tier": 2,
+		"category": "bar",
+		"sell": 22,
+		"icon": {
+			"shape": "ingot",
+			"color": "#9aa4b2"
+		},
+		"element": "pyric"
+	},
+	{
+		"id": "sunsteel-bar",
+		"name": "Sunsteel Bar",
+		"tier": 3,
+		"category": "bar",
+		"sell": 48,
+		"icon": {
+			"shape": "ingot",
+			"color": "#ffb640"
+		},
+		"element": "pyric"
+	},
+	{
+		"id": "skysteel-bar",
+		"name": "Skysteel Bar",
+		"tier": 4,
+		"category": "bar",
+		"sell": 95,
+		"icon": {
+			"shape": "ingot",
+			"color": "#6fd3ff"
+		},
+		"element": "pyric"
+	},
+	{
+		"id": "aether-ingot",
+		"name": "Aether Ingot",
+		"tier": 5,
+		"category": "bar",
+		"sell": 190,
+		"icon": {
+			"shape": "ingot",
+			"color": "#bf93ff"
+		},
+		"element": "pyric"
+	},
+	{
+		"id": "grilled-minnow",
+		"name": "Grilled Minnow",
+		"tier": 1,
+		"category": "meal",
+		"sell": 8,
+		"icon": {
+			"shape": "meal",
+			"color": "#e0a36a"
+		},
+		"heal": 0.12,
+		"desc": "Expedition food. Heals the whole party for 12% of their Health between waves."
+	},
+	{
+		"id": "herb-sunfish",
+		"name": "Herbed Sunfish",
+		"tier": 2,
+		"category": "meal",
+		"sell": 18,
+		"icon": {
+			"shape": "meal",
+			"color": "#f0c24a"
+		},
+		"heal": 0.18,
+		"desc": "Expedition food. Heals the whole party for 18% of their Health between waves."
+	},
+	{
+		"id": "bubble-stew",
+		"name": "Bubblepuff Stew",
+		"tier": 3,
+		"category": "meal",
+		"sell": 40,
+		"icon": {
+			"shape": "meal",
+			"color": "#e9785a"
+		},
+		"heal": 0.25,
+		"desc": "Expedition food. Heals the whole party for 25% of their Health between waves."
+	},
+	{
+		"id": "lantern-roll",
+		"name": "Lantern Roll",
+		"tier": 4,
+		"category": "meal",
+		"sell": 80,
+		"icon": {
+			"shape": "meal",
+			"color": "#52cfc2"
+		},
+		"heal": 0.33,
+		"desc": "Expedition food. Heals the whole party for 33% of their Health between waves."
+	},
+	{
+		"id": "starfin-feast",
+		"name": "Starfin Feast",
+		"tier": 5,
+		"category": "meal",
+		"sell": 160,
+		"icon": {
+			"shape": "meal",
+			"color": "#8f8cff"
+		},
+		"heal": 0.45,
+		"desc": "Expedition food. Heals the whole party for 45% of their Health between waves."
+	},
+	{
+		"id": "copper-coil",
+		"name": "Copper Coil",
+		"tier": 1,
+		"category": "component",
+		"sell": 14,
+		"icon": {
+			"shape": "coil",
+			"color": "#d27a3c"
+		},
+		"element": "voltaic"
+	},
+	{
+		"id": "iron-capacitor",
+		"name": "Iron Capacitor",
+		"tier": 2,
+		"category": "component",
+		"sell": 30,
+		"icon": {
+			"shape": "capacitor",
+			"color": "#9aa4b2"
+		},
+		"element": "voltaic"
+	},
+	{
+		"id": "sun-resonator",
+		"name": "Sun Resonator",
+		"tier": 3,
+		"category": "component",
+		"sell": 64,
+		"icon": {
+			"shape": "chip",
+			"color": "#ffb640"
+		},
+		"element": "voltaic"
+	},
+	{
+		"id": "sky-relay",
+		"name": "Sky Relay",
+		"tier": 4,
+		"category": "component",
+		"sell": 125,
+		"icon": {
+			"shape": "chip",
+			"color": "#6fd3ff"
+		},
+		"element": "voltaic"
+	},
+	{
+		"id": "aether-dynamo",
+		"name": "Aether Dynamo",
+		"tier": 5,
+		"category": "component",
+		"sell": 250,
+		"icon": {
+			"shape": "dynamo",
+			"color": "#bf93ff"
+		},
+		"element": "voltaic"
+	},
+	{
+		"id": "dusk-thread",
+		"name": "Dusk Thread",
+		"tier": 1,
+		"category": "thread",
+		"sell": 15,
+		"icon": {
+			"shape": "spool",
+			"color": "#7a6ad8"
+		},
+		"element": "void"
+	},
+	{
+		"id": "gloam-thread",
+		"name": "Gloam Thread",
+		"tier": 2,
+		"category": "thread",
+		"sell": 35,
+		"icon": {
+			"shape": "spool",
+			"color": "#5f58b8"
+		},
+		"element": "void"
+	},
+	{
+		"id": "star-thread",
+		"name": "Star Thread",
+		"tier": 3,
+		"category": "thread",
+		"sell": 75,
+		"icon": {
+			"shape": "spool",
+			"color": "#9ab0ff"
+		},
+		"element": "void"
+	},
+	{
+		"id": "veil-thread",
+		"name": "Veil Thread",
+		"tier": 4,
+		"category": "thread",
+		"sell": 150,
+		"icon": {
+			"shape": "spool",
+			"color": "#c07cff"
+		},
+		"element": "void"
+	},
+	{
+		"id": "eventide-thread",
+		"name": "Eventide Thread",
+		"tier": 5,
+		"category": "thread",
+		"sell": 300,
+		"icon": {
+			"shape": "spool",
+			"color": "#ff8fcf"
+		},
+		"element": "void"
+	},
+	{
+		"id": "tinkerers-vessel",
+		"name": "Tinker's Vessel",
+		"tier": 1,
+		"category": "vessel",
+		"sell": 5,
+		"icon": {
+			"shape": "vessel",
+			"color": "#c9a36a"
+		},
+		"vessel": {
+			"base": 0.55,
+			"falloff": 0.75
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "sturdy-vessel",
+		"name": "Sturdy Vessel",
+		"tier": 2,
+		"category": "vessel",
+		"sell": 15,
+		"icon": {
+			"shape": "vessel",
+			"color": "#8fa3b8"
+		},
+		"vessel": {
+			"base": 0.7,
+			"falloff": 0.8
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "polished-vessel",
+		"name": "Polished Vessel",
+		"tier": 3,
+		"category": "vessel",
+		"sell": 40,
+		"icon": {
+			"shape": "vessel",
+			"color": "#6fd3ff"
+		},
+		"vessel": {
+			"base": 0.8,
+			"falloff": 0.85
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "resonant-vessel",
+		"name": "Resonant Vessel",
+		"tier": 4,
+		"category": "vessel",
+		"sell": 90,
+		"icon": {
+			"shape": "vessel",
+			"color": "#b98bff"
+		},
+		"vessel": {
+			"base": 0.9,
+			"falloff": 0.9
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "luminescent-vessel",
+		"name": "Luminescent Vessel",
+		"tier": 5,
+		"category": "vessel",
+		"sell": 200,
+		"icon": {
+			"shape": "vessel",
+			"color": "#fff0a0"
+		},
+		"vessel": {
+			"base": 1.0,
+			"falloff": 0.94
+		},
+		"desc": "Binds a defeated wild Aetherling. Consumed on use."
+	},
+	{
+		"id": "timber-frame",
+		"name": "Timber Frame",
+		"tier": 2,
+		"category": "part",
+		"sell": 25,
+		"icon": {
+			"shape": "crate",
+			"color": "#b9854f"
+		},
+		"desc": "Sanctum building part."
+	},
+	{
+		"id": "resonance-frame",
+		"name": "Resonance Frame",
+		"tier": 4,
+		"category": "part",
+		"sell": 120,
+		"icon": {
+			"shape": "frame",
+			"color": "#ffb640"
+		},
+		"desc": "Sanctum building part that hums with stored Aether."
+	},
+	{
+		"id": "aether-lantern",
+		"name": "Aether Lantern",
+		"tier": 5,
+		"category": "part",
+		"sell": 300,
+		"icon": {
+			"shape": "lantern",
+			"color": "#9ff3ff"
+		},
+		"desc": "Top-tier Sanctum building part."
+	},
+	{
+		"id": "aether-crystal",
+		"name": "Aether Crystal",
+		"tier": 3,
+		"category": "rare",
+		"sell": 0,
+		"icon": {
+			"shape": "crystal",
+			"color": "#6ef0ff"
+		},
+		"aether": 60,
+		"desc": "Condensed Aether. Shatter it in the Inventory for 60 Aether."
+	}
+]

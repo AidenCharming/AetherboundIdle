@@ -1,0 +1,1744 @@
+[
+	{
+		"id": "overgrowth",
+		"name": "Overgrowth",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "briar-patch",
+		"name": "Briar Patch",
+		"kind": "signature",
+		"text": "Rare-drop chance within tier.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "lubricated-joints",
+		"name": "Lubricated Joints",
+		"kind": "signature",
+		"text": "Cooldown reduction.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "pollinator",
+		"name": "Pollinator",
+		"kind": "signature",
+		"text": "Rare-drop chance within tier.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "deep-excavator",
+		"name": "Deep Excavator",
+		"kind": "signature",
+		"text": "Rare-drop chance within tier.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "resonant-frequency",
+		"name": "Resonant Frequency",
+		"kind": "signature",
+		"text": "Aura, cooldown reduction for other active miners, strongest aura only.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "other-active-in-skill",
+					"skills": [
+						"mining"
+					]
+				},
+				"aura": {
+					"group": "resonant-frequency",
+					"stacking": "strongest-only"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "rhythmic-tunnels",
+		"name": "Rhythmic Tunnels",
+		"kind": "signature",
+		"text": "Cooldown reduction.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "mineral-diviner",
+		"name": "Mineral Diviner",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "searing-bite",
+		"name": "Searing Bite",
+		"kind": "signature",
+		"text": "Chance to save materials.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "eager-fetcher",
+		"name": "Eager Fetcher",
+		"kind": "signature",
+		"text": "Bonus XP.",
+		"effects": [
+			{
+				"key": "bonus_xp",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "slow-cooker",
+		"name": "Slow Cooker",
+		"kind": "signature",
+		"text": "Chance to save ingredients.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "culinary-flow",
+		"name": "Culinary Flow",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "pure-filter",
+		"name": "Pure Filter",
+		"kind": "signature",
+		"text": "Rare-catch chance within tier.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "wide-net",
+		"name": "Wide Net",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "sea-breeze",
+		"name": "Sea Breeze",
+		"kind": "signature",
+		"text": "Aura, cooldown reduction for active Aqueous creatures, strongest aura only.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "active-creatures",
+					"types": [
+						"aqueous"
+					]
+				},
+				"aura": {
+					"group": "sea-breeze",
+					"stacking": "strongest-only"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "deep-diver",
+		"name": "Deep Diver",
+		"kind": "signature",
+		"text": "Chance at sunken-treasure drops.",
+		"effects": [
+			{
+				"key": "treasure_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "major"
+	},
+	{
+		"id": "static-cling",
+		"name": "Static Cling",
+		"kind": "signature",
+		"text": "Chance to save materials.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "high-voltage",
+		"name": "High Voltage",
+		"kind": "signature",
+		"text": "Cooldown reduction.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "daisy-chain",
+		"name": "Daisy Chain",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "overclocked",
+		"name": "Overclocked",
+		"kind": "signature",
+		"text": "Small stacking cooldown reduction that resets on task completion.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self"
+				},
+				"dynamic": {
+					"kind": "stacking-until-complete",
+					"perStack": 0.02,
+					"maxStacks": 5
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "void-resonance",
+		"name": "Void Resonance",
+		"kind": "signature",
+		"text": "Chance to save Aether materials.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"aether-weaving"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "spatial-pocket",
+		"name": "Spatial Pocket",
+		"kind": "signature",
+		"text": "Chance for extra vessel output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"vessel-crafting"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "silent-weaver",
+		"name": "Silent Weaver",
+		"kind": "signature",
+		"text": "Chance for extra output.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "starlight-infusion",
+		"name": "Starlight Infusion",
+		"kind": "signature",
+		"text": "Increases bind rate of vessels it crafts.",
+		"effects": [
+			{
+				"key": "bind_rate",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"vessel-crafting"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "kindled-sap",
+		"name": "Kindled Sap",
+		"kind": "signature",
+		"text": "Bonus Pyric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting"
+					]
+				},
+				"elementType": "pyric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "verdant-current",
+		"name": "Verdant Current",
+		"kind": "signature",
+		"text": "Bonus Verdant resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				},
+				"elementType": "verdant"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "rooted-vein",
+		"name": "Rooted Vein",
+		"kind": "signature",
+		"text": "Bonus Telluric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"herbalism"
+					]
+				},
+				"elementType": "telluric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "static-leaf",
+		"name": "Static Leaf",
+		"kind": "signature",
+		"text": "Bonus Verdant resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				},
+				"elementType": "verdant"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "silt-filter",
+		"name": "Silt Filter",
+		"kind": "signature",
+		"text": "Bonus Telluric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				},
+				"elementType": "telluric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "tectonic-heat",
+		"name": "Tectonic Heat",
+		"kind": "signature",
+		"text": "Bonus Pyric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				},
+				"elementType": "pyric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "conductive-vein",
+		"name": "Conductive Vein",
+		"kind": "signature",
+		"text": "Bonus Voltaic resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				},
+				"elementType": "voltaic"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "steaming-catch",
+		"name": "Steaming Catch",
+		"kind": "signature",
+		"text": "Bonus Aqueous resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"cooking"
+					]
+				},
+				"elementType": "aqueous"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "thermal-loop",
+		"name": "Thermal Loop",
+		"kind": "signature",
+		"text": "Bonus Voltaic resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"smithing"
+					]
+				},
+				"elementType": "voltaic"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "galvanized-hook",
+		"name": "Galvanized Hook",
+		"kind": "signature",
+		"text": "Bonus Voltaic resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				},
+				"elementType": "voltaic"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "twilight-root",
+		"name": "Twilight Root",
+		"kind": "signature",
+		"text": "Bonus Verdant resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"aether-weaving"
+					]
+				},
+				"elementType": "verdant"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "void-ore",
+		"name": "Void Ore",
+		"kind": "signature",
+		"text": "Bonus Telluric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"vessel-crafting"
+					]
+				},
+				"elementType": "telluric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "dark-ash",
+		"name": "Dark Ash",
+		"kind": "signature",
+		"text": "Bonus Pyric resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"vessel-crafting"
+					]
+				},
+				"elementType": "pyric"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "twilight-tide",
+		"name": "Twilight Tide",
+		"kind": "signature",
+		"text": "Bonus Aqueous resource drop.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"aether-weaving"
+					]
+				},
+				"elementType": "aqueous"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "singularity-glow",
+		"name": "Singularity Glow",
+		"kind": "signature",
+		"text": "Bonus Aether emission while benched.",
+		"effects": [
+			{
+				"key": "bench_aether_emission",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "major"
+	},
+	{
+		"id": "night-owl",
+		"name": "Night Owl",
+		"kind": "pool",
+		"text": "Chance for extra output while offline.",
+		"effects": [
+			{
+				"key": "offline_extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "swift-worker",
+		"name": "Swift Worker",
+		"kind": "pool",
+		"text": "Cooldown reduction for all tasks.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "geneticist",
+		"name": "Geneticist",
+		"kind": "pool",
+		"text": "Small capped bonus to mutation odds during breeding.",
+		"effects": [
+			{
+				"key": "mutation_odds",
+				"scope": {
+					"target": "self"
+				},
+				"valueByStrength": {
+					"minor": 0.005,
+					"moderate": 0.01,
+					"major": 0.02
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 2
+	},
+	{
+		"id": "fertile",
+		"name": "Fertile",
+		"kind": "pool",
+		"text": "Decreases egg hatch time.",
+		"effects": [
+			{
+				"key": "hatch_time_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "resourceful",
+		"name": "Resourceful",
+		"kind": "pool",
+		"text": "Chance to save materials on any task.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "bountiful",
+		"name": "Bountiful",
+		"kind": "pool",
+		"text": "Chance for extra output on any task.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "scholar",
+		"name": "Scholar",
+		"kind": "pool",
+		"text": "Bonus XP from tasks.",
+		"effects": [
+			{
+				"key": "bonus_xp",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "lucky",
+		"name": "Lucky",
+		"kind": "pool",
+		"text": "Rare-drop chance within the current tier.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "glimmer",
+		"name": "Glimmer",
+		"kind": "pool",
+		"text": "Bonus Aether emission while benched.",
+		"effects": [
+			{
+				"key": "bench_aether_emission",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "captivating",
+		"name": "Captivating",
+		"kind": "pool",
+		"text": "Bonus bind/capture rate when in the active party.",
+		"effects": [
+			{
+				"key": "bind_rate",
+				"scope": {
+					"target": "party"
+				}
+			}
+		],
+		"category": "universal-econ",
+		"rollWeight": 10
+	},
+	{
+		"id": "vitality",
+		"name": "Vitality",
+		"kind": "pool",
+		"text": "Bonus Health.",
+		"effects": [
+			{
+				"key": "bonus_health",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 10
+	},
+	{
+		"id": "brawn",
+		"name": "Brawn",
+		"kind": "pool",
+		"text": "Bonus Power.",
+		"effects": [
+			{
+				"key": "bonus_power",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 10
+	},
+	{
+		"id": "stalwart",
+		"name": "Stalwart",
+		"kind": "pool",
+		"text": "Bonus Guard.",
+		"effects": [
+			{
+				"key": "bonus_guard",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 10
+	},
+	{
+		"id": "haste",
+		"name": "Haste",
+		"kind": "pool",
+		"text": "Ability cooldown reduction.",
+		"effects": [
+			{
+				"key": "ability_cooldown_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 10
+	},
+	{
+		"id": "veteran",
+		"name": "Veteran",
+		"kind": "pool",
+		"text": "Bonus combat XP.",
+		"effects": [
+			{
+				"key": "bonus_combat_xp",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 10
+	},
+	{
+		"id": "champion",
+		"name": "Champion",
+		"kind": "pool",
+		"text": "Bonus Power and Guard.",
+		"effects": [
+			{
+				"key": "bonus_power",
+				"scope": {
+					"target": "self"
+				},
+				"valueByStrength": {
+					"minor": 0.03,
+					"moderate": 0.06,
+					"major": 0.12
+				}
+			},
+			{
+				"key": "bonus_guard",
+				"scope": {
+					"target": "self"
+				},
+				"valueByStrength": {
+					"minor": 0.03,
+					"moderate": 0.06,
+					"major": 0.12
+				}
+			}
+		],
+		"category": "universal-combat",
+		"rollWeight": 2
+	},
+	{
+		"id": "green-thumb",
+		"name": "Green Thumb",
+		"kind": "pool",
+		"text": "Chance for extra output on Woodcutting or Herbalism.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting",
+						"herbalism"
+					]
+				}
+			}
+		],
+		"category": "verdant",
+		"rollWeight": 10,
+		"typeAffinity": "verdant"
+	},
+	{
+		"id": "spreading-roots",
+		"name": "Spreading Roots",
+		"kind": "pool",
+		"text": "Cooldown reduction for Woodcutting or Herbalism.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting",
+						"herbalism"
+					]
+				}
+			}
+		],
+		"category": "verdant",
+		"rollWeight": 10,
+		"typeAffinity": "verdant"
+	},
+	{
+		"id": "hard-hat",
+		"name": "Hard Hat",
+		"kind": "pool",
+		"text": "Chance to save materials during Mining.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"category": "telluric",
+		"rollWeight": 10,
+		"typeAffinity": "telluric"
+	},
+	{
+		"id": "prospector",
+		"name": "Prospector",
+		"kind": "pool",
+		"text": "Rare-drop chance within the current tier for Mining.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"category": "telluric",
+		"rollWeight": 10,
+		"typeAffinity": "telluric"
+	},
+	{
+		"id": "forge-tested",
+		"name": "Forge-Tested",
+		"kind": "pool",
+		"text": "Chance to save materials during Smithing or Cooking.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"smithing",
+						"cooking"
+					]
+				}
+			}
+		],
+		"category": "pyric",
+		"rollWeight": 10,
+		"typeAffinity": "pyric"
+	},
+	{
+		"id": "white-hot",
+		"name": "White-Hot",
+		"kind": "pool",
+		"text": "Cooldown reduction for Smithing or Cooking.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"smithing",
+						"cooking"
+					]
+				}
+			}
+		],
+		"category": "pyric",
+		"rollWeight": 10,
+		"typeAffinity": "pyric"
+	},
+	{
+		"id": "steady-stream",
+		"name": "Steady Stream",
+		"kind": "pool",
+		"text": "Chance for extra output during Fishing.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"category": "aqueous",
+		"rollWeight": 10,
+		"typeAffinity": "aqueous"
+	},
+	{
+		"id": "sunken-tide",
+		"name": "Sunken Tide",
+		"kind": "pool",
+		"text": "Chance for sunken-treasure drops while fishing.",
+		"effects": [
+			{
+				"key": "treasure_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"category": "aqueous",
+		"rollWeight": 10,
+		"typeAffinity": "aqueous"
+	},
+	{
+		"id": "grounded",
+		"name": "Grounded",
+		"kind": "pool",
+		"text": "Chance to save materials during Circuitry.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				}
+			}
+		],
+		"category": "voltaic",
+		"rollWeight": 10,
+		"typeAffinity": "voltaic"
+	},
+	{
+		"id": "short-circuit",
+		"name": "Short Circuit",
+		"kind": "pool",
+		"text": "Cooldown reduction for Circuitry.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				}
+			}
+		],
+		"category": "voltaic",
+		"rollWeight": 10,
+		"typeAffinity": "voltaic"
+	},
+	{
+		"id": "aether-drenched",
+		"name": "Aether-Drenched",
+		"kind": "pool",
+		"text": "Increases Aether emission while this creature is benched.",
+		"effects": [
+			{
+				"key": "bench_aether_emission",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "void-only",
+		"rollWeight": 2,
+		"typeAffinity": "void",
+		"minStrength": "moderate"
+	},
+	{
+		"id": "rift-tethered",
+		"name": "Rift-Tethered",
+		"kind": "pool",
+		"text": "Reduces the Aether cost of attunement for this creature.",
+		"effects": [
+			{
+				"key": "attunement_cost_reduction",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"category": "void-only",
+		"rollWeight": 2,
+		"typeAffinity": "void",
+		"minStrength": "moderate"
+	},
+	{
+		"id": "starlight-magnet",
+		"name": "Starlight Magnet",
+		"kind": "pool",
+		"text": "Increases vessel bind rate when this creature is in the active party.",
+		"effects": [
+			{
+				"key": "bind_rate",
+				"scope": {
+					"target": "party"
+				}
+			}
+		],
+		"category": "void-only",
+		"rollWeight": 2,
+		"typeAffinity": "void",
+		"minStrength": "moderate"
+	},
+	{
+		"id": "void-grasp",
+		"name": "Void Grasp",
+		"kind": "pool",
+		"text": "One free vessel bind attempt per zone run.",
+		"effects": [
+			{
+				"key": "free_bind_attempts",
+				"scope": {
+					"target": "party"
+				},
+				"valueByStrength": {
+					"moderate": 1,
+					"major": 2
+				}
+			}
+		],
+		"category": "void-only",
+		"rollWeight": 2,
+		"typeAffinity": "void",
+		"minStrength": "moderate"
+	},
+	{
+		"id": "sure-footing",
+		"name": "Sure Footing",
+		"kind": "signature",
+		"text": "Chance to save materials while working Woodcutting.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "slow-seam",
+		"name": "Slow Seam",
+		"kind": "signature",
+		"text": "Rare-drop chance within the current tier while working Mining.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "bristle-puff",
+		"name": "Bristle Puff",
+		"kind": "signature",
+		"text": "Chance for extra output while working Woodcutting.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "nectar-focus",
+		"name": "Nectar Focus",
+		"kind": "signature",
+		"text": "Bonus XP while working Herbalism.",
+		"effects": [
+			{
+				"key": "bonus_xp",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"herbalism"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "still-water",
+		"name": "Still Water",
+		"kind": "signature",
+		"text": "Chance at sunken-treasure drops while working Fishing.",
+		"effects": [
+			{
+				"key": "treasure_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "slick-coat",
+		"name": "Slick Coat",
+		"kind": "signature",
+		"text": "Bonus Health.",
+		"effects": [
+			{
+				"key": "bonus_health",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "jolt-wing",
+		"name": "Jolt Wing",
+		"kind": "signature",
+		"text": "Bonus Power.",
+		"effects": [
+			{
+				"key": "bonus_power",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "nut-hoard",
+		"name": "Nut Hoard",
+		"kind": "signature",
+		"text": "Bonus Voltaic resource drop while working Woodcutting.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"woodcutting"
+					]
+				},
+				"elementType": "voltaic"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "fast-claws",
+		"name": "Fast Claws",
+		"kind": "signature",
+		"text": "Cooldown reduction while working Mining.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "spined-hide",
+		"name": "Spined Hide",
+		"kind": "signature",
+		"text": "Bonus Guard.",
+		"effects": [
+			{
+				"key": "bonus_guard",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "shell-hoard",
+		"name": "Shell Hoard",
+		"kind": "signature",
+		"text": "Chance at sunken-treasure drops while working Fishing.",
+		"effects": [
+			{
+				"key": "treasure_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "patient-gnaw",
+		"name": "Patient Gnaw",
+		"kind": "signature",
+		"text": "Cooldown reduction while working Mining.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "cave-tuner",
+		"name": "Cave Tuner",
+		"kind": "signature",
+		"text": "Rare-drop chance within the current tier while working Circuitry.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "iron-skull",
+		"name": "Iron Skull",
+		"kind": "signature",
+		"text": "Bonus Guard.",
+		"effects": [
+			{
+				"key": "bonus_guard",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "careful-skimmer",
+		"name": "Careful Skimmer",
+		"kind": "signature",
+		"text": "Chance to save ingredients while working Cooking.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"cooking"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "unbothered",
+		"name": "Unbothered",
+		"kind": "signature",
+		"text": "Bonus Health.",
+		"effects": [
+			{
+				"key": "bonus_health",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "beacon-lure",
+		"name": "Beacon Lure",
+		"kind": "signature",
+		"text": "Chance for extra output while working Circuitry.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "sly-temper",
+		"name": "Sly Temper",
+		"kind": "signature",
+		"text": "Bonus Power.",
+		"effects": [
+			{
+				"key": "bonus_power",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "charged-wake",
+		"name": "Charged Wake",
+		"kind": "signature",
+		"text": "Bonus Aqueous resource drop while working Circuitry.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				},
+				"elementType": "aqueous"
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "sharp-study",
+		"name": "Sharp Study",
+		"kind": "signature",
+		"text": "Bonus XP while working Fishing.",
+		"effects": [
+			{
+				"key": "bonus_xp",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "loose-soil",
+		"name": "Loose Soil",
+		"kind": "signature",
+		"text": "Chance for extra output while working Herbalism.",
+		"effects": [
+			{
+				"key": "extra_output_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"herbalism"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "fading-light",
+		"name": "Fading Light",
+		"kind": "signature",
+		"text": "Increases vessel bind rate while in the expedition party.",
+		"effects": [
+			{
+				"key": "bind_rate",
+				"scope": {
+					"target": "party"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "hidden-seam",
+		"name": "Hidden Seam",
+		"kind": "signature",
+		"text": "Rare-drop chance within the current tier while working Vessel Crafting.",
+		"effects": [
+			{
+				"key": "rare_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"vessel-crafting"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "rolling-plate",
+		"name": "Rolling Plate",
+		"kind": "signature",
+		"text": "Cooldown reduction while working Mining.",
+		"effects": [
+			{
+				"key": "cooldown_reduction",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"mining"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "old-coals",
+		"name": "Old Coals",
+		"kind": "signature",
+		"text": "Bonus Power.",
+		"effects": [
+			{
+				"key": "bonus_power",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "warm-den",
+		"name": "Warm Den",
+		"kind": "signature",
+		"text": "Bonus Health.",
+		"effects": [
+			{
+				"key": "bonus_health",
+				"scope": {
+					"target": "self"
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "drift-net",
+		"name": "Drift Net",
+		"kind": "signature",
+		"text": "Chance at sunken-treasure drops while working Fishing.",
+		"effects": [
+			{
+				"key": "treasure_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"fishing"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "careful-weave",
+		"name": "Careful Weave",
+		"kind": "signature",
+		"text": "Chance to save materials while working Aether-Weaving.",
+		"effects": [
+			{
+				"key": "save_material_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"aether-weaving"
+					]
+				}
+			}
+		],
+		"strength": "moderate"
+	},
+	{
+		"id": "amp-focus",
+		"name": "Amp Focus",
+		"kind": "signature",
+		"text": "Bonus XP while working Circuitry.",
+		"effects": [
+			{
+				"key": "bonus_xp",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"circuitry"
+					]
+				}
+			}
+		],
+		"strength": "minor"
+	},
+	{
+		"id": "spark-loom",
+		"name": "Spark Loom",
+		"kind": "signature",
+		"text": "Bonus Voltaic resource drop while working Aether-Weaving.",
+		"effects": [
+			{
+				"key": "partner_element_drop_chance",
+				"scope": {
+					"target": "self",
+					"skills": [
+						"aether-weaving"
+					]
+				},
+				"elementType": "voltaic"
+			}
+		],
+		"strength": "moderate"
+	}
+]

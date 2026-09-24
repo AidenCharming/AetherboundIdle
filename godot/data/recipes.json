@@ -1,0 +1,261 @@
+{
+	"defaults": {
+		"pyric+verdant": "ashwood",
+		"aqueous+verdant": "brambletide",
+		"telluric+verdant": "sproutfault",
+		"verdant+voltaic": "mosscoil",
+		"aqueous+telluric": "mudskulker",
+		"pyric+telluric": "quakeforge",
+		"telluric+voltaic": "geodegrid",
+		"aqueous+pyric": "cinderbasin",
+		"pyric+voltaic": "embersurge",
+		"aqueous+voltaic": "brinecore",
+		"verdant+void": "eclipseed",
+		"telluric+void": "nullshale",
+		"pyric+void": "gloamforge",
+		"aqueous+void": "hushflow",
+		"void+voltaic": "gridrift"
+	},
+	"special": [
+		{
+			"parents": [
+				"sproutlet",
+				"tuskcub"
+			],
+			"result": "sorrelcliff",
+			"hint": "A sure-footed climber with a reddish coat grazes where the rock crumbles underfoot."
+		},
+		{
+			"parents": [
+				"mossgear",
+				"pebblescoot"
+			],
+			"result": "hazelslate",
+			"hint": "Patience wears a shell of stacked grey plates and waits for the seam to open."
+		},
+		{
+			"parents": [
+				"brambletrundle",
+				"cinderpup"
+			],
+			"result": "brackensear",
+			"hint": "Curl tight, roll fast, and the dry thicket catches before anything else does."
+		},
+		{
+			"parents": [
+				"buzzbud",
+				"roastbelly"
+			],
+			"result": "yarrowflare",
+			"hint": "A small bright flyer sips warmth from blossoms that never quite go out."
+		},
+		{
+			"parents": [
+				"dewdrop",
+				"mossgear"
+			],
+			"result": "sedgestilt",
+			"hint": "Long legs, longer patience, standing still until the water gives something up."
+		},
+		{
+			"parents": [
+				"frothsprite",
+				"sproutlet"
+			],
+			"result": "rowanboulder",
+			"hint": "It naps on the biggest stone in the stream and swims like the current owes it something."
+		},
+		{
+			"parents": [
+				"buzzbud",
+				"coilchirp"
+			],
+			"result": "ivyflux",
+			"hint": "Green wings trail a live current; blink and it has already turned twice."
+		},
+		{
+			"parents": [
+				"brambletrundle",
+				"joulebug"
+			],
+			"result": "burrbolt",
+			"hint": "It hoards prickly seeds that tingle, and leaps before the static settles."
+		},
+		{
+			"parents": [
+				"emberfang",
+				"quakemaw"
+			],
+			"result": "cliffscorch",
+			"hint": "Two heated claws wait under a slab that never quite stops being warm."
+		},
+		{
+			"parents": [
+				"charwhisk",
+				"geodecore"
+			],
+			"result": "nettlemesa",
+			"hint": "Flat, dry, and spiky, it suns itself on the hottest ledge and refuses to move first."
+		},
+		{
+			"parents": [
+				"pebblescoot",
+				"puddlescoop"
+			],
+			"result": "gravelnip",
+			"hint": "A shell of rock that carries its own little pond. Walk sideways and pinch what washes in."
+		},
+		{
+			"parents": [
+				"quakemaw",
+				"splashfin"
+			],
+			"result": "ripplesnap",
+			"hint": "Jaws that shatter rock beside a swimmer built from gears: lie low, then everything snaps."
+		},
+		{
+			"parents": [
+				"coilchirp",
+				"geodecore"
+			],
+			"result": "cairnflit",
+			"hint": "A humming hollow stone hears a copper-wrapped songbird; together they see in the dark."
+		},
+		{
+			"parents": [
+				"tuskcub",
+				"voltfluff"
+			],
+			"result": "flintlamb",
+			"hint": "A stout, quartz-spiked digger and a crackling cloud of fleece: lower your head and climb."
+		},
+		{
+			"parents": [
+				"charwhisk",
+				"frothsprite"
+			],
+			"result": "coralpeep",
+			"hint": "A long-legged kitchen bird wades beside a giggling bubble: rosy, one-legged, proud."
+		},
+		{
+			"parents": [
+				"dewdrop",
+				"roastbelly"
+			],
+			"result": "drizzlenub",
+			"hint": "A sleepy warmth and a bead of clear water: sink in, sit still, and let the whole party unwind."
+		},
+		{
+			"parents": [
+				"emberfang",
+				"joulebug"
+			],
+			"result": "coalgrub",
+			"hint": "A maned little flame and a pocket-sized battery blink together after dark."
+		},
+		{
+			"parents": [
+				"cinderpup",
+				"voltfluff"
+			],
+			"result": "boltkit",
+			"hint": "A hound that pops with light as it trots meets a crackling sheepdog: red, quick, clever."
+		},
+		{
+			"parents": [
+				"dewdrop",
+				"plasmaplug"
+			],
+			"result": "eddyelver",
+			"hint": "A silver-banded water ribbon and a prong-tailed snake share one long body: slip, loop, jolt."
+		},
+		{
+			"parents": [
+				"coilchirp",
+				"splashfin"
+			],
+			"result": "sprayfledge",
+			"hint": "A mechanical swimmer and a copper-wrapped songbird: perch, watch the water, then plunge."
+		},
+		{
+			"parents": [
+				"mossgear",
+				"netherpod"
+			],
+			"result": "murkroot",
+			"hint": "It never sees the surface, but every root it passes ends up healthier."
+		},
+		{
+			"parents": [
+				"buzzbud",
+				"riftsneak"
+			],
+			"result": "duskbloom",
+			"hint": "Quick, quiet, and gone before the last light fully fades from the field."
+		},
+		{
+			"parents": [
+				"pebblescoot",
+				"riftsneak"
+			],
+			"result": "riftshale",
+			"hint": "Dig anywhere near it and the hole goes darker than it should."
+		},
+		{
+			"parents": [
+				"netherpod",
+				"quakemaw"
+			],
+			"result": "nethershale",
+			"hint": "Curl up and it could be mistaken for just another loose rock."
+		},
+		{
+			"parents": [
+				"cinderpup",
+				"eclipsa"
+			],
+			"result": "wraithcoal",
+			"hint": "It circles cold fires, waiting for one more spark to rise."
+		},
+		{
+			"parents": [
+				"riftsneak",
+				"roastbelly"
+			],
+			"result": "duskflare",
+			"hint": "It hunts right at the edge where the warmth of day runs out."
+		},
+		{
+			"parents": [
+				"dewdrop",
+				"netherpod"
+			],
+			"result": "murkmire",
+			"hint": "It looks empty until something brushes past and finds out otherwise."
+		},
+		{
+			"parents": [
+				"frothsprite",
+				"hushflutter"
+			],
+			"result": "hollowstream",
+			"hint": "Easy to miss until the ripples move against the current."
+		},
+		{
+			"parents": [
+				"coilchirp",
+				"riftsneak"
+			],
+			"result": "wraithwire",
+			"hint": "It strikes once, and the air near it hums for a moment after."
+		},
+		{
+			"parents": [
+				"eclipsa",
+				"joulebug"
+			],
+			"result": "duskvolt",
+			"hint": "Touch one thread and the whole thing lights up for a heartbeat."
+		}
+	]
+}
