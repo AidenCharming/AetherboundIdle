@@ -640,11 +640,11 @@ func _summary_tile(tex: Texture2D, value: String, caption: String, col: Color) -
 
 
 ## One item in the summary: icon, amount and name.
-func _summary_item(id: String, qty: float, col: Color, sign := "+") -> PanelContainer:
+func _summary_item(id: String, qty: float, col: Color, prefix := "+") -> PanelContainer:
 	var h := UI.hbox(8)
 	h.add_child(UI.icon(Data.item_icon(id) if Data.items.has(id) else Data.ui_icon(id), 30))
 	var v := UI.vbox(0)
-	v.add_child(UI.label(sign + F.format_num(qty), "Num", col))
+	v.add_child(UI.label(prefix + F.format_num(qty), "Num", col))
 	var nm := UI.label(Data.item_name(id), "Faint")
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nm.custom_minimum_size.x = 80
