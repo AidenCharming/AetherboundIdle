@@ -71,7 +71,7 @@ func test_crafting_consumes_and_stalls() -> void:
 	t.eq(Skills.assign(s, c, "smithing"), "")
 	GameState.add_item(s, "copper-ore", 4)
 	Skills.step(s, 60000.0, _rng())
-	t.eq(GameState.count(s, "copper-bar"), 2.0, "2 bars from 4 ore")
+	t.eq(GameState.count(s, "copper-bar"), 4.0, "two smelts of 2 ore, two bars each")
 	t.eq(GameState.count(s, "copper-ore"), 0.0)
 	t.ok(c.get("stalled", false), "stalled without ore")
 
@@ -222,6 +222,20 @@ func test_migration_keeps_creature_levels_across_a_curve_change() -> void:
 	t.eq(F.level_for_xp(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel), 12, "XP now matches it")
 	Creatures.add_xp(c, 1.0)
 	t.eq(int(c.level), 12, "and the next XP gain does not drop it")
+
+
+func test_migration_keeps_skill_levels_across_a_curve_change() -> void:
+	var s := GameState.new_game()
+	s.skills.mining.level = 40
+	s.skills.mining.xp = 10.0   # far too little for level 40 on the current curve
+	s.skills.woodcutting.level = 5
+	s.skills.woodcutting.xp = 1e9   # far too much for level 5
+	GameState.migrate(s)
+	var mx: int = Data.tuning.skills.maxLevel
+	t.eq(int(s.skills.mining.level), 40, "level kept")
+	t.eq(F.level_for_xp(F.skill_curve(), float(s.skills.mining.xp), mx), 40, "XP now matches it")
+	t.eq(int(s.skills.woodcutting.level), 5, "a level is not raised either")
+	t.eq(F.level_for_xp(F.skill_curve(), float(s.skills.woodcutting.xp), mx), 5)
 
 
 func test_work_rates_rank_speed_output_and_secondary_finds() -> void:

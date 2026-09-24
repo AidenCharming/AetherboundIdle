@@ -32,5 +32,5 @@ func _time_to(levels: Array) -> Dictionary:
 func test_lone_starter_landmarks() -> void:
 	var m := _time_to([2, 10, 30])
 	t.ok(m.get(2, 1e9) <= 30.0, "first level-up in %ss" % m.get(2))
-	t.ok(m.get(10, 1e9) >= 20 * 60.0 and m.get(10, 1e9) <= 50 * 60.0, "level 10 at %s" % F.format_seconds(m.get(10, 0)))
+	t.ok(m.get(10, 1e9) >= 10 * 60.0 and m.get(10, 1e9) <= 40 * 60.0, "level 10 at %s" % F.format_seconds(m.get(10, 0)))
 	t.ok(m.get(30, 1e9) >= 10 * 3600.0 and m.get(30, 1e9) <= 26 * 3600.0, "level 30 at %s" % F.format_seconds(m.get(30, 0)))

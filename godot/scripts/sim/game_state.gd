@@ -3,7 +3,7 @@ extends RefCounted
 ## The shape of a save, new-game setup, inventory helpers and save migration.
 ## The whole game is one Dictionary so it serialises straight to JSON.
 
-const SAVE_VERSION := 2  # 2: creature XP curve changed (levels kept, see migrate)
+const SAVE_VERSION := 3  # 2: creature XP curve changed; 3: skill and creature curves retuned (levels kept, see migrate)
 
 
 static func new_game(seed_value: int = 0) -> Dictionary:
@@ -155,11 +155,18 @@ static func slot_count(s: Dictionary, skill_id: String) -> int:
 static func migrate(s: Dictionary) -> Dictionary:
 	var fresh := new_game()
 	_fill_missing(s, fresh, ["creatures", "items", "skills", "pods", "upgrades", "species", "zones", "claimed", "seen"])
+	var skill_max: int = Data.tuning.skills.maxLevel
 	for skill in Data.skill_list:
 		if not s.skills.has(skill.id):
 			s.skills[skill.id] = fresh.skills[skill.id]
-		elif not Data.actions[skill.id].has(s.skills[skill.id].action):
-			s.skills[skill.id].action = skill.actions[0].id
+			continue
+		var st: Dictionary = s.skills[skill.id]
+		if not Data.actions[skill.id].has(st.action):
+			st.action = skill.actions[0].id
+		# as with creatures below: the saved level is kept across a change to the skill XP curve
+		st.level = clampi(int(st.get("level", 1)), 1, skill_max)
+		if F.level_for_xp(F.skill_curve(), float(st.get("xp", 0.0)), skill_max) != int(st.level):
+			st.xp = F.xp_for_level(F.skill_curve(), int(st.level), skill_max)
 	for id in s.creatures.keys():
 		var c: Dictionary = s.creatures[id]
 		if not Data.species.has(c.get("species", "")):

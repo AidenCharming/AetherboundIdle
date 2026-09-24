@@ -656,7 +656,7 @@
 		"name": "Copper Bar",
 		"tier": 1,
 		"category": "bar",
-		"sell": 10,
+		"sell": 5,
 		"icon": {
 			"shape": "ingot",
 			"color": "#d27a3c"
@@ -668,7 +668,7 @@
 		"name": "Iron Bar",
 		"tier": 2,
 		"category": "bar",
-		"sell": 22,
+		"sell": 9,
 		"icon": {
 			"shape": "ingot",
 			"color": "#9aa4b2"
@@ -680,7 +680,7 @@
 		"name": "Sunsteel Bar",
 		"tier": 3,
 		"category": "bar",
-		"sell": 48,
+		"sell": 14,
 		"icon": {
 			"shape": "ingot",
 			"color": "#ffb640"
@@ -692,7 +692,7 @@
 		"name": "Tidesilver Bar",
 		"tier": 4,
 		"category": "bar",
-		"sell": 44,
+		"sell": 22,
 		"icon": {
 			"shape": "ingot",
 			"color": "#d6e2ea"
@@ -704,7 +704,7 @@
 		"name": "Skysteel Bar",
 		"tier": 5,
 		"category": "bar",
-		"sell": 95,
+		"sell": 33,
 		"icon": {
 			"shape": "ingot",
 			"color": "#6fd3ff"
@@ -716,7 +716,7 @@
 		"name": "Nullsteel Bar",
 		"tier": 6,
 		"category": "bar",
-		"sell": 96,
+		"sell": 48,
 		"icon": {
 			"shape": "ingot",
 			"color": "#6a5a9a"
@@ -728,7 +728,7 @@
 		"name": "Aether Ingot",
 		"tier": 7,
 		"category": "bar",
-		"sell": 190,
+		"sell": 67,
 		"icon": {
 			"shape": "ingot",
 			"color": "#bf93ff"
@@ -740,7 +740,7 @@
 		"name": "Magmasteel Bar",
 		"tier": 8,
 		"category": "bar",
-		"sell": 182,
+		"sell": 91,
 		"icon": {
 			"shape": "ingot",
 			"color": "#ff7a3a"
@@ -752,7 +752,7 @@
 		"name": "Stormsteel Bar",
 		"tier": 9,
 		"category": "bar",
-		"sell": 247,
+		"sell": 124,
 		"icon": {
 			"shape": "ingot",
 			"color": "#f0dc5a"
@@ -764,7 +764,7 @@
 		"name": "Celestine Ingot",
 		"tier": 10,
 		"category": "bar",
-		"sell": 331,
+		"sell": 166,
 		"icon": {
 			"shape": "ingot",
 			"color": "#d8ecff"
@@ -901,7 +901,7 @@
 		"name": "Copper Coil",
 		"tier": 1,
 		"category": "component",
-		"sell": 17,
+		"sell": 10,
 		"icon": {
 			"shape": "coil",
 			"color": "#d27a3c"
@@ -913,7 +913,7 @@
 		"name": "Iron Capacitor",
 		"tier": 2,
 		"category": "component",
-		"sell": 37,
+		"sell": 19,
 		"icon": {
 			"shape": "capacitor",
 			"color": "#9aa4b2"
@@ -925,7 +925,7 @@
 		"name": "Sun Resonator",
 		"tier": 3,
 		"category": "component",
-		"sell": 77,
+		"sell": 30,
 		"icon": {
 			"shape": "chip",
 			"color": "#ffb640"
@@ -937,7 +937,7 @@
 		"name": "Tidesilver Wiring",
 		"tier": 4,
 		"category": "component",
-		"sell": 77,
+		"sell": 47,
 		"icon": {
 			"shape": "coil",
 			"color": "#d6e2ea"
@@ -949,7 +949,7 @@
 		"name": "Sky Relay",
 		"tier": 5,
 		"category": "component",
-		"sell": 156,
+		"sell": 69,
 		"icon": {
 			"shape": "chip",
 			"color": "#6fd3ff"
@@ -961,7 +961,7 @@
 		"name": "Null Conduit",
 		"tier": 6,
 		"category": "component",
-		"sell": 167,
+		"sell": 100,
 		"icon": {
 			"shape": "capacitor",
 			"color": "#6a5a9a"
@@ -973,7 +973,7 @@
 		"name": "Aether Dynamo",
 		"tier": 7,
 		"category": "component",
-		"sell": 311,
+		"sell": 139,
 		"icon": {
 			"shape": "dynamo",
 			"color": "#bf93ff"
@@ -985,7 +985,7 @@
 		"name": "Magmasteel Turbine",
 		"tier": 8,
 		"category": "component",
-		"sell": 317,
+		"sell": 189,
 		"icon": {
 			"shape": "dynamo",
 			"color": "#ff7a3a"
@@ -997,7 +997,7 @@
 		"name": "Tempest Capacitor",
 		"tier": 9,
 		"category": "component",
-		"sell": 430,
+		"sell": 258,
 		"icon": {
 			"shape": "capacitor",
 			"color": "#f0dc5a"
@@ -1009,7 +1009,7 @@
 		"name": "Zenith Engine",
 		"tier": 10,
 		"category": "component",
-		"sell": 576,
+		"sell": 345,
 		"icon": {
 			"shape": "dynamo",
 			"color": "#e8f4ff"

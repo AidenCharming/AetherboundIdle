@@ -34,7 +34,7 @@ The `export/` folder is git-ignored.
 | `assets/creatures/` | Creature sprites, `<species id>-f<form>.png`, 512×512 transparent PNG |
 | `assets/icons/` | Generated item and interface icons (`tools/make_icons.py`) |
 | `assets/shaders/` | Sky, creature (shiny palettes, silhouettes), hybrid placeholder, egg, light rays |
-| `tests/` | Headless tests, a screenshot tour and a balance probe |
+| `tests/` | Headless tests, a screenshot tour, a balance probe and a one-month pacing probe (`month_probe.tscn`) |
 
 Saves are in three slots under Godot's user folder (on Windows
 `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`). The game keeps working while closed, up to 12 hours
@@ -59,6 +59,14 @@ Balance probe (prints how far sample parties get on each island):
 
 ```
 godot --headless --path godot res://tests/balance_probe.tscn
+```
+
+Month probe (a dedicated player's first month through the real sim: the day each skill reaches 10/30/50/70/
+90/99 and each island is first cleared; about 40 s; `--calibrate` and `--rates` are the tuning modes
+described in docs/DECISIONS.md under Pacing):
+
+```
+godot --headless --path godot res://tests/month_probe.tscn -- --days=35
 ```
 
 ## Adding art

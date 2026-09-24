@@ -36,8 +36,8 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
   `%APPDATA%\Godot\app_userdata\Aetherbound Idle\`. The pause menu can copy a save to the clipboard and
   restore one from pasted text.
-- **Tests:** `tests/test_*.gd`, 74 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
-  renders every screen and dialog to PNG (for visual checks), and `tests/balance_probe.tscn`, which prints
+- **Tests:** `tests/test_*.gd`, 76 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+  renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
   icon, ~130 MB) and a Linux one. Both were exported and the Linux build was booted to confirm the
@@ -282,22 +282,47 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     - Gravelgrit → Abyssburrow, and Sunflare → Gloamfang.
 
 ### Pacing
-- **Creature XP curve** (designer feedback: one cleared Fractured Quarry run gave ten levels): now
-  `6 × level^2.9` XP per level (was `40 × 1.13^(level − 1)`, which was cheap early and exploded after 60).
-  Measured with `tests/balance_probe.tscn`, a party fighting at its own level takes about 3–5 minutes per
-  level early on, 10–20 in the middle islands and 30–45 at the top: roughly 30 hours of expedition time to
-  level 100, with offline time counting. One run at your level is now a fraction of a level
-  (`test_one_run_is_a_fraction_of_a_level`). Saves keep every creature's level: migration resets XP to the
-  start of the saved level when the curve no longer matches it.
-- **Skill max level 99** (reference 250) with a new XP curve, `10 × level² × 1.06^(level-1)`, found by
-  modelling a team that grows as slots open against targets: first level in seconds, level 10 in about
-  half an hour, 30 in about 8 hours, 50 in about 2 days, 99 in about two months for a full team.
-  `tests/test_pacing.gd` guards the lone-starter landmarks.
+- **One month to finish** (designer's request, replacing the earlier two-month target). This is for a
+  dedicated player: every work slot filled, checking in through the day, with offline time counting.
+  - **The target:** every skill at 99 and Zenith Spire cleared by a party in the 90s at about day 30, with
+    both tracks moving together. The target curve is level 10 in an hour, 30 in half a day, 50 by day 3–4,
+    70 by day 9–10, and 90 by day 20–22.
+  - **How it's checked:** `tests/month_probe.tscn` (a dev tool, about 40 s) runs that player through the
+    real sim. It fills every slot with a specialist and keeps each supply chain fed, so a skill makes
+    whatever a later skill is short of. It breeds workers up to one rarity below what the materials allow,
+    and levels a party on the hardest island it can clear, with XP from real battles. `--calibrate` finds
+    each island's strength for a target party, and `--rates` measures party XP along the target timeline
+    for curve fitting.
+  - **Result:** every skill reaches 99 between day 28.5 and day 33. Islands are first cleared on days
+    1, 1, 1, 2, 3, 5, 5, 7, 11 and about 24, with the party at level 98–100 by day 30.
+- **Skill XP curve** `1.0 × level³ × 1.028^(level−1)`, and **creature XP curve** `8.45 × level^3.3 × 1.014^(level−1)`.
+  Both were fitted to the target timeline from the probe's measured XP rates.
+  - **Skills:** the old skill curve (`10 × level² × 1.06^(level−1)`) was quick in the middle and slow at the
+    end.
+  - **Creatures:** the old creature curve (`6 × level^2.9`) got a party to level 100 in about a day and a
+    half of fighting.
+  - **Saves** keep every skill's and creature's level (`SAVE_VERSION` 3): migration resets XP to the start of
+    the saved level whenever a curve no longer matches it.
+  - **Tests:** `tests/test_pacing.gd` guards the lone-starter landmarks (level 10 in about 20 minutes, 30 in
+    about 21 hours).
+- **Crafting reshaped so the supply chains can keep up.**
+  - **Crafting actions** take twice as long and give twice the XP, and a smelt yields 2 bars. Before, one
+    Smithing team had to feed Circuitry, Vessel Crafting and Fabrication, and every bar also cost two ore.
+  - **Aether-Weaving** threads cost 1–12 Aether, down from 15–5,000; the old costs starved Weaving for the
+    whole game.
+  - **Per-skill XP** is scaled so all eleven finish together. Cooking's actions give a little less. Vessel
+    Crafting and Fabrication give more, because their top recipes (at 55 and 70) carry them to 99.
+- **Late islands are harder** (Null Horizon ×1.15, Verdigris Canopy ×1.16, Magmaglass Rift ×1.52, Stormsea
+  Expanse ×1.68 and Zenith Spire ×2.2 on wild enemies and boss).
+  - **Why:** rarity outgrew them, and a Brilliant party at level 70 cleared Zenith Spire.
+  - **Now:** each late island wants the rarity its material tier can breed, around the day that tier opens,
+    at the top of its level band. The first five islands are unchanged; they gate by level and were tuned for
+    a lone starter.
 - **Ten material tiers, one per island** (designer's request; names approved by the designer), unlocking at
   skill levels 1/10/20/.../90:
   - **Which skills:** the five gathering skills, and Smithing, Cooking, Circuitry and Aether-Weaving.
-  - **Recipes:** bars take ore ×2 plus a log a tier down, meals take a fish plus a herb a tier down,
-    components take a bar plus salvage, and threads take Aether plus a herb.
+  - **Recipes:** a smelt of ore ×2 plus a log a tier down gives two bars; meals take a fish plus a herb a
+    tier down; components take a bar plus salvage; and threads take a little Aether plus a herb.
   - **Islands:** island *n* drops tier-*n* materials, and its boss drops a stack of them plus that tier's bars.
   - **Unchanged:** Vessel Crafting and Fabrication keep their products (the vessel ladder and the Sanctum
     parts).
@@ -307,7 +332,7 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     also count the Aether they cost.
   - **Icons:** placeholder icons come from `tools/make_icons.py`. The FLUX prompts are in
     `docs/art-prompts-icons.md`.
-- **Creature max level 60, forms at 20 and 40** (reference 99, 30 and 60), so evolutions (with their
+- **Creature max level 100, forms at 20 and 40** (reference 99, 30 and 60), so evolutions (with their
   reveal) happen in the first sessions. **Working creatures earn half the skill XP they produce**; the
   reference only gave combat XP, so a creature that never fought never evolved.
 - **Rarity stat multipliers softened** to 1.0 → 6.8 (reference 1 → 24), so a high-level Dim is still
@@ -339,7 +364,7 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
     Dim + Dim gave Faint 36% and Dim + Faint was exactly the same as Dim + Dim. Designer feedback: too
     generous for two Dims, and a rarer parent must help.
 - **Materials:** 5 per parent of that parent's element at the chosen tier (logs, ores, bars, fish,
-  components, threads) plus Aether 100 → 130,000. The reference's special Void-offspring rule is
+  components, threads) plus Aether 100 → 64,000. The reference's special Void-offspring rule is
   simplified: Void just needs threads.
 - **Hybrid parents breed true** (a hybrid × anything gives one of the two parents' species), same-type
   pairs give one of the two parents, and the reference's rare "sibling species" is not built (no content).

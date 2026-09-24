@@ -20,9 +20,9 @@
 		"other": 0.9,
 		"statPerLevel": 0.06,
 		"xpCurve": {
-			"base": 6,
-			"growth": 1.0,
-			"power": 2.9
+			"base": 8.45,
+			"growth": 1.014,
+			"power": 3.3
 		},
 		"workXpShare": 0.5,
 		"maxPoolTraits": 3
@@ -30,9 +30,9 @@
 	"skills": {
 		"maxLevel": 99,
 		"xpCurve": {
-			"base": 10,
-			"growth": 1.06,
-			"power": 2.0
+			"base": 1.0,
+			"growth": 1.028,
+			"power": 3.0
 		},
 		"slotLevels": [
 			1,
@@ -108,15 +108,15 @@
 	"breeding": {
 		"aetherCost": [
 			100,
-			250,
-			600,
-			1400,
-			3200,
-			7000,
-			15000,
+			200,
+			450,
+			1000,
+			2000,
+			4000,
+			8000,
+			16000,
 			32000,
-			65000,
-			130000
+			64000
 		],
 		"materialQty": 5,
 		"ceilingByTier": [
