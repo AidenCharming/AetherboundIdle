@@ -92,8 +92,9 @@ func _entry(sp: Dictionary) -> Control:
 	v.offset_top = 8
 	v.offset_bottom = -8
 	card.add_child(v)
-	var num := UI.label("#%03d" % (Data.species_list.find(sp) + 1), "Faint")
-	v.add_child(num)
+	# the dex number as a chip: the species' type colour once owned, grey until then
+	var num_col := Data.type_color(sp.types[0]) if owned else (Palette.TEXT_DIM if seen else Palette.TEXT_FAINT)
+	v.add_child(UI.chip("#%03d" % (Data.species_list.find(sp) + 1), num_col))
 	var best_form := 1
 	for f in entry.get("forms", []):
 		best_form = maxi(best_form, int(f))

@@ -405,7 +405,7 @@ func _dev_modal() -> void:
 	var v := UI.vbox(12)
 	v.add_child(UI.wrap_label("Testing shortcuts. Anything done here counts like normal play in this save slot.", "Faint", 560))
 	# grant a creature
-	var row := UI.hbox(8)
+	var row := UI.flow(8, 8)
 	var sp := OptionButton.new()
 	for i in Data.species_list.size():
 		sp.add_item(Data.species_list[i].name, i)
@@ -418,8 +418,17 @@ func _dev_modal() -> void:
 	lvl.value = 1
 	var shiny := CheckButton.new()
 	shiny.text = "Shiny"
+	# form comes from level: picking a form sets the level to where that form starts, and typing a level
+	# shows the form it gives
+	var form_levels: Array = Data.tuning.creature.formLevels
+	var form := OptionButton.new()
+	for i in form_levels.size():
+		form.add_item("Form %d" % (i + 1), i)
+	form.item_selected.connect(func(i): lvl.value = int(form_levels[i]))
+	lvl.value_changed.connect(func(new_level): form.selected = F.form_for_level(int(new_level)) - 1)
 	row.add_child(sp)
 	row.add_child(rar)
+	row.add_child(form)
 	row.add_child(UI.label("Lv", "Faint"))
 	row.add_child(lvl)
 	row.add_child(shiny)
