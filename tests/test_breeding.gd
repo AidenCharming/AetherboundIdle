@@ -295,3 +295,13 @@ func test_aether_pearl_upgrades_and_sources() -> void:
 	Economy.release(s, sh)
 	t.eq(int(GameState.count(s, "aether-pearl") - p0), int(pt.shinyRelease), "a shiny leaves pearls")
 	t.ok(Data.zones["zenith-spire"].bossLoot.get("pearlChance", 0.0) > 0.0, "Zenith Spire's boss can drop a pearl")
+
+
+## Play-test feedback: speeding an egg up was nearly free (6 Aether to skip a tier-1 egg that cost 100 to
+## lay). Skipping a whole hatch now costs about what laying the egg did, at every tier.
+func test_speeding_up_a_whole_hatch_costs_about_the_egg() -> void:
+	var br: Dictionary = Data.tuning.breeding
+	for i in br.aetherCost.size():
+		var full := float(br.hatchMinutes[i]) * float(br.speedUpAetherPerMinute[i])
+		var ratio := full / float(br.aetherCost[i])
+		t.ok(ratio > 0.8 and ratio < 1.5, "tier %d: skipping costs %d, the egg %d" % [i + 1, full, int(br.aetherCost[i])])

@@ -149,16 +149,16 @@
 			360
 		],
 		"speedUpAetherPerMinute": [
-			3,
-			4,
-			6,
-			9,
-			13,
-			18,
-			25,
-			35,
 			50,
-			70
+			40,
+			45,
+			50,
+			60,
+			70,
+			90,
+			110,
+			135,
+			180
 		],
 		"inheritChance": 0.4,
 		"traitStrengthUpChance": 0.15,
