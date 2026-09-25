@@ -68,7 +68,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 166 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 167 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
@@ -372,7 +372,8 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
 - **Nicknames, locking, releasing for Aether, and bulk release** in the Nexus (the reference's roster
   tool): releases resting, unlocked, non-shiny Aetherlings up to a chosen rarity, and always keeps the
   best of each species.
-- **Developer tools** (off by default): grant any species at any rarity, level and shiny; add Aether,
+- **Developer tools** (off by default; a release build shows the switch only after clicking the version chip in
+  Patch Notes 7 times): grant any species at any rarity, level and shiny; add Aether,
   gold or items; fast-forward; finish eggs; set skill levels. For testing art, shinies and balance.
 - **Keyboard shortcuts:** 1–7 for the main screens, Esc for the menu.
 - **Void first-clear reward:** beating The Aetherial Apex the first time brings a Void Aetherling home

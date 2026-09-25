@@ -1169,3 +1169,24 @@ func test_nexus_refresh_keeps_unchanged_cards() -> void:
 	t.ok(not (after[5] in before), "the renamed one is built again")
 	main.free()
 	_teardown()
+
+
+## Designer's pick (review 3 #10): in a release build the Developer tools switch is hidden until the version in
+## Patch Notes is clicked Options.DEV_UNLOCK_CLICKS times; a debug build always has it.
+func test_dev_tools_hidden_in_release_until_unlocked() -> void:
+	var was: bool = Options.values.dev_unlocked
+	Options.values.dev_unlocked = false
+	t.ok(Options.dev_tools_allowed(true), "a debug build always has them")
+	t.ok(not Options.dev_tools_allowed(false), "a release build hides them")
+	var chip := PatchNotes._version_chip()
+	var click := InputEventMouseButton.new()
+	click.button_index = MOUSE_BUTTON_LEFT
+	click.pressed = true
+	for i in Options.DEV_UNLOCK_CLICKS - 1:
+		chip.gui_input.emit(click)
+	t.ok(not Options.dev_tools_allowed(false), "not yet, one click short")
+	chip.gui_input.emit(click)
+	t.ok(Options.dev_tools_allowed(false), "unlocked by the last click")
+	t.ok("unlocked" in (chip.get_child(0) as Label).text, "the chip says so")
+	chip.free()
+	Options.values.dev_unlocked = was

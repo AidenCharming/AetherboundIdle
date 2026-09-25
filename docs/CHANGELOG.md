@@ -25,8 +25,11 @@ Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` h
   - #8 / HANDOFF small text: first run picks the largest window that fits the screen (≤ 1920×1080) and the
     1.15 interface scale when it's smaller. `power_rating` weights moved to `tuning.creature.powerRating`.
   - #9 stale 1600×900 text; #10 `Sfx.sound_names()` and preview buttons that play with their group off.
-  - Still deferred to the designer: #10–#12 of the first review (dev tools in release builds,
-    `.claude/settings.json`, `levelTimes` on the wall clock).
+  - The first review's deferred #10–#12, decided by the designer: developer tools in a release build are
+    hidden until the version chip in Patch Notes is clicked 7 times (`Options.dev_tools_allowed`, a debug
+    build always has them); the blanket permissions moved from the committed `.claude/settings.json` to the
+    untracked `.claude/settings.local.json` (gitignored); `levelTimes` stays as is, and an achievements page
+    that could use it is on the HANDOFF to-do list.
 - **Nexus refresh (HANDOFF performance):** 109 ms → 12 ms a `Game.changed` with 600 Aetherlings. Cards carry
   their look (`CreatureCard.look`); unchanged ones stay in the grid and are only moved into sorted order.
   (Re-adding them to the tree was itself 50 ms, so they are never removed.)

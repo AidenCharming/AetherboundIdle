@@ -32,6 +32,7 @@ var values := {
 	"screen_shake": true,
 	"toasts": true,
 	"dev_tools": false,
+	"dev_unlocked": false,   # a release build shows the Developer tools switch only after the hidden unlock
 	"exp_zones_open": true,   # Expeditions page: the island list is shown (or folded to a strip)
 	"exp_log_open": true,     # Expeditions page: the log column is shown (or folded to a strip)
 	"keybinds": {},           # tab -> keycode, only where the player changed it (0 = no key); see keybind()
@@ -169,6 +170,15 @@ func flush() -> void:
 ## First run: the largest window that fits the screen with room to spare (1920x1080 at most, the layout's own
 ## size), and larger text when that window is smaller, since the 1920x1080 layout shrinks with it (to 83% at
 ## 1600x900, the usual pick on a 1080p screen, and 67% at 1280x720).
+## Developer tools (the pause-menu page, the Options switch): always in a debug build; in a release build only
+## after the hidden unlock (click the version in Patch Notes DEV_UNLOCK_CLICKS times; review 3, designer's pick).
+const DEV_UNLOCK_CLICKS := 7
+
+
+func dev_tools_allowed(debug := OS.is_debug_build()) -> bool:
+	return debug or bool(values.dev_unlocked)
+
+
 func first_run_defaults(screen: Vector2i) -> Dictionary:
 	var res := 0
 	for i in RESOLUTIONS.size():

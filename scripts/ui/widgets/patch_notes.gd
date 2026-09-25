@@ -25,6 +25,22 @@ var _chips: Dictionary = {}   # kind key ("" = all) -> Button
 var _kind := ""
 
 
+## The version chip. Clicking it Options.DEV_UNLOCK_CLICKS times unlocks the Developer tools switch in a
+## release build (Options > Gameplay); nothing hints at it.
+static func _version_chip() -> Control:
+	var chip := UI.chip("v%s" % ProjectSettings.get_setting("application/config/version"), Palette.AETHER, 16)
+	chip.mouse_filter = Control.MOUSE_FILTER_STOP
+	var clicks := {"n": 0}
+	chip.gui_input.connect(func(e: InputEvent):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT and not Options.get_value("dev_unlocked"):
+			clicks.n += 1
+			if clicks.n >= Options.DEV_UNLOCK_CLICKS:
+				Options.set_value("dev_unlocked", true)
+				var l: Label = chip.get_child(0)
+				l.text += " · developer tools unlocked (Options > Gameplay)")
+	return chip
+
+
 func _init() -> void:
 	theme_type_variation = "Glass"
 	var v := UI.vbox(14)
@@ -33,7 +49,7 @@ func _init() -> void:
 	head.add_child(UI.icon(Data.ui_icon("upgrade"), 34))
 	head.add_child(UI.label("Patch Notes", "H2"))
 	head.add_child(UI.spacer())
-	head.add_child(UI.chip("v%s" % ProjectSettings.get_setting("application/config/version"), Palette.AETHER, 16))
+	head.add_child(_version_chip())
 	v.add_child(head)
 	var chips := UI.hbox(8)
 	chips.add_child(_chip("", "All", Palette.TEXT_DIM))

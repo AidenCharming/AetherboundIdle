@@ -529,7 +529,7 @@ func open_pause_menu() -> void:
 		Game.save_game()
 		Game.info("Saved to slot %d" % Game.slot, Data.ui_icon("xp")))
 	add.call("Back up or restore this save", "", _backup_modal)
-	if Options.get_value("dev_tools"):
+	if Options.get_value("dev_tools") and Options.dev_tools_allowed():
 		add.call("Developer tools", "", _dev_modal)
 	add.call("Save and return to title", "", func(): _leave(false))
 	if OS.get_name() != "Web":

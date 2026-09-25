@@ -70,7 +70,8 @@ func _rebuild() -> void:
 			_toggle("Show damage numbers in battles", "damage_numbers")
 			_toggle("Screen shake on big moments", "screen_shake")
 			_toggle("Toast notifications", "toasts")
-			_toggle("Developer tools in the pause menu (for testing)", "dev_tools")
+			if Options.dev_tools_allowed():
+				_toggle("Developer tools in the pause menu (for testing)", "dev_tools")
 		"controls":
 			_controls_page()
 

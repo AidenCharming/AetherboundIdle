@@ -6,7 +6,7 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 
 ## Where things stand (2026-09-25, v0.6.3a)
 
-- Current version **0.6.3a**. All 166 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.6.3a**. All 167 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - The designer is painting in `D:\AI`: every prompt is written, and Form 3 and hybrid sprites are being generated
   and reviewed there. Leave the art files alone (see the art rules below).
@@ -26,9 +26,10 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
      breeding `mutationPlusOne` / `ceilingByTier`, trait strength odds, Mossgear's lean.
    - The last benchmark's party (three at Lv 10) failed Smoldering Caldera (Lv 15–25) for 4 minutes.
    - Measure with `tests/balance_probe.tscn`, `month_probe --split` and the month probe.
-2. **Sharpness:** 512 px icons instead of 256 (`icon_runner.py finish --size`, sources in `D:\AI`), after the
-   current art run. Font hinting none vs light made no difference at 1080p. The designer dislikes icons that look
-   different sizes anywhere.
+2. **Achievements page (designer asked for it on the to-do list, 2026-09-25; plan it with the designer before
+   building, it's a new system).** Each skill already records the real time it reached each level
+   (`skills.<id>.levelTimes`); levels gained offline all get the same "now" stamp, which would need spreading
+   across the time away if a page shows them. `docs/cosmetics.md` has milestone-style rewards to build on.
 3. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
    rebuilding everything on each `Game.changed` at 600: the Aether-Log (~40 ms), Expeditions and skill pages
    (~25 ms), Market (~18 ms).

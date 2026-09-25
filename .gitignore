@@ -20,3 +20,6 @@ Thumbs.db
 # Scenario runs (python tools/bridge.py run ...): reports, screenshots, clips
 bridge_runs/
 __pycache__/
+
+# Claude Code: personal permissions stay on this machine (review 3 #11)
+.claude/settings.local.json
