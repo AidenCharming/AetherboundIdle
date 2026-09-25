@@ -30,6 +30,19 @@ static func ally(c: Dictionary) -> Dictionary:
 	})
 
 
+## After a level-up or evolution mid-run: the fighter takes the creature's new level, form and stats. It keeps
+## its buffs, timers and shield, and gains the extra maximum Health as Health (a knocked-out one stays down).
+static func refresh_ally(f: Dictionary, c: Dictionary) -> void:
+	var fresh := ally(c)
+	var gain := float(fresh.maxHp) - float(f.maxHp)
+	for k in ["level", "form", "name", "maxHp", "power", "guard", "abCdMs", "atkMs"]:
+		f[k] = fresh[k]
+	if f.alive:
+		f.hp = clampf(float(f.hp) + maxf(0.0, gain), 1.0, float(f.maxHp))
+	else:
+		f.hp = minf(float(f.hp), float(f.maxHp))
+
+
 ## A wild creature (or boss) as a fighter. `mult` scales its stats.
 static func wild(species_id: String, level: int, rarity: int, shiny: bool, mult: Dictionary, name_override := "", ability_override := "", form_override := 0) -> Dictionary:
 	var sp: Dictionary = Data.species[species_id]

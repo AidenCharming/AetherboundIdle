@@ -566,3 +566,40 @@ func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
 	t.ok(is_instance_valid(claim) and not claim.is_queued_for_deletion(), "an unrelated change doesn't rebuild the card mid-click")
 	main.free()
 	_teardown()
+
+
+## Play-test feedback: XP seemed to come only from the boss. A party member's nameplate has an XP bar that
+## moves with every kill, and its level chip follows a mid-run level-up.
+func test_arena_shows_party_xp_from_each_kill() -> void:
+	_setup()
+	var s := Game.state
+	var c := Creatures.make(s, "sproutlet", 1, 3, false, [], "test")
+	s.creatures[c.id] = c
+	Expedition.set_party_member(s, 0, c)
+	var rng := RandomNumberGenerator.new()
+	Expedition.start(s, "whisperleaf-hollow", rng)
+	var b: Dictionary = s.expedition.battle
+	for i in 200:
+		if not b.enemies.is_empty():
+			break
+		Expedition.step(s, 250.0, rng)
+		b = s.expedition.battle
+	var arena := Arena.new()
+	_layer.add_child(arena)
+	arena.size = Vector2(510, 585)
+	arena._build(b)
+	var v: Dictionary = arena._allies[0]
+	t.ok(v.xp != null, "the party member has an XP bar")
+	t.ok(arena._enemies.all(func(e): return e.get("xp") == null), "wild Aetherlings don't")
+	arena._update(b)
+	var before: float = v.xp.value
+	var ev := []
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 2, "rarity": 1, "shiny": false}, [c], rng, ev, b)
+	arena._update(b)
+	t.ok(v.xp.value > before or int(c.level) > 3, "the bar moved after one kill (%.3f -> %.3f)" % [before, v.xp.value])
+	c.xp = F.xp_for_level(F.creature_curve(), 7, Data.tuning.creature.maxLevel) - 0.5
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 2, "rarity": 1, "shiny": false}, [c], rng, ev, b)
+	arena._update(b)
+	t.eq(v.lv.text, "Lv %d" % int(c.level), "the level chip follows")
+	t.eq(int(b.allies[0].level), int(c.level), "and so does the fighter")
+	_teardown()

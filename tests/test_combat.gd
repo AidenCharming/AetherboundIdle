@@ -239,3 +239,29 @@ func test_one_run_is_a_fraction_of_a_level() -> void:
 		ms += 250.0
 	t.ok(int(lead.level) <= 13, "level %d after one run from 12" % int(lead.level))
 	t.ok(float(lead.xp) > F.xp_for_level(F.creature_curve(), 12, Data.tuning.creature.maxLevel), "but it did earn XP")
+
+
+## Play-test feedback: XP seemed to arrive only with the boss, because a party member's fighter kept the level
+## it started the run at. A level-up from an ordinary kill now shows (and fights) at once.
+func test_a_kill_levels_the_fighter_mid_run() -> void:
+	var s := _party_game([["sproutlet", 1, 5]])
+	var c: Dictionary = s.creatures.values()[0]
+	var rng := _rng()
+	t.eq(Expedition.start(s, "whisperleaf-hollow", rng), "")
+	while s.expedition.battle.phase != "fight":
+		Expedition.step(s, 250.0, rng)
+	var f: Dictionary = s.expedition.battle.allies[0]
+	f.hp = float(f.maxHp) * 0.5
+	var hp_before := float(f.hp)
+	var max_before := float(f.maxHp)
+	# one XP short of level 6, then an ordinary wild falls
+	c.xp = F.xp_for_level(F.creature_curve(), 6, Data.tuning.creature.maxLevel) - 1.0
+	var ev := []
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 3, "rarity": 1, "shiny": false},
+		[c], rng, ev, s.expedition.battle)
+	t.ok(ev.any(func(e): return e.type == "creature_level"), "a level-up event")
+	t.eq(int(c.level), 6)
+	t.eq(int(f.level), 6, "the fighter took the new level")
+	t.ok(float(f.maxHp) > max_before, "and its higher Health")
+	t.ok(float(f.hp) > hp_before, "gaining the extra Health")
+	t.ok(float(f.power) >= float(Combat.ally(c).power) - 0.001, "and its new power")

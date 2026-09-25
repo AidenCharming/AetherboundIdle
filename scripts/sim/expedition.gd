@@ -222,13 +222,7 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 	s.counters.kills = int(s.counters.kills) + 1
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + 1
-	var xp := kill_xp(int(w.level), int(w.rarity))
-	for c in party:
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
+	_party_xp(s, party, kill_xp(int(w.level), int(w.rarity)), events, b)
 	var gold := rng.randi_range(int(z.gold[0]), int(z.gold[1]))
 	GameState.add_item(s, "gold", gold)
 	var loot := {"gold": gold}
@@ -239,6 +233,22 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 			loot[l.item] = loot.get(l.item, 0) + q
 	events.append({"type": "loot", "items": loot})
 	try_capture(s, w, party, rng, events, b)
+
+
+## Combat XP for each party member. One who levels or evolves mid-run fights at the new level at once: its
+## fighter in the live battle `b` is refreshed, so XP from every kill shows, not only after the boss.
+static func _party_xp(s: Dictionary, party: Array, xp: float, events: Array, b: Dictionary) -> void:
+	for c in party:
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
+		if cev.is_empty():
+			continue
+		for e in cev:
+			if e.type == "evolved":
+				Collection.on_evolved(s, c)
+		events.append_array(cev)
+		for f in b.get("allies", []):
+			if f.get("cid", "") == c.id:
+				Combat.refresh_ally(f, c)
 
 
 ## Picks the vessel the auto-bind settings allow for this encounter, or "" to let it go.
@@ -373,13 +383,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	zs.cleared = true
 	s.counters.bossKills = int(s.counters.bossKills) + 1
 	var boss: Dictionary = z.boss
-	var xp := kill_xp(int(boss.level), 3, true)
-	for c in _alive_party(s):
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
+	_party_xp(s, _alive_party(s), kill_xp(int(boss.level), 3, true), events, s.expedition.battle)
 	var bl: Dictionary = z.bossLoot
 	GameState.add_item(s, "gold", float(bl.gold))
 	for id in bl.items:
