@@ -40,7 +40,10 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
    and update `docs/HANDOFF.md` and `docs/DECISIONS.md` with what changed and why.
 7. **Pacing target:** one month to every skill at 99 and Zenith Spire cleared. Check balance changes with the
    month probe.
-8. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
+8. **Session task list:** keep a task list with each task's percent done and estimated share of the 5-hour
+   usage in its title (`[40%] Fix X (est. +3%)`), and post a one-line progress note after each task. See
+   `docs/HANDOFF.md`.
+9. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
    pushes art to the same branch), then push.
 
 ## Commands
