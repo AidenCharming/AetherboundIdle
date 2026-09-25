@@ -624,7 +624,7 @@ func _dev_modal() -> void:
 		Game.info("Granted %d %s" % [n, Data.species_list[sp.selected].name])))
 	var total := per_species * Data.species_list.size()
 	all_row.add_child(UI.button("Every Aetherling, every form, rarity and shiny (%s)" % F.format_num(total), "", func():
-		Modal.confirm("Grant every Aetherling?", "Adds %s Aetherlings to this save (every species in Forms 1 to 3, Dim to Zenith, plain and shiny) and fills the Aether-Log. The Nexus gets slow with this many." % F.format_num(total), "Grant them all", func():
+		Modal.confirm("Grant every Aetherling?", "Adds %s Aetherlings to this save (every species in Forms 1 to 3, Dim to Aetheric, plain and shiny) and fills the Aether-Log. The Nexus gets slow with this many." % F.format_num(total), "Grant them all", func():
 			Game.info("Granted %s Aetherlings" % F.format_num(Game.dev_grant_all())))))
 	v.add_child(all_row)
 	v.add_child(UI.label("Resources", "H3"))

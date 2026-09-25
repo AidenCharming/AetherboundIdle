@@ -3,6 +3,24 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.5 (2026-09-25): one new rarity per island, and Aetheric
+
+- **The designer's question:** what if each island brought one new rarity? There were nine rarities for ten
+  islands, so the designer added a tenth, **Aetheric** (chosen from light words like the rest), for Zenith Spire.
+- Wild `rarityWeights` are cut off at the island's tier: Whisperleaf is all Dim, Quarry adds Faint, … Stormsea
+  adds Zenith (0.15%), the Spire adds Aetheric (0.1%). The 0.6.4 odds below each cutoff are kept, so
+  Whisperleaf loses its rare Faint, Steady and Gleaming finds.
+- Aetheric: stats x8.6, 1,024 Aether/min perched, releases for 5,120 Aether and 6 Aether Pearls, 2,560 Aether
+  for a new Aether-Log entry. Bred only by a mutation on tier-10 materials (`breeding.topRarityMinTier`);
+  mutation halving is now anchored at Resplendent (`topTierMutationFrom` 8) so older odds don't shift.
+- Every effect plus its own: shader `fx` 6 (a turning halo of rays, twice the motes, a stronger shimmer), a
+  faster, richer rainbow, a second counter-turning rim ring and four orbiting lights. `live` and `orbiters` in
+  `rarities.json` now say which tiers pulse, shine in rainbow or have orbiting lights (was "top n tiers").
+- A final goal for Overseer Vance: own an Aetheric Aetherling (113 goals).
+- `month_probe --split`: Fractured Quarry `enemyMult` 0.708 → 0.77 and Zenith Spire 2.417 → 2.267 keep their
+  waves at about x1.45. Month probe unchanged: skills at 99 on days 27–32, the Spire first cleared on day 22.
+- Tests (171): each island introduces the next rarity; Aetheric only as a top-tier mutation.
+
 ## Designer playtest (2026-09-25)
 
 - Confirmed in the real game: the shiny entrance sound (`shiny_appear`), the sprite effects' motion ("amazing"),

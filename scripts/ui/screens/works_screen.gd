@@ -48,7 +48,7 @@ func refresh() -> void:
 		cv.add_child(h)
 		cv.add_child(UI.wrap_label(u.blurb, "Dim"))
 		if pearl and lv == 0 and GameState.count(s, "aether-pearl") < 1:
-			cv.add_child(UI.wrap_label("Aether Pearls come from the last two islands' bosses (rarely), releasing Resplendent and Zenith Aetherlings, and finding or releasing shinies.", "Faint"))
+			cv.add_child(UI.wrap_label("Aether Pearls come from the last two islands' bosses (rarely), releasing Resplendent, Zenith and Aetheric Aetherlings, and finding or releasing shinies.", "Faint"))
 		var pips := UI.hbox(5)
 		for i in u.levels.size():
 			var pip := ColorRect.new()

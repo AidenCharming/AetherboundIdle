@@ -14,7 +14,8 @@ uniform vec4 silhouette_color : source_color = vec4(0.23, 0.25, 0.47, 1.0);
 uniform float flash = 0.0;            // 0..1 white flash
 uniform float shimmer = 0.0;          // shiny sparkle sweep strength
 // Rarity effects (data/rarities.json "fx"), all following the sprite's own outline:
-// 1-2 outline glow, 3 + a sweeping shine, 4 + the glow pulses, 5 rainbow edge, body shimmer, rising motes.
+// 1-2 outline glow, 3 + a sweeping shine, 4 + the glow pulses, 5 rainbow edge, body shimmer, rising motes,
+// 6 (Aetheric) + a turning halo of rays, twice the motes and a stronger shimmer.
 uniform float fx = 0.0;
 uniform vec4 fx_color : source_color = vec4(1.0, 0.85, 0.4, 1.0);
 
@@ -81,8 +82,11 @@ void fragment() {
 		}
 		// Zenith: a soft rainbow sheen over the body and motes rising around it
 		if (fx > 4.5) {
-			rgb = mix(rgb, rgb * 0.75 + hue(TIME * 0.12 + UV.y * 0.8) * 0.35, 0.22 * c.a);
-			for (int i = 0; i < 7; i++) {
+			rgb = mix(rgb, rgb * 0.75 + hue(TIME * 0.12 + UV.y * 0.8) * 0.35, (fx > 5.5 ? 0.32 : 0.22) * c.a);
+			for (int i = 0; i < 14; i++) {
+				if (i >= 7 && fx < 5.5) {
+					break;
+				}
 				float fi = float(i);
 				float y = 1.0 - fract(TIME * (0.12 + hash1(fi) * 0.1) + hash1(fi + 3.1));
 				vec2 m = vec2(0.12 + 0.76 * hash1(fi + 9.7), y);
@@ -92,6 +96,21 @@ void fragment() {
 				glow = max(glow, mote * (1.0 - c.a) * 0.9);
 				fc = mix(fc, hue(TIME * 0.2 + fi * 0.14) * 0.6 + 0.4, mote * (1.0 - c.a));
 			}
+		}
+		// Aetheric: a halo of slowly turning rays reaching out past the glow
+		if (fx > 5.5) {
+			vec2 d = UV - vec2(0.5, 0.52);
+			float ang = atan(d.y, d.x);
+			float rays = pow(abs(sin(ang * 6.0 + TIME * 0.5)), 10.0) + 0.6 * pow(abs(sin(ang * 9.0 - TIME * 0.35)), 14.0);
+			float reach = 0.0;
+			for (int i = 0; i < 12; i++) {
+				float ra = float(i) * 0.5236;
+				vec2 rd = vec2(cos(ra), sin(ra)) * 0.09;
+				reach = max(reach, max(texture(TEXTURE, UV + rd).a * 0.55, texture(TEXTURE, UV + rd * 0.5).a * 0.8));
+			}
+			float halo = rays * reach * (1.0 - near) * (1.0 - c.a) * 0.75;
+			glow = max(glow, halo);
+			fc = mix(fc, hue(TIME * 0.15 + ang * 0.16) * 0.5 + 0.5, halo);
 		}
 		rgb = mix(fc, rgb, c.a);
 		out_a = max(c.a, glow);

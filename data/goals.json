@@ -1311,5 +1311,17 @@
 		"reward": {
 			"gold": 2500000
 		}
+		},
+	{
+		"id": "rarity10",
+		"text": "Own an Aetheric Aetherling",
+		"check": {
+			"kind": "rarity",
+			"n": 10
+		},
+		"reward": {
+			"aether": 3000000,
+			"gold": 3000000
+		}
 	}
 ]

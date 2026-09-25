@@ -68,7 +68,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 169 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 171 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
@@ -299,7 +299,7 @@ A creature-collecting idle game in five loops that feed each other:
 5. **Collect.** The Aether-Log tracks species, forms, recipes, rarities and shinies, with milestone rewards
    and titles; secret recipes show a hint until found. Every rarity of every species is its own entry:
    owning a species at a rarity you have not had before is announced ("New in the Aether-Log: Faint
-   Buzzbud") and pays 5 × 2^(rarity − 1) Aether (Faint 10 … Zenith 1,280; `collection.json` `newRarity`).
+   Buzzbud") and pays 5 × 2^(rarity − 1) Aether (Faint 10 … Zenith 1,280, Aetheric 2,560; `collection.json` `newRarity`).
    The Creaturedex opens with a strip of all five tracks' counts (designer's request). A Show bar under it
    picks how the cards look: the best form found or Form 1/2/3 (a form not found is a silhouette), the
    highest rarity owned with its frame and effects, and the shiny colours once a shiny was caught (all
@@ -478,6 +478,18 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     level 6, 7 at level 7; Faint trio 8 from level 4; one Gleaming with two Dims 8 from level 3; a Steady
     trio still wins at any level (three 1% finds). The stat multipliers per rarity are unchanged. Every
     later island was rescaled back to waves x1.45 and boss x1.30 (`month_probe --split`).
+  - **One new rarity per island (0.6.5, designer's call).** Island *n*'s rarest wild is rarity *n*: Whisperleaf
+    Hollow is all Dim, Fractured Quarry adds Faint, and so on up to Zenith in Stormsea Expanse. For the tenth
+    island a tenth rarity was added, **Aetheric** (a light word like the rest), found only on Zenith Spire.
+    Each island's `rarityWeights` kept its 0.6.4 odds cut off at its tier (the new top tier is 0.25% on
+    the Rift, 0.15% on Stormsea and 0.1% on the Spire). Breeding ceilings and market eggs are unchanged. Aetheric
+    has every effect: its own `fx` 6 (a turning halo of rays, twice the motes and a stronger shimmer), a
+    faster and richer rainbow, a second rim ring and four orbiting lights. Which tiers pulse, show a rainbow
+    or have orbiting lights is now data (`live`, `orbiters` in rarities.json), so the older tiers look as
+    before. `month_probe --split` then showed the Quarry's waves easier (x1.55, fewer rare wilds) and the
+    Spire's harder (x1.36, rare Zenith and Aetheric wilds): `enemyMult` 0.708 → 0.77 and 2.417 → 2.267 put
+    both back at about x1.45. The month probe is unchanged (skills 99 on days 27–32, the Spire first cleared on
+    day 22).
   - **Levels matter in a fight** (designer's play-test: a level 5–6 Dim/Faint party cleared Fractured Quarry
     and its boss easily, and nearly beat a level-24 Caldera wild). Two causes: one rarity step (×1.3 stats)
     was worth about ten levels, and islands scale their wilds down (`enemyMult` below 1), so a nameplate's
@@ -528,7 +540,7 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
 - **Creature max level 100, forms at 20 and 40** (reference 99, 30 and 60), so evolutions (with their
   reveal) happen in the first sessions. **Working creatures earn half the skill XP they produce**; the
   reference only gave combat XP, so a creature that never fought never evolved.
-- **Rarity stat multipliers softened** to 1.0 → 6.8 (reference 1 → 24), so a high-level Dim is still
+- **Rarity stat multipliers softened** to 1.0 → 6.8 for Dim to Zenith, and 8.6 for Aetheric (reference 1 → 24), so a high-level Dim is still
   useful and rarity is an upgrade rather than a wall. Bench emission doubled (Dim 2/min, doubling per
   tier) to make early breeding reachable.
 
@@ -543,7 +555,7 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
 - **Aether Pearls, the endgame currency** (designer's request: a free way to boost shinies and more at the
   end). Sources: the last two islands' bosses drop one rarely (`bossLoot.pearlChance`: Stormsea 0.15%, Zenith
   Spire 0.4% per clear; a strong party clears 25–110 an hour, so about 3–7 a day of play), releasing a
-  Resplendent (1) or Zenith (3) (`releasePearls` in rarities.json), and shinies (1 for hatching or binding one,
+  Resplendent (1), Zenith (3) or Aetheric (6) (`releasePearls` in rarities.json), and shinies (1 for hatching or binding one,
   2 more for releasing one). They buy six Pearl upgrades in Sanctum Works, 5 levels each, costing 3/6/10/15/20
   pearls (54 per upgrade, 324 for all): Pearl Lens (+0.5% shiny chance per level on eggs, as the designer asked,
   and +0.1% on wild encounters, which happen far more often), Pearl Resonator (+20% rarity mutation per level),
@@ -557,11 +569,14 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
   designer asked whether five was enough; it wasn't once materials went to ten). Tiers 1–10 cap at Faint,
   Steady, Steady, Gleaming, Gleaming, Luminous, Radiant, Brilliant, Resplendent and Zenith, so the rarest
   eggs need the late islands' materials.
+  - **Aetheric (0.6.5)** is above every ceiling: it only comes from a mutation, and only on tier-10 materials
+    (`topRarityMinTier`), so two Zeniths on tier 10 make one about 4% of the time. Two Aetherics still need
+    the mutation.
   - **Odds:** they centre on the parents' average rarity and fall off by `stepWeight` (0.18) for each tier
     away from it, never below the weaker parent. Each tier above the first lifts that centre by
     `centreLiftPerTier` (0.05 of a rarity step), so a tier sharing its ceiling with the one below still has
     better odds.
-  - **Mutation:** two rolls (+1 at 8%, +2 at 1%, halved for the top two rarities; 0.6.4, was 15% and 2.5%,
+  - **Mutation:** two rolls (+1 at 8%, +2 at 1%, halved into Resplendent and above, `topTierMutationFrom` 8; 0.6.4, was 15% and 2.5%,
     which let two Steadys make a Gleaming too often) can pass the ceiling.
     The full odds are shown before laying.
   - **Examples:** with tier 1 materials, Dim + Dim → Faint 25%; Dim + Faint → Faint 49%, Steady 9%;

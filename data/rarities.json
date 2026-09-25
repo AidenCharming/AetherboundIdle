@@ -62,6 +62,7 @@
 	{
 		"tier": 7,
 		"id": "brilliant",
+		"live": "pulse", "orbiters": 1,
 		"name": "Brilliant", "fx": 3,
 		"color": "#ff6f9c",
 		"statMultiplier": 4.3,
@@ -72,6 +73,7 @@
 	{
 		"tier": 8,
 		"id": "resplendent",
+		"live": "pulse", "orbiters": 2,
 		"name": "Resplendent", "releasePearls": 1, "fx": 4,
 		"color": "#c58bff",
 		"statMultiplier": 5.4,
@@ -82,11 +84,23 @@
 	{
 		"tier": 9,
 		"id": "zenith",
+		"live": "rainbow", "orbiters": 3,
 		"name": "Zenith", "releasePearls": 3, "fx": 5,
 		"color": "#fff6d6",
 		"statMultiplier": 6.8,
 		"benchAetherPerMin": 512,
 		"glow": 1.0,
 		"releaseAether": 2560
+		},
+	{
+		"tier": 10,
+		"id": "aetheric",
+		"live": "rainbow", "orbiters": 4,
+		"name": "Aetheric", "releasePearls": 6, "fx": 6,
+		"color": "#fff1b8",
+		"statMultiplier": 8.6,
+		"benchAetherPerMin": 1024,
+		"glow": 1.0,
+		"releaseAether": 5120
 	}
 ]

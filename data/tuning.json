@@ -144,7 +144,7 @@
 		"centreLiftPerTier": 0.05,
 		"mutationPlusOne": 0.08,
 		"mutationPlusTwo": 0.01,
-		"topTierMutationMult": 0.5,
+		"topTierMutationMult": 0.5, "topTierMutationFrom": 8, "topRarityMinTier": 10,
 		"hatchMinutes": [
 			2,
 			5,

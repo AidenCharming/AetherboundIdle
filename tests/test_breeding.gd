@@ -260,13 +260,29 @@ func test_better_materials_lift_the_odds_and_zenith_needs_the_top_tier() -> void
 	for tier in range(2, Breeding.tier_count() + 1):
 		t.ok(mean.call(Breeding.rarity_odds(a, b, tier)) > mean.call(Breeding.rarity_odds(a, b, tier - 1)) - 1e-9,
 			"tier %d is at least as good as tier %d" % [tier, tier - 1])
-	t.eq(Breeding.ceiling(Breeding.tier_count()), Data.max_rarity(), "the top tier reaches the top rarity")
+	var zenith := Data.max_rarity() - 1
+	t.eq(Breeding.ceiling(Breeding.tier_count()), zenith, "the top tier's ceiling is Zenith")
 	for tier in range(1, Breeding.tier_count()):
-		t.ok(Breeding.ceiling(tier) < Data.max_rarity(), "only the top tier's ceiling is the top rarity (tier %d)" % tier)
+		t.ok(Breeding.ceiling(tier) < zenith, "only the top tier's ceiling is Zenith (tier %d)" % tier)
 	var r8a := _c(s, "sproutlet", 8)
 	var r8b := _c(s, "sproutlet", 8)
-	var z: float = Breeding.rarity_odds(r8a, r8b, Breeding.tier_count())[Data.max_rarity() - 1]
-	t.ok(z > 0.35 and z < 0.7, "two top-but-one parents on the top tier: about a coin flip (%.2f)" % z)
+	var z: float = Breeding.rarity_odds(r8a, r8b, Breeding.tier_count())[zenith - 1]
+	t.ok(z > 0.35 and z < 0.7, "two Resplendent parents on the top tier: about a coin flip (%.2f)" % z)
+
+
+## Aetheric (the top rarity, above every ceiling) only comes from a mutation with the top materials.
+func test_aetheric_is_only_a_top_tier_mutation() -> void:
+	var s := GameState.new_game()
+	var top := Data.max_rarity()
+	var za := _c(s, "sproutlet", top - 1)
+	var zb := _c(s, "sproutlet", top - 1)
+	var on_top: float = Breeding.rarity_odds(za, zb, Breeding.tier_count())[top - 1]
+	t.ok(on_top > 0.01 and on_top < 0.1, "two Zeniths on the top tier: a small Aetheric chance (%.3f)" % on_top)
+	for tier in range(1, Breeding.tier_count()):
+		t.near(float(Breeding.rarity_odds(za, zb, tier)[top - 1]), 0.0, 1e-9, "no Aetheric from tier %d" % tier)
+	var aa := _c(s, "sproutlet", top)
+	var ab := _c(s, "sproutlet", top)
+	t.ok(float(Breeding.rarity_odds(aa, ab, Breeding.tier_count())[top - 1]) < 0.1, "Aetheric parents still need the mutation")
 
 
 ## Shiny parents lift the egg's shiny chance a little: one shiny parent by half, two by double.

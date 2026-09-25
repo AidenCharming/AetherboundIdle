@@ -58,11 +58,14 @@ static func mutation_bonus(a: Dictionary, b: Dictionary) -> float:
 ## parents' average rarity, falling off by `stepWeight` per tier away from it (so a Dim + Faint pair sits
 ## halfway between two Dims and two Faints), and never go below the weaker parent. Better materials lift
 ## the centre by `centreLiftPerTier` per tier above the first, so a tier that shares its ceiling with the
-## one below still has better odds. Then two separate mutation rolls can push past the ceiling.
+## one below still has better odds. Then two separate mutation rolls can push past the ceiling (weaker into
+## `topTierMutationFrom` and up); the top rarity (Aetheric) only comes from `topRarityMinTier` materials.
 static func rarity_odds(a: Dictionary, b: Dictionary, tier: int, s: Dictionary = {}) -> Array:
 	var br: Dictionary = Data.tuning.breeding
 	var top := Data.max_rarity()
 	var ceil_r := ceiling(tier)
+	var reach := top if tier >= int(br.topRarityMinTier) else top - 1
+	var weak_from := int(br.topTierMutationFrom)
 	var lowest := mini(mini(int(a.rarity), int(b.rarity)), ceil_r)
 	var lift := float(br.get("centreLiftPerTier", 0.0)) * (tier - 1)
 	var centre := minf((float(a.rarity) + float(b.rarity)) / 2.0 + lift, float(ceil_r))
@@ -80,11 +83,11 @@ static func rarity_odds(a: Dictionary, b: Dictionary, tier: int, s: Dictionary =
 		var k: int = pair[0]
 		var p: float = pair[1] / total
 		var pm := 1.0 + float(Data.tuning.pearls.mutationPerLevel) * GameState.pearl(s, "pearl-resonator")
-		var p2: float = float(br.mutationPlusTwo) * pm * (float(br.topTierMutationMult) if k + 2 >= top - 1 else 1.0)
-		var p1: float = (float(br.mutationPlusOne) + bonus) * pm * (float(br.topTierMutationMult) if k + 1 >= top - 1 else 1.0)
-		if k + 2 > top:
+		var p2: float = float(br.mutationPlusTwo) * pm * (float(br.topTierMutationMult) if k + 2 >= weak_from else 1.0)
+		var p1: float = (float(br.mutationPlusOne) + bonus) * pm * (float(br.topTierMutationMult) if k + 1 >= weak_from else 1.0)
+		if k + 2 > reach:
 			p2 = 0.0
-		if k + 1 > top:
+		if k + 1 > reach:
 			p1 = 0.0
 		out[k - 1] += p * (1.0 - p1 - p2)
 		if p1 > 0.0:

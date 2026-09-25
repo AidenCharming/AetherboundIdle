@@ -1,5 +1,20 @@
 [
 	{
+		"version": "0.6.5",
+		"date": "2026-09-25",
+		"title": "One island, one new rarity",
+		"notes": {
+			"New": [
+				["Expeditions", "A new top rarity: Aetheric, above Zenith, with every effect of the rarities below it plus a turning halo of light. Wild Aetheric Aetherlings live only on Zenith Spire, and two Zeniths can rarely breed one with the finest materials."],
+				["Game", "Overseer Vance has a new final goal: own an Aetheric Aetherling."]
+			],
+			"Balancing": [
+				["Expeditions", "Each island brings one new rarity: Whisperleaf Hollow has only Dims, Fractured Quarry adds Faint, Smoldering Caldera adds Steady, and so on up to Zenith in Stormsea Expanse and Aetheric atop Zenith Spire."],
+				["Expeditions", "Fractured Quarry's wild Aetherlings are a little stronger and Zenith Spire's a little weaker, to keep each island as hard as before."]
+			]
+		}
+	},
+	{
 		"version": "0.6.4",
 		"date": "2026-09-25",
 		"title": "Lucky finds feel lucky",

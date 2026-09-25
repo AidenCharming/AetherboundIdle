@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.4)
+## Where things stand (2026-09-25, v0.6.5)
 
-- Current version **0.6.4**. All 169 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.6.5**. All 171 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
@@ -26,9 +26,12 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
    (~25 ms), Market (~18 ms).
 ## Open: for the designer
 
-- **Play-test the 0.6.4 rarity pass:** rarer wild rarities (a Gleaming in Whisperleaf is about 1 in 400),
-  fewer traits on catches, rarer egg mutations, a half-strength Glimmer Lure, a weaker Old Thicketroll (Dims
-  win at level 7) and a smaller attack-speed edge from rarity. The last benchmark party (three at Lv 10)
+- **Play-test the 0.6.5 rarity ladder:** each island brings one new rarity (Whisperleaf all Dim, Quarry adds
+  Faint, … Stormsea adds Zenith) and the new top rarity, **Aetheric**, lives only on Zenith Spire (0.1% of its
+  wilds, or a 4% mutation from two Zeniths on tier-10 materials). Judge the Aetheric look (grant one in
+  Developer tools; its sprite halo shows in battle), and whether an all-Dim Whisperleaf feels right. Still
+  from 0.6.4: fewer traits on catches, rarer egg mutations, a half-strength Glimmer Lure, a weaker Old
+  Thicketroll (Dims win at level 7) and a smaller attack-speed edge from rarity. The last benchmark party (three at Lv 10)
   failing Smoldering Caldera (Lv 15–25) is expected: that island's calibration party is Faint at Lv 23.
 
 - **Sound and music (designer's playtest, 2026-09-25):** `rare_appear` works but feels "meh"; the type attack
@@ -37,7 +40,7 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - **Close button is too purple** (designer, 2026-09-25): tone down `face_sat` / `face_value` in
   `assets/shaders/flat_icon.gdshader` (or set them per button in `modal.gd`'s `close_x`).
 - **Confirm on Windows:** the Options window-mode fix (the bug was on Windows fullscreen; guarded three ways).
-- **Balance only play can judge:** Overseer Vance's 112 goals (order, texts, rewards in `data/goals.json`),
+- **Balance only play can judge:** Overseer Vance's 113 goals (order, texts, rewards in `data/goals.json`),
   Market prices (`data/market.json`, and whether buying materials makes gathering pointless), Aether Pearl drop
   rates (3–7 a day at the end), work XP, early-island pacing (`combat.levelGap`, Fractured Quarry).
 - **Cosmetics:** pick from `docs/cosmetics.md`; nothing is built.

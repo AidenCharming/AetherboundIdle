@@ -68,6 +68,18 @@ func test_zones_reference_species_and_items() -> void:
 			t.ok(Data.items.has(l.item), z.id + " loot " + l.item)
 
 
+## Each island brings one new rarity: island n's rarest wild is tier n (the Spire's is Aetheric, the top).
+func test_each_island_introduces_the_next_rarity() -> void:
+	t.eq(Data.zone_list.size(), Data.max_rarity(), "one rarity per island")
+	for i in Data.zone_list.size():
+		var w: Array = Data.zone_list[i].rarityWeights
+		t.eq(w.size(), i + 1, "%s tops out at %s" % [Data.zone_list[i].id, Data.rarity(i + 1).name])
+		for x in w:
+			t.ok(float(x) > 0.0, "%s weights are all positive" % Data.zone_list[i].id)
+	for r in Data.rarities:
+		t.eq(r.has("live"), r.has("orbiters"), r.name + ": animated tiers set both live and orbiters")
+
+
 func test_special_recipes_are_cross_type() -> void:
 	for r in Data.special_list:
 		var a: Dictionary = Data.species[r.parents[0]]
