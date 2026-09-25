@@ -1,6 +1,6 @@
 extends Node
 ## Headless test runner. Runs every tests/test_*.gd: each public method named test_* is one test.
-## Usage (from the repo root):  godot --headless --path godot res://tests/test_runner.tscn
+## Usage (from the repo root):  godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null
 ## Exit code 0 when everything passes, 1 otherwise.
 
 var failures: Array = []

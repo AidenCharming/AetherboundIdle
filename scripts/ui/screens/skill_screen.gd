@@ -251,20 +251,22 @@ func _fill_actions() -> void:
 		if a.has("gold"):
 			info.add_child(UI.amount("gold", float(a.gold), -1, 18))
 		cv.add_child(info)
-		if a.has("inputs"):
-			var need := UI.hbox(6, [UI.label("Needs", "Faint")])
-			for id in a.inputs:
-				need.add_child(UI.amount(id, float(a.inputs[id]), float(a.inputs[id]), 20))
-			cv.add_child(need)
-		# what the task makes and can drop, with how many you hold
+		# the recipe, top to bottom: what one action uses, what it makes, what it can find besides; each line with
+		# how many you hold (an input turns red when you have too few)
 		cv.add_child(UI.spacer())
-		var hv := UI.vbox(4)
-		hv.add_child(UI.label("YOU HAVE", "Faint"))
-		hv.add_child(_have_row(out, ""))
-		if a.has("rare"):
-			hv.add_child(_have_row(a.rare.item, "Rare drop · %s" % F.pct(float(a.rare.chance))))
-		if a.has("treasure"):
-			hv.add_child(_have_row(a.treasure.item, "Treasure · %s" % F.pct(float(a.treasure.chance))))
+		var hv := UI.vbox(3)
+		if a.has("inputs"):
+			hv.add_child(_section_head("Uses each time"))
+			for id in a.inputs:
+				hv.add_child(_item_line(id, "×%d" % int(a.inputs[id]), Palette.TEXT_DIM, float(a.inputs[id])))
+		hv.add_child(_section_head("Makes"))
+		hv.add_child(_item_line(out, "×%d" % int(a.outputs[out]), Palette.GOOD))
+		if a.has("rare") or a.has("treasure"):
+			hv.add_child(_section_head("Sometimes finds"))
+			if a.has("rare"):
+				hv.add_child(_item_line(a.rare.item, F.pct(float(a.rare.chance)), Palette.GOLD))
+			if a.has("treasure"):
+				hv.add_child(_item_line(a.treasure.item, F.pct(float(a.treasure.chance)), Palette.GOLD))
 		var hp := UI.panel("Inset", hv)
 		hp.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cv.add_child(hp)
@@ -275,27 +277,35 @@ func _fill_actions() -> void:
 	_fit_cards.call_deferred()
 
 
-## One "You have" line: item icon, a big live count, the name and an optional drop-chance note.
-func _have_row(id: String, note: String) -> HBoxContainer:
+## A small caps heading inside the recipe box.
+func _section_head(text: String) -> Label:
+	var l := UI.label(text.to_upper(), "Faint")
+	l.add_theme_font_size_override("font_size", 11)
+	return l
+
+
+## One recipe line: item icon and name, a note (×2, or a drop chance) in `note_color`, and a live count of how
+## many you hold on the right. With `need`, the count turns red while you hold fewer than one action uses.
+func _item_line(id: String, note: String, note_color: Color, need := 0.0) -> HBoxContainer:
 	var row := UI.hbox(6)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(UI.icon(Data.item_icon(id), 26))
-	var n := UI.label("", "Num")
-	n.add_theme_font_size_override("font_size", 21)
-	n.custom_minimum_size.x = 28
-	row.add_child(n)
-	var nv := UI.vbox(-2)
-	nv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nv.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(UI.icon(Data.item_icon(id), 22))
 	var name_l := UI.label(Data.item_name(id), "Dim")
 	name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_l.clip_text = true
-	nv.add_child(name_l)
-	if note != "":
-		nv.add_child(UI.label(note, "Small", Palette.GOLD))
-	row.add_child(nv)
-	row.tooltip_text = Data.item_name(id)
-	_have_labels.append({"id": id, "label": n, "last": -1.0})
+	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	name_l.custom_minimum_size.x = 60
+	row.add_child(name_l)
+	var nl := UI.label(note, "Small", note_color)
+	nl.add_theme_font_override("font", ThemeFactory.bold_font())
+	row.add_child(nl)
+	var n := UI.label("", "Num")
+	n.add_theme_font_size_override("font_size", 15)
+	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	n.custom_minimum_size.x = 40
+	n.tooltip_text = "You have this many"
+	row.add_child(n)
+	_have_labels.append({"id": id, "label": n, "last": -1.0, "need": need})
 	_update_have()
 	return row
 
@@ -317,7 +327,10 @@ func _update_have() -> void:
 			continue
 		e.last = n
 		e.label.text = F.format_num(n)
-		e.label.add_theme_color_override("font_color", Palette.TEXT if n > 0 else Palette.TEXT_FAINT)
+		var col := Palette.TEXT if n > 0 else Palette.TEXT_FAINT
+		if float(e.get("need", 0.0)) > 0.0 and n < float(e.need):
+			col = Palette.DANGER
+		e.label.add_theme_color_override("font_color", col)
 
 
 func _fill_rate() -> void:

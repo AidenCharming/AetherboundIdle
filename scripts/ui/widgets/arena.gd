@@ -14,8 +14,8 @@ var _ground: Control
 var _backdrop: TextureRect
 var _zone_type := "verdant"
 var _zone_seed := 0.0
-var _boss_music := false
-var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced   # the boss track is playing because of this arena
+var _boss_music := false   # the boss track is playing because of this arena
+var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
 ## row stands (a slight stagger, so each side reads as one line). Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.

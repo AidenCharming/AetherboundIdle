@@ -1774,24 +1774,6 @@
 				}
 			},
 			{
-				"id": "sturdy-vessel",
-				"name": "Sturdy Vessel",
-				"level": 25,
-				"ms": 11000,
-				"xp": 58,
-				"inputs": {
-					"iron-bar": 1,
-					"spring": 1
-				},
-				"outputs": {
-					"sturdy-vessel": 1
-				},
-				"rare": {
-					"item": "aether-crystal",
-					"chance": 0.005
-				}
-			},
-			{
 				"id": "resonance-frame",
 				"name": "Resonance Frame",
 				"level": 45,

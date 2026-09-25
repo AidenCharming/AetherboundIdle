@@ -262,39 +262,56 @@ func _milestones() -> void:
 		var v := UI.vbox(8)
 		card.add_child(v)
 		var h := UI.hbox(10)
-		h.add_child(UI.label(t.name, "H2"))
-		h.add_child(UI.label(t.blurb, "Faint"))
+		var names := UI.vbox(0, [UI.label(t.name, "H2"), UI.label(t.blurb, "Faint")])
+		h.add_child(names)
 		h.add_child(UI.spacer())
 		h.add_child(UI.label("%d / %d" % [p, total], "Num"))
 		v.add_child(h)
 		var bar := UI.bar(Palette.GOLD, 10)
 		bar.value = float(p) / maxf(1.0, float(total))
 		v.add_child(bar)
-		var ms := UI.flow(10, 10)
+		var ms := UI.flow(14, 14)
 		for i in t.milestones.size():
 			var m: Dictionary = t.milestones[i]
 			var target := Collection.milestone_target(t.id, m)
 			var claimed := Collection.is_claimed(s, t.id, i)
-			var mc := UI.panel("CardFlat")
-			var mv := UI.vbox(4)
+			var claimable := not claimed and p >= target
+			# one card per milestone: the goal on top, each reward on its own line, the state at the bottom
+			var mc := PanelContainer.new()
+			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not claimable else Color(Palette.GOLD, 0.10), 14, 1,
+				Color(Palette.GOLD, 0.7) if claimable else Palette.LINE, 14)
+			sb.content_margin_top = 12
+			sb.content_margin_bottom = 12
+			mc.add_theme_stylebox_override("panel", sb)
+			mc.custom_minimum_size.x = 150
+			var mv := UI.vbox(8)
 			mc.add_child(mv)
-			mv.add_child(UI.label("All %d" % target if str(m.at) == "all" else "At %d" % target, "H3"))
-			var rr := UI.flow(8, 4)
+			var title := UI.label("All %d" % target if str(m.at) == "all" else "At %d" % target, "H3", Palette.GOLD if claimable else Palette.TEXT)
+			mv.add_child(title)
+			var mbar := UI.bar(Palette.GOOD if claimed else Palette.AETHER, 4)
+			mbar.value = clampf(float(p) / maxf(1.0, float(target)), 0.0, 1.0)
+			mv.add_child(mbar)
+			var rr := UI.vbox(6)
 			var r: Dictionary = m.reward
 			for k in ["aether", "gold"]:
 				if r.has(k):
-					rr.add_child(UI.amount(k, float(r[k]), -1, 18))
+					rr.add_child(UI.amount(k, float(r[k]), -1, 20))
 			for id in r.get("items", {}):
-				rr.add_child(UI.amount(id, float(r.items[id]), -1, 18))
+				rr.add_child(UI.amount(id, float(r.items[id]), -1, 20))
 			if r.has("title"):
-				rr.add_child(UI.label("Title: " + r.title, "Small", Palette.GOLD))
+				rr.add_child(UI.wrap_label("Title: " + r.title, "Small", 122))
+				(rr.get_child(rr.get_child_count() - 1) as Label).add_theme_color_override("font_color", Palette.GOLD)
 			if r.has("revealRecipe"):
-				rr.add_child(UI.label("Reveals %d secret pair%s" % [int(r.revealRecipe), "" if int(r.revealRecipe) == 1 else "s"], "Small", Palette.AETHER))
+				rr.add_child(UI.wrap_label("Reveals %d secret pair%s" % [int(r.revealRecipe), "" if int(r.revealRecipe) == 1 else "s"], "Small", 122))
+				(rr.get_child(rr.get_child_count() - 1) as Label).add_theme_color_override("font_color", Palette.AETHER)
 			mv.add_child(rr)
+			var foot := UI.spacer()
+			foot.size_flags_vertical = Control.SIZE_EXPAND_FILL
+			mv.add_child(foot)
 			if claimed:
-				mv.add_child(UI.label("Claimed", "Small", Palette.GOOD))
+				mv.add_child(UI.label("✓ Claimed", "Small", Palette.GOOD))
 				mc.modulate.a = 0.6
-			elif p >= target:
+			elif claimable:
 				mv.add_child(UI.button("Claim", "Gold", func(): Game.claim_milestone(t.id, i)))
 			else:
 				mv.add_child(UI.chip("%d to go" % (target - p), Palette.AETHER, 11))

@@ -121,6 +121,20 @@ func test_inherited_traits_are_valid() -> void:
 			t.ok(Data.traits.has(x.id) and x.s in Traits.STRENGTHS)
 
 
+## Trait inheritance uses only the game's generator: the same seed gives the same traits whatever the global
+## generator does in between (Array.shuffle() used to read the global one).
+func test_inherited_traits_repeat_from_a_seed() -> void:
+	var s := GameState.new_game()
+	var a := _c(s, "sproutlet", 1, [{"id": "lucky", "s": "moderate"}, {"id": "scholar", "s": "major"}])
+	var b := _c(s, "sproutlet", 1, [{"id": "green-thumb", "s": "minor"}, {"id": "overgrowth", "s": "moderate"}])
+	for seed_value in 30:
+		seed(12345)
+		var first := Breeding.inherit(_rng(seed_value), a, b, ["verdant"])
+		randomize()
+		var second := Breeding.inherit(_rng(seed_value), a, b, ["verdant"])
+		t.eq(second, first, "seed %d" % seed_value)
+
+
 ## Designer's rule: a trait passed down keeps its strength or grows a step; it never comes out weaker.
 func test_inherited_traits_never_weaken() -> void:
 	var s := GameState.new_game()
@@ -143,7 +157,11 @@ func test_inherited_traits_never_weaken() -> void:
 func test_attunement_keeps_locked_traits_and_charges_more() -> void:
 	var s := GameState.new_game()
 	var c := _c(s, "sproutlet", 3, [{"id": "lucky", "s": "major"}, {"id": "scholar", "s": "minor"}])
-	t.near(float(Traits.attune_cost(c, 2)), float(Traits.attune_cost(c, 0)) * 9.0, 9.0, "two locks cost about nine times as much")
+	var free := float(Traits.attune_cost(c, []))
+	t.near(float(Traits.attune_cost(c, ["lucky"])), free * Traits.lock_mult("major"), 2.0, "a Major lock")
+	t.near(float(Traits.attune_cost(c, ["scholar"])), free * Traits.lock_mult("minor"), 2.0, "a Minor lock")
+	t.ok(Traits.attune_cost(c, ["scholar"]) < Traits.attune_cost(c, ["lucky"]), "keeping a Minor trait costs less than a Major")
+	t.near(float(Traits.attune_cost(c, ["lucky", "scholar"])), free * Traits.lock_mult("major") * Traits.lock_mult("minor"), 3.0, "locks multiply")
 	GameState.add_item(s, "aether", 100000)
 	var rng := _rng()
 	for i in 20:
@@ -275,14 +293,14 @@ func test_aether_pearl_upgrades_and_sources() -> void:
 	var pt: Dictionary = Data.tuning.pearls
 	var shiny0 := Breeding.hatch_chance_shiny(s, a, b)
 	var hatch0 := Breeding.hatch_seconds(a, b, 5, s)
-	var cost0 := Traits.attune_cost(a, 0, s)
+	var cost0 := Traits.attune_cost(a, [], s)
 	var bind0 := Expedition.bind_chance(s, "tinkerers-vessel", 3, [])
 	for id in ["pearl-lens", "pearl-resonator", "pearl-crucible", "pearl-incubator", "pearl-vessel", "pearl-hourglass"]:
 		t.ok(Data.upgrades.has(id), "%s exists" % id)
 		s.upgrades[id] = 5
 	t.near(Breeding.hatch_chance_shiny(s, a, b), shiny0 + float(pt.lensHatchPerLevel) * 5.0, 0.00001, "Pearl Lens: +0.5% per level on eggs")
 	t.ok(Breeding.hatch_seconds(a, b, 5, s) < hatch0, "Pearl Incubator: faster hatching")
-	t.ok(Traits.attune_cost(a, 0, s) < cost0, "Pearl Crucible: cheaper attunement")
+	t.ok(Traits.attune_cost(a, [], s) < cost0, "Pearl Crucible: cheaper attunement")
 	t.ok(Expedition.bind_chance(s, "tinkerers-vessel", 3, []) > bind0, "Pearl Binding: better bind chance")
 	# sources: releasing a Zenith, and a shiny
 	var z := _c(s, "sproutlet", Data.max_rarity(), [])

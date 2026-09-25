@@ -33,6 +33,10 @@ var _rail_refresh := 0.0
 var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
 var _limited_flash := false   # a rare limited offer is in the Market: its badge pulses
 var _boosts_box: HBoxContainer
+var _history: Array = []   # [[screen, arg]] pages visited, for the mouse's back and forward buttons
+var _history_at := -1
+var _mouse_held := false        # the left button is down: rebuilding now could free the button being clicked
+var _refresh_waiting := false   # a Game.changed came while it was down; the screen rebuilds on release
 
 
 func _ready() -> void:
@@ -120,9 +124,16 @@ static func go(screen: String, arg := "") -> void:
 		instance.show_screen(screen, arg)
 
 
-func show_screen(screen: String, arg := "") -> void:
+func show_screen(screen: String, arg := "", from_history := false) -> void:
 	if screen == current and arg == current_arg and _screen:
 		return
+	if not from_history:
+		# a new page drops anything "forward" of where the player was, like a browser
+		_history.resize(_history_at + 1)
+		_history.append([screen, arg])
+		if _history.size() > HISTORY_MAX:
+			_history.pop_front()
+		_history_at = _history.size() - 1
 	current = screen
 	current_arg = arg
 	# a dialog belongs to the page that opened it: one left open would call back into a freed page
@@ -146,9 +157,40 @@ func show_screen(screen: String, arg := "") -> void:
 
 
 func _on_changed() -> void:
+	# A capture or level-up mid-click used to rebuild the screen between mouse down and up, freeing the button
+	# and losing the click. While the button is held, the rebuild waits for the release.
+	if _mouse_held:
+		_refresh_waiting = true
+	else:
+		_refresh_screen()
+	_refresh_rail()
+
+
+func _refresh_screen() -> void:
+	_refresh_waiting = false
 	if _screen and _screen.has_method("refresh"):
 		_screen.refresh()
-	_refresh_rail()
+
+
+## The mouse's back (or forward) button: the page visited before (or after) this one.
+func history_step(dir: int) -> void:
+	var to := _history_at + dir
+	if to < 0 or to >= _history.size():
+		return
+	_history_at = to
+	show_screen(_history[to][0], _history[to][1], true)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
+		if not Modal.any_open() and not _reveal.active:
+			get_viewport().set_input_as_handled()
+			history_step(-1 if event.button_index == MOUSE_BUTTON_XBUTTON1 else 1)
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_mouse_held = event.pressed
+		if not event.pressed and _refresh_waiting:
+			_refresh_screen.call_deferred()   # after the release has reached (and clicked) the button
 
 
 func _build_rail() -> Control:
@@ -157,7 +199,7 @@ func _build_rail() -> Control:
 	var v := UI.vbox(6)
 	rail.add_child(v)
 	var logo := UI.hbox(8)
-	logo.add_child(UI.icon(Data.ui_icon("aether"), 30))
+	logo.add_child(UI.icon(APP_ICON, 32))
 	var title_lbl := UI.label("Aetherbound", "H2")
 	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
 	title_lbl.add_theme_constant_override("shadow_outline_size", 10)
@@ -399,6 +441,10 @@ func _update_bell() -> void:
 func _process(delta: float) -> void:
 	if Game.state.is_empty():
 		return
+	if _mouse_held and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_mouse_held = false   # released where this window never saw it (focus lost mid-click)
+		if _refresh_waiting:
+			_refresh_screen()
 	var s := Game.state
 	_top.aether.value.text = F.format_num(float(s.aether))
 	_top.aether.sub.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
@@ -428,6 +474,10 @@ func _process(delta: float) -> void:
 		UI.set_chip(_top.perched, "%d perched" % Economy.perched(s).size(), Palette.AETHER)
 
 
+const APP_ICON := preload("res://assets/app-icon.png")
+const HISTORY_MAX := 50
+
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel") and not Modal.any_open() and not _reveal.active:
 		get_viewport().set_input_as_handled()
@@ -452,7 +502,7 @@ func go_tab(tab: String) -> void:
 
 func open_pause_menu() -> void:
 	var v := UI.vbox(10)
-	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.upgrade_value(Game.state, "offline-cap")), "Faint", 380))
+	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.offline_cap_hours(Game.state)), "Faint", 380))
 	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var add := func(text: String, variation: String, cb: Callable):
 		var b := UI.button(text, variation, cb)
@@ -530,7 +580,7 @@ func _dev_modal() -> void:
 	lvl.min_value = 1
 	lvl.max_value = Data.tuning.creature.maxLevel
 	lvl.value = 1
-	var shiny := CheckButton.new()
+	var shiny := ToggleSwitch.new()
 	shiny.text = "Shiny"
 	# form comes from level: picking a form sets the level to where that form starts, and typing a level
 	# shows the form it gives

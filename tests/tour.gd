@@ -1,11 +1,12 @@
 extends Node
 ## Visual tour for development: builds a varied game in save slot 3, visits every screen and writes a
 ## screenshot of each. Needs a real display (or xvfb):
-##   godot --path godot res://tests/tour.tscn -- --out=/some/folder [--only=name,name]
+##   godot --path . res://tests/tour.tscn -- --out=/some/folder [--only=name,name] [--size=1280x720]
 ## It overwrites save slot 3.
 
 var out := "user://tour"
 var only: Array = []
+var size := Vector2i(1600, 900)   ## --size=1280x720 to see a smaller window
 
 
 func _ready() -> void:
@@ -14,8 +15,11 @@ func _ready() -> void:
 			out = a.substr(6)
 		elif a.begins_with("--only="):
 			only = a.substr(7).split(",")
+		elif a.begins_with("--size="):
+			var wh := a.substr(7).split("x")
+			size = Vector2i(int(wh[0]), int(wh[1]))
 	DirAccess.make_dir_recursive_absolute(out)
-	get_window().size = Vector2i(1600, 900)
+	get_window().size = size
 	# stay alive across scene changes: this node stops being "the current scene"
 	await get_tree().process_frame
 	get_tree().current_scene = null
@@ -34,12 +38,23 @@ func _shot(name: String) -> void:
 	print("shot ", name)
 
 
+func _tip_label(text: String) -> Label:
+	var l := Label.new()
+	l.theme_type_variation = "TooltipLabel"
+	l.text = text
+	return l
+
+
 func _wait(sec: float) -> void:
 	await get_tree().create_timer(sec).timeout
 
 
 func _run() -> void:
 	Options.values.reduce_motion = false
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--ui-scale="):
+			Options.values.ui_scale = int(a.substr(11))   # this run only: not saved to options.cfg
+			Options.apply()
 	if _want("title"):
 		get_tree().change_scene_to_file("res://scenes/title.tscn")
 		await _wait(1.6)
@@ -81,6 +96,9 @@ func _run() -> void:
 	for m in Modal.layer.get_children():
 		m.queue_free()
 	await _wait(0.4)
+	GameState.add_item(Game.state, "sunken-trinket", 2)
+	GameState.add_item(Game.state, "seedcache", 1)
+	load("res://scripts/ui/screens/inventory_screen.gd").selected = "oak-log"
 	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["skill", "fishing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
 		var name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
 		if not _want(name):
@@ -105,6 +123,52 @@ func _run() -> void:
 		Main.instance._open_notifications()
 		await _wait(0.4)
 		await _shot("expeditions_dialog")
+		_close_modals()
+	if _want("autobind"):
+		Main.go("expeditions")
+		await _wait(0.4)
+		for tab in ["autobind", "party", "supplies"]:
+			Main.instance._screen._bottom_tab = tab
+			Main.instance._screen._fill_bottom()
+			await _wait(0.4)
+			await _shot("bottom_" + tab)
+	if _want("folded"):
+		Main.go("expeditions")
+		await _wait(0.3)
+		Main.instance._screen._set_open("exp_log_open", false)
+		Main.instance._screen._set_open("exp_zones_open", false)
+		await _wait(0.6)
+		await _shot("folded")
+		Main.instance._screen._set_open("exp_log_open", true)
+		Main.instance._screen._set_open("exp_zones_open", true)
+	if _want("tooltip"):
+		# tooltips can't be hovered here: draw the two kinds in their themed panel instead
+		var row := UI.hbox(24)
+		row.position = Vector2(420, 200)
+		for content in [UI.item_tooltip("oak-log"), UI.item_tooltip("timber-frame"), _tip_label("A Faint Brambletrundle broke free of a Tinker's Vessel · 41% chance")]:
+			var p := PanelContainer.new()
+			p.theme_type_variation = "TooltipPanel"
+			p.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			p.add_child(content)
+			row.add_child(p)
+		Main.instance.add_child(row)
+		await _wait(0.4)
+		await _shot("tooltip")
+		row.queue_free()
+	if _want("milestones"):
+		Main.go("aetherlog")
+		await _wait(0.3)
+		Main.instance._screen.tab = "milestones"
+		Main.instance._screen.refresh()
+		await _wait(0.6)
+		await _shot("milestones")
+	if _want("attune"):
+		Main.go("nexus")
+		await _wait(0.4)
+		var c: Dictionary = Game.state.creatures.values().filter(func(x): return x.traits.size() >= 2)[0]
+		Main.instance._screen._attune(c)
+		await _wait(0.5)
+		await _shot("attune")
 		_close_modals()
 	if _want("shinies"):
 		Main.go("nexus")

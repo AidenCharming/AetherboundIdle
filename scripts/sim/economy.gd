@@ -55,6 +55,35 @@ static func shatter(s: Dictionary, id: String, qty: int) -> float:
 	return gain
 
 
+## Everything an item is good for besides selling: [{kind, name, ...}] with kind "recipe" (a skill task that uses
+## it, with skill and level), "upgrade" (a Sanctum Works build), "breeding" (a Genesis Pods material), "vessel",
+## "meal" or "shatter". Empty means it is only worth its gold.
+static func uses(id: String) -> Array:
+	var out := []
+	var it: Dictionary = Data.items.get(id, {})
+	if it.is_empty():
+		return out
+	match str(it.category):
+		"vessel":
+			out.append({"kind": "vessel", "name": "Binding wild Aetherlings on expeditions"})
+		"meal":
+			out.append({"kind": "meal", "name": "Healing the party between waves"})
+	if it.has("aether"):
+		out.append({"kind": "shatter", "name": "Shatter into %s Aether" % F.format_num(float(it.aether))})
+	for sk in Data.skill_list:
+		for a in sk.actions:
+			if a.has("inputs") and a.inputs.has(id):
+				out.append({"kind": "recipe", "name": a.name, "skill": sk.id, "level": int(a.level), "qty": int(a.inputs[id])})
+	for u in Data.upgrade_list:
+		for lv in u.levels:
+			if lv.cost.has(id):
+				out.append({"kind": "upgrade", "name": u.name, "id": u.id})
+				break
+	if it.has("element") and it.category != "rare" and Breeding.material(str(it.element), int(it.tier)) == id:
+		out.append({"kind": "breeding", "name": "Tier %d eggs in Genesis Pods (%s parents)" % [int(it.tier), Data.types[it.element].name]})
+	return out
+
+
 static func next_upgrade(s: Dictionary, id: String) -> Dictionary:
 	var u: Dictionary = Data.upgrades[id]
 	var lv := GameState.upgrade_level(s, id)

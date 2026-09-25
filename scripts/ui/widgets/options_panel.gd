@@ -157,7 +157,7 @@ func _slider(title: String, key: String) -> void:
 
 
 func _toggle(title: String, key: String) -> void:
-	var c := CheckButton.new()
+	var c := ToggleSwitch.new()
 	c.text = title
 	c.button_pressed = bool(Options.get_value(key))
 	c.focus_mode = Control.FOCUS_NONE

@@ -10,6 +10,7 @@ const RESOLUTIONS := [Vector2i(1280, 720), Vector2i(1366, 768), Vector2i(1600, 9
 const FPS_CAPS := [30, 60, 90, 120, 144, 165, 240, 0]   # 0 = unlimited
 const WINDOW_MODES := ["Windowed", "Borderless fullscreen", "Exclusive fullscreen"]
 const UI_SCALES := [0.85, 1.0, 1.15, 1.3]
+const WINDOW_KEYS := ["window_mode", "resolution"]   ## only these move or resize the window
 
 var values := {
 	"master": 0.8,
@@ -36,16 +37,25 @@ var values := {
 const TABS := [["nexus", "Nexus"], ["pods", "Genesis Pods"], ["expeditions", "Expeditions"], ["aetherlog", "Aether-Log"],
 	["inventory", "Inventory"], ["market", "Market"], ["eggmarket", "Egg Market"], ["works", "Sanctum Works"]]
 ## Keys a tab can't take: Esc opens the menu, and modifiers alone aren't keys.
-const RESERVED_KEYS := [KEY_ESCAPE, KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK]
+const RESERVED_KEYS := [KEY_ESCAPE, KEY_F11, KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK]
 
 var _focused := true
+var _last_fullscreen := 1   # the fullscreen mode Alt+Enter / F11 goes back to
+var save_delay := 0.4   ## seconds of quiet before a change is written (a dragged slider changes every frame)
+var _save_timer: Timer
+var save_count := 0   ## writes of options.cfg so far (the tests check the debounce with it)
 
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
 	_ensure_buses()
+	_save_timer = Timer.new()
+	_save_timer.one_shot = true
+	_save_timer.timeout.connect(save_options)
+	add_child(_save_timer)
 	load_options()
 	apply()
+	_apply_window()
 
 
 func _ensure_buses() -> void:
@@ -64,7 +74,9 @@ func get_value(key: String) -> Variant:
 func set_value(key: String, v: Variant) -> void:
 	values[key] = v
 	apply()
-	save_options()
+	if key in WINDOW_KEYS:
+		_apply_window(key == "resolution")   # picking a size is a request to leave a maximized window
+	_save_timer.start(save_delay)   # restarts on every change: one write once the player lets go
 	options_changed.emit()
 
 
@@ -80,13 +92,15 @@ func tab_list() -> Array:
 	return out
 
 
-## The default keys: 1 to 9 for the Sanctum and the other pages in rail order, F1 onwards for the skills.
+## The default keys: 1 to 9 for the Sanctum and the other pages in rail order, F1 onwards for the skills
+## (skipping F11, which toggles fullscreen).
 func default_keybind(tab: String) -> int:
 	if tab == "sanctum":
 		return KEY_1
 	if tab.begins_with("skill:"):
 		var i := Data.skill_list.map(func(sk): return "skill:" + sk.id).find(tab)
-		return KEY_F1 + i if i >= 0 and i < 12 else 0
+		var fkeys := [KEY_F1, KEY_F2, KEY_F3, KEY_F4, KEY_F5, KEY_F6, KEY_F7, KEY_F8, KEY_F9, KEY_F10, KEY_F12]
+		return fkeys[i] if i >= 0 and i < fkeys.size() else 0
 	for i in TABS.size():
 		if TABS[i][0] == tab:
 			return KEY_2 + i if i < 8 else 0
@@ -133,6 +147,18 @@ func key_name(code: int) -> String:
 	return OS.get_keycode_string(code) if code != 0 else ""
 
 
+## True while a change waits for the debounce timer to write it.
+func save_pending() -> bool:
+	return _save_timer != null and not _save_timer.is_stopped()
+
+
+## Writes a waiting change now (on quit, so it isn't lost with the timer).
+func flush() -> void:
+	if save_pending():
+		_save_timer.stop()
+		save_options()
+
+
 func load_options() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(PATH) != OK:
@@ -143,6 +169,7 @@ func load_options() -> void:
 
 
 func save_options() -> void:
+	save_count += 1
 	var cfg := ConfigFile.new()
 	for k in values:
 		cfg.set_value("options", k, values[k])
@@ -166,15 +193,30 @@ func _apply_audio() -> void:
 		AudioServer.set_bus_mute(i, float(pair[1]) <= 0.001)
 
 
+## VSync, the frame-rate cap and the interface scale: safe to apply on any change or focus change, since none
+## of them touches the window itself (that would undo a window the player maximized).
 func _apply_display() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = FPS_CAPS[clampi(int(values.fps_cap), 0, FPS_CAPS.size() - 1)] if _focused else int(values.background_fps)
+	var tree := get_tree()
+	if tree and tree.root:
+		tree.root.content_scale_factor = UI_SCALES[clampi(int(values.ui_scale), 0, UI_SCALES.size() - 1)]
+
+
+## The window mode and size: at start-up and when the player changes one of them, never on other options or on
+## alt-tab. A maximized window stays maximized.
+func _apply_window(resize_maximized := false) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
 	var mode := int(values.window_mode)
 	match mode:
 		0:
-			if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+			var now := DisplayServer.window_get_mode()
+			if now == DisplayServer.WINDOW_MODE_MINIMIZED or (now == DisplayServer.WINDOW_MODE_MAXIMIZED and not resize_maximized):
+				return   # the player's own maximize (or a minimized window) wins over the size setting
+			if now != DisplayServer.WINDOW_MODE_WINDOWED:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			var res: Vector2i = RESOLUTIONS[clampi(int(values.resolution), 0, RESOLUTIONS.size() - 1)]
 			var screen := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
@@ -186,10 +228,23 @@ func _apply_display() -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		2:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
-	var tree := get_tree()
-	if tree and tree.root:
-		tree.root.content_scale_factor = UI_SCALES[clampi(int(values.ui_scale), 0, UI_SCALES.size() - 1)]
 
+
+## Alt+Enter and F11 switch between a window and fullscreen (the fullscreen kind last used, borderless at first).
+func toggle_fullscreen() -> void:
+	var mode := int(values.window_mode)
+	if mode != 0:
+		_last_fullscreen = mode
+		set_value("window_mode", 0)
+	else:
+		set_value("window_mode", _last_fullscreen)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F11 or (event.keycode == KEY_ENTER and event.alt_pressed):
+			get_viewport().set_input_as_handled()
+			toggle_fullscreen()
 
 func _notification(what: int) -> void:
 	match what:
@@ -199,6 +254,8 @@ func _notification(what: int) -> void:
 		NOTIFICATION_APPLICATION_FOCUS_IN:
 			_focused = true
 			apply()
+		NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_EXIT_TREE:
+			flush()   # the window is closing or a Quit button called get_tree().quit()
 
 
 ## Size of the screen the window is on (the fullscreen size).

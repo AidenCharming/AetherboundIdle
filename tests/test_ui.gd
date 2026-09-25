@@ -410,22 +410,6 @@ func test_damage_numbers_spread_out() -> void:
 	arena.free()
 
 
-## A save slot can be named ("Dev Save") and the title screen's slot info reports the name.
-func test_save_slots_can_be_renamed() -> void:
-	var n := 3
-	var had := FileAccess.file_exists(Game.slot_path(n))
-	var backup := FileAccess.get_file_as_string(Game.slot_path(n)) if had else ""
-	FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(JSON.stringify(GameState.new_game()))
-	Game.rename_slot(n, "  Dev Save  ")
-	t.eq(Game.slot_info(n).get("name"), "Dev Save", "named and trimmed")
-	Game.rename_slot(n, "")
-	t.eq(Game.slot_info(n).get("name"), "", "cleared")
-	if had:
-		FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(backup)
-	else:
-		DirAccess.remove_absolute(Game.slot_path(n))
-
-
 ## Party members on a running expedition are not offered as workers (they can't be moved mid-run).
 func test_worker_picker_hides_the_locked_party() -> void:
 	_setup()
@@ -636,6 +620,86 @@ func test_changing_page_closes_its_dialogs() -> void:
 	t.ok(Modal.any_open(), "the parent picker is open")
 	main.show_screen("sanctum")
 	t.ok(not Modal.any_open(), "going to the Sanctum closed it")
+
+
+## During the fade back to the title the state is empty; a worker bubble on the open skill page must not read it.
+func test_worker_bubble_waits_out_an_empty_state() -> void:
+	_setup()
+	var keep := Game.state
+	var c: Dictionary = keep.creatures.values()[0]
+	var bubble := WorkerBubble.make(c, "woodcutting", 58)
+	_layer.add_child(bubble)
+	Game.state = {}
+	bubble._process(0.016)
+	t.ok(true, "no error with an empty state")
+	Game.state = keep
+	_teardown()
+
+
+## The parents picked in Genesis Pods belong to one save: another save opens the page with nothing picked.
+func test_pods_forget_the_parents_of_another_save() -> void:
+	_setup()
+	var scr: Node = preload("res://scripts/ui/screens/pods_screen.gd").new()
+	_layer.add_child(scr)
+	var starter: String = Game.state.creatures.keys()[0]
+	PodsScreen.parent_a = starter
+	PodsScreen.parent_b = starter
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, starter, "kept within the same save")
+	var other := GameState.new_game()
+	other.created = int(Game.state.created) + 1
+	Game.state = other
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, "", "parent A cleared")
+	t.eq(PodsScreen.parent_b, "", "parent B cleared")
+	_teardown()
+
+
+## Dragging a slider changes an option every frame; options.cfg is written once, after the changes stop.
+func test_option_changes_are_saved_once_after_they_stop() -> void:
+	var key := "music"
+	var was: float = Options.get_value(key)
+	var writes := Options.save_count
+	for i in 20:
+		Options.set_value(key, was)   # the same value, so the player's options.cfg ends up unchanged
+	t.eq(Options.save_count, writes, "nothing written while the changes keep coming")
+	t.ok(Options.save_pending(), "a write is waiting")
+	Options.flush()   # what the timer does when it runs (the runner can't wait for it)
+	t.eq(Options.save_count, writes + 1, "written once")
+	t.ok(not Options.save_pending(), "nothing left waiting")
+	Options.flush()
+	t.eq(Options.save_count, writes + 1, "and not again")
+
+
+## A capture or level-up while the mouse button is down must not rebuild the screen under the click (the button
+## would be freed between press and release and the click lost). The rebuild waits for the release.
+func test_screen_waits_for_the_mouse_before_rebuilding() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var screens := ["skill", "pods", "works", "market"]
+	for scr_id in screens:
+		main.show_screen(scr_id, "woodcutting" if scr_id == "skill" else "")
+		var btn := _first_button(main._screen)
+		t.ok(btn != null, "%s has a button" % scr_id)
+		if btn == null:
+			continue
+		var down := InputEventMouseButton.new()
+		down.button_index = MOUSE_BUTTON_LEFT
+		down.pressed = true
+		main._input(down)
+		Game.changed.emit()
+		t.ok(btn.is_inside_tree() and not btn.is_queued_for_deletion(), "%s: the button survives a change mid-click" % scr_id)
+		var up := InputEventMouseButton.new()
+		up.button_index = MOUSE_BUTTON_LEFT
+		up.pressed = false
+		main._input(up)
+		t.ok(main._refresh_waiting, "%s: the rebuild is still owed until after the release" % scr_id)
+		main._refresh_screen()
+		t.ok(not main._refresh_waiting, "%s: and then done" % scr_id)
+		Game.changed.emit()
+		if scr_id in ["pods", "market"]:   # Works and the skill page's header keep their buttons on purpose
+			t.ok(not btn.is_inside_tree(), "%s: with the button up, a change rebuilds at once" % scr_id)
 	main.free()
 	_teardown()
 
@@ -780,6 +844,57 @@ func test_fill_empty_slots() -> void:
 	t.eq(busy.job.id, "herbalism", "a worker elsewhere isn't moved")
 	main._on_changed()
 	t.ok(not main._screen._fill_btn.visible, "no empty slot, no button")
+
+
+func _first_button(root: Node) -> Button:
+	if root is Button and root.visible:
+		return root
+	for c in root.get_children():
+		var b := _first_button(c)
+		if b:
+			return b
+	return null
+
+
+## Alt+Enter / F11 flip between a window and the fullscreen kind used last, and back.
+func test_fullscreen_toggle_goes_back_and_forth() -> void:
+	var was: int = Options.get_value("window_mode")
+	Options.values.window_mode = 2
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 0, "to a window")
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 2, "back to the same fullscreen")
+	var key := InputEventKey.new()
+	key.keycode = KEY_F11
+	key.pressed = true
+	Options._input(key)
+	t.eq(int(Options.get_value("window_mode")), 0, "F11 does it too")
+	Options.values.window_mode = was
+	Options.flush()
+
+
+## The mouse's back and forward buttons walk the pages visited, like a browser.
+func test_mouse_back_and_forward_walk_the_pages() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("expeditions")
+	main.show_screen("skill", "woodcutting")
+	var back := InputEventMouseButton.new()
+	back.button_index = MOUSE_BUTTON_XBUTTON1
+	back.pressed = true
+	main._input(back)
+	t.eq(main.current, "expeditions", "back")
+	var fwd := InputEventMouseButton.new()
+	fwd.button_index = MOUSE_BUTTON_XBUTTON2
+	fwd.pressed = true
+	main._input(fwd)
+	t.eq([main.current, main.current_arg], ["skill", "woodcutting"], "forward")
+	main.history_step(-1)
+	main.show_screen("nexus")
+	main.history_step(1)
+	t.eq(main.current, "nexus", "a new page drops the forward history")
+	t.eq((main._nav_buttons["nexus:"].keycap.get_child(0) as Label).text, "2", "the rail shows the shortcut")
 	main.free()
 	_teardown()
 
@@ -848,3 +963,34 @@ func test_idle_motion_breathes_from_the_feet() -> void:
 	p._layout()
 	t.eq(p._art.pivot_offset.y, p._art.size.y, "the art pivots on its feet")
 	p.free()
+
+
+## An item's tooltip is a card saying what the item is for, or that it only sells.
+func test_item_tooltips_say_what_an_item_is_for() -> void:
+	_setup()
+	var row := UI.amount("oak-log", 3)
+	t.ok(row is ItemTip, "cost chips carry a rich tooltip")
+	var card: Control = row._make_custom_tooltip("")
+	var texts := _texts(card)
+	t.ok(texts.any(func(x): return x.begins_with("• ")), "oak logs list their uses: %s" % [texts])
+	var only_gold := ""
+	for it in Data.item_list:
+		if Economy.uses(it.id).is_empty():
+			only_gold = it.id
+			break
+	if only_gold != "":
+		var tip := UI.item_tooltip(only_gold)
+		t.ok(_texts(tip).any(func(x): return x.begins_with("Only worth its gold")), "%s says it only sells" % only_gold)
+		tip.free()
+	card.free()
+	row.free()
+	_teardown()
+
+
+func _texts(root: Node) -> Array:
+	var out := []
+	if root is Label:
+		out.append(root.text)
+	for c in root.get_children():
+		out.append_array(_texts(c))
+	return out

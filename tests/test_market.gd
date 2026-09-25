@@ -210,3 +210,87 @@ func test_market_eggs() -> void:
 	# a shiny-egg offer always hatches shiny
 	var e := Market.make_egg(s, "verdant", 0, true, rng, 0.0)
 	t.ok(bool(e.shiny))
+
+
+## A buy made from a page showing an old stock window buys nothing once the stock has changed, so index i can
+## never buy a different offer at a different price.
+func test_buying_from_a_changed_stock_buys_nothing() -> void:
+	var s := _game(1e9)
+	var rng := _rng()
+	var now := 10.0 * Market.window_seconds() + 5.0
+	var w := Market.window(now)
+	var later := now + Market.window_seconds()
+	var o: Dictionary = Market.stock(s, now).offers[0]
+	var left := int(o.left)
+	t.eq(Market.buy_offer(s, 0, later, rng, w), Market.STOCK_CHANGED, "an offer")
+	t.eq(float(s.gold), 1e9, "no gold taken")
+	t.eq(int(o.left), left, "the old offer is untouched")
+	var pods: Array = s.pods.duplicate(true)
+	var f: Dictionary = Market.stock(s, now).featured
+	t.eq(Market.buy_featured(s, later, rng, w), Market.STOCK_CHANGED, "the featured egg")
+	t.eq(float(s.gold), 1e9, "no gold taken for the egg")
+	t.eq(s.pods, pods, "no egg laid")
+	t.ok(f.is_empty() or int(f.left) == 1, "the old featured egg is still for sale")
+	t.eq(Market.buy_offer(s, 0, now, rng, w), "", "the same window still buys")
+
+
+## Buying none (or a negative number) is refused, not reported as a purchase.
+func test_buying_nothing_is_refused() -> void:
+	var s := _game(1e6)
+	var id: String = Market.catalog("vessel")[0].id
+	var before := GameState.count(s, id)
+	for qty in [0, -5]:
+		t.ok(Market.buy(s, id, qty) != "", "qty %d is refused" % qty)
+	t.eq(float(s.gold), 1e6, "no gold taken")
+	t.eq(GameState.count(s, id), before, "no items added")
+
+
+## Every discounted offer really costs less than the Boosts and wares tabs (cheap items used to round the discount
+## away per unit), never less than selling it back, and a boost offer follows the boost's price as islands clear.
+func test_stock_discounts_are_real() -> void:
+	var s := _game(1e9)
+	var items := 0
+	for w in 200:
+		for o in Market.roll_stock(s, w).offers:
+			if o.get("limited", false) or not o.has("discount"):
+				continue
+			if o.kind == "item":
+				items += 1
+				var full: int = Market.buy_price(o.item) * int(o.qty)
+				t.ok(int(o.gold) < full, "%d× %s costs %d, less than %d" % [int(o.qty), o.item, int(o.gold), full])
+				t.ok(int(o.gold) > int(Data.items[o.item].sell) * int(o.qty), "and more than it sells back for")
+				t.near(float(o.discount), 1.0 - float(o.gold) / full, 0.0001, "the chip shows the true discount")
+	t.ok(items > 0, "item offers were rolled")
+	var boost := {}
+	var now := 0.0
+	for w in 200:
+		now = w * Market.window_seconds() + 1.0
+		for o in Market.stock(s, now).offers:
+			if o.kind == "boost":
+				boost = o
+		if not boost.is_empty():
+			break
+	t.ok(not boost.is_empty(), "a boost offer turned up")
+	if boost.is_empty():
+		return
+	var before := int(boost.gold)
+	_clear(s, 2)
+	Market.stock(s, now)
+	t.eq(int(boost.gold), ceili(Market.boost_price(s, boost.boost) * (1.0 - float(boost.discount))), "priced from today's boost price")
+	t.ok(int(boost.gold) > before, "which went up with the clears")
+
+
+## "Sell treasure" takes every unlocked item nothing uses, and nothing a recipe, build or pod needs.
+func test_treasure_is_what_nothing_uses() -> void:
+	var s := _game()
+	GameState.add_item(s, "sunken-trinket", 3)
+	GameState.add_item(s, "seedcache", 2)
+	GameState.add_item(s, "oak-log", 50)
+	Market.toggle_item_lock(s, "seedcache")
+	var c := Market.treasure_candidates(s)
+	t.eq(int(c.get("sunken-trinket", 0)), 3, "treasure sells")
+	t.ok(not c.has("seedcache"), "a locked one stays")
+	t.ok(not c.has("oak-log"), "logs are used in recipes")
+	for id in c:
+		t.eq(Economy.uses(id), [], "%s has no use" % id)
+	t.ok(Economy.uses("oak-log").any(func(u): return u.kind == "recipe"), "oak logs list their recipes")

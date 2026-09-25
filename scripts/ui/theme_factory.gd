@@ -146,13 +146,30 @@ static func get_theme() -> Theme:
 	t.set_stylebox("pressed", "CheckButton", StyleBoxEmpty.new())
 	t.set_stylebox("hover_pressed", "CheckButton", StyleBoxEmpty.new())
 	t.set_stylebox("focus", "CheckButton", StyleBoxEmpty.new())
-	t.set_icon("checked", "CheckButton", _toggle_texture(true))
-	t.set_icon("unchecked", "CheckButton", _toggle_texture(false))
+	# ToggleSwitch paints the switch itself; the blank icons only keep its room beside the text
+	var blank := _blank_texture(int(ToggleSwitch.W), int(ToggleSwitch.H))
+	for icon_name in ["checked", "unchecked", "checked_disabled", "unchecked_disabled", "checked_mirrored", "unchecked_mirrored",
+			"checked_disabled_mirrored", "unchecked_disabled_mirrored"]:
+		t.set_icon(icon_name, "CheckButton", blank)
 
 	# tooltips
-	t.set_stylebox("panel", "TooltipPanel", box(Palette.PANEL_SOLID, 10, 1, Palette.LINE_STRONG, 10, 8))
+	# tooltips: a small glass card with an aether edge on top and a soft drop shadow
+	var tip := box(Color(0.10, 0.11, 0.25, 0.97), 12, 1, Palette.LINE_STRONG, 14, 0)
+	tip.border_width_top = 3
+	tip.border_color = Color(Palette.AETHER, 0.55)
+	tip.shadow_color = Color(0, 0, 0.04, 0.6)
+	tip.shadow_size = 14
+	tip.shadow_offset = Vector2(0, 5)
+	tip.content_margin_top = 10
+	tip.content_margin_bottom = 10
+	tip.anti_aliasing = true
+	t.set_stylebox("panel", "TooltipPanel", tip)
 	t.set_color("font_color", "TooltipLabel", Palette.TEXT)
-	t.set_font_size("font_size", "TooltipLabel", 15)
+	t.set_color("font_shadow_color", "TooltipLabel", Color(0, 0, 0, 0.35))
+	t.set_constant("shadow_offset_y", "TooltipLabel", 1)
+	t.set_font("font", "TooltipLabel", font(F_BODY_BOLD))
+	t.set_font_size("font_size", "TooltipLabel", 14)
+	t.set_constant("line_spacing", "TooltipLabel", 2)
 
 	# scrollbars: thin and quiet
 	var sbar := box(Color(1, 1, 1, 0.03), 99, 0, Palette.LINE, 0)
@@ -222,22 +239,5 @@ static func _circle_texture(size: int, c: Color) -> ImageTexture:
 	return ImageTexture.create_from_image(img)
 
 
-static func _toggle_texture(on: bool) -> ImageTexture:
-	var w := 44
-	var h := 24
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	var bg := Color("5a4de0") if on else Color(0.2, 0.22, 0.4)
-	var knob := Color.WHITE if on else Color(0.7, 0.72, 0.9)
-	var kx := w - h / 2.0 if on else h / 2.0
-	for y in h:
-		for x in w:
-			var p := Vector2(x + 0.5, y + 0.5)
-			var cx := clampf(p.x, h / 2.0, w - h / 2.0)
-			var d := p.distance_to(Vector2(cx, h / 2.0))
-			var a := clampf(h / 2.0 - d, 0.0, 1.0)
-			var col := bg
-			var dk := p.distance_to(Vector2(kx, h / 2.0))
-			if dk < h / 2.0 - 3.0:
-				col = knob
-			img.set_pixel(x, y, Color(col, a))
-	return ImageTexture.create_from_image(img)
+static func _blank_texture(w: int, h: int) -> ImageTexture:
+	return ImageTexture.create_from_image(Image.create(w, h, false, Image.FORMAT_RGBA8))

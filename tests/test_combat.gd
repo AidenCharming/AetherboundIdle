@@ -109,6 +109,12 @@ func test_capture_consumes_a_vessel() -> void:
 	Expedition.try_capture(s, {"species": "brambletrundle", "level": 3, "rarity": 1, "shiny": false}, [], _rng(), ev, {"freeBinds": 0})
 	t.eq(GameState.count(s, "tinkerers-vessel"), before - 1.0)
 	t.ok(ev.any(func(e): return e.type in ["captured", "escaped"]))
+	var rolled: Array = ev.filter(func(e): return e.type in ["captured", "escaped"])
+	t.near(float(rolled[0].get("chance", -1.0)) if not rolled.is_empty() else -1.0,
+		Expedition.bind_chance(s, "tinkerers-vessel", 1, []), 0.0001, "the event carries the chance it had, for the log")
+	Game._log_battle(rolled[0])
+	t.ok(Game.battle_log[0].text.ends_with("% chance"), "and the log line says it: %s" % Game.battle_log[0].text)
+	Game.battle_log.clear()
 
 
 func test_autobind_respects_min_rarity_for_owned_species() -> void:
@@ -308,3 +314,23 @@ func test_wild_aetherlings_come_in_a_mix_of_forms() -> void:
 	t.eq(Combat.ally(bound).form, 3, "and fights as form 3")
 	bound.level = 45
 	t.eq(Creatures.form_of(bound), 3, "levelling past never lowers it")
+
+
+## Thorns that knock out an attacker mid-way through a multi-target ability stop it: nothing more is hit.
+func test_thorns_stop_a_multi_target_ability() -> void:
+	var ab_id := ""
+	for id in Data.abilities:
+		if Data.abilities[id].effect == "multi-target-damage":
+			ab_id = id
+			break
+	var att := Combat.wild("sproutlet", 10, 1, false, {}, "", ab_id)
+	att.hp = 1.0
+	var foes := []
+	for i in 3:
+		foes.append(Combat.wild("sproutlet", 10, 1, false, {"health": 100.0}))
+	foes[0].thornsT = 5000.0
+	var events := []
+	Combat._use_ability([att], foes, 0, 0, _rng(), events)
+	var hits := events.filter(func(e): return e.type == "hit" and e.side == 0 and e.from == 0)
+	t.eq(hits.size(), 1, "only the thorned target was hit")
+	t.ok(not att.alive, "the attacker went down")
