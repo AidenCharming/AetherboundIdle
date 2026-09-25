@@ -6,6 +6,8 @@ extends Control
 signal closed
 
 const CLOSE_ICON := "res://assets/icons/ui/close.png"   ## the painted close button, when there is one
+const FLAT_ICON := preload("res://assets/shaders/flat_icon.gdshader")
+const CLOSE_SIZE := 48.0
 static var layer: Control   ## set by the title and game scenes
 
 var panel: PanelContainer
@@ -24,30 +26,44 @@ static func open(content: Control, title := "", width := 672.0, close_button := 
 	return m
 
 
-## The round close button: a drawn cross that brightens on hover. A painted icon dropped in as
-## assets/icons/ui/close.png replaces the cross (close.svg is its placeholder for the art pipeline, not drawn).
+## The round close button: the painted assets/icons/ui/close.png, flattened by `flat_icon.gdshader` (its gloss
+## toned down) and lifted on hover; without the painting, a drawn cross in a faint round box.
 ## Its tooltip is "Close", which is how tests and the bridge's `click "Close"` find it.
 static func close_x(on_press: Callable) -> Button:
 	var b := Button.new()
 	b.tooltip_text = "Close"
-	b.custom_minimum_size = Vector2(40, 40)
+	b.custom_minimum_size = Vector2(CLOSE_SIZE, CLOSE_SIZE)
 	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	b.focus_mode = Control.FOCUS_NONE
 	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.pressed.connect(on_press)
+	var tex: Texture2D = Data.texture(CLOSE_ICON) if ResourceLoader.exists(CLOSE_ICON) else null
+	if tex:
+		# the painted button is the whole button: no round box behind it, flattened by a shader
+		for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+			b.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+		var icon := TextureRect.new()
+		icon.texture = tex
+		icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+		icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+		icon.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		icon.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		var mat := ShaderMaterial.new()
+		mat.shader = FLAT_ICON
+		icon.material = mat
+		b.add_child(icon)
+		b.mouse_entered.connect(func(): mat.set_shader_parameter("brighten", 1.15))
+		b.mouse_exited.connect(func(): mat.set_shader_parameter("brighten", 1.0))
+		b.button_down.connect(func(): icon.scale = Vector2(0.92, 0.92))
+		b.button_up.connect(func(): icon.scale = Vector2.ONE)
+		b.resized.connect(func(): icon.pivot_offset = b.size * 0.5)
+		return b
 	b.add_theme_stylebox_override("normal", ThemeFactory.box(Color(1, 1, 1, 0.04), 20, 1, Color(1, 1, 1, 0.1), 0))
 	b.add_theme_stylebox_override("hover", ThemeFactory.box(Color(1, 1, 1, 0.12), 20, 1, Color(1, 1, 1, 0.25), 0))
 	b.add_theme_stylebox_override("pressed", ThemeFactory.box(Color(1, 1, 1, 0.2), 20, 1, Color(1, 1, 1, 0.3), 0))
-	b.pressed.connect(on_press)
 	b.mouse_entered.connect(b.queue_redraw)
 	b.mouse_exited.connect(b.queue_redraw)
-	var painted := CLOSE_ICON if ResourceLoader.exists(CLOSE_ICON) else ""
 	b.draw.connect(func():
-		if painted != "":
-			var tex := Data.texture(painted)
-			if tex:
-				b.draw_texture_rect(tex, Rect2(Vector2(4, 4), b.size - Vector2(8, 8)), false,
-					Color.WHITE if b.is_hovered() else Color(1, 1, 1, 0.8))
-				return
 		var c := b.size * 0.5
 		var r := 7.0
 		var col := Palette.TEXT if b.is_hovered() else Palette.TEXT_DIM
@@ -88,8 +104,8 @@ func _build(content: Control, title: String, width: float, close_button: bool) -
 		over.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		var x := close_x(close)
 		x.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
-		x.offset_left = -40
-		x.offset_bottom = 40
+		x.offset_left = -CLOSE_SIZE
+		x.offset_bottom = CLOSE_SIZE
 		over.add_child(x)
 		panel.add_child(over)
 	body.add_child(content)

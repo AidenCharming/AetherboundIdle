@@ -3,6 +3,16 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3f (2026-09-25): flatter, bigger painted close button
+
+- **Close button (designer's feedback):** the old round box still showed behind the painted icon (the icon
+  was drawn at 80% opacity over it), and the icon was only 32 px. With `close.png` present, the button has
+  no box at all, the icon fills it, and the button is 48 px (`Modal.CLOSE_SIZE`; the drawn cross stays
+  for when there's no painting). The gloss is toned down in code by `assets/shaders/flat_icon.gdshader`: the
+  violet face's brightness and saturation are pulled toward one flat value (`flatness` 0.8), which removes
+  the gradient and the white highlight; the navy rim, outlines and cream X keep their paint. Hover lifts
+  the icon (`brighten` 1.15) and a press shrinks it slightly.
+
 ## 0.6.3e (2026-09-25): violet close button, 3 more Form 3 sprites
 
 - **Close button painted:** the ruby-red prompt looked out of place, so `build_icon_prompts.py` now asks for a
