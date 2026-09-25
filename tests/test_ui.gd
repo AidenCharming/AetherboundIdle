@@ -1135,3 +1135,37 @@ func test_first_run_window_and_text_size_follow_the_screen() -> void:
 	t.eq(at.call(2560, 1400), [Vector2i(1920, 1080), 1.0], "a 1440p screen: the full layout at normal text")
 	t.eq(at.call(3840, 2100), [Vector2i(1920, 1080), 1.0], "a 4K screen: no bigger than the layout")
 	t.eq(at.call(1366, 728), [Vector2i(1280, 720), 1.15], "a small laptop: the smallest window, larger text")
+
+
+## A Game.changed refresh keeps the Nexus cards whose look is unchanged (the same nodes) and rebuilds only the
+## changed ones, in the sorted order, with the pages already shown (HANDOFF: a big roster hitched on captures).
+func test_nexus_refresh_keeps_unchanged_cards() -> void:
+	_setup()
+	var s := Game.state
+	for i in UI.PAGE + 30:
+		var c := Creatures.make(s, "emberfang", 1, 1 + i % 10, false, [], "test")
+		s.creatures[c.id] = c
+	var main := _main()
+	_teardown()
+	main.show_screen("nexus")
+	var nexus: Node = main._screen
+	var cards := func() -> Array:
+		return nexus._grid.get_children().filter(func(n): return n is CreatureCard and not n.is_queued_for_deletion())
+	var more: Button = nexus._grid.get_children().filter(func(n): return n is Button and not (n is CreatureCard))[0]
+	more.pressed.emit()
+	var before: Array = cards.call()
+	t.eq(before.size(), UI.PAGE + 31, "two pages shown")
+	var changed: Dictionary = GameState.creature(s, before[5].cid)
+	changed.nick = "Renamed"
+	nexus.refresh()
+	var after: Array = cards.call()
+	t.eq(after.size(), before.size(), "the pages shown are kept")
+	t.eq(after.map(func(n): return n.cid), nexus._sorted_list().slice(0, after.size()).map(func(c): return c.id), "in the sorted order")
+	var same := 0
+	for n in after:
+		if n in before:
+			same += 1
+	t.eq(same, after.size() - 1, "every card but the changed one is the same node")
+	t.ok(not (after[5] in before), "the renamed one is built again")
+	main.free()
+	_teardown()

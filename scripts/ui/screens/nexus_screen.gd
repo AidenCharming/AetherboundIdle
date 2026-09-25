@@ -129,28 +129,60 @@ func _sorted_list() -> Array:
 
 func _fill_grid() -> void:
 	# a capture or evolution refreshes the grid: keep the pages already shown and the scroll position
-	var shown := _grid.get_child_count()
+	var shown := 0
+	var kept := {}   # card id -> card still in the grid
+	for n in _grid.get_children():
+		if n is CreatureCard:
+			shown += 1
+			kept[n.cid] = n
+		else:
+			_grid.remove_child(n)   # the "Show more" button: added again below if there is more
+			n.queue_free()
 	var sc := _grid.get_parent()
 	while sc and not (sc is ScrollContainer):
 		sc = sc.get_parent()
 	var scroll_y: int = sc.scroll_vertical if sc else 0
-	UI.clear(_grid)
 	CreatureCard.refresh_perched()
 	var list := _sorted_list()
 	UI.clear(_count)
 	_count.add_child(UI.chip("%d / %d shown" % [list.size(), Game.state.creatures.size()], Palette.TEXT_DIM, 14))
 	_count.add_child(UI.chip("+%s Aether/min" % F.format_num(Economy.aether_per_min(Game.state)), Palette.AETHER, 14))
-	UI.fill_paged(_grid, list, func(c):
-		var card := CreatureCard.make(c, c.id == selected)
-		card.picked.connect(func(id):
-			selected = id
-			for other in _grid.get_children():
-				if other is CreatureCard:
-					other.theme_type_variation = "TileOn" if other.cid == id else "Tile"
-			_fill_detail())
-		return card, UI.PAGE, 0, shown)
+	# a card whose look is unchanged stays in the grid and is only moved into place; taking a page of cards
+	# out of the tree and building them again made every capture on a big roster hitch
+	var to := mini(list.size(), maxi(UI.PAGE, shown))
+	for i in to:
+		var c: Dictionary = list[i]
+		var card: CreatureCard = kept.get(c.id)
+		kept.erase(c.id)
+		if card and card.get_meta("look") != CreatureCard.look(c):
+			_grid.remove_child(card)
+			card.queue_free()
+			card = null
+		if card == null:
+			card = _make_card(c)
+			_grid.add_child(card)
+		card.theme_type_variation = "TileOn" if c.id == selected else "Tile"
+		if card.get_index() != i:
+			_grid.move_child(card, i)
+	for card in kept.values():
+		_grid.remove_child(card)
+		card.queue_free()
+	if to < list.size():
+		# the rest of the pages, built as "Show more" asks for them
+		UI.fill_paged(_grid, list, _make_card, UI.PAGE, to, 0, true)
 	if sc:
 		sc.set_deferred("scroll_vertical", scroll_y)
+
+
+func _make_card(c: Dictionary) -> CreatureCard:
+	var card := CreatureCard.make(c, c.id == selected)
+	card.picked.connect(func(id):
+		selected = id
+		for other in _grid.get_children():
+			if other is CreatureCard:
+				other.theme_type_variation = "TileOn" if other.cid == id else "Tile"
+		_fill_detail())
+	return card
 
 
 # ---------------------------------------------------------------- detail panel

@@ -252,8 +252,9 @@ const PAGE := 120
 
 ## Fills `box` with make.call(item) for the first `page` items and a "Show more" button for the next page, so
 ## a long roster (thousands of Aetherlings) builds a page of cards, not all of them at once.
-static func fill_paged(box: Container, items: Array, make: Callable, page := PAGE, from := 0, at_least := 0) -> void:
-	var to := mini(items.size(), from + maxi(page, at_least))
+## With `button_only`, only the "Show more" button for items from `from` on is added (the caller built the rest).
+static func fill_paged(box: Container, items: Array, make: Callable, page := PAGE, from := 0, at_least := 0, button_only := false) -> void:
+	var to := from if button_only else mini(items.size(), from + maxi(page, at_least))
 	for i in range(from, to):
 		box.add_child(make.call(items[i]))
 	if to < items.size():

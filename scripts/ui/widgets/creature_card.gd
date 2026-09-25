@@ -22,7 +22,15 @@ static func refresh_perched() -> void:
 static func make(c: Dictionary, selected := false, note := "", compact := false) -> CreatureCard:
 	var card := CreatureCard.new()
 	card.build(c, selected, note, compact)
+	card.set_meta("look", look(c))
 	return card
+
+
+## Everything a plain card shows, as one value: a screen can keep a card whose look is unchanged instead of
+## building it again (a big roster made every capture rebuild a page of 120).
+static func look(c: Dictionary) -> String:
+	return str([c.species, Creatures.form_of(c), int(c.rarity), int(c.level), c.shiny, c.get("locked", false),
+		Creatures.display_name(c), status_text(c)])
 
 
 func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
