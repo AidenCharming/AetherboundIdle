@@ -3,6 +3,14 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3i (2026-09-25): forms are found one by one; auto-bind per form
+
+- **Designer's rule:** catching a Form 2 no longer logs its Form 1 as found. `forms` in each Aether-Log
+  entry is now only the forms actually had (0.6.3g's separate `ownedForms` is folded back in). Save version
+  4: older saves keep each species' highest logged form plus the roster's forms (`Collection.migrate`).
+- **Auto-bind is per form:** "Always try new forms" (was "new species") and `maxCopies`/best-rarity count
+  the wild one's form (`Expedition.owned_copies(s, species, form)`).
+
 ## 0.6.3h (2026-09-25): 14 Form 3 sprites drawn from scratch
 
 - Form 3 of Boltkit, Cairnflit, Duskvolt, Geodegrid, Gridrift, Hollowstream, Hushflow, Ivyflux, Nullshale,

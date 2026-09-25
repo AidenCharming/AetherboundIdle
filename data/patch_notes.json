@@ -1,5 +1,16 @@
 [
 	{
+		"version": "0.6.3i",
+		"date": "2026-09-25",
+		"title": "Every form counts",
+		"notes": {
+			"Balancing": [
+				["Aether-Log", "Catching a later form no longer counts its earlier forms as found: each form is found on its own."],
+				["Expeditions", "Auto-bind now tries every form you haven't had yet, and counts copies per form."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3h",
 		"date": "2026-09-25",
 		"title": "Nearly every final form",
