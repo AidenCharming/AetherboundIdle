@@ -4,8 +4,8 @@ extends Button
 
 signal picked(cid: String)
 
-const W := 150.0
-const H := 214.0
+const W := 180.0
+const H := 257.0
 
 var cid := ""
 
@@ -37,10 +37,10 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	var v := UI.vbox(2)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	v.offset_left = 8
-	v.offset_right = -8
-	v.offset_top = 8
-	v.offset_bottom = -8
+	v.offset_left = 10
+	v.offset_right = -10
+	v.offset_top = 10
+	v.offset_bottom = -10
 	add_child(v)
 	var top := UI.hbox(5)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE

@@ -275,7 +275,7 @@ func test_worker_picker_sorts_by_output_and_secondary() -> void:
 	_teardown()
 
 
-## Every screen fits the 1600-wide base layout next to the sidebar. A long header once made the Nexus's left
+## Every screen fits the 1920-wide base layout next to the sidebar. A long header once made the Nexus's left
 ## column so wide that its detail panel was pushed off the right edge.
 func test_screens_fit_the_base_width() -> void:
 	_setup()
@@ -294,7 +294,7 @@ func test_screens_fit_the_base_width() -> void:
 		for c in main._screen.get_children():
 			if c is Control:
 				widest = maxf(widest, c.get_combined_minimum_size().x)
-		t.ok(rail_w + widest <= 1600.0, "%s needs %d px beside a %d px sidebar" % [screen[0], widest, rail_w])
+		t.ok(rail_w + widest <= 1920.0, "%s needs %d px beside a %d px sidebar" % [screen[0], widest, rail_w])
 	main.free()
 	_teardown()
 
@@ -557,7 +557,7 @@ func test_menu_icons_are_drawn_small() -> void:
 	var main := _main()
 	_teardown()
 	var w: int = main.get_theme_constant("icon_max_width", "PopupMenu")
-	t.ok(w > 0 and w <= 32, "PopupMenu icons capped at %d px" % w)
+	t.ok(w > 0 and w <= 38, "PopupMenu icons capped at %d px" % w)
 	main.free()
 	_teardown()
 
@@ -938,7 +938,7 @@ func test_nexus_filters_and_put_to_work_menu() -> void:
 	var pm := mb.get_popup()
 	t.ok(pm.item_count > 0)
 	for i in pm.item_count:
-		t.eq(pm.get_item_icon_max_width(i), 22, "%s's icon is text-sized" % pm.get_item_text(i))
+		t.eq(pm.get_item_icon_max_width(i), 26, "%s's icon is text-sized" % pm.get_item_text(i))
 	Skills.assign(s, starter, "woodcutting")   # woodcutting's one slot is now taken, by this one
 	nexus._fill_detail()
 	pm = (nexus._detail.find_children("*", "MenuButton", true, false)[0] as MenuButton).get_popup()

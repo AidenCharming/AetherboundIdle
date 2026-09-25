@@ -275,7 +275,7 @@ func _draw_plate() -> void:
 		if rarity >= Data.max_rarity():
 			for i in 24:
 				var a0 := TAU * i / 24.0
-				draw_arc(c, r, a0, a0 + TAU / 24.0 + 0.02, 4, Color.from_hsv(fmod(t * 0.18 + i / 24.0, 1.0), 0.45, 1.0, 0.95), maxf(2.0, s * 0.026), true)
+				draw_arc(c, r, a0, a0 + TAU / 24.0 + 0.02, 4, Color.from_hsv(fmod(t * 0.18 + i / 24.0, 1.0), 0.45, 1.0, 0.95), maxf(2.4, s * 0.026), true)
 		var orbiters := rarity - (Data.max_rarity() - 3)
 		for i in orbiters:
 			var a := t * 0.9 + TAU * i / float(orbiters)
@@ -284,8 +284,8 @@ func _draw_plate() -> void:
 			draw_circle(p, maxf(2.0, s * 0.02), Color(oc, 0.35))
 			draw_circle(p, maxf(1.2, s * 0.011), Color(oc.lightened(0.5), 0.95))
 	# rarity pips (one per tier) along the bottom of the rim, so the tier can be counted, not just colour-read
-	if not silhouette and s >= 44.0:
-		var pr := clampf(s * 0.024, 2.2, 5.0)
+	if not silhouette and s >= 53.0:
+		var pr := clampf(s * 0.024, 2.6, 6.0)
 		var n := rarity
 		var step_a := (pr * 2.3) / r
 		for i in n:

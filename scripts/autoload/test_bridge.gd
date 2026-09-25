@@ -153,7 +153,7 @@ func _handle(r: Dictionary) -> Dictionary:
 			await _wheel(Vector2(float(r.get("x", 800)), float(r.get("y", 450))), int(r.get("steps", 3)))
 			return {"ok": true}
 		"click_at":
-			# canvas: x, y in the game's 1600x900 layout (as "buttons" reports them); otherwise window pixels
+			# canvas: x, y in the game's 1920x1080 layout (as "buttons" reports them); otherwise window pixels
 			await _real_click(Vector2(float(r.get("x", 0)), float(r.get("y", 0))), bool(r.get("canvas", false)))
 			return {"ok": true}
 		"key":

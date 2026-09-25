@@ -239,7 +239,7 @@ func _fill_detail() -> void:
 		var tag := " · specialty" if sk.id == sp.primarySkill else ""
 		pm.add_icon_item(Data.ui_icon(sk.id), "%s   %d/%d%s%s" % [sk.name, used, slots, tag, " · working here" if here else (" · full" if used >= slots else "")], i)
 		# the icons are painted large: keep them the size of the text (they once filled the menu)
-		pm.set_item_icon_max_width(i, 22)
+		pm.set_item_icon_max_width(i, 26)
 		pm.set_item_disabled(i, here or used >= slots)
 	pm.id_pressed.connect(func(i): Game.assign(c.id, eligible[i].id))
 	actions.add_child(assign)

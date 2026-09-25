@@ -19,7 +19,7 @@ static func make(c: Dictionary, skill: String, px: float) -> WorkerBubble:
 	if not c.is_empty():
 		w.cid = c.id
 		w._portrait = CreaturePortrait.of(c, px - 12)
-		w._portrait.position = Vector2(5, 5)
+		w._portrait.position = Vector2(6, 6)
 		w._portrait.glow_scale = 0.5
 		w.add_child(w._portrait)
 		w.tooltip_text = "%s · Lv %d" % [Creatures.display_name(c), int(c.level)]
@@ -57,13 +57,13 @@ static func _auras() -> Array:
 func _draw() -> void:
 	var s := size.x
 	var c := Vector2(s, s) / 2.0
-	var r := s / 2.0 - 2.0
+	var r := s / 2.0 - 2.4
 	if cid == "":
 		for i in 16:
 			var a0 := TAU * i / 16.0
-			draw_arc(c, r - 4, a0, a0 + TAU / 32.0, 6, Color(1, 1, 1, 0.22), 2.0, true)
+			draw_arc(c, r - 5, a0, a0 + TAU / 32.0, 6, Color(1, 1, 1, 0.22), 2.4, true)
 		return
-	draw_arc(c, r, 0, TAU, 48, Color(0, 0, 0, 0.35), 4.0, true)
+	draw_arc(c, r, 0, TAU, 48, Color(0, 0, 0, 0.35), 4.8, true)
 	var col := Palette.DANGER if _stalled else _ring_color
 	if _frac > 0.0:
-		draw_arc(c, r, -PI / 2, -PI / 2 + TAU * _frac, 48, col, 4.0, true)
+		draw_arc(c, r, -PI / 2, -PI / 2 + TAU * _frac, 48, col, 4.8, true)

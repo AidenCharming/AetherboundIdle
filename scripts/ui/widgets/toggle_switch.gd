@@ -4,8 +4,8 @@ extends CheckButton
 ## usual) that paints its own track and knob instead of the theme's icon. Drawn with anti-aliased shapes at the
 ## real screen scale, so it stays smooth at any window size, and the knob slides instead of jumping.
 
-const W := 46.0
-const H := 26.0
+const W := 55.0
+const H := 31.0
 const SLIDE := 0.14   ## seconds for the knob to cross
 
 var _t := 0.0          # 0 = off, 1 = on, in between while sliding
@@ -60,11 +60,11 @@ func _draw() -> void:
 		track.border_color = Palette.AETHER
 		track.set_border_width_all(2)
 	draw_style_box(track, r)
-	var pad := 3.0
+	var pad := 3.6
 	var rad := H * 0.5 - pad
 	var cx := lerpf(r.position.x + pad + rad, r.end.x - pad - rad, _t)
 	var c := Vector2(cx, r.position.y + H * 0.5)
-	draw_circle(c + Vector2(0, 1.5), rad, Color(0, 0, 0.05, 0.35), true, -1.0, true)   # soft drop shadow
+	draw_circle(c + Vector2(0, 1.8), rad, Color(0, 0, 0.05, 0.35), true, -1.0, true)   # soft drop shadow
 	draw_circle(c, rad, Palette.TEXT_DIM.lerp(Color.WHITE, _t), true, -1.0, true)
 	# a small aether dot in the knob when on, so on and off differ by more than colour
 	if _t > 0.5:

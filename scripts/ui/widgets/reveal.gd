@@ -44,13 +44,13 @@ func _ready() -> void:
 	_particles.lifetime = 1.4
 	_particles.explosiveness = 0.95
 	_particles.spread = 180.0
-	_particles.initial_velocity_min = 180.0
-	_particles.initial_velocity_max = 520.0
-	_particles.gravity = Vector2(0, 260)
-	_particles.damping_min = 40.0
-	_particles.damping_max = 90.0
-	_particles.scale_amount_min = 3.0
-	_particles.scale_amount_max = 7.0
+	_particles.initial_velocity_min = 216.0
+	_particles.initial_velocity_max = 624.0
+	_particles.gravity = Vector2(0, 312)
+	_particles.damping_min = 48.0
+	_particles.damping_max = 108.0
+	_particles.scale_amount_min = 3.6
+	_particles.scale_amount_max = 8.4
 	var grad := Gradient.new()
 	grad.set_color(0, Color(1, 1, 1, 1))
 	grad.set_color(1, Color(1, 1, 1, 0))
@@ -78,15 +78,15 @@ func enqueue(kind: String, data: Dictionary) -> void:
 
 func _layout() -> void:
 	var vs := size
-	var center := vs / 2.0 - Vector2(0, 50)
-	_rays.size = Vector2(900, 900)
+	var center := vs / 2.0 - Vector2(0, 60)
+	_rays.size = Vector2(1080, 1080)
 	_rays.position = center - _rays.size / 2.0
 	_stage.position = center
 	_particles.position = center
-	_caption.position = Vector2(0, center.y + 150)
-	_caption.size = Vector2(vs.x, 200)
-	_hint.position = Vector2(0, vs.y - 60)
-	_hint.size = Vector2(vs.x, 30)
+	_caption.position = Vector2(0, center.y + 180)
+	_caption.size = Vector2(vs.x, 240)
+	_hint.position = Vector2(0, vs.y - 72)
+	_hint.size = Vector2(vs.x, 36)
 
 
 func _next() -> void:
@@ -152,8 +152,8 @@ func _play_hatch(res: Dictionary) -> void:
 	var rarity := int(c.rarity)
 	var rc := Data.rarity_color(rarity)
 	var ev := EggView.make(egg, 360)
-	ev.position = Vector2(-150, -150)
-	ev.pivot_offset = Vector2(150, 150)
+	ev.position = Vector2(-180, -180)
+	ev.pivot_offset = Vector2(180, 180)
 	_stage.add_child(ev)
 	_rays_mat.set_shader_parameter("ray_color", Data.rarity_color(int(egg.get("shell", rarity))))
 	var tw := create_tween()
@@ -218,7 +218,7 @@ func _play_evolve(e: Dictionary) -> void:
 		return
 	var old := CreaturePortrait.make(e.species, int(e.from), int(c.rarity), bool(c.shiny), 360)
 	old.plate = false
-	old.position = Vector2(-150, -150)
+	old.position = Vector2(-180, -180)
 	_stage.add_child(old)
 	_rays_mat.set_shader_parameter("ray_color", Palette.AETHER)
 	var tw := create_tween()
@@ -268,15 +268,15 @@ func _burst(color: Color, rarity: int) -> void:
 		var host: Control = get_parent()
 		var st := create_tween()
 		for i in 8:
-			st.tween_property(host, "position", Vector2(randf_range(-9, 9), randf_range(-7, 7)) * (1.0 - i / 8.0), 0.04)
+			st.tween_property(host, "position", Vector2(randf_range(-11, 11), randf_range(-8, 8)) * (1.0 - i / 8.0), 0.04)
 		st.tween_property(host, "position", Vector2.ZERO, 0.04)
 
 
 func _show_creature(c: Dictionary, _rc: Color) -> void:
 	var p := CreaturePortrait.of(c, 360)
 	p.plate = false
-	p.position = Vector2(-150, -150)
-	p.pivot_offset = Vector2(150, 150)
+	p.position = Vector2(-180, -180)
+	p.pivot_offset = Vector2(180, 180)
 	p.scale = Vector2(0.2, 0.2)
 	_stage.add_child(p)
 	var tw := create_tween()
@@ -285,7 +285,7 @@ func _show_creature(c: Dictionary, _rc: Color) -> void:
 	if c.get("shiny", false):
 		for i in 10:
 			var sp := UI.icon(Data.ui_icon("shiny"), 36)
-			sp.position = Vector2(randf_range(-170, 150), randf_range(-170, 140))
+			sp.position = Vector2(randf_range(-204, 180), randf_range(-204, 168))
 			sp.modulate.a = 0.0
 			_stage.add_child(sp)
 			var st := sp.create_tween().set_loops(3)

@@ -6,7 +6,7 @@ extends Node
 
 var out := "user://tour"
 var only: Array = []
-var size := Vector2i(1600, 900)   ## --size=1280x720 to see a smaller window
+var size := Vector2i(1920, 1080)   ## --size=1280x720 to see a smaller window
 
 
 func _ready() -> void:

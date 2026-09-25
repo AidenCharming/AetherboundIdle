@@ -3,8 +3,8 @@ extends Control
 ## A flashy frame for rare, limited-time offers: an animated rainbow-gold border that runs around the card and
 ## little sparkles that twinkle over it. wrap() puts a card and the frame together; it never takes the mouse.
 
-var radius := 14.0
-var width := 3.0
+var radius := 17.0
+var width := 3.6
 var _t := 0.0
 var _sparks: Array = []   # [{pos (0..1), phase, size}]
 
@@ -25,7 +25,7 @@ func _ready() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = get_instance_id()
 	for i in 9:
-		_sparks.append({"pos": Vector2(rng.randf(), rng.randf()), "phase": rng.randf() * TAU, "size": rng.randf_range(3.0, 7.0)})
+		_sparks.append({"pos": Vector2(rng.randf(), rng.randf()), "phase": rng.randf() * TAU, "size": rng.randf_range(3.6, 8.4)})
 
 
 func _process(delta: float) -> void:

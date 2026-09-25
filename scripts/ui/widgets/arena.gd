@@ -49,13 +49,13 @@ func _ready() -> void:
 	_banner.add_theme_color_override("font_outline_color", Palette.INK)
 	_banner.add_theme_constant_override("outline_size", 12)
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	_banner.offset_top = 14
+	_banner.offset_top = 17
 	_banner.z_index = 6
 	add_child(_banner)
 	_status = UI.label("", "Dim")
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_status.offset_top = -34
+	_status.offset_top = -41
 	_status.z_index = 6
 	add_child(_status)
 	Game.event.connect(_on_event)
@@ -75,13 +75,13 @@ func _draw_ground() -> void:
 	_hills(s.y * HORIZON_Y, s.y * 0.16, Color(c.darkened(0.55), 0.85), 3.0, _zone_seed)
 	_hills(s.y * (HORIZON_Y + 0.06), s.y * 0.1, Color(c.darkened(0.7), 0.95), 5.0, _zone_seed + 4.0)
 	_grad_rect(Rect2(0, ground_top, s.x, s.y - ground_top), Color(c.darkened(0.62), 1.0), Color(c.darkened(0.82), 1.0))
-	_ground.draw_line(Vector2(0, ground_top), Vector2(s.x, ground_top), Color(c.lightened(0.1), 0.45), 2.0)
+	_ground.draw_line(Vector2(0, ground_top), Vector2(s.x, ground_top), Color(c.lightened(0.1), 0.45), 2.4)
 	# scattered stones and tufts, fixed per island
 	for i in 26:
 		var fx := fposmod(sin((i + 1) * 12.9898 + _zone_seed) * 43758.5453, 1.0)
 		var fy := fposmod(sin((i + 1) * 78.233 + _zone_seed) * 12345.678, 1.0)
-		var y := ground_top + 8.0 + fy * (s.y - ground_top - 10.0)
-		var r := 2.0 + 5.0 * fy
+		var y := ground_top + 10.0 + fy * (s.y - ground_top - 12.0)
+		var r := 2.4 + 6.0 * fy
 		_ground.draw_set_transform(Vector2(fx * s.x, y), 0.0, Vector2(1.0, 0.45))
 		_ground.draw_circle(Vector2.ZERO, r, Color(c.darkened(0.4), 0.55))
 		_ground.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
@@ -266,8 +266,8 @@ func _announce(b: Dictionary) -> void:
 		var col: Color = Color(CreaturePortrait.shiny_palette(f.species).light) if f.shiny else Data.rarity_color(r)
 		var centre: Vector2 = v.root.position + v.root.size * 0.5
 		_burst(centre, col, 1.4 if f.shiny else 1.0)
-		FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 10.0),
-			"Shiny!" if f.shiny else Data.rarity(r).name + "!", col, Data.ui_icon("shiny") if f.shiny else null, 17, 34.0, true)
+		FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 12.0),
+			"Shiny!" if f.shiny else Data.rarity(r).name + "!", col, Data.ui_icon("shiny") if f.shiny else null, 20, 41.0, true)
 		sound = "shiny_appear" if f.shiny else (sound if sound != "" else "rare_appear")
 	if sound != "":
 		Sfx.play(sound)
@@ -284,13 +284,13 @@ func _burst(at: Vector2, col: Color, strength: float) -> void:
 	fx.draw.connect(func():
 		var k: float = state.k
 		var a := 1.0 - k
-		var r := 20.0 + 70.0 * k * strength
-		fx.draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(col, 0.8 * a), 3.0 + 3.0 * a, true)
+		var r := 24.0 + 84.0 * k * strength
+		fx.draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(col, 0.8 * a), 3.6 + 3.6 * a, true)
 		fx.draw_circle(Vector2.ZERO, r * 0.6, Color(col, 0.18 * a))
 		for i in 10:
 			var ang := TAU * i / 10.0 + k * 0.6
 			var d := Vector2(cos(ang), sin(ang))
-			fx.draw_line(d * r * 0.75, d * (r * 1.15 + 10.0), Color(col.lightened(0.3), 0.7 * a), 2.0, true))
+			fx.draw_line(d * r * 0.75, d * (r * 1.15 + 12.0), Color(col.lightened(0.3), 0.7 * a), 2.4, true))
 	var tw := fx.create_tween()
 	tw.tween_method(func(k: float):
 		state.k = k
@@ -344,7 +344,7 @@ func _build(b: Dictionary) -> void:
 		# side, so a lone enemy is drawn at the same size as one of three.
 		var side_w := s.x * 0.44
 		var full := maxi(maxi(int(Data.tuning.combat.partySize), 3), maxi(b.allies.size(), b.enemies.size()))
-		var base_px := clampf(minf(side_w / (full * 0.78 + 0.35), s.y * 0.34), 64.0, 150.0)
+		var base_px := clampf(minf(side_w / (full * 0.78 + 0.35), s.y * 0.34), 77.0, 180.0)
 		for i in n:
 			var f: Dictionary = list[i]
 			var boss: bool = f.get("boss", false)
@@ -353,7 +353,7 @@ func _build(b: Dictionary) -> void:
 			var x := (s.x * 0.04 + slot_x if side == 0 else s.x * 0.96 - slot_x) - px / 2.0
 			var back := (i % 2 == 1) if n > 1 else false
 			# keep the fighter, its name and its bars inside the backdrop, with a small margin
-			var edge := s.x * 0.02 + 20.0
+			var edge := s.x * 0.02 + 24.0
 			x = clampf(x, edge, maxf(edge, s.x - edge - px))
 			var root := Control.new()
 			root.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -382,7 +382,7 @@ func _build(b: Dictionary) -> void:
 			root.z_index = 0 if back else 1
 			add_child(root)
 			# the nameplate floats above the head; back-row plates sit a step higher so neighbours never overlap
-			var plate_w := clampf(1.55 * side_w / maxf(1.0, float(full)) - 6.0, 92.0, 150.0)
+			var plate_w := clampf(1.55 * side_w / maxf(1.0, float(full)) - 7.0, 110.0, 180.0)
 			if boss:
 				plate_w = 176.0
 			var np := _nameplate(f, side, boss, plate_w)
@@ -392,7 +392,7 @@ func _build(b: Dictionary) -> void:
 			var top := head - 6.0 - ph - ((ph + 4.0) if back else 0.0)
 			np.panel.size = Vector2(plate_w, ph)
 			# centred over the art, but never past the arena's edges
-			var plate_x := clampf(root.position.x + art.get_center().x - plate_w / 2.0, 4.0, s.x - 4.0 - plate_w)
+			var plate_x := clampf(root.position.x + art.get_center().x - plate_w / 2.0, 5.0, s.x - 5.0 - plate_w)
 			np.panel.position = Vector2(plate_x - root.position.x, top)
 			root.add_child(np.pips)
 			np.pips.position = np.panel.position + Vector2(plate_w / 2.0, 0)
@@ -505,14 +505,14 @@ func _on_event(e: Dictionary) -> void:
 			if motion and e.ability == "":
 				var dir := 1.0 if e.side == 0 else -1.0
 				var tw: Tween = att.root.create_tween()   # bound to the fighter, so it dies with it when the wave is rebuilt
-				tw.tween_property(att.root, "position", att.home + Vector2(26 * dir, -6), 0.08).set_trans(Tween.TRANS_QUAD)
+				tw.tween_property(att.root, "position", att.home + Vector2(31 * dir, -7), 0.08).set_trans(Tween.TRANS_QUAD)
 				tw.tween_property(att.root, "position", att.home, 0.14).set_trans(Tween.TRANS_QUAD)
 			var por: CreaturePortrait = def.portrait
 			var ft := por.create_tween()
 			ft.tween_method(func(v): por.set_flash(v), 0.8, 0.0, 0.18)
 			if motion:
 				var st: Tween = def.root.create_tween()
-				st.tween_property(def.root, "position", def.home + Vector2(randf_range(-5, 5), randf_range(-3, 3)), 0.04)
+				st.tween_property(def.root, "position", def.home + Vector2(randf_range(-6, 6), randf_range(-4, 4)), 0.04)
 				st.tween_property(def.root, "position", def.home, 0.06)
 			var eff: float = e.eff
 			if Options.get_value("damage_numbers"):
@@ -529,7 +529,7 @@ func _on_event(e: Dictionary) -> void:
 				return
 			var ab: Dictionary = Data.abilities[e.ability]
 			# starts above the name tag so it never crosses the fighter's own name
-			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 6.0)
+			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -10.0)) - 7.0)
 			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 18, 31.0, true)
 			if Data.types.has(ab.damageType):
 				Sfx.play("cast_" + ab.damageType)
@@ -551,12 +551,12 @@ func _on_event(e: Dictionary) -> void:
 			# every kill's XP, over each party member it went to
 			for v in _allies:
 				if e.xp.has(v.cid) and not v.down:
-					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 22.0)
+					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -10.0)) - 26.0)
 					FloatText.spawn(_fx, at, "+%s XP" % _num(float(e.xp[v.cid])), Palette.AETHER, null, 16, 36.0, true)
 		"creature_level":
 			for v in _allies:
 				if v.cid == e.creature:
-					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 40.0)
+					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -10.0)) - 48.0)
 					FloatText.spawn(_fx, at, "Level %d!" % int(e.level), Palette.GOLD, null, 20, 53.0, true)
 		"captured":
 			var at := Vector2(size.x * 0.73, size.y * 0.35)
@@ -566,8 +566,8 @@ func _on_event(e: Dictionary) -> void:
 		"creature_level":
 			for v in _allies:
 				if v.get("cid", "") == e.creature:
-					FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 10.0),
-						"Level %d!" % int(e.level), Palette.AETHER, Data.ui_icon("xp"), 16, 30.0, true)
+					FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 12.0),
+						"Level %d!" % int(e.level), Palette.AETHER, Data.ui_icon("xp"), 19, 36.0, true)
 		"boss_defeated":
 			_show_banner("Victory!", Palette.GOLD)
 		"wiped":
