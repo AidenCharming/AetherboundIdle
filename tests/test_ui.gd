@@ -566,3 +566,20 @@ func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
 	t.ok(is_instance_valid(claim) and not claim.is_queued_for_deletion(), "an unrelated change doesn't rebuild the card mid-click")
 	main.free()
 	_teardown()
+
+
+## Bridge bug 1: a dialog fading out kept catching clicks, counted as open and could be closed twice.
+func test_a_closing_dialog_lets_go_of_the_mouse_at_once() -> void:
+	_setup()
+	var count := {"closed": 0}
+	var m := Modal.confirm("Sure?", "Really?", "Yes", func(): pass)
+	m.closed.connect(func(): count.closed += 1)
+	t.ok(Modal.any_open())
+	m.close()
+	t.ok(not m.is_queued_for_deletion(), "still fading out")
+	t.ok(not Modal.any_open(), "a closing dialog doesn't count as open")
+	t.eq(m.mouse_filter, Control.MOUSE_FILTER_IGNORE, "the dim no longer catches clicks")
+	t.eq(_find_button(m, "Yes").mouse_filter, Control.MOUSE_FILTER_IGNORE, "nor do its buttons")
+	m.close()
+	t.eq(count.closed, 1, "closing twice closes once")
+	_teardown()

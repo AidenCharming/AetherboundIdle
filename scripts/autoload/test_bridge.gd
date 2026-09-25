@@ -279,7 +279,7 @@ func _top_modal() -> Node:
 		return null
 	for i in range(Modal.layer.get_child_count() - 1, -1, -1):
 		var m := Modal.layer.get_child(i)
-		if m is Modal and not m.is_queued_for_deletion():
+		if m is Modal and not m.is_queued_for_deletion() and not m.closing:
 			return m
 	return null
 
@@ -619,7 +619,7 @@ func modals_info() -> Array:
 	var now := Time.get_ticks_msec()
 	var live := {}
 	for m in Modal.layer.get_children():
-		if not (m is Modal) or m.is_queued_for_deletion():
+		if not (m is Modal) or m.is_queued_for_deletion() or m.closing:
 			continue
 		var key := m.get_instance_id()
 		live[key] = true

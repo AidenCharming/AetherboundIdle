@@ -10,6 +10,7 @@ static var layer: Control   ## set by the title and game scenes
 var panel: PanelContainer
 var body: VBoxContainer
 var locked := false
+var closing := false
 var _dim: ColorRect
 
 
@@ -79,14 +80,18 @@ func _remeasure() -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if event.is_action_pressed("ui_cancel") and not locked:
+	if event.is_action_pressed("ui_cancel") and not locked and not closing:
 		get_viewport().set_input_as_handled()
 		close()
 
 
+## Closing lets go of the mouse at once: during the fade a closing dialog doesn't swallow clicks meant for the
+## screen under it, doesn't count as open (Esc, the page shortcuts) and can't be closed a second time.
 func close() -> void:
-	if is_queued_for_deletion():
+	if closing or is_queued_for_deletion():
 		return
+	closing = true
+	propagate_call("set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
 	closed.emit()
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, 0.1)
@@ -115,6 +120,6 @@ static func any_open() -> bool:
 	if not layer or not is_instance_valid(layer):
 		return false
 	for c in layer.get_children():
-		if c is Modal and not c.is_queued_for_deletion():
+		if c is Modal and not c.is_queued_for_deletion() and not c.closing:
 			return true
 	return false
