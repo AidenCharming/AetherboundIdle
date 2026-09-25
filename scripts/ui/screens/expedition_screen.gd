@@ -305,14 +305,30 @@ func _fill_right() -> void:
 func _strip(arrow: String, tip: String, tex: Texture2D, on_open: Callable) -> VBoxContainer:
 	var v := UI.vbox(10)
 	v.custom_minimum_size.x = 44
-	var b := _fold_button(arrow, on_open)
+	# one button: the panel's icon with a small arrow on its corner, pointing the way the panel opens
+	var b := _fold_button("", on_open)
+	b.custom_minimum_size = Vector2(42, 46)
 	b.tooltip_text = tip
-	v.add_child(b)
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	b.add_child(center)
 	var ic := UI.icon(tex, 26)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	ic.tooltip_text = tip
-	ic.mouse_filter = Control.MOUSE_FILTER_PASS
-	v.add_child(ic)
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(ic)
+	var arr := UI.label(arrow, "", Palette.AETHER)
+	arr.add_theme_font_size_override("font_size", 18)
+	arr.add_theme_constant_override("outline_size", 6)
+	arr.add_theme_color_override("font_outline_color", Palette.BG_DEEP)
+	arr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	arr.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if arrow == "‹" else HORIZONTAL_ALIGNMENT_RIGHT
+	arr.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	arr.offset_left = 2
+	arr.offset_right = -2
+	arr.offset_bottom = 2
+	b.add_child(arr)
+	v.add_child(b)
 	var badge := UI.label("", "Small", Palette.GOLD)
 	badge.name = "Badge"
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
