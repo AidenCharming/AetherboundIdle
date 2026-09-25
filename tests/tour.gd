@@ -1,11 +1,12 @@
 extends Node
 ## Visual tour for development: builds a varied game in save slot 3, visits every screen and writes a
 ## screenshot of each. Needs a real display (or xvfb):
-##   godot --path godot res://tests/tour.tscn -- --out=/some/folder [--only=name,name]
+##   godot --path . res://tests/tour.tscn -- --out=/some/folder [--only=name,name] [--size=1280x720]
 ## It overwrites save slot 3.
 
 var out := "user://tour"
 var only: Array = []
+var size := Vector2i(1600, 900)   ## --size=1280x720 to see a smaller window
 
 
 func _ready() -> void:
@@ -14,8 +15,11 @@ func _ready() -> void:
 			out = a.substr(6)
 		elif a.begins_with("--only="):
 			only = a.substr(7).split(",")
+		elif a.begins_with("--size="):
+			var wh := a.substr(7).split("x")
+			size = Vector2i(int(wh[0]), int(wh[1]))
 	DirAccess.make_dir_recursive_absolute(out)
-	get_window().size = Vector2i(1600, 900)
+	get_window().size = size
 	# stay alive across scene changes: this node stops being "the current scene"
 	await get_tree().process_frame
 	get_tree().current_scene = null
@@ -40,6 +44,10 @@ func _wait(sec: float) -> void:
 
 func _run() -> void:
 	Options.values.reduce_motion = false
+	for a in OS.get_cmdline_user_args():
+		if a.begins_with("--ui-scale="):
+			Options.values.ui_scale = int(a.substr(11))   # this run only: not saved to options.cfg
+			Options.apply()
 	if _want("title"):
 		get_tree().change_scene_to_file("res://scenes/title.tscn")
 		await _wait(1.6)
