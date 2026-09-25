@@ -1,5 +1,5 @@
 extends Control
-## Title screen: Continue, New Game, Load Game (three save slots), Options, Credits, Quit.
+## Title screen: Continue, New Game, Load Game (three save slots), Options, Credits, Quit; patch notes on the right.
 
 const GAME_SCENE := "res://scenes/main.tscn"
 
@@ -84,6 +84,13 @@ func _build_menu() -> void:
 		col.add_child(_menu_button("Quit", "Ghost", func(): get_tree().quit()))
 	col.add_child(UI.spacer(true))
 	col.add_child(UI.label("Version %s · Godot rebuild · progress saves automatically" % ProjectSettings.get_setting("application/config/version"), "Faint"))
+	var notes := PatchNotes.new()
+	notes.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
+	notes.offset_left = -660
+	notes.offset_right = -72
+	notes.offset_top = 84
+	notes.offset_bottom = -60
+	add_child(notes)
 
 
 func _menu_button(text: String, variation: String, cb: Callable) -> Button:

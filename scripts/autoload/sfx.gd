@@ -4,9 +4,22 @@ extends Node
 
 const RATE := 22050
 const POOL := 10
+## The kinds of sound the player can switch off one by one (Options > Audio): [option key, name, a sound to
+## preview it with]. Every sound belongs to one kind (GROUP_OF); one not listed there is an interface sound.
+const GROUPS := [
+	["sfx_rare", "Rare finds (rare drops, shinies, Pearls, binds)", "rare"],
+	["sfx_notify", "Notifications (level-ups, goals, hatches, evolutions)", "level"],
+	["sfx_battle", "Battle (hits, abilities, entrances)", "hit_pyric"],
+	["sfx_ui", "Interface (clicks, coins, errors)", "click"],
+]
+const GROUP_OF := {
+	"rare": "sfx_rare", "shiny_appear": "sfx_rare", "rare_appear": "sfx_rare", "capture": "sfx_rare",
+	"level": "sfx_notify", "evolve": "sfx_notify", "hatch": "sfx_notify", "egg": "sfx_notify", "crack": "sfx_notify",
+	"hit": "sfx_battle", "strong": "sfx_battle", "whoosh": "sfx_battle",
+}
 
 var _streams: Dictionary = {}
-var last_played := ""   # the most recent sound asked for, even headless (tests read it)
+var last_played := ""   # the most recent sound that would play, even headless (tests read it); a switched-off one isn't
 var _players: Array[AudioStreamPlayer] = []
 
 
@@ -59,6 +72,8 @@ func _ready() -> void:
 
 
 func play(sound: String, pitch := 1.0) -> void:
+	if not enabled(sound):
+		return
 	last_played = sound
 	# headless runs (tests, exports) have no audio output, and sounds left playing at exit show up as leaks
 	if not _streams.has(sound) or DisplayServer.get_name() == "headless":
@@ -69,6 +84,17 @@ func play(sound: String, pitch := 1.0) -> void:
 			p.pitch_scale = pitch
 			p.play()
 			return
+
+
+## Whether this sound's kind is switched on in the Options.
+func enabled(sound: String) -> bool:
+	return bool(Options.get_value(group_of(sound)))
+
+
+func group_of(sound: String) -> String:
+	if sound.begins_with("hit_") or sound.begins_with("cast_"):
+		return "sfx_battle"
+	return GROUP_OF.get(sound, "sfx_ui")
 
 
 func _render(notes: Array, gain := 1.0) -> AudioStreamWAV:

@@ -1005,3 +1005,16 @@ func _texts(root: Node) -> Array:
 	for c in root.get_children():
 		out.append_array(_texts(c))
 	return out
+
+
+func test_patch_notes_list_every_version_and_filter_by_kind() -> void:
+	var pn := PatchNotes.new()
+	t.add_child(pn)
+	t.eq(pn._list.get_child_count(), Data.patch_notes.size(), "a card for every version")
+	pn._pick("Bugfixes")
+	var with_fixes := Data.patch_notes.filter(func(p): return not p.notes.get("Bugfixes", []).is_empty()).size()
+	t.eq(pn._list.get_child_count(), with_fixes, "only versions with bug fixes")
+	t.ok(pn._chips["Bugfixes"].button_pressed and not pn._chips[""].button_pressed, "the chip shows the filter")
+	pn._pick("")
+	t.eq(pn._list.get_child_count(), Data.patch_notes.size(), "All shows them all again")
+	pn.free()

@@ -112,3 +112,30 @@ func test_meals_can_be_cooked_before_the_first_aqueous_aetherling() -> void:
 		t.ok(z.loot.any(func(l): return l.item == fish), "%s drops %s" % [z.id, fish])
 		if z.type == "pyric":
 			break
+
+
+func test_patch_notes_are_well_formed_and_start_at_this_version() -> void:
+	var notes: Array = Data.patch_notes
+	t.ok(notes.size() > 0, "there are patch notes")
+	t.eq(str(notes[0].version), str(ProjectSettings.get_setting("application/config/version")), "the newest is this build's version")
+	var kinds := PatchNotes.KINDS.map(func(k): return k[0])
+	var prev := ""
+	for p: Dictionary in notes:
+		t.ok(p.has("version") and p.has("date") and p.has("title") and p.has("notes"), "v%s has every field" % p.get("version"))
+		if prev != "":
+			t.ok(_version_less(str(p.version), prev), "v%s comes after v%s: newest first" % [p.version, prev])
+		prev = str(p.version)
+		for k: String in p.notes:
+			t.ok(k in kinds, "v%s: %s is a known kind" % [p.version, k])
+			for e: Array in p.notes[k]:
+				t.ok(e.size() == 2 and str(e[0]) != "" and str(e[1]) != "", "v%s: an entry is [area, text]" % p.version)
+				t.ok(PatchNotes.AREA_COLORS.has(e[0]), "v%s: area %s has a colour" % [p.version, e[0]])
+
+
+func _version_less(a: String, b: String) -> bool:
+	var x := a.split(".")
+	var y := b.split(".")
+	for i in 3:
+		if int(x[i]) != int(y[i]):
+			return int(x[i]) < int(y[i])
+	return false

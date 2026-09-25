@@ -28,6 +28,7 @@ var special_recipes: Dictionary = {} # "speciesA+speciesB" (sorted) -> recipe
 var special_list: Array = []
 var goals: Array = []
 var market: Dictionary = {}
+var patch_notes: Array = []        # newest first, shown on the title screen
 
 var _textures: Dictionary = {}
 var _opaque: Dictionary = {}
@@ -62,6 +63,7 @@ func load_all() -> void:
 	collection = _read("collection.json")
 	goals = _read("goals.json")
 	market = _read("market.json")
+	patch_notes = _read("patch_notes.json")
 	var recipes: Dictionary = _read("recipes.json")
 	default_hybrids = recipes.defaults
 	special_list = recipes.special

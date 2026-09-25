@@ -16,6 +16,10 @@ var values := {
 	"master": 0.8,
 	"music": 0.55,
 	"sfx": 0.7,
+	"sfx_rare": true,     # the kinds of sound effect, each with its own switch (Sfx.GROUPS)
+	"sfx_notify": true,
+	"sfx_battle": true,
+	"sfx_ui": true,
 	"mute_unfocused": true,
 	"window_mode": 0,
 	"resolution": 2,

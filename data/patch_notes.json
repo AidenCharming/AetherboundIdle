@@ -1,0 +1,179 @@
+[
+	{
+		"version": "0.6.0",
+		"date": "2026-09-25",
+		"title": "Patch notes and sound switches",
+		"notes": {
+			"New": [
+				["UI", "Patch notes on the title screen: every version's changes, sorted by kind."],
+				["Options", "Sound effects have their own switches: rare finds, notifications, battle, work and menu sounds."],
+				["Inventory", "Click an item to see where it comes from, with each island's drop chance."],
+				["UI", "A dot on the Sanctum and Aether-Log tabs when a goal or milestone is ready to claim, with a tooltip listing them."]
+			]
+		}
+	},
+	{
+		"version": "0.5.2",
+		"date": "2026-09-25",
+		"title": "Smoother edges",
+		"notes": {
+			"QOL": [
+				["UI", "Rarity pips and the sparkles on portraits and frames have smooth edges."],
+				["Options", "On screens 1440 px wide or smaller, a new game starts with the Interface scale at 115%."]
+			]
+		}
+	},
+	{
+		"version": "0.5.1",
+		"date": "2026-09-25",
+		"title": "No more jagged art",
+		"notes": {
+			"Bugfixes": [
+				["UI", "Icons and sprites were drawn with hard, stair-stepped edges; they are smooth again."],
+				["UI", "Portraits, orbit dots, Aether-Log dots and battle shadows are drawn anti-aliased."],
+				["Options", "The Repeat switch's text was cut off at the new sizes."]
+			],
+			"QOL": [
+				["UI", "Rounder corners on pills and boxes."]
+			]
+		}
+	},
+	{
+		"version": "0.5.0",
+		"date": "2026-09-25",
+		"title": "Sharp at 1080p",
+		"notes": {
+			"QOL": [
+				["UI", "The game is laid out at 1920x1080, so the most common screen draws 1:1 with no stretching: sharper text and icons at the same size as before."]
+			]
+		}
+	},
+	{
+		"version": "0.4.1",
+		"date": "2026-09-25",
+		"title": "Even cards",
+		"notes": {
+			"QOL": [
+				["Market", "Every Market tab gives all its cards one size, so a locked card is as big as an open one."]
+			],
+			"Bugfixes": [
+				["Nexus", "Fixed an error when a delayed scroll ran after its list had closed."]
+			]
+		}
+	},
+	{
+		"version": "0.4.0",
+		"date": "2026-09-25",
+		"title": "Second code review",
+		"notes": {
+			"New": [
+				["Dev tools", "Force the next wave: a boss, a shiny or the rarest rarity."],
+				["Dev tools", "Rarity preview: every rarity plain and shiny, for any species and form, with its sounds."]
+			],
+			"Bugfixes": [
+				["Saves", "A copy is kept from the start of each session and before every import; imports are checked first."],
+				["Expeditions", "Thorns that knock out an attacker are handled correctly."],
+				["Nexus", "Keeps your page and a stable order when the list changes."],
+				["Game", "Bad tiers and indices are refused instead of breaking a save."]
+			],
+			"Balancing": [
+				["Game", "Eight numbers that were written in the code moved to the data files."]
+			]
+		}
+	},
+	{
+		"version": "0.3.1",
+		"date": "2026-09-25",
+		"title": "Bulk release switches",
+		"notes": {
+			"Bugfixes": [
+				["Nexus", "Bulk release's \"Release shinies too\" and \"Release working ones too\" showed as bare text; they are real switches now."]
+			],
+			"QOL": [
+				["Nexus", "Bulk release filters and switches sit on inset cards, like the Options pages."]
+			]
+		}
+	},
+	{
+		"version": "0.3.0",
+		"date": "2026-09-25",
+		"title": "Play-test round one",
+		"notes": {
+			"New": [
+				["Expeditions", "Wild Aetherlings roll their form: Form 2 from level 20, Form 3 from level 40. One caught below its level's form evolves as it levels."],
+				["Nexus", "Bulk release by rarity range, type, species and level, keep the best few of each species, with a live preview."],
+				["UI", "Every sidebar tab has a key you can change (Options > Controls), shown as a keycap on the tab."],
+				["Inventory", "Item tooltips and tiles say what an item is used for; sell treasure from the Inventory."],
+				["UI", "Sprites breathe, sway and hop now and then while idle."],
+				["Skills", "Fill empty slots on a skill page in one click."]
+			],
+			"QOL": [
+				["Expeditions", "XP from every kill shows at once, with live XP bars and a level-up pop."],
+				["Expeditions", "The log says the chance each bind or escape had."],
+				["Expeditions", "The island list and log fold away; the panel under the battle keeps one height."],
+				["Nexus", "Filters on one row of dropdowns and a tidier detail panel."],
+				["Nexus", "The Put to work menu's skill icons are drawn at text size."],
+				["UI", "Pickers still show what an Aetherling is doing under a card's note."],
+				["UI", "Styled tooltip cards; mouse back and forward buttons change page."],
+				["Options", "Alt+Enter and F11 toggle fullscreen."],
+				["Breeding", "Speeding up a whole hatch costs about what the egg did."],
+				["Breeding", "Attune: a lock costs by the trait's strength; Lock pills instead of switches."]
+			],
+			"Bugfixes": [
+				["UI", "A closing dialog no longer eats the next click; changing page closes a page's dialogs."],
+				["UI", "Clicks were lost when a screen rebuilt while the mouse button was down."],
+				["Sanctum", "Works Build buttons follow your gold live and their clicks aren't lost."],
+				["Sanctum", "The goal card now shows Claim for item and counter goals."],
+				["Options", "The window no longer unmaximizes on its own."],
+				["Market", "Stock discounts are real."],
+				["Nexus", "Thousands of Aetherlings no longer slow the game to a crawl."]
+			],
+			"Balancing": [
+				["Expeditions", "Bosses from island 5 on were pushovers; every island now has one wave margin and a boss a little tougher than its waves."],
+				["Cooking", "The first three islands drop fish, so meals exist before the first Aqueous Aetherling."]
+			]
+		}
+	},
+	{
+		"version": "0.2.0",
+		"date": "2026-09-24",
+		"title": "The Godot rebuild",
+		"notes": {
+			"New": [
+				["Game", "Aetherbound rebuilt in Godot: title screen with three save slots, options, offline progress."],
+				["Market", "A full Market: stock, rotating offers, boosts, extra work slots, bulk selling and the Egg Market."],
+				["Sanctum", "Aether Pearls: an endgame currency with six Pearl upgrades in Sanctum Works."],
+				["Sanctum", "Overseer Vance has 112 goals paced over the month (was 26)."],
+				["Expeditions", "Four late islands (levels 59 to 95) with painted battle backdrops."],
+				["Crafting", "Ten material tiers per skill, ten egg tiers and ten vessel tiers."],
+				["UI", "Rarity pips, animated top-tier colours, shiny nameplates and rarity effects on sprites and frames."],
+				["Expeditions", "Shiny and rare entrance effects, type attack sounds, and damage numbers that spread out."],
+				["Audio", "A boss track, looping music and a sound of its own for evolution."],
+				["Saves", "Save slots can be renamed."],
+				["UI", "Welcome Back screen redesigned."]
+			],
+			"QOL": [
+				["Skills", "Work slots: up to ten per skill."],
+				["Skills", "The worker picker lists each Aetherling's trait bonuses and sorts by best output or secondary."],
+				["Skills", "Action cards show how many of the product, rare drop and treasure you have."],
+				["Expeditions", "An Owned badge on island previews and wild fighters."],
+				["Expeditions", "Auto-bind chances as pills in each rarity's colour."],
+				["UI", "No faint grey numbers: counts, levels and stats are coloured chips."]
+			],
+			"Bugfixes": [
+				["Options", "The Options panel went blank after going fullscreen."],
+				["Nexus", "The detail panel could be pushed off screen."],
+				["Audio", "Music dropped out."],
+				["Expeditions", "Fighters faced the wrong way; the Sanctum expedition card didn't update."],
+				["Saves", "Saves are written safely, so a crash mid-save can't break one."]
+			],
+			"Balancing": [
+				["Breeding", "Inherited traits never come out weaker than the parent's; shiny parents raise an egg's shiny chance a little."],
+				["Breeding", "Breeding odds follow the parents' rarity."],
+				["Expeditions", "Levels matter in a fight; the first boss and Fractured Quarry are tougher."],
+				["Game", "Skill and creature curves fitted to a one-month pace; creature level cap 100."],
+				["Market", "Sell prices sit below shop prices; crafted goods are worth more than their inputs."]
+			]
+		}
+	}
+]

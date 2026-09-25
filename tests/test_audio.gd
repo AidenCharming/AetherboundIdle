@@ -115,3 +115,22 @@ func test_each_type_has_its_own_attack_sounds() -> void:
 	for id in rms:
 		datas[Sfx._streams[id].data] = true
 	t.eq(datas.size(), rms.size(), "every attack sound is different")
+
+
+func test_a_switched_off_kind_of_sound_stays_quiet() -> void:
+	var was: Dictionary = Options.values.duplicate()
+	for g: Array in Sfx.GROUPS:
+		t.ok(Options.values.has(g[0]), "%s has an option" % g[0])
+		t.eq(Sfx.group_of(g[2]), g[0], "%s previews its own kind" % g[2])
+	t.eq(Sfx.group_of("hit_void"), "sfx_battle")
+	t.eq(Sfx.group_of("cast_pyric"), "sfx_battle")
+	t.eq(Sfx.group_of("shiny_appear"), "sfx_rare")
+	t.eq(Sfx.group_of("coin"), "sfx_ui", "anything unlisted is an interface sound")
+	Options.values.sfx_rare = false
+	Sfx.play("click")
+	Sfx.play("rare")
+	t.eq(Sfx.last_played, "click", "a rare-find sound was not played")
+	Options.values.sfx_rare = true
+	Sfx.play("rare")
+	t.eq(Sfx.last_played, "rare", "and plays again once switched back on")
+	Options.values = was
