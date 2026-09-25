@@ -348,11 +348,17 @@ func _release(c: Dictionary) -> void:
 			selected = "", true)
 
 
+static func _mult(m: float) -> String:
+	return str(snappedf(m, 0.01)).trim_suffix(".0")
+
+
 func _attune(c: Dictionary) -> void:
 	var v := UI.vbox(12)
 	var locks := {}
 	var body := UI.vbox(8)
-	v.add_child(UI.wrap_label("Attunement rerolls this Aetherling's pool traits with Aether. Lock up to two traits to keep them; each lock triples the cost. The signature trait never changes.", "Dim", 520))
+	var at: Dictionary = Data.tuning.attunement
+	v.add_child(UI.wrap_label("Attunement rerolls this Aetherling's pool traits with Aether. Lock up to %d traits to keep them. A lock multiplies the cost by its strength: Minor ×%s, Moderate ×%s, Major ×%s. The signature trait never changes." % [
+		int(at.maxLocks), _mult(Traits.lock_mult("minor")), _mult(Traits.lock_mult("moderate")), _mult(Traits.lock_mult("major"))], "Dim", 520))
 	v.add_child(body)
 	var fill := func(fill_ref: Callable) -> void:
 		UI.clear(body)
@@ -361,9 +367,25 @@ func _attune(c: Dictionary) -> void:
 			body.add_child(UI.label("No pool traits yet.", "Faint"))
 		for t in cr.traits:
 			var trait_def: Dictionary = Data.traits[t.id]
-			var cb := CheckButton.new()
-			cb.text = "%s (%s): %s" % [trait_def.name, t.s.capitalize(), Traits.describe(t.id, t.s)]
-			cb.button_pressed = locks.has(t.id)
+			# a trait row: its name and strength, what it does, and a Lock pill that turns gold when locked
+			var card := PanelContainer.new()
+			card.theme_type_variation = "Inset"
+			var row_t := UI.hbox(12)
+			card.add_child(row_t)
+			var txt := UI.vbox(2)
+			txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			var name_row := UI.hbox(8, [UI.label(trait_def.name), UI.chip(t.s.capitalize(), Palette.AETHER, 11)])
+			txt.add_child(name_row)
+			txt.add_child(UI.wrap_label(Traits.describe(t.id, t.s), "Dim", 360))
+			row_t.add_child(txt)
+			var locked_now := locks.has(t.id)
+			var cb := UI.button("Locked ×%s" % _mult(Traits.lock_mult(t.s)) if locked_now else "Lock ×%s" % _mult(Traits.lock_mult(t.s)),
+				"Gold" if locked_now else "Chip", Callable(), Data.ui_icon("lock"))
+			cb.toggle_mode = true
+			cb.button_pressed = locked_now
+			cb.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+			cb.tooltip_text = "Keep this trait through the reroll (cost ×%s)." % _mult(Traits.lock_mult(t.s))
+			row_t.add_child(cb)
 			cb.toggled.connect(func(on):
 				if on:
 					if locks.size() >= int(Data.tuning.attunement.maxLocks):
@@ -374,8 +396,8 @@ func _attune(c: Dictionary) -> void:
 				else:
 					locks.erase(t.id)
 				fill_ref.call(fill_ref))
-			body.add_child(cb)
-		var cost := Traits.attune_cost(cr, locks.size(), Game.state)
+			body.add_child(card)
+		var cost := Traits.attune_cost(cr, locks.keys(), Game.state)
 		var row := UI.hbox(10)
 		row.add_child(UI.label("Cost", "Faint"))
 		row.add_child(UI.amount("aether", cost, cost))
