@@ -821,3 +821,30 @@ func test_nexus_filters_and_put_to_work_menu() -> void:
 			t.ok(pm.is_item_disabled(i), "can't pick the skill it already works in")
 	main.free()
 	_teardown()
+
+
+## Designer's request: idle motion on the creature sprites. They breathe and sway from the feet, and hop now
+## and then; on the arena's ground (no plate) the feet stay planted between hops.
+func test_idle_motion_breathes_from_the_feet() -> void:
+	var lifts := []
+	var stretch := []
+	var sways := []
+	for i in 60:
+		var m := CreaturePortrait.idle_motion(i * 0.1, 1.3, false)
+		lifts.append(m.x)
+		stretch.append(m.y)
+		sways.append(m.z)
+	t.ok(lifts.all(func(v): return v == 0.0), "on the ground the feet stay put")
+	t.ok(stretch.max() > 1.01 and stretch.min() < 0.99, "it breathes")
+	t.ok(absf(sways.max()) > 0.01 and absf(sways.max()) < 0.05, "a slight sway")
+	t.ok(CreaturePortrait.idle_motion(0.7, 1.3, true).x != 0.0, "on a plate it floats a little")
+	var peak := 0.0
+	for i in 56:
+		peak = maxf(peak, CreaturePortrait.hop_motion(i * 0.01).x)
+	t.ok(peak > 0.03, "a hop leaves the ground")
+	t.eq(CreaturePortrait.hop_motion(CreaturePortrait.HOP_TIME).x, 0.0, "and lands")
+	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 120)
+	p.size = Vector2(120, 120)
+	p._layout()
+	t.eq(p._art.pivot_offset.y, p._art.size.y, "the art pivots on its feet")
+	p.free()
