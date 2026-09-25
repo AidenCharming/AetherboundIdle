@@ -313,33 +313,102 @@ func _rename(c: Dictionary) -> void:
 	le.grab_focus.call_deferred()
 
 
+## The last bulk release settings, kept while the game runs so the window opens the way you left it.
+static var _bulk := {}
+
+
 func _bulk_release() -> void:
-	var v := UI.vbox(12)
-	v.add_child(UI.wrap_label("Release many duplicates at once for Aether. Only resting Aetherlings go: working ones, the party, locked ones and shinies are always kept, and so is the best one of every species.", "Dim", 520))
-	var row := UI.hbox(8, [UI.label("Release up to", "Dim")])
-	var ob := OptionButton.new()
-	for i in 4:
-		ob.add_item(Data.rarities[i].name, i)
-	row.add_child(ob)
-	v.add_child(row)
+	var o := Economy.BULK_DEFAULTS.duplicate()
+	o.merge(_bulk, true)
+	var v := UI.vbox(10)
+	v.add_child(UI.wrap_label("Release many Aetherlings at once for Aether. Locked ones and the expedition party always stay, and so do the best of each species (as many as you choose).", "Dim", 700))
+	var rar_pick := func(value: int) -> OptionButton:
+		var ob := OptionButton.new()
+		for i in Data.rarities.size():
+			ob.add_item(Data.rarities[i].name, i)
+		ob.selected = clampi(value, 1, Data.rarities.size()) - 1
+		return ob
+	var from: OptionButton = rar_pick.call(int(o.minRarity))
+	var to: OptionButton = rar_pick.call(int(o.maxRarity))
+	v.add_child(UI.hbox(8, [UI.label("Rarity from", "Dim"), from, UI.label("to", "Dim"), to]))
+	var ty := OptionButton.new()
+	ty.add_item("Any type")
+	var type_ids: Array = Data.types.keys()
+	for id in type_ids:
+		ty.add_item(Data.types[id].name)
+	ty.selected = type_ids.find(o.type) + 1
+	var spo := OptionButton.new()
+	spo.add_item("Any species")
+	var owned: Array = Data.species_list.filter(func(sp): return Game.state.creatures.values().any(func(c): return c.species == sp.id)).map(func(sp): return sp.id)
+	for id in owned:
+		spo.add_item(Data.species[id].name)
+	spo.selected = owned.find(o.species) + 1
+	var lvl := SpinBox.new()
+	lvl.min_value = 0
+	lvl.max_value = Data.tuning.creature.maxLevel
+	lvl.value = int(o.maxLevel)
+	lvl.tooltip_text = "0 means any level"
+	v.add_child(UI.hbox(8, [UI.label("Type", "Dim"), ty, UI.label("Species", "Dim"), spo, UI.label("Up to level (0 = any)", "Dim"), lvl]))
+	var keep := SpinBox.new()
+	keep.min_value = 0
+	keep.max_value = 10
+	keep.value = int(o.keepPerSpecies)
+	v.add_child(UI.hbox(8, [UI.label("Keep the best", "Dim"), keep, UI.label("of each species (rarity, then level)", "Dim")]))
+	var shinies := CheckButton.new()
+	shinies.text = "Release shinies too"
+	shinies.button_pressed = bool(o.shinies)
+	var working := CheckButton.new()
+	working.text = "Release working ones too (they leave their jobs)"
+	working.button_pressed = bool(o.working)
+	v.add_child(UI.hbox(16, [shinies, working]))
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
+	var kept_lbl := UI.wrap_label("", "Faint", 700)
+	v.add_child(kept_lbl)
+	var who := UI.flow(6, 6)
+	var who_sc := UI.scroll(who)
+	who_sc.custom_minimum_size = Vector2(700, 150)
+	v.add_child(who_sc)
 	var box := {}
 	var go := UI.button("Release", "Danger")
-	var upd := func(_i := 0):
-		var list := Economy.bulk_release_candidates(Game.state, ob.selected + 1)
+	var opts := func() -> Dictionary:
+		return {"minRarity": mini(from.selected, to.selected) + 1, "maxRarity": maxi(from.selected, to.selected) + 1,
+			"type": "" if ty.selected <= 0 else type_ids[ty.selected - 1], "species": "" if spo.selected <= 0 else owned[spo.selected - 1],
+			"maxLevel": int(lvl.value), "keepPerSpecies": int(keep.value), "shinies": shinies.button_pressed, "working": working.button_pressed}
+	var upd := func(_x = null):
+		var plan := Economy.bulk_release_plan(Game.state, opts.call())
+		var list: Array = plan.list
 		var total := 0
+		var pearls := 0
 		for c in list:
 			total += Creatures.release_value(c)
-		preview.text = "%d Aetherlings · +%s Aether" % [list.size(), F.format_num(total)]
+			pearls += int(Data.rarity(int(c.rarity)).get("releasePearls", 0)) + (int(Data.tuning.pearls.shinyRelease) if c.shiny else 0)
+		preview.text = "%d Aetherling%s · +%s Aether%s" % [list.size(), "" if list.size() == 1 else "s", F.format_num(total),
+			" · +%d Aether Pearl%s" % [pearls, "" if pearls == 1 else "s"] if pearls > 0 else ""]
+		var reasons: Array = plan.kept.keys().map(func(k): return "%d %s" % [int(plan.kept[k]), k])
+		kept_lbl.text = ("Staying: " + ", ".join(reasons) + ".") if not reasons.is_empty() else ""
+		if list.is_empty():
+			kept_lbl.text = "Nobody matches these settings. " + kept_lbl.text
+		UI.clear(who)
+		UI.fill_paged(who, UI.sort_by_key(list, func(c): return [int(c.rarity), int(c.level)]), func(c):
+			var por := CreaturePortrait.of(c, 44)
+			por.bob = false
+			por.tooltip_text = "%s · %s · Lv %d%s" % [Creatures.display_name(c), Data.rarity(int(c.rarity)).name, int(c.level), " · shiny" if c.shiny else ""]
+			return por, 60)
 		go.disabled = list.is_empty()
-	ob.item_selected.connect(upd)
+		_bulk = opts.call()
+	for ob in [from, to, ty, spo]:
+		ob.item_selected.connect(upd)
+	for sb in [lvl, keep]:
+		sb.value_changed.connect(upd)
+	for cb in [shinies, working]:
+		cb.toggled.connect(upd)
 	upd.call()
 	go.pressed.connect(func():
 		box.m.close()
-		Game.bulk_release(ob.selected + 1))
-	v.add_child(go)
-	box.m = Modal.open(v, "Bulk release", 580)
+		Game.bulk_release(opts.call()))
+	v.add_child(UI.hbox(8, [UI.spacer(), go]))
+	box.m = Modal.open(v, "Bulk release", 760)
 
 
 func _release(c: Dictionary) -> void:

@@ -602,10 +602,14 @@ func release(cid: String) -> void:
 	changed.emit()
 
 
-func bulk_release(max_rarity: int) -> void:
-	var res := Economy.bulk_release(state, max_rarity)
+## `opts`: see Economy.BULK_DEFAULTS (a bare number is the highest rarity to release).
+func bulk_release(opts: Variant) -> void:
+	var res := Economy.bulk_release(state, opts)
 	if res.count > 0:
-		info("Released %d Aetherlings. +%s Aether" % [res.count, F.format_num(res.aether)], Data.ui_icon("aether"))
+		info("Released %d Aetherlings. +%s Aether%s" % [res.count, F.format_num(res.aether),
+			"  +%d Aether Pearl%s" % [res.pearls, "" if res.pearls == 1 else "s"] if res.pearls > 0 else ""], Data.ui_icon("aether"))
+	else:
+		warn("Nobody matched, so nobody was released.")
 	save_game()
 	changed.emit()
 

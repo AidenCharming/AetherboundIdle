@@ -292,3 +292,40 @@ func test_a_creature_behind_its_level_evolves_one_form_per_level_up() -> void:
 	# saves from before forms were stored take the form their level gives
 	var old := {"species": "tuskcub", "level": int(levels[1])}
 	t.eq(Creatures.form_of(old), 2)
+
+
+func test_bulk_release_options_and_reasons() -> void:
+	var s := GameState.new_game()
+	var add := func(sp: String, rarity: int, level: int, shiny := false) -> Dictionary:
+		var c := Creatures.make(s, sp, rarity, level, shiny, [], "test")
+		s.creatures[c.id] = c
+		GameState.roster_changed()
+		return c
+	for i in 4:
+		add.call("tuskcub", 1, 5)
+	var sh: Dictionary = add.call("tuskcub", 1, 5, true)
+	var worker: Dictionary = add.call("tuskcub", 3, 30)
+	Skills.assign(s, worker, "mining")
+	var hi: Dictionary = add.call("emberfang", 6, 40)
+	add.call("emberfang", 6, 20)
+	# default: Dim only, keep 1 of each, no shinies, no workers
+	var plan := Economy.bulk_release_plan(s, {"maxRarity": 1})
+	t.eq(plan.list.size(), 4, "four plain Dim Tuskcubs (the best one is the Steady worker)")
+	t.eq(int(plan.kept.get("shiny", 0)), 1)
+	t.eq(int(plan.kept.get("working", 0)), 1)
+	# shinies and higher rarities when asked
+	plan = Economy.bulk_release_plan(s, {"maxRarity": 9, "shinies": true, "species": "tuskcub"})
+	t.ok(plan.list.has(sh), "a shiny goes when shinies are allowed")
+	t.ok(not plan.list.has(worker), "the worker stays (and is the best)")
+	plan = Economy.bulk_release_plan(s, {"minRarity": 6, "maxRarity": 6, "keepPerSpecies": 0, "working": true})
+	t.eq(plan.list.size(), 2, "keep 0 lets every matching one go")
+	plan = Economy.bulk_release_plan(s, {"minRarity": 6, "maxRarity": 6, "maxLevel": 25, "keepPerSpecies": 0})
+	t.eq(plan.list.size(), 1, "level cap")
+	t.ok(not plan.list.has(hi))
+	plan = Economy.bulk_release_plan(s, {"maxRarity": 9, "type": "pyric", "keepPerSpecies": 0})
+	t.ok(plan.list.all(func(c): return c.species == "emberfang"), "type filter")
+	# working ones leave their job when released
+	var res := Economy.bulk_release(s, {"maxRarity": 9, "working": true, "shinies": true, "keepPerSpecies": 0})
+	t.ok(res.count > 0)
+	t.ok(GameState.workers(s, "mining").is_empty(), "the worker was released and left Mining")
+	t.ok(s.creatures.size() >= 1, "never the last one")

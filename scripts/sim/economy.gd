@@ -111,29 +111,76 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	return value
 
 
-## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, and never the
-## best (highest rarity, then level) of each species, so a species is never lost from the Nexus.
-static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
-	var best := {}
+## Bulk release options, all optional: minRarity/maxRarity (tiers, inclusive), type and species ("" for any),
+## maxLevel (0 for any), keepPerSpecies (the best N of each species by rarity, then level, then shiny always stay,
+## counting every one you own), shinies and working (let those go too). Locked Aetherlings and the expedition
+## party always stay, and so does your last Aetherling.
+const BULK_DEFAULTS := {"minRarity": 1, "maxRarity": 1, "type": "", "species": "", "maxLevel": 0, "keepPerSpecies": 1,
+	"shinies": false, "working": false}
+
+
+## Who a bulk release would let go, and why each other Aetherling stays: {list, kept: {reason: count}}.
+static func bulk_release_plan(s: Dictionary, opts: Dictionary) -> Dictionary:
+	var o := BULK_DEFAULTS.duplicate()
+	o.merge(opts, true)
+	var keep_n := maxi(0, int(o.keepPerSpecies))
+	var by_species := {}
 	for c in s.creatures.values():
-		var b: Dictionary = best.get(c.species, {})
-		if b.is_empty() or [int(c.rarity), int(c.level)] > [int(b.rarity), int(b.level)]:
-			best[c.species] = c
+		if not by_species.has(c.species):
+			by_species[c.species] = []
+		by_species[c.species].append(c)
+	var best := {}
+	for sp in by_species:
+		var ranked: Array = by_species[sp].map(func(c): return [[int(c.rarity), int(c.level), int(bool(c.shiny))], c.id])
+		ranked.sort_custom(func(a, b): return a[0] > b[0])
+		for i in mini(keep_n, ranked.size()):
+			best[ranked[i][1]] = true
+	var kept := {}
 	var out := []
 	for c in s.creatures.values():
-		if not Creatures.is_benched(c) or c.get("locked", false) or c.shiny or int(c.rarity) > max_rarity:
-			continue
-		if best[c.species].id == c.id:
-			continue
-		out.append(c)
-	return out
+		var why := ""
+		var kind := Creatures.job_kind(c)
+		if c.get("locked", false):
+			why = "locked"
+		elif kind == "party":
+			why = "in the party"
+		elif kind == "skill" and not o.working:
+			why = "working"
+		elif c.shiny and not o.shinies:
+			why = "shiny"
+		elif int(c.rarity) < int(o.minRarity) or int(c.rarity) > int(o.maxRarity):
+			why = "other rarity"
+		elif o.type != "" and not (o.type in Creatures.types_of(c)):
+			why = "other type"
+		elif o.species != "" and c.species != o.species:
+			why = "other species"
+		elif int(o.maxLevel) > 0 and int(c.level) > int(o.maxLevel):
+			why = "above the level"
+		elif best.has(c.id):
+			why = "best of its species"
+		if why == "":
+			out.append(c)
+		else:
+			kept[why] = int(kept.get(why, 0)) + 1
+	if not out.is_empty() and out.size() >= s.creatures.size():
+		out.pop_back()
+		kept["your last one"] = 1
+	return {"list": out, "kept": kept}
 
 
-static func bulk_release(s: Dictionary, max_rarity: int) -> Dictionary:
-	var list := bulk_release_candidates(s, max_rarity)
+## A bare number is the highest rarity to release (the old one-choice window).
+static func bulk_release_candidates(s: Dictionary, opts: Variant) -> Array:
+	return bulk_release_plan(s, opts if opts is Dictionary else {"maxRarity": int(opts)}).list
+
+
+static func bulk_release(s: Dictionary, opts: Variant) -> Dictionary:
+	var list := bulk_release_candidates(s, opts)
 	var total := 0
+	var count := 0
+	var pearls_before := GameState.count(s, "aether-pearl")
 	for c in list:
 		var v := release(s, c)
 		if v > 0:
 			total += v
-	return {"count": list.size(), "aether": total}
+			count += 1
+	return {"count": count, "aether": total, "pearls": int(GameState.count(s, "aether-pearl") - pearls_before)}
