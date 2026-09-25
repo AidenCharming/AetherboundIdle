@@ -39,6 +39,7 @@ static func box(bg: Color, radius := 17, border := 0, border_color := Palette.LI
 	sb.content_margin_top = margin * 0.75
 	sb.content_margin_bottom = margin * 0.75
 	sb.anti_aliasing = true
+	sb.corner_detail = 16
 	if shadow > 0:
 		sb.shadow_size = shadow
 		sb.shadow_color = Palette.SHADOW

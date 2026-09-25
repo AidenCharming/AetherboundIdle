@@ -261,11 +261,11 @@ func _draw_plate() -> void:
 		var rc := Data.rarity_color_live(rarity)
 		for i in 6:
 			var rr := r + s * 0.012 * (i + 1)
-			draw_circle(c, rr, Color(rc, 0.07 * glow * (1.0 - i / 6.0)))
-	draw_circle(c, r, Color(0.06, 0.065, 0.16, 0.95))
+			draw_circle(c, rr, Color(rc, 0.07 * glow * (1.0 - i / 6.0)), true, -1.0, true)
+	draw_circle(c, r, Color(0.06, 0.065, 0.16, 0.95), true, -1.0, true)
 	# inner gradient: a lighter disc toward the top
 	for i in 5:
-		draw_circle(c - Vector2(0, r * 0.12 * i / 5.0), r * (0.95 - i * 0.12), Color(type_c, 0.035))
+		draw_circle(c - Vector2(0, r * 0.12 * i / 5.0), r * (0.95 - i * 0.12), Color(type_c, 0.035), true, -1.0, true)
 	draw_arc(c, r, 0, TAU, 64, Color(type_c, 0.85), maxf(2.0, s * 0.022), true)
 	if not silhouette and rarity > 1:
 		draw_arc(c, r + s * 0.02, -PI * 0.85, -PI * 0.15, 32, Color(Data.rarity_color_live(rarity), 0.9), maxf(1.5, s * 0.014), true)
@@ -281,8 +281,8 @@ func _draw_plate() -> void:
 			var a := t * 0.9 + TAU * i / float(orbiters)
 			var p := c + Vector2(cos(a), sin(a)) * (r + s * 0.02)
 			var oc := Data.rarity_color_live(rarity)
-			draw_circle(p, maxf(2.0, s * 0.02), Color(oc, 0.35))
-			draw_circle(p, maxf(1.2, s * 0.011), Color(oc.lightened(0.5), 0.95))
+			draw_circle(p, maxf(2.0, s * 0.02), Color(oc, 0.35), true, -1.0, true)
+			draw_circle(p, maxf(1.2, s * 0.011), Color(oc.lightened(0.5), 0.95), true, -1.0, true)
 	# rarity pips (one per tier) along the bottom of the rim, so the tier can be counted, not just colour-read
 	if not silhouette and s >= 53.0:
 		var pr := clampf(s * 0.024, 2.6, 6.0)

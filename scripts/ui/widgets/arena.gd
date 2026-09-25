@@ -83,7 +83,7 @@ func _draw_ground() -> void:
 		var y := ground_top + 10.0 + fy * (s.y - ground_top - 12.0)
 		var r := 2.4 + 6.0 * fy
 		_ground.draw_set_transform(Vector2(fx * s.x, y), 0.0, Vector2(1.0, 0.45))
-		_ground.draw_circle(Vector2.ZERO, r, Color(c.darkened(0.4), 0.55))
+		_ground.draw_circle(Vector2.ZERO, r, Color(c.darkened(0.4), 0.55), true, -1.0, true)
 		_ground.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 
 
@@ -286,7 +286,7 @@ func _burst(at: Vector2, col: Color, strength: float) -> void:
 		var a := 1.0 - k
 		var r := 24.0 + 84.0 * k * strength
 		fx.draw_arc(Vector2.ZERO, r, 0, TAU, 48, Color(col, 0.8 * a), 3.6 + 3.6 * a, true)
-		fx.draw_circle(Vector2.ZERO, r * 0.6, Color(col, 0.18 * a))
+		fx.draw_circle(Vector2.ZERO, r * 0.6, Color(col, 0.18 * a), true, -1.0, true)
 		for i in 10:
 			var ang := TAU * i / 10.0 + k * 0.6
 			var d := Vector2(cos(ang), sin(ang))
@@ -375,7 +375,7 @@ func _build(b: Dictionary) -> void:
 			shadow.draw.connect(func():
 				shadow.draw_set_transform(sh_at, 0.0, Vector2(1.0, 0.22))
 				for k in 3:
-					shadow.draw_circle(Vector2.ZERO, sh_w * (1.0 - k * 0.22), Color(0, 0, 0, 0.16))
+					shadow.draw_circle(Vector2.ZERO, sh_w * (1.0 - k * 0.22), Color(0, 0, 0, 0.16), true, -1.0, true)
 				shadow.draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE))
 			root.add_child(shadow)
 			root.add_child(por)

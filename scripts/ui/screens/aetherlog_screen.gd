@@ -117,9 +117,9 @@ func _entry(sp: Dictionary) -> Control:
 		var n := Data.max_rarity()
 		for i in n:
 			var c := Data.rarity_color(i + 1) if (i + 1) in rar else Color(1, 1, 1, 0.1)
-			dots.draw_circle(Vector2(10 + i * 15.0, 7), 5.0, c)
+			dots.draw_circle(Vector2(10 + i * 15.0, 7), 5.0, c, true, -1.0, true)
 		if shiny:
-			dots.draw_circle(Vector2(10 + n * 15.0, 7), 5.5, Palette.GOLD))
+			dots.draw_circle(Vector2(10 + n * 15.0, 7), 5.5, Palette.GOLD, true, -1.0, true))
 	v.add_child(dots)
 	card.tooltip_text = sp.name if seen else "Not found yet"
 	return card

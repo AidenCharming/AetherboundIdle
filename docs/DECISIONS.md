@@ -769,6 +769,9 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 - Open question for the designer (ask before the sharpness work): move the base layout from 1600x900 to 1920x1080,
   most players' resolution, so it draws 1:1 there instead of stretched 1.2x. It would make everything ~17% smaller
   unless sizes are raised to match.
+- **Linear texture filtering (0.5.1).** `rendering/textures/canvas_textures/default_texture_filter=2` (Linear
+  Mipmap). It was 3, which that setting reads as Nearest Mipmap, so art drawn smaller than its source looked
+  jagged. Filled circles drawn in code are anti-aliased, and boxes use 16 corner segments. 155 tests.
 - **1920×1080 base (0.5.0).** The designer chose "same size, sharper" over a smaller UI with more room. Every size
   literal in `scripts/ui/` (theme fonts and boxes, helper arguments and defaults, overrides, minimum sizes, offsets,
   drawn pixels, tween distances) was raised ×1.2 and rounded to whole pixels; `project.godot` is 1920×1080. The

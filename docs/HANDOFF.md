@@ -79,6 +79,11 @@ All commands run from the repo root.
 - **Ask the designer first:** whether to move the base layout from 1600x900 to 1920x1080 (the most common
   resolution, same 16:9 shape), so the usual screen draws 1:1 with no stretch. Everything would then look ~17%
   smaller unless sizes are raised to match; weigh that before the sharpness work above.
+- **Jagged art fixed (0.5.1).** `default_texture_filter` was 3, which for that project setting means *Nearest* with
+  mipmaps (the enum is Nearest, Linear, Linear Mipmap, Nearest Mipmap), so every icon and sprite was sampled
+  nearest-neighbour: the hard, stair-stepped edges the designer saw. Now 2 (Linear Mipmap). Filled `draw_circle`
+  calls (portraits, orbit dots, Aether-Log dots, arena shadows) now pass `antialiased = true`, and `ThemeFactory.box`
+  uses `corner_detail = 16` for rounder pills. Still worth a look: hinting none vs light, 512 px icons.
 - **1920x1080 base: done (0.5.0, designer chose "same size, sharper").** The layout is now 1920x1080 and every
   size in `scripts/ui/` was raised x1.2 and rounded, so a 1080p screen draws 1:1 with things the same size as before.
   New sizes are written at 1920x1080 scale. Worth a look by eye: anything drawn in code (arena, portraits, reveal,
