@@ -155,6 +155,13 @@ func _run() -> void:
 		await _wait(0.4)
 		await _shot("tooltip")
 		row.queue_free()
+	if _want("milestones"):
+		Main.go("aetherlog")
+		await _wait(0.3)
+		Main.instance._screen.tab = "milestones"
+		Main.instance._screen.refresh()
+		await _wait(0.6)
+		await _shot("milestones")
 	if _want("attune"):
 		Main.go("nexus")
 		await _wait(0.4)
