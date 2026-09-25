@@ -87,7 +87,9 @@ This session's branch (`claude/vigilant-meitner-d7539t`) started from before las
   and Put to work menu.
 
 **Next session: rarity balancing (designer's pick).** Read this file, then work on the early-game balance
-item below; the designer runs the bug-test benchmark locally.
+item below; the designer runs the bug-test benchmark locally. **The designer adds: rare rarities pop up too
+often on expeditions; include the wild rarity odds (`rarityWeights` per zone in `data/zones.json`, the Glimmer
+Lure) in the balance pass.** A friend played 3–4 hours on 2026-09-24 and loves it so far.
 
 **Still open:** the early-game balance item below (a Luminous party at Lv 1-3 beating Old Thicketroll; breeding
 two Steadys into Gleaming) was not touched; `month_probe --split` can measure it.
@@ -118,6 +120,13 @@ in the cloud). A new `class_name` needs `godot --headless --path . --import` bef
 passes); watch for `SCRIPT ERROR` in its output. Fixing that in `tests/test_runner.gd` would be worth it.
 
 ## Recently done (this session)
+
+**Second code review (0.4.0),** see `DECISIONS.md` ("Code review fixes, second review"): crashing tests fail and
+warnings are a separate enforced check; session-start and pre-import save copies; checked imports; thorns,
+Nexus paging and stable sort, the bridge refuses HTTP, bad inputs refused, eight numbers moved to data.
+**Dev tools:** "Next wave: boss / a shiny / the rarest rarity" (see the real entrances and sounds in the
+arena) and "Rarity preview" (every rarity plain and shiny, any species and form, a button per sound).
+**Art:** every vessel tier and Market icon is painted (checked 2026-09-25).
 
 **Repo housekeeping:** `.gitattributes` forces LF (the ~390 "changed" `.import` files were CRLF/LF noise, not
 edits). Finished and web-era docs moved to `docs/archive/` (see its README); the `art-*` docs stay where the art
@@ -176,7 +185,8 @@ What its first runs found and fixed:
 
 - The shiny and rare entrance burst and its two sounds (`shiny_appear`, `rare_appear`), and the type attack sounds.
   None has been heard; the sprite effects' motion (sweep, pulse, orbiting lights, Zenith motes) has only been seen
-  as still frames. A small test scene that spawns a shiny and a rare wild Aetherling on demand would help.
+  as still frames. The shiny entrance and burst were seen working on 2026-09-25 (bridge screenshot); hear them
+  with Developer tools > "Next wave: a shiny" / "the rarest rarity", and "Rarity preview" plays every sound.
 - The Options window-mode fix could not be reproduced on Linux (the bug was on Windows fullscreen). The cause was
   found and guarded three ways; confirm on Windows.
 
@@ -189,8 +199,6 @@ What its first runs found and fixed:
 - The Market (market.json): egg, work-slot, boost and limited-offer prices are first guesses, since the month
   probe doesn't track gold. Check them against real play, and whether buying materials makes gathering
   feel pointless.
-- Vessels now have ten tiers; the five new ones (Gloaming, Prismatic, Emberheart, Stormglass, Celestial) and the
-  seven new Market icons need paintings. Their prompts are in `tools/art/artnew_merge_me_on_pull.md`.
 
 - Aether Pearl drop rates are estimates from timed runs (3–7 a day at the end); check them in play.
 
@@ -203,7 +211,5 @@ What its first runs found and fixed:
 
 ## Ideas worth doing next
 
-- A dev scene to preview every rarity effect, entrance and sound together.
-- Rarity pips and effects in the Aether-Log and the hatch reveal (they already show wherever a portrait is used; check
-  that each looks right).
-- A "Dev tools" button to jump an expedition straight to a shiny or boss wave, for testing.
+- Rarity pips in the hatch reveal: check one hatch (the Aether-Log's cards and collected-rarity dots were
+  checked 2026-09-25 and look right).

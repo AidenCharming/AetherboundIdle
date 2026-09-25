@@ -2,7 +2,7 @@
 
 What the Godot rebuild changed, added or dropped compared with the reference material (`CLAUDE.md`,
 `docs/design.md`, `docs/content-data.md`, `docs/archive/web-build/PROGRESS.md`, `src/data/*.json`, `src/sim/`), and why. The
-web build on `main` is untouched; everything here lives under `/godot` on the `godot-rebuild` branch.
+web build lives on the `web-archive` branch; `main` and `godot-rebuild` both hold the Godot game.
 
 Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprite files](#sprite-files) ·
 [What the game is now](#what-the-game-is-now) · [Added](#added) · [Changed](#changed) ·
@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 150 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 155 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -447,6 +447,27 @@ A friend's first hours of play, reported with screenshots. Each change is its ow
 - **Windowed text:** checked at 1280×720. The font settings already render best (hinting light); text is small
   because the 1600×900 layout is scaled to 80%. A bigger scale floor overflows the Expeditions page (its log
   column is cut), so that needs the layout to reflow narrower first. Not changed.
+
+### Code review fixes, second review (2026-09-25)
+The review is in `docs/archive/done/codereview-2026-09-25.md`. Fixed, one commit each group:
+- **Tests (#2):** a runtime error aborted a test without a failure, so it printed `ok`. The runner counts script
+  errors with a `Logger`. Under `--debug` the error instead stopped at a debugger prompt forever (Windows, even
+  with stdin closed), so the tests run without `--debug`, and `-- --warnings` loads every script in `--debug`
+  without running any and fails on a warning. That found 7 warnings in the month probe and tour.
+- **Saves (#1, #7):** `slot_N.session.json` (the save as the session started, never autosaved over, the last
+  load fallback) and `slot_N.pre-import.json` (the game an import replaced). An import is migrated on a copy
+  and refused unless its containers have the right shape. The autosave trusts a main file it wrote itself
+  while its size is unchanged instead of parsing it every 20 s.
+- **Combat (#4):** a fighter knocked out by thorns during its own ability no longer attacks in that substep.
+- **UI (#5, #6):** a `Game.changed` refresh keeps the Nexus pages shown and the scroll; `UI.sort_by_key` is
+  stable. `Main.instance` is cleared when the game screen leaves the tree.
+- **Bridge (#3):** a connection whose first line looks like HTTP is dropped before its body can run.
+- **Actions (#9):** bad breeding tiers, egg grades or types, milestone tracks or indices and missing Aetherlings
+  are refused in the sim.
+- **Data (#8):** `shiny.hatchPityMax`/`hatchCap`, `aether.releaseLevelsPerStep`/`releasePerForm`,
+  `combat.healBelow`/`bossXpRarity`/`firstClearLevelBelowBoss`, `market.offerQtyBase` (same values as before).
+- **Not changed:** #12 (`levelTimes` uses the wall clock; nothing reads it), #10 (dev tools in release builds)
+  and #11 (`.claude/settings.json` allows all Bash) wait for the designer.
 
 ### Code review fixes (2026-09-24)
 A review of the whole repo found save, purchase and correctness bugs; each fix is its own commit with a test.
