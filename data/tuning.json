@@ -219,6 +219,10 @@
 		},
 		"bossXpMult": 6,
 		"rarityXpPerTier": 0.25,
+		"wildFormUp": [
+			0.1,
+			0.02
+		],
 		"tempo": {
 			"quick": {
 				"cooldownMs": 5000,

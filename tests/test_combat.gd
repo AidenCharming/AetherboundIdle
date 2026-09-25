@@ -285,3 +285,26 @@ func test_a_kill_levels_the_fighter_mid_run() -> void:
 	t.ok(float(f.maxHp) > max_before, "and its higher Health")
 	t.ok(float(f.hp) > hp_before, "gaining the extra Health")
 	t.ok(float(f.power) >= float(Combat.ally(c).power) - 0.001, "and its new power")
+
+
+## Designer's request: the islands show a mix of forms. A wild one is sometimes met a form or two above its
+## level's form (combat.wildFormUp), fights in that form, and keeps it when bound.
+func test_wild_aetherlings_come_in_a_mix_of_forms() -> void:
+	var s := GameState.new_game()
+	var z: Dictionary = Data.zones["whisperleaf-hollow"]   # levels 1-5: form 1 by level
+	var rng := _rng(11)
+	var counts := [0, 0, 0]
+	for i in 3000:
+		var w := Expedition.roll_wild(s, z, rng)
+		counts[int(w.form) - 1] += 1
+	var up: Array = Data.tuning.combat.wildFormUp
+	t.near(counts[1] / 3000.0, float(up[0]), 0.03, "form 2 about %s of the time (%d)" % [up[0], counts[1]])
+	t.near(counts[2] / 3000.0, float(up[1]), 0.015, "form 3 about %s (%d)" % [up[1], counts[2]])
+	t.ok(counts[0] > counts[1] and counts[1] > counts[2], "most are form 1")
+	var ev := []
+	Expedition.try_capture(s, {"species": "tuskcub", "level": 4, "rarity": 1, "shiny": false, "form": 3}, [], rng, ev, {"freeBinds": 0})
+	var bound: Dictionary = s.creatures[ev.filter(func(e): return e.type == "captured")[0].creature]
+	t.eq(Creatures.form_of(bound), 3, "bound in form 3 at level 4, it stays form 3")
+	t.eq(Combat.ally(bound).form, 3, "and fights as form 3")
+	bound.level = 45
+	t.eq(Creatures.form_of(bound), 3, "levelling past never lowers it")

@@ -114,15 +114,16 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 		for i in count:
 			var w := roll_wild(s, z, rng)
 			var mult := {"health": z.enemyMult, "power": z.enemyMult, "guard": z.enemyMult}
-			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult)
+			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult, "", "", int(w.form))
 			b.enemies.append(f)
 			if w.shiny:
 				events.append({"type": "shiny_spotted", "species": w.species})
 	events.append({"type": "wave", "wave": b.wave, "waves": b.waves})
 
 
-## A random wild encounter for a zone: {species, level, rarity, shiny}. Counts toward shiny pity and marks
-## the species as seen in the Aether-Log.
+## A random wild encounter for a zone: {species, level, rarity, shiny, form}. Counts toward shiny pity and
+## marks the species as seen in the Aether-Log. Now and then one is met a form (or two) above what its level
+## has reached (`combat.wildFormUp`), so the islands show a mix of forms.
 static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var sp_id: String = Rng.weighted_key(rng, z.species)
 	# a Glimmer Lure makes every rarity above Dim more common
@@ -141,7 +142,18 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
 	s.collection.seen[sp_id] = true
-	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny}
+	var form := F.form_for_level(level)
+	var up: Array = Data.tuning.combat.get("wildFormUp", [])
+	var roll := rng.randf()
+	for i in range(up.size() - 1, -1, -1):
+		var p_up := 0.0
+		for j in range(i, up.size()):
+			p_up += float(up[j])
+		if roll < p_up:
+			form += i + 1
+			break
+	form = mini(form, Data.species[sp_id].forms.size())
+	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": form}
 
 
 # ---------------------------------------------------------------- stepping
@@ -212,7 +224,7 @@ static func _on_enemy_down(s: Dictionary, f: Dictionary, rng: RandomNumberGenera
 	b.kills = int(b.kills) + 1
 	if f.get("boss", false):
 		return  # boss rewards land when the wave clears
-	defeated_wild(s, Data.zones[b.zone], {"species": f.species, "level": int(f.level), "rarity": int(f.rarity), "shiny": bool(f.shiny)},
+	defeated_wild(s, Data.zones[b.zone], {"species": f.species, "level": int(f.level), "rarity": int(f.rarity), "shiny": bool(f.shiny), "form": int(f.form)},
 		_alive_party(s), rng, events, b)
 
 
@@ -336,6 +348,8 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String) -> Dictionary:
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
 	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild")
+	if int(w.get("form", 1)) > Creatures.form_of(c):
+		c.form = int(w.form)   # bound in a higher form than its level: it keeps it
 	s.creatures[c.id] = c
 	s.counters.captures = int(s.counters.captures) + 1
 	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
