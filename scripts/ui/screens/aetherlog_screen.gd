@@ -144,7 +144,8 @@ func _entry(sp: Dictionary) -> Control:
 	p.modulate.a = 1.0 if owned else (0.8 if seen else 0.45)
 	p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(p)
-	var name_lbl := UI.label(sp.name if seen else "???", "H3")
+	# the name of the form the card shows, once that form is found
+	var name_lbl := UI.label(sp.forms[form - 1].name if have else (sp.name if seen else "???"), "H3")
 	name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	name_lbl.clip_text = true
 	v.add_child(name_lbl)
@@ -175,8 +176,9 @@ static func _detail(sp: Dictionary) -> Modal:
 	var row := UI.hbox(28)
 	var left := UI.vbox(18)
 	var big_box := UI.vbox(0)
+	big_box.custom_minimum_size.y = 280   # the portrait's rarity pips draw a little past its 260 px box
 	left.add_child(big_box)
-	var thumbs := UI.hbox(10)
+	var thumbs := UI.hbox(4)
 	thumbs.alignment = BoxContainer.ALIGNMENT_CENTER
 	left.add_child(thumbs)
 	row.add_child(left)
@@ -191,8 +193,11 @@ static func _detail(sp: Dictionary) -> Modal:
 	var parts := {"big": big_box, "text": form_box, "thumbs": thumbs}
 	# a species never seen keeps its later forms hidden: no thumbnails, just the Form 1 shape
 	for f in ([1, 2, 3] if seen else []):
+		# each thumbnail with the form's name under it (the number until that form is found)
+		var col := UI.vbox(4)
 		var b := UI.button("", "Tile")
 		b.custom_minimum_size = Vector2(88, 88)
+		b.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		b.set_meta("form", f)
 		var tp := CreaturePortrait.make(sp.id, f, 1, false, 72)
 		tp.bob = false
@@ -200,13 +205,21 @@ static func _detail(sp: Dictionary) -> Modal:
 		tp.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		tp.position = Vector2(8, 8)
 		b.add_child(tp)
-		b.tooltip_text = sp.forms[f - 1].name if f in entry.get("forms", []) else "Form %d: not discovered yet" % f
 		b.pressed.connect(func(): _show_form(sp, f, parts))
-		thumbs.add_child(b)
+		col.add_child(b)
+		var nm := UI.label(sp.forms[f - 1].name if f in entry.get("forms", []) else "Form %d" % f, "Faint")
+		nm.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		nm.custom_minimum_size.x = 112
+		nm.clip_text = true
+		nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		nm.tooltip_text = nm.text
+		nm.mouse_filter = Control.MOUSE_FILTER_PASS
+		col.add_child(nm)
+		thumbs.add_child(col)
 	_show_form(sp, best_form, parts)
 	if not seen:
 		right.add_child(UI.wrap_label(_where(sp), "Dim", 560))
-		return Modal.open(row, "???", 1000)
+		return Modal.open(row, "", 1000)
 	var badges := UI.hbox(7)
 	for t in sp.types:
 		badges.add_child(UI.type_badge(t))
@@ -235,7 +248,8 @@ static func _detail(sp: Dictionary) -> Modal:
 		sh.add_child(shv)
 		right.add_child(sh)
 	right.add_child(UI.wrap_label(_where(sp), "Dim", 560))
-	return Modal.open(row, sp.name, 1000)
+	# no title: the selected form's name heads the text (the species' name is only its Form 1 name)
+	return Modal.open(row, "", 1000)
 
 
 ## Shows form f on the species page: the large portrait, the thumbnail highlight, and the form's own text.
@@ -247,8 +261,10 @@ static func _show_form(sp: Dictionary, f: int, parts: Dictionary) -> void:
 	var p := CreaturePortrait.make(sp.id, f, 1, false, 260)
 	p.set_silhouette(not have)
 	p.set_meta("big", true)
+	p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER   # the column is wider than the portrait (the names)
 	parts.big.add_child(p)
-	for b in parts.thumbs.get_children():
+	for col in parts.thumbs.get_children():
+		var b: Button = col.get_child(0)
 		b.theme_type_variation = "TileOn" if b.get_meta("form") == f else "Tile"
 	UI.clear(parts.text)
 	var form: Dictionary = sp.forms[f - 1]

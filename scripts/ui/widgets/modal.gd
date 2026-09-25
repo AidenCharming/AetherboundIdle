@@ -23,6 +23,30 @@ static func open(content: Control, title := "", width := 672.0, close_button := 
 	return m
 
 
+## The round close button: a drawn cross that brightens on hover. Its tooltip is "Close", which is how tests
+## and the bridge's `click "Close"` find it.
+static func close_x(on_press: Callable) -> Button:
+	var b := Button.new()
+	b.tooltip_text = "Close"
+	b.custom_minimum_size = Vector2(40, 40)
+	b.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	b.focus_mode = Control.FOCUS_NONE
+	b.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	b.add_theme_stylebox_override("normal", ThemeFactory.box(Color(1, 1, 1, 0.04), 20, 1, Color(1, 1, 1, 0.1), 0))
+	b.add_theme_stylebox_override("hover", ThemeFactory.box(Color(1, 1, 1, 0.12), 20, 1, Color(1, 1, 1, 0.25), 0))
+	b.add_theme_stylebox_override("pressed", ThemeFactory.box(Color(1, 1, 1, 0.2), 20, 1, Color(1, 1, 1, 0.3), 0))
+	b.pressed.connect(on_press)
+	b.mouse_entered.connect(b.queue_redraw)
+	b.mouse_exited.connect(b.queue_redraw)
+	b.draw.connect(func():
+		var c := b.size * 0.5
+		var r := 7.0
+		var col := Palette.TEXT if b.is_hovered() else Palette.TEXT_DIM
+		b.draw_line(c + Vector2(-r, -r), c + Vector2(r, r), col, 2.5, true)
+		b.draw_line(c + Vector2(r, -r), c + Vector2(-r, r), col, 2.5, true))
+	return b
+
+
 func _build(content: Control, title: String, width: float, close_button: bool) -> void:
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -42,15 +66,23 @@ func _build(content: Control, title: String, width: float, close_button: bool) -
 	center.add_child(panel)
 	body = UI.vbox(17)
 	panel.add_child(body)
-	if title != "" or close_button:
+	if title != "":
 		var head := UI.hbox(12)
-		if title != "":
-			head.add_child(UI.label(title, "H2"))
+		head.add_child(UI.label(title, "H2"))
 		head.add_child(UI.spacer())
 		if close_button:
-			var x := UI.button("Close", "Ghost", close)
-			head.add_child(x)
+			head.add_child(close_x(close))
 		body.add_child(head)
+	elif close_button:
+		# no title: the close button sits in the corner over the content, not on a header row of its own
+		var over := Control.new()
+		over.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		var x := close_x(close)
+		x.set_anchors_and_offsets_preset(Control.PRESET_TOP_RIGHT)
+		x.offset_left = -40
+		x.offset_bottom = 40
+		over.add_child(x)
+		panel.add_child(over)
 	body.add_child(content)
 	content.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	modulate.a = 0.0

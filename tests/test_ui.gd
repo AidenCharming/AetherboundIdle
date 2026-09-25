@@ -23,7 +23,7 @@ func _teardown() -> void:
 
 
 func _find_button(root: Node, text: String) -> Button:
-	if root is Button and root.text == text:
+	if root is Button and (root.text == text or (root.text == "" and root.tooltip_text == text)):
 		return root
 	for c in root.get_children():
 		var b := _find_button(c, text)
@@ -1063,6 +1063,7 @@ func test_aetherlog_species_page_shows_one_form_at_a_time() -> void:
 	m = AetherlogScreen._detail(sp)
 	t.eq(big_form.call(m), 1, "a seen species opens on Form 1")
 	t.eq(thumbs.call(m).size(), 3, "three form thumbnails")
+	t.ok(_find_label(m, "Form 2") != null and _find_label(m, "Form 3") != null, "forms not found are named by number under their thumbnails")
 	t.ok(_find_label(m, "Form 1") != null, "a form not found yet is named by its number")
 	_teardown()
 	# owned up to Form 2: opens there, its description is shown, and a click on Form 3 swaps
@@ -1071,6 +1072,7 @@ func test_aetherlog_species_page_shows_one_form_at_a_time() -> void:
 	Collection.on_owned(s, c)
 	m = AetherlogScreen._detail(sp)
 	t.eq(big_form.call(m), 2, "opens on the highest form found")
+	t.ok(_find_label(m, sp.forms[0].name) != null and _find_label(m, "Form 3") != null, "found forms show their names under the thumbnails")
 	t.ok(_find_label(m, sp.forms[1].desc) != null, "Form 2's description is shown")
 	var t3: Button = thumbs.call(m)[2]
 	t3.pressed.emit()
@@ -1108,6 +1110,7 @@ func test_aetherlog_cards_show_chosen_form_rarity_and_shiny() -> void:
 		return null
 	var p: CreaturePortrait = card.call()
 	t.eq([p.form, p.rarity, p.shiny, p.silhouette], [2, 3, true, false], "best form, highest rarity, shiny")
+	t.ok(screen.find_children("*", "Label", true, false).any(func(l): return l.text == Data.species.emberfang.forms[1].name), "the card is named for the form it shows")
 	_find_button(screen, "Form 3").pressed.emit()
 	p = card.call()
 	t.eq([p.form, p.silhouette, p.shiny], [3, true, false], "a form not found is a plain silhouette")

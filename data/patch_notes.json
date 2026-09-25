@@ -1,5 +1,19 @@
 [
 	{
+		"version": "0.6.3c",
+		"date": "2026-09-25",
+		"title": "Tidier windows",
+		"notes": {
+			"New": [
+				["UI", "Windows close with a round ✕ button."],
+				["Aether-Log", "A species' page names all three forms under their pictures and is headed by the chosen form's name; Creaturedex cards are named for the form they show."]
+			],
+			"Bugfixes": [
+				["UI", "Tooltips open clear of the mouse pointer, so they no longer catch your clicks."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3b",
 		"date": "2026-09-25",
 		"title": "More final forms",

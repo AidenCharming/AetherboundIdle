@@ -3,6 +3,17 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3c (2026-09-25): species page names, round close button, tooltips clear of the pointer
+
+- **Species page (designer's feedback):** each form's name sits under its thumbnail ("Form N" until found);
+  the modal has no title (the species' name is only its Form 1 name), so the selected form's name heads the
+  text. The big portrait keeps its 260 px size in the wider column. Creaturedex cards are named for the form
+  they show once that form is found.
+- **Close button:** every modal's "Close" text button is a round drawn ✕ (`Modal.close_x`, tooltip "Close",
+  which the bridge and `_find_button` match). A modal with no title has no header row: the ✕ sits in the corner.
+- **Tooltips caught clicks:** Godot put them 10 px from the pointer, inside the cursor arrow, so a small move
+  landed the click on the tooltip. `display/mouse_cursor/tooltip_position_offset` is (22, 30).
+
 ## 0.6.3b (2026-09-25): 13 more Form 3 sprites
 
 - Form 3 of Burrbolt, Cliffscorch, Duskbloom, Duskflare, Eddyelver, Flintlamb, Mudskulker, Murkmire, Nettlemesa,
