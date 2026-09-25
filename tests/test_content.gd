@@ -97,3 +97,18 @@ func test_market_prices() -> void:
 			for id in a.outputs:
 				out_value += float(Data.items[id].sell) * float(a.outputs[id])
 			t.ok(out_value >= in_value * 1.25, "%s/%s: output %d vs inputs %d" % [skill.id, a.id, out_value, in_value])
+
+
+## Play-test feedback: Cooking opens with the first Pyric Aetherling (Smoldering Caldera), but fish only came
+## from Fishing, which needs an Aqueous one from the island after it, so there were no meals for the Caldera
+## boss. Every island up to the first Pyric one drops the fish for the first Cooking recipe.
+func test_meals_can_be_cooked_before_the_first_aqueous_aetherling() -> void:
+	var first_cook: Dictionary = {}
+	for sk in Data.skill_list:
+		if sk.id == "cooking":
+			first_cook = sk.actions[0]
+	var fish: String = first_cook.inputs.keys()[0]
+	for z in Data.zone_list:
+		t.ok(z.loot.any(func(l): return l.item == fish), "%s drops %s" % [z.id, fish])
+		if z.type == "pyric":
+			break

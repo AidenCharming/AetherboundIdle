@@ -21,6 +21,9 @@ func test_first_hours() -> void:
 	t.eq(Expedition.start(s, "whisperleaf-hollow", rng), "")
 	var summary := Offline.apply(s, 3 * 3600.0, rng)
 	t.ok(int(s.counters.kills) > 20, "kills %d" % int(s.counters.kills))
-	t.ok(s.creatures.size() > 1, "bound something (%d creatures)" % s.creatures.size())
+	# the starter pack's vessels are thrown at the wild ones: each throw binds or breaks free (a fixed seed
+	# can miss all five at 55%, so the count of throws is checked, not a bind)
+	t.eq(GameState.count(s, "tinkerers-vessel"), 0.0, "the starter vessels were all thrown")
+	t.eq(s.creatures.size(), 1 + int(s.counters.captures), "every bind became an Aetherling")
 	t.ok(int(sprout.level) > 5, "the starter levelled up to %d" % int(sprout.level))
 	t.ok(summary.aether >= 0.0)

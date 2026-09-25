@@ -410,7 +410,9 @@ func _fill_bottom() -> void:
 		ob.item_selected.connect(func(i): Game.state.expedition.meal = "" if i == 0 else meals[i - 1].id)
 		sv.add_child(ob)
 		if GameState.count(s, Expedition.pick_meal(s)) < 1:
-			sv.add_child(UI.label("No meals: cook some (Cooking needs a Pyric Aetherling)", "Small", Palette.DANGER))
+			var nm := UI.wrap_label("No meals. Cook some in Cooking (a Pyric Aetherling): the first islands' wild Aetherlings drop Minnows and Sunfish, and the Market sells fish and meals.", "Small", 560)
+			nm.add_theme_color_override("font_color", Palette.DANGER)
+			sv.add_child(nm)
 		_bind.add_child(sv)
 		return
 	var ab: Dictionary = s.expedition.autobind
