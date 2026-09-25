@@ -603,3 +603,39 @@ func test_arena_shows_party_xp_from_each_kill() -> void:
 	t.eq(v.lv.text, "Lv %d" % int(c.level), "the level chip follows")
 	t.eq(int(b.allies[0].level), int(c.level), "and so does the fighter")
 	_teardown()
+
+
+## Bridge bug: after a picker closed, the next rail click did nothing. The fading dialog (0.1 s) still took
+## every click and still counted as open, so the bridge clicked its Close again, which landed on the page
+## (opening another picker). A closing dialog now lets clicks through and isn't open.
+func test_a_closing_dialog_lets_clicks_through() -> void:
+	_setup()
+	var m := Modal.open(UI.label("Pick one"), "Choose parent B")
+	t.ok(Modal.any_open() and m.is_open(), "open")
+	t.eq(m.mouse_filter, Control.MOUSE_FILTER_STOP, "an open dialog covers the page")
+	m.close()
+	t.ok(not Modal.any_open(), "a closing dialog no longer counts as open")
+	t.ok(not m.is_open())
+	t.eq(m.mouse_filter, Control.MOUSE_FILTER_IGNORE, "clicks pass it while it fades")
+	t.eq(m.mouse_behavior_recursive, Control.MOUSE_BEHAVIOR_DISABLED, "and pass its buttons and dim too")
+	var closes := {"n": 0}
+	m.closed.connect(func(): closes.n += 1)
+	m.close()
+	t.eq(closes.n, 0, "a second close does nothing")
+	_teardown()
+
+
+## A dialog belongs to its page: changing page closes it, so a picker can't outlive the Pods screen and
+## call back into it (every pick then errored and the picker stayed open for good).
+func test_changing_page_closes_its_dialogs() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("pods")
+	PodsScreen.parent_a = ""
+	main._screen._pick(1)
+	t.ok(Modal.any_open(), "the parent picker is open")
+	main.show_screen("sanctum")
+	t.ok(not Modal.any_open(), "going to the Sanctum closed it")
+	main.free()
+	_teardown()

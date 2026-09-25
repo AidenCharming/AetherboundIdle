@@ -124,6 +124,8 @@ func show_screen(screen: String, arg := "") -> void:
 		return
 	current = screen
 	current_arg = arg
+	# a dialog belongs to the page that opened it: one left open would call back into a freed page
+	Modal.close_all()
 	if _screen:
 		_screen.queue_free()
 	var s: Control = SCREENS[screen].new()
