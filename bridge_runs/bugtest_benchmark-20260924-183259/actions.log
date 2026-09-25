@@ -1,0 +1,733 @@
+   0.0s #1 new game in slot 2
+   1.8s #2 click "Let's start: open Woodcutting" at 800,597
+   1.9s #3 key Escape
+   2.2s #4 click 'Close' at 962,230
+   2.5s #5 goal 0: work (Put your Sproutlet to work in Woodcutting)
+   2.6s #6 click 'Assign an Aetherling' at 387,400
+   2.6s #7 click card c1 at 420,371
+   2.7s #8 click 'Close' at 1232,163
+   3.7s #9 click 'Sanctum' at 109,81
+   3.8s #10 click 'Claim' at 1521,189
+   3.8s #11 CLAIMED goal 0 work
+   4.7s #12 goal 1: logs (Gather 10 Oak Logs)
+   6.3s #13 click 'Egg Market' at 109,781
+  19.5s #14 click 'Sanctum' at 109,81
+  19.6s #15 watching goal logs finish on the Sanctum (7/10)
+  29.3s #16 Claim showed up on the open Sanctum
+  30.5s #17 click 'Claim' at 1521,189
+  30.5s #18 CLAIMED goal 1 logs
+  30.8s #19 click 'Expeditions' at 109,743
+  31.0s #20 click 'Party' at 370,760
+  31.2s #21 click 'Add an Aetherling' at 416,847
+  31.4s #22 click card c1 at 407,360
+  32.0s #23 click 'Whisperleaf Hollow' at 1076,696
+  32.0s #24 click 'Explore' failed: no visible button says "Explore"
+  32.0s #25 STUCK no 'Explore' for Whisperleaf Hollow
+  33.1s #26 goal 2: explore (Send an Aetherling exploring Whisperleaf Hollow)
+  33.4s #27 click 'Sanctum' at 109,81
+  33.6s #28 click 'Claim' at 1521,189
+  33.7s #29 CLAIMED goal 2 explore
+  34.6s #30 goal 3: bind (Bind a wild Aetherling with a vessel)
+  45.2s #31 coverage sweep 1
+  46.4s #32 click 'Aether-Weaving' at 109,475
+  47.4s #33 click 'Circuitry' at 109,435
+  48.4s #34 click 'Cooking' at 109,395
+  49.3s #35 click 'Fabrication' at 109,555
+  50.3s #36 click 'Fishing' at 109,275
+  51.2s #37 click 'Herbalism' at 109,195
+  52.1s #38 click 'Mining' at 109,235
+  53.1s #39 click 'Scavenging' at 109,315
+  54.0s #40 click 'Smithing' at 109,355
+  55.0s #41 click 'Vessel Crafting' at 109,515
+  55.9s #42 click 'Woodcutting' at 109,155
+  56.9s #43 click 'Nexus' at 109,629
+  57.8s #44 click card c1 at 337,442
+  58.1s #45 click 'Genesis Pods' at 109,669
+  59.1s #46 click 'Expeditions' at 109,743
+  60.1s #47 click 'Party' at 370,745
+  60.5s #48 click 'Auto-bind' at 493,745
+  60.9s #49 click 'Supplies' at 626,698
+  61.2s #50 click 'Party' at 370,746
+  61.5s #51 click 'Aether-Log' at 109,817
+  62.4s #52 click 'Creaturedex' at 317,167
+  62.7s #53 click 'Recipes' at 420,167
+  63.0s #54 click 'Milestones' at 517,167
+  63.4s #55 click 'Inventory' at 109,794
+  64.3s #56 click 'Sell in bulk…' at 1079,116
+  64.6s #57 click 'Close' at 1042,313
+  65.1s #58 click 'Market' at 109,834
+  66.0s #59 click "Today's stock" at 338,195
+  66.4s #60 click 'Vessels' at 478,195
+  66.9s #61 click 'Materials' at 605,195
+  67.2s #62 click 'Boosts' at 729,195
+  67.6s #63 click 'Work slots' at 859,195
+  68.1s #64 click "Today's stock" at 338,195
+  68.4s #65 click 'Egg Market' at 109,781
+  69.3s #66 click 'Sanctum Works' at 109,821
+  70.2s #67 click 'Menu' at 118,869
+  70.4s #68 click 'Options' at 800,395
+  70.4s #69 click 'Audio' failed: no visible button says "Audio"
+  70.6s #70 click 'Display' failed: no visible button says "Display"
+  70.7s #71 click 'Gameplay' failed: no visible button says "Gameplay"
+  70.8s #72 click 'Notifications' at 1482,36
+  70.9s #73 click 'Close' at 1052,233
+  72.0s #74 skip 0.50h (compress 1/10): {"actions": 0, "aether": 110.0, "capped": false, "elapsed": 1800.0, "events": 4, "gained": 3, "gold": 238.0, "levels": 0, "usedSeconds": 1800.0}
+  72.2s #75 click 'Continue' at 1198,652
+  72.6s #76 click 'Sanctum' at 109,81
+  72.6s #77 click 'Claim' at 1521,189
+  72.6s #78 CLAIMED goal 3 bind
+  72.8s #79 click 'Market' at 109,834
+  72.8s #80 click 'Vessels' at 478,195
+  72.9s #81 click 'Buy 10' at 396,390
+  73.5s #82 goal 4: team (Own 3 Aetherlings)
+  73.6s #83 click 'Sanctum' at 109,81
+  73.7s #84 click 'Claim' at 1521,189
+  73.7s #85 CLAIMED goal 4 team
+  73.9s #86 click 'Herbalism' at 109,195
+  74.0s #87 click 'Assign an Aetherling' at 387,400
+  74.0s #88 click card c2 at 606,380
+  74.1s #89 click 'Close' at 1232,163
+  74.5s #90 click 'Woodcutting' at 109,155
+  74.5s #91 click 'Assign an Aetherling' at 387,400
+  74.5s #92 click card c4 at 420,380
+  74.6s #93 click 'Close' at 1232,163
+  75.0s #94 click 'Fabrication' at 109,555
+  75.0s #95 click 'Assign an Aetherling' at 387,400
+  75.1s #96 click card c3 at 606,371
+  75.1s #97 click 'Close' at 1232,163
+  76.0s #98 goal 5: herb-work (Put an Aetherling to work in Herbalism)
+  76.1s #99 click 'Sanctum' at 109,81
+  76.2s #100 click 'Claim' at 1521,189
+  76.2s #101 CLAIMED goal 5 herb-work
+  76.2s #102 click 'Scavenging' at 109,315
+  76.3s #103 click 'Assign an Aetherling' at 387,400
+  76.3s #104 click card c2 at 606,371
+  76.4s #105 click 'Close' at 1232,163
+  77.3s #106 goal 6: scav-work (Send an Aetherling Scavenging (any Aetherling can))
+  77.4s #107 click 'Sanctum' at 109,81
+  77.5s #108 click 'Claim' at 1521,189
+  77.5s #109 CLAIMED goal 6 scav-work
+  77.6s #110 click 'Expeditions' at 109,743
+  77.7s #111 click 'Party' at 370,745
+  77.7s #112 click 'Show the island list' at 270,99
+  77.8s #113 click 'Whisperleaf Hollow' at 379,179
+  77.8s #114 click 'Stop' at 1088,745
+  77.9s #115 click 'Add an Aetherling' at 849,783
+  77.9s #116 click card c2 at 407,360
+  78.0s #117 click 'Close' at 1232,163
+  78.3s #118 click 'Add an Aetherling' at 1046,783
+  78.3s #119 click card c4 at 407,360
+  78.4s #120 click 'Close' at 1232,163
+  78.8s #121 click 'Whisperleaf Hollow' at 379,179
+  78.8s #122 click 'Explore' at 1076,696
+  78.8s #123 expedition running at whisperleaf-hollow with ['c1', 'c2', 'c4']
+  79.4s #124 goal 7: vessel (Make a Tinker's Vessel in Fabrication (any Aetherling can))
+  79.6s #125 click 'Genesis Pods' at 109,669
+  79.6s #126 click 'Choose parent A' at 626,287
+  79.6s #127 click card c2 at 567,360
+  79.6s #128 click 'Close' at 1232,163
+  79.9s #129 click 'Choose parent B' at 1210,287
+  80.0s #130 click card c3 at 727,360
+  80.0s #131 click 'Close' at 1232,163
+  80.3s #132 click 'Tier 1 ·' at 356,508
+  80.4s #133 click 'Lay an egg' at 1438,718
+  80.4s #134 laid an egg: c2 + c3, tier 1
+  81.2s #135 click 'Sanctum' at 109,81
+  81.3s #136 click 'Claim' at 1521,189
+  81.3s #137 CLAIMED goal 7 vessel
+  81.5s #138 click 'Sanctum Works' at 109,821
+  81.6s #139 click 'Build' at 848,383
+  81.6s #140 built an upgrade (1 levels now)
+  82.2s #141 goal 8: mint (Hold 20 Mintleaf)
+  82.3s #142 click 'Sanctum' at 109,81
+  82.4s #143 click 'Claim' at 1521,189
+  82.4s #144 CLAIMED goal 8 mint
+  83.0s #145 goal 9: kills25 (Defeat 25 wild Aetherlings)
+  83.1s #146 click 'Claim' at 1521,189
+  83.1s #147 CLAIMED goal 9 kills25
+  83.4s #148 click 'Woodcutting' at 109,155
+  83.5s #149 click 'Assign an Aetherling' at 387,400
+  83.5s #150 click card c3 at 420,371
+  83.5s #151 click 'Close' at 1232,163
+  84.5s #152 goal 10: wc10 (Reach Woodcutting level 10)
+ 102.8s #153 click 'Genesis Pods' at 109,669
+ 103.0s #154 click 'Choose parent A' at 617,287
+ 103.1s #155 click card c1 at 407,360
+ 103.3s #156 click 'Close' at 1232,163
+ 103.8s #157 click 'Close' at 1232,163
+ 104.3s #158 click 'Choose parent B' at 1201,287
+ 104.4s #159 click card c3 at 727,360
+ 105.0s #160 click 'Tier 1 ·' at 356,508
+ 105.2s #161 click 'Lay an egg' at 1438,718
+ 105.2s #162 laid an egg: c1 + c3, tier 1
+ 109.9s #163 skip 0.50h (compress 2/10): {"actions": 685, "aether": 30.0, "capped": false, "elapsed": 1800.0, "events": 6, "gained": 5, "gold": 333.0, "levels": 1, "usedSeconds": 1800.0}
+ 110.3s #164 click 'Continue' at 1198,709
+ 111.0s #165 click 'Woodcutting' at 109,155
+ 111.2s #166 click 'Willow Tree' at 651,681
+ 112.3s #167 click 'Sanctum' at 109,81
+ 112.5s #168 click 'Claim' at 1521,189
+ 112.6s #169 CLAIMED goal 10 wc10
+ 113.5s #170 goal 11: breed (Lay your first egg in a Genesis Pod)
+ 113.7s #171 click 'Claim' at 1521,189
+ 113.8s #172 CLAIMED goal 11 breed
+ 114.0s #173 click 'Genesis Pods' at 109,669
+ 114.3s #174 click 'Speed up' at 372,893
+ 114.7s #175 click 'Hatch' at 372,893
+ 118.8s #176 click 'Click to continue' at 800,450
+ 120.1s #177 goal 12: hatch (Hatch an egg)
+ 120.3s #178 click 'Sanctum' at 109,81
+ 120.5s #179 click 'Claim' at 1521,189
+ 120.6s #180 CLAIMED goal 12 hatch
+ 121.5s #181 goal 13: captures5 (Bind 5 wild Aetherlings)
+ 121.8s #182 click 'Claim' at 1521,189
+ 121.8s #183 CLAIMED goal 13 captures5
+ 122.2s #184 click 'Aether-Log' at 109,817
+ 122.4s #185 click 'Milestones' at 559,167
+ 122.8s #186 click 'Claim' at 328,837
+ 123.7s #187 goal 14: boss1 (Defeat Old Thicketroll at the end of Whisperleaf Hollow)
+ 124.8s #188 click 'Herbalism' at 109,195
+ 124.9s #189 click 'Assign an Aetherling' at 387,400
+ 125.0s #190 click card c6 at 978,380
+ 125.0s #191 click 'Close' at 1232,163
+ 125.4s #192 click 'Woodcutting' at 109,155
+ 125.4s #193 click 'Assign an Aetherling' at 667,400
+ 125.5s #194 click card c7 at 606,380
+ 125.5s #195 click 'Close' at 1232,163
+ 127.9s #196 click 'Genesis Pods' at 109,669
+ 128.0s #197 click 'Choose parent A' at 617,287
+ 128.0s #198 click card c7 at 407,360
+ 128.0s #199 click 'Close' at 1232,163
+ 128.4s #200 click 'Choose parent B' at 1201,287
+ 128.4s #201 click card c10 at 887,360
+ 128.4s #202 click 'Close' at 1232,163
+ 128.7s #203 click 'Tier 1 ·' at 356,508
+ 128.7s #204 click 'Lay an egg' at 1438,718
+ 128.7s #205 laid an egg: c7 + c10, tier 1
+ 131.4s #206 click 'Scavenging' at 109,315
+ 131.5s #207 click 'Assign an Aetherling' at 387,400
+ 131.5s #208 click card c9 at 420,380
+ 131.6s #209 click 'Close' at 1232,163
+ 131.9s #210 click 'Fabrication' at 109,555
+ 132.0s #211 click 'Assign an Aetherling' at 387,400
+ 132.0s #212 click card c5 at 792,371
+ 132.0s #213 click 'Close' at 1232,163
+ 158.8s #214 click 'Market' at 109,834
+ 158.9s #215 click "Today's stock" at 338,195
+ 159.0s #216 click at 412,390 (a Market offer)
+ 164.5s #217 skip 0.50h (compress 3/10): {"actions": 3076, "aether": 250.0, "capped": false, "elapsed": 1800.0, "events": 6, "gained": 8, "gold": 1045.0, "levels": 4, "usedSeconds": 1800.0}
+ 164.7s #218 click 'Continue' at 1180,787
+ 166.5s #219 click 'Herbalism' at 109,98
+ 166.5s #220 click 'Assign an Aetherling' at 667,400
+ 166.5s #221 click card c11 at 1164,380
+ 166.6s #222 click 'Close' at 1232,163
+ 167.0s #223 click 'Fabrication' at 109,458
+ 167.0s #224 click 'Assign an Aetherling' at 667,430
+ 167.1s #225 click card c13 at 606,626
+ 167.1s #226 click 'Close' at 1232,163
+ 168.1s #227 click 'Timber Frame' at 651,725
+ 168.2s #228 click 'Herbalism' at 109,98
+ 168.3s #229 click 'Sunpetal Bed' at 651,681
+ 169.0s #230 click 'Expeditions' at 109,646
+ 169.0s #231 click 'Party' at 606,745
+ 169.1s #232 click 'Whisperleaf Hollow' at 379,179
+ 169.1s #233 click 'Stop' at 1088,745
+ 169.2s #234 click 'Swap' at 602,847
+ 169.2s #235 click card c9 at 407,360
+ 169.2s #236 party: swapped c1 for c9
+ 169.2s #237 click 'Swap' failed: no visible button says "Swap"
+ 169.2s #238 click 'Close' at 1232,163
+ 169.5s #239 click 'Swap' at 996,847
+ 169.6s #240 click card c7 at 407,360
+ 169.6s #241 party: swapped c4 for c7
+ 169.7s #242 click 'Whisperleaf Hollow' at 379,179
+ 169.7s #243 click 'Explore' at 1076,696
+ 169.7s #244 expedition running at whisperleaf-hollow with ['c9', 'c2', 'c7']
+ 173.3s #245 click 'Woodcutting' at 109,155
+ 173.3s #246 click 'Assign an Aetherling' at 667,400
+ 173.4s #247 click card c1 at 978,380
+ 173.4s #248 click 'Close' at 1232,163
+ 173.8s #249 click 'Scavenging' at 109,315
+ 173.8s #250 click 'Assign an Aetherling' at 387,400
+ 173.9s #251 click card c4 at 792,371
+ 173.9s #252 click 'Close' at 1232,163
+ 175.0s #253 click 'Broken Carts' at 651,681
+ 177.1s #254 click 'Sanctum Works' at 109,821
+ 177.2s #255 click 'Build' at 848,645
+ 177.2s #256 built an upgrade (2 levels now)
+ 179.2s #257 click 'Scavenging' at 109,125
+ 179.3s #258 click 'Assign an Aetherling' at 667,400
+ 179.3s #259 click card c8 at 978,371
+ 179.4s #260 click 'Close' at 1232,163
+ 191.8s #261 click 'Sanctum Works' at 109,821
+ 191.9s #262 click 'Build' at 848,383
+ 191.9s #263 built an upgrade (3 levels now)
+ 206.4s #264 STUCK Sanctum Works: Genesis Pods is affordable but no Build button is enabled
+ 211.5s #265 STUCK Sanctum Works: Genesis Pods is affordable but no Build button is enabled
+ 216.6s #266 STUCK Sanctum Works: Genesis Pods is affordable but no Build button is enabled
+ 218.8s #267 skip 0.50h (compress 4/10): {"actions": 3895, "aether": 380.0, "capped": false, "elapsed": 1800.0, "events": 36, "gained": 12, "gold": 4894.0, "levels": 4, "usedSeconds": 1800.0}
+ 219.3s #268 click 'Continue' at 1180,787
+ 220.9s #269 click 'Sanctum' at 109,81
+ 221.2s #270 click 'Claim' at 1521,189
+ 221.2s #271 CLAIMED goal 14 boss1
+ 221.4s #272 click 'Expeditions' at 109,743
+ 221.7s #273 click 'Party' at 606,745
+ 221.9s #274 click 'Fractured Quarry' at 379,279
+ 222.0s #275 click 'Move here' at 1065,745
+ 222.1s #276 expedition running at fractured-quarry with ['c9', 'c2', 'c7']
+ 223.0s #277 goal 15: telluric (Bind your first Telluric Aetherling in the Fractured Quarry)
+ 225.4s #278 click 'Sanctum Works' at 109,821
+ 225.7s #279 click 'Build' at 452,358
+ 225.7s #280 built an upgrade (4 levels now)
+ 230.6s #281 click 'Sanctum' at 109,81
+ 230.8s #282 click 'Claim' at 1521,189
+ 230.9s #283 CLAIMED goal 15 telluric
+ 231.1s #284 click 'Mining' at 109,235
+ 231.3s #285 click 'Assign an Aetherling' at 387,400
+ 231.4s #286 click card c22 at 420,360
+ 232.8s #287 goal 16: mine-work (Put a Telluric Aetherling to work in Mining)
+ 233.0s #288 click 'Sanctum' at 109,81
+ 233.3s #289 click 'Claim' at 1521,189
+ 233.3s #290 CLAIMED goal 16 mine-work
+ 233.7s #291 click 'Genesis Pods' at 109,669
+ 234.0s #292 click 'Hatch' at 606,860
+ 237.9s #293 click 'Click to continue' at 800,450
+ 238.8s #294 click 'Choose parent A' at 617,79
+ 239.0s #295 click card c12 at 1047,745
+ 239.2s #296 click 'Close' at 1232,163
+ 239.7s #297 click 'Close' at 1232,163
+ 240.1s #298 click 'Choose parent B' at 1201,79
+ 240.3s #299 click card c22 at 567,360
+ 240.5s #300 click 'Close' at 1232,163
+ 240.9s #301 click 'Close' at 1232,163
+ 241.4s #302 click 'Tier 1 ·' at 356,300
+ 241.6s #303 click 'Lay an egg' at 1438,510
+ 241.6s #304 laid an egg: c12 + c22, tier 1
+ 242.4s #305 goal 17: frames (Make 4 Timber Frames in Fabrication (Fabrication level 10))
+ 242.6s #306 click 'Sanctum' at 109,81
+ 242.6s #307 BREAK asked for sanctum , the game shows pods 
+ 244.0s #308 BREAK goal frames is done but the Sanctum shows no Claim button
+ 244.3s #309 click 'Nexus' at 109,629
+ 244.6s #310 click 'Sanctum' at 109,81
+ 244.8s #311 click 'Claim' at 1521,189
+ 244.9s #312 CLAIMED goal 17 frames
+ 245.4s #313 click 'Sanctum Works' at 109,821
+ 245.7s #314 click 'Build' at 452,670
+ 245.7s #315 built an upgrade (5 levels now)
+ 246.5s #316 goal 18: creatures6 (Own 6 Aetherlings)
+ 246.9s #317 click 'Sanctum' at 109,81
+ 247.1s #318 click 'Claim' at 1521,189
+ 247.2s #319 CLAIMED goal 18 creatures6
+ 247.5s #320 click 'Aether-Log' at 109,817
+ 247.8s #321 click 'Milestones' at 559,167
+ 247.9s #322 click 'Claim' at 328,375
+ 248.2s #323 click 'Claim' at 328,875
+ 249.1s #324 goal 19: slot2 (Open a second work slot in any skill (skill level 10))
+ 249.3s #325 click 'Sanctum' at 109,81
+ 249.6s #326 click 'Claim' at 1521,189
+ 249.6s #327 CLAIMED goal 19 slot2
+ 250.7s #328 goal 20: works (Build any upgrade in Sanctum Works)
+ 250.9s #329 click 'Claim' at 1521,189
+ 251.0s #330 CLAIMED goal 20 works
+ 251.9s #331 goal 21: herb20 (Reach Herbalism level 20)
+ 252.2s #332 coverage sweep 2
+ 253.1s #333 click 'Aether-Weaving' at 109,475
+ 253.9s #334 click 'Circuitry' at 109,435
+ 254.7s #335 click 'Cooking' at 109,395
+ 255.5s #336 click 'Fabrication' at 109,555
+ 256.3s #337 click 'Fishing' at 109,275
+ 257.1s #338 click 'Herbalism' at 109,195
+ 258.0s #339 click 'Mining' at 109,235
+ 258.8s #340 click 'Scavenging' at 109,315
+ 259.6s #341 click 'Smithing' at 109,355
+ 260.4s #342 click 'Vessel Crafting' at 109,515
+ 261.2s #343 click 'Woodcutting' at 109,155
+ 262.1s #344 click 'Nexus' at 109,629
+ 262.9s #345 click card c7 at 661,442
+ 263.1s #346 click 'Genesis Pods' at 109,669
+ 263.9s #347 click 'Expeditions' at 109,743
+ 264.7s #348 click 'Party' at 606,745
+ 264.8s #349 click 'Auto-bind' at 729,745
+ 265.0s #350 click 'Supplies' at 862,694
+ 265.1s #351 click 'Party' at 606,724
+ 265.3s #352 click 'Aether-Log' at 109,817
+ 266.1s #353 click 'Creaturedex' at 317,167
+ 266.2s #354 click 'Recipes' at 420,167
+ 266.4s #355 click 'Milestones' at 517,167
+ 266.7s #356 click 'Inventory' at 109,794
+ 267.4s #357 click 'Sell in bulk…' at 1079,116
+ 267.6s #358 click 'Close' at 1042,313
+ 268.1s #359 click 'Market' at 109,834
+ 268.9s #360 click "Today's stock" at 338,195
+ 269.2s #361 click 'Vessels' at 478,195
+ 269.5s #362 click 'Materials' at 605,195
+ 269.8s #363 click 'Boosts' at 729,195
+ 270.1s #364 click 'Work slots' at 859,195
+ 270.4s #365 click "Today's stock" at 338,195
+ 270.7s #366 click 'Egg Market' at 109,781
+ 271.5s #367 click 'Sanctum Works' at 109,821
+ 272.2s #368 click 'Menu' at 118,869
+ 272.4s #369 click 'Options' at 800,395
+ 272.6s #370 click 'Audio' at 496,270
+ 272.9s #371 click 'Display' at 577,270
+ 273.3s #372 click 'Gameplay' at 672,265
+ 273.7s #373 click 'Close' at 1137,213
+ 274.2s #374 click 'Close' at 962,230
+ 274.7s #375 click 'Notifications' at 1477,36
+ 274.9s #376 click 'Close' at 1052,233
+ 276.2s #377 skip 0.50h (compress 5/10): {"actions": 4504, "aether": 1200.0, "capped": false, "elapsed": 1800.0, "events": 42, "gained": 13, "gold": 8405.0, "levels": 4, "usedSeconds": 1800.0}
+ 276.8s #378 click 'Continue' at 1180,787
+ 277.1s #379 save/load round trip
+ 277.3s #380 click 'Menu' at 118,869
+ 277.5s #381 click 'Save now' at 800,450
+ 277.6s #382 click 'Save and return to title' at 800,615
+ 278.5s #383 click 'Load Game' at 256,538
+ 278.8s #384 click at 788,552 (Load, slot 2)
+ 280.0s #385 round trip: Everything came back.
+ 280.2s #386 click 'Expeditions' at 109,743
+ 280.3s #387 click 'Party' at 606,745
+ 280.4s #388 click 'Smoldering Caldera' at 379,379
+ 280.5s #389 click 'Move here' at 1043,745
+ 280.5s #390 expedition running at smoldering-caldera with ['c9', 'c2', 'c7']
+ 281.3s #391 click 'Genesis Pods' at 109,669
+ 281.3s #392 click 'Hatch' at 372,860
+ 285.6s #393 click 'Click to continue' at 800,450
+ 286.2s #394 click 'Choose parent A' at 617,79
+ 286.2s #395 click card c20 at 887,360
+ 286.3s #396 click 'Close' at 1232,163
+ 286.6s #397 click 'Choose parent B' at 1201,79
+ 286.6s #398 click card c40 at 407,360
+ 286.7s #399 click 'Close' at 1232,163
+ 287.0s #400 click 'Tier 2 ·' at 521,300
+ 287.0s #401 click 'Lay an egg' at 1438,510
+ 287.0s #402 laid an egg: c20 + c40, tier 2
+ 289.9s #403 click 'Mining' at 109,235
+ 289.9s #404 click 'Assign an Aetherling' at 667,400
+ 290.0s #405 click card c35 at 792,371
+ 290.0s #406 click 'Close' at 1232,163
+ 291.1s #407 click 'Fabrication' at 109,555
+ 291.1s #408 click "Tinker's Vessel" at 387,748
+ 291.2s #409 click 'Mining' at 109,235
+ 291.3s #410 click 'Iron Vein' at 651,681
+ 292.1s #411 click 'Expeditions' at 109,743
+ 292.2s #412 click 'Throw at all' at 1512,108
+ 292.2s #413 Throw at all bound nobody this time (1 still waiting)
+ 297.0s #414 click 'Throw at all' at 1512,108
+ 298.5s #415 click 'Sanctum Works' at 109,821
+ 298.5s #416 click 'Build' at 1244,695
+ 298.5s #417 built an upgrade (6 levels now)
+ 300.5s #418 click 'Cooking' at 109,205
+ 300.6s #419 click 'Assign an Aetherling' at 387,400
+ 300.6s #420 click card c46 at 420,371
+ 300.7s #421 click 'Close' at 1232,163
+ 307.9s #422 click 'Genesis Pods' at 109,479
+ 308.0s #423 click 'Choose parent A' at 617,287
+ 308.2s #424 click card c17 at 887,720
+ 308.3s #425 click 'Close' at 1232,163
+ 308.6s #426 click 'Choose parent B' at 1201,287
+ 308.6s #427 click card c37 at 887,360
+ 308.7s #428 click 'Close' at 1232,163
+ 309.0s #429 click 'Tier 2 ·' at 521,508
+ 309.1s #430 click 'Lay an egg' at 1438,718
+ 309.1s #431 laid an egg: c17 + c37, tier 2
+ 309.9s #432 click 'Market' at 109,741
+ 310.0s #433 click "Today's stock" at 338,195
+ 310.0s #434 click at 412,390 (a Market offer)
+ 328.3s #435 skip 0.50h (compress 6/10): {"actions": 5170, "aether": 1745.0, "capped": false, "elapsed": 1800.0, "events": 17, "gained": 13, "gold": 3127.0, "levels": 5, "usedSeconds": 1800.0}
+ 328.8s #436 click 'Continue' at 1180,787
+ 330.5s #437 click 'Aether-Log' at 109,627
+ 330.7s #438 click 'Milestones' at 559,167
+ 330.8s #439 click 'Claim' at 409,375
+ 331.0s #440 click 'Claim' at 328,554
+ 331.3s #441 click 'Claim' at 409,816
+ 333.5s #442 click 'Smithing' at 109,165
+ 333.7s #443 click 'Assign an Aetherling' at 387,400
+ 333.9s #444 click card c55 at 792,380
+ 362.1s #445 click 'Genesis Pods' at 109,479
+ 362.2s #446 click 'Hatch' at 606,893
+ 366.4s #447 click 'Click to continue' at 800,450
+ 367.1s #448 click 'Choose parent A' at 617,79
+ 367.3s #449 click card c44 at 727,720
+ 367.4s #450 click 'Close' at 1232,163
+ 367.7s #451 click 'Choose parent B' at 1201,79
+ 367.8s #452 click card c56 at 407,360
+ 367.8s #453 click 'Close' at 1232,163
+ 368.2s #454 click 'Tier 2 ·' at 521,300
+ 368.3s #455 click 'Lay an egg' at 1438,510
+ 368.3s #456 laid an egg: c44 + c56, tier 2
+ 382.3s #457 skip 0.50h (compress 7/10): {"actions": 5515, "aether": 2675.0, "capped": false, "elapsed": 1800.0, "events": 5, "gained": 14, "gold": 3362.0, "levels": 5, "usedSeconds": 1800.0}
+ 382.4s #458 click 'Continue' at 1180,787
+ 382.9s #459 click 'Smithing' at 109,165
+ 382.9s #460 click 'Iron Bar' at 651,699
+ 383.1s #461 click 'Woodcutting' at 109,63
+ 383.1s #462 click 'Maple Tree' at 915,681
+ 386.3s #463 click 'Aether-Log' at 109,725
+ 386.4s #464 click 'Milestones' at 559,167
+ 386.5s #465 click 'Claim' at 422,837
+ 388.1s #466 click 'Smithing' at 109,263
+ 388.2s #467 click 'Assign an Aetherling' at 667,430
+ 388.3s #468 click card c56 at 420,380
+ 388.3s #469 click 'Close' at 1232,163
+ 390.2s #470 skip 3.00h (time-away jump): {"actions": 30716, "aether": 11580.0, "capped": false, "elapsed": 10800.0, "events": 9, "gained": 14, "gold": 20207.0, "levels": 5, "usedSeconds": 10800.0}
+ 390.5s #471 click 'Continue' at 1180,787
+ 391.8s #472 click 'Sanctum' at 109,81
+ 391.9s #473 click 'Claim' at 1521,189
+ 391.9s #474 CLAIMED goal 21 herb20
+ 392.7s #475 goal 22: boss2 (Defeat Granitusk in the Fractured Quarry)
+ 392.9s #476 click 'Claim' at 1521,189
+ 392.9s #477 CLAIMED goal 22 boss2
+ 393.2s #478 click 'Sanctum Works' at 109,821
+ 393.3s #479 click 'Build' at 1244,695
+ 393.3s #480 BREAK clicked Build but upgrade levels went 6 -> 6
+ 394.1s #481 goal 23: pyric (Bind your first Pyric Aetherling in the Smoldering Caldera)
+ 394.3s #482 click 'Sanctum' at 109,81
+ 394.4s #483 click 'Claim' at 1521,189
+ 394.4s #484 CLAIMED goal 23 pyric
+ 395.2s #485 goal 24: smith-work (Put a Pyric Aetherling to work in Smithing)
+ 395.4s #486 click 'Claim' at 1521,189
+ 395.4s #487 CLAIMED goal 24 smith-work
+ 396.1s #488 goal 25: cook-work (Put a Pyric Aetherling to work in Cooking)
+ 396.3s #489 click 'Claim' at 1521,189
+ 396.3s #490 CLAIMED goal 25 cook-work
+ 396.5s #491 click 'Woodcutting' at 109,155
+ 396.6s #492 click 'Assign an Aetherling' at 947,400
+ 396.9s #493 click card c16 at 606,703
+ 396.9s #494 click 'Close' at 1232,163
+ 397.9s #495 goal 26: species10 (Log 10 species in the Aether-Log)
+ 398.1s #496 click 'Sanctum' at 109,81
+ 398.2s #497 click 'Claim' at 1521,189
+ 398.2s #498 CLAIMED goal 26 species10
+ 398.5s #499 click 'Herbalism' at 109,195
+ 398.5s #500 click 'Glowcap Ring' at 915,681
+ 398.7s #501 click 'Mining' at 109,235
+ 398.7s #502 click 'Sunstone Seam' at 915,681
+ 399.4s #503 goal 27: form2 (Evolve an Aetherling to its second form (level 20))
+ 399.5s #504 click 'Sanctum' at 109,81
+ 399.7s #505 click 'Claim' at 1521,189
+ 399.7s #506 CLAIMED goal 27 form2
+ 399.8s #507 click 'Expeditions' at 109,743
+ 399.9s #508 click 'Party' at 606,745
+ 400.0s #509 click 'Smoldering Caldera' at 379,379
+ 400.1s #510 click 'Stop' at 1088,745
+ 400.3s #511 click 'Swap' at 602,847
+ 400.5s #512 click card c56 at 407,360
+ 400.5s #513 party: swapped c9 for c56
+ 400.5s #514 click 'Swap' failed: no visible button says "Swap"
+ 401.0s #515 click 'Swap' at 996,847
+ 401.1s #516 click card c73 at 407,360
+ 401.1s #517 party: swapped c7 for c73
+ 401.3s #518 click 'Smoldering Caldera' at 379,379
+ 401.3s #519 click 'Explore' at 1076,696
+ 401.4s #520 expedition running at smoldering-caldera with ['c56', 'c2', 'c73']
+ 402.1s #521 goal 28: boss3 (Defeat Ignis Prime in the Smoldering Caldera)
+ 403.2s #522 click 'Sanctum Works' at 109,821
+ 403.3s #523 click 'Build' at 1244,695
+ 403.3s #524 built an upgrade (7 levels now)
+ 405.6s #525 click 'Smithing' at 109,165
+ 405.7s #526 click 'Assign an Aetherling' at 667,453
+ 405.8s #527 click card c54 at 978,635
+ 407.0s #528 click 'Scavenging' at 109,125
+ 407.1s #529 click 'Old Observatory' at 915,681
+ 407.2s #530 click 'Smithing' at 109,165
+ 407.3s #531 click 'Copper Bar' at 387,748
+ 429.5s #532 click 'Sanctum' at 109,81
+ 429.7s #533 click 'Claim' at 1521,189
+ 429.7s #534 CLAIMED goal 28 boss3
+ 430.0s #535 click 'Expeditions' at 109,743
+ 430.2s #536 click 'Party' at 606,745
+ 430.4s #537 click 'Whispering Tides' at 379,479
+ 430.6s #538 click 'Move here' at 1065,745
+ 430.6s #539 expedition running at whispering-tides with ['c56', 'c2', 'c73']
+ 431.5s #540 goal 29: aqueous (Bind your first Aqueous Aetherling at Whispering Tides)
+ 435.5s #541 click 'Sanctum' at 109,81
+ 435.7s #542 click 'Claim' at 1521,189
+ 435.8s #543 CLAIMED goal 29 aqueous
+ 436.0s #544 click 'Fishing' at 109,275
+ 436.2s #545 click 'Assign an Aetherling' at 387,400
+ 436.3s #546 click card c75 at 420,371
+ 437.9s #547 skip 0.50h (compress 8/10): {"actions": 6271, "aether": 2315.0, "capped": false, "elapsed": 1800.0, "events": 28, "gained": 18, "gold": 7061.0, "levels": 6, "usedSeconds": 1800.0}
+ 438.7s #548 click 'Continue' at 1180,787
+ 439.0s #549 goal 30: fish-work (Put an Aqueous Aetherling to work in Fishing)
+ 439.3s #550 click 'Sanctum' at 109,81
+ 439.5s #551 click 'Claim' at 1521,189
+ 439.5s #552 CLAIMED goal 30 fish-work
+ 440.0s #553 click 'Inventory' at 109,794
+ 440.2s #554 click 'Tidewort' at 1050,331
+ 440.4s #555 click 'Sell all but 10' at 1335,382
+ 440.4s #556 sold tidewort: +1023 gold
+ 441.2s #557 goal 31: hybrid (Hatch a hybrid (breed two Aetherlings of different types))
+ 441.6s #558 click 'Sanctum' at 109,81
+ 441.8s #559 click 'Claim' at 1521,189
+ 441.8s #560 CLAIMED goal 31 hybrid
+ 442.8s #561 goal 32: total150 (Reach a total skill level of 150)
+ 443.1s #562 click 'Claim' at 1521,189
+ 443.1s #563 CLAIMED goal 32 total150
+ 444.0s #564 goal 33: captures15 (Bind 15 wild Aetherlings)
+ 444.3s #565 click 'Claim' at 1521,189
+ 444.3s #566 CLAIMED goal 33 captures15
+ 444.7s #567 click 'Fishing' at 109,275
+ 444.9s #568 click 'Assign an Aetherling' at 667,400
+ 445.1s #569 click card c92 at 420,635
+ 445.3s #570 click 'Close' at 1232,163
+ 445.9s #571 click 'Cooking' at 109,395
+ 446.1s #572 click 'Assign an Aetherling' at 667,404
+ 446.4s #573 click card c58 at 420,709
+ 447.6s #574 goal 34: rarity3 (Own a Steady Aetherling (better eggs or luckier binds))
+ 447.9s #575 click 'Sanctum' at 109,81
+ 448.1s #576 click 'Claim' at 1521,189
+ 448.2s #577 CLAIMED goal 34 rarity3
+ 448.6s #578 click 'Fishing' at 109,275
+ 448.8s #579 click 'Sunfish Pool' at 651,702
+ 449.6s #580 goal 35: boss4 (Defeat Leviathan Core at Whispering Tides)
+ 451.9s #581 click 'Inventory' at 109,794
+ 452.1s #582 click 'Brass Gear' at 928,599
+ 452.2s #583 click 'Sell all but 10' at 1335,360
+ 452.3s #584 sold brass-gear: +928 gold
+ 456.3s #585 click 'Cooking' at 109,298
+ 456.5s #586 click 'Herbed Sunfish' at 651,699
+ 456.7s #587 coverage sweep 3
+ 457.0s #588 click 'Sanctum' at 109,81
+ 457.8s #589 click 'Aether-Weaving' at 109,475
+ 458.7s #590 click 'Circuitry' at 109,435
+ 459.5s #591 click 'Cooking' at 109,395
+ 460.3s #592 click 'Fabrication' at 109,555
+ 461.2s #593 click 'Fishing' at 109,275
+ 462.0s #594 click 'Herbalism' at 109,195
+ 462.8s #595 click 'Mining' at 109,235
+ 463.7s #596 click 'Scavenging' at 109,315
+ 464.5s #597 click 'Smithing' at 109,355
+ 465.3s #598 click 'Vessel Crafting' at 109,515
+ 466.1s #599 click 'Woodcutting' at 109,155
+ 467.0s #600 click 'Nexus' at 109,629
+ 467.8s #601 click card c56 at 337,442
+ 468.0s #602 click 'Genesis Pods' at 109,669
+ 468.8s #603 click 'Expeditions' at 109,743
+ 469.6s #604 click 'Party' at 606,745
+ 469.7s #605 click 'Auto-bind' at 729,745
+ 469.9s #606 click 'Supplies' at 862,694
+ 470.0s #607 click 'Party' at 606,751
+ 470.2s #608 click 'Aether-Log' at 109,817
+ 471.0s #609 click 'Creaturedex' at 317,167
+ 471.2s #610 click 'Recipes' at 420,167
+ 471.3s #611 click 'Milestones' at 517,167
+ 471.6s #612 click 'Inventory' at 109,794
+ 472.4s #613 click 'Sell in bulk…' at 1079,116
+ 472.6s #614 click 'Close' at 1042,297
+ 473.1s #615 click 'Market' at 109,834
+ 473.9s #616 click "Today's stock" at 338,195
+ 474.1s #617 click 'Vessels' at 478,195
+ 474.4s #618 click 'Materials' at 605,195
+ 474.7s #619 click 'Boosts' at 729,195
+ 475.0s #620 click 'Work slots' at 859,195
+ 475.3s #621 click "Today's stock" at 338,195
+ 475.6s #622 click 'Egg Market' at 109,781
+ 476.5s #623 click 'Sanctum Works' at 109,821
+ 477.2s #624 click 'Menu' at 118,869
+ 477.4s #625 click 'Options' at 800,395
+ 477.5s #626 click 'Audio' at 496,270
+ 477.8s #627 click 'Display' at 577,270
+ 478.1s #628 click 'Gameplay' at 672,265
+ 478.4s #629 click 'Close' at 1137,213
+ 478.9s #630 click 'Close' at 962,230
+ 479.4s #631 click 'Notifications' at 1477,36
+ 479.5s #632 click 'Close' at 1052,233
+ 483.0s #633 click 'Market' at 109,741
+ 483.2s #634 click "Today's stock" at 338,195
+ 483.4s #635 click at 412,390 (a Market offer)
+ 491.9s #636 skip 0.50h (compress 9/10): {"actions": 7218, "aether": 2360.0, "capped": false, "elapsed": 1800.0, "events": 5, "gained": 16, "gold": 7441.0, "levels": 4, "usedSeconds": 1800.0}
+ 492.4s #637 click 'Continue' at 1180,787
+ 492.9s #638 click 'Expeditions' at 109,553
+ 493.1s #639 click 'Party' at 606,745
+ 493.2s #640 click 'Whispering Tides' at 379,479
+ 493.4s #641 click 'Stop' at 1088,745
+ 493.7s #642 click 'Swap' at 799,847
+ 493.9s #643 click card c97 at 1047,360
+ 493.9s #644 party: swapped c2 for c97
+ 493.9s #645 click 'Swap' failed: no visible button says "Swap"
+ 494.5s #646 click 'Whispering Tides' at 379,479
+ 494.6s #647 click 'Explore' at 1076,696
+ 494.7s #648 expedition running at whispering-tides with ['c56', 'c97', 'c73']
+ 496.0s #649 click 'Scavenging' at 109,125
+ 496.3s #650 click 'Assign an Aetherling' at 947,400
+ 496.4s #651 click card c93 at 978,371
+ 496.6s #652 click 'Close' at 1232,163
+ 500.9s #653 click 'Inventory' at 109,701
+ 501.1s #654 click 'Tidewort' at 1050,331
+ 501.3s #655 click 'Sell all but 10' at 1335,382
+ 501.3s #656 sold tidewort: +1323 gold
+ 508.1s #657 click 'Brass Gear' at 928,599
+ 508.3s #658 click 'Sell all but 10' at 1335,360
+ 508.3s #659 sold brass-gear: +1210 gold
+ 546.2s #660 skip 0.50h (compress 10/10): {"actions": 7716, "aether": 3760.0, "capped": false, "elapsed": 1800.0, "events": 24, "gained": 19, "gold": 27563.0, "levels": 5, "usedSeconds": 1800.0}
+ 546.7s #661 click 'Continue' at 1180,806
+ 547.4s #662 click 'Expeditions' at 109,553
+ 547.6s #663 click 'Party' at 606,745
+ 547.8s #664 click 'Thunderhum Steppe' at 379,579
+ 548.0s #665 click 'Move here' at 1065,745
+ 548.0s #666 expedition running at thunderhum-steppe with ['c56', 'c97', 'c73']
+ 549.2s #667 click 'Sanctum' at 109,81
+ 549.4s #668 click 'Claim' at 1521,189
+ 549.5s #669 CLAIMED goal 35 boss4
+ 550.4s #670 goal 36: voltaic (Bind your first Voltaic Aetherling on the Thunderhum Steppe)
+ 550.9s #671 click 'Inventory' at 109,794
+ 551.1s #672 click 'Sunken Trinket' at 440,599
+ 551.2s #673 click 'Sell all but 10' at 1334,333
+ 551.3s #674 sold sunken-trinket: +3080 gold
+ 551.6s #675 click 'Sanctum Works' at 109,821
+ 552.0s #676 click 'Build' at 452,669
+ 552.1s #677 built an upgrade (8 levels now)
+ 555.1s #678 click 'Circuitry' at 109,245
+ 555.3s #679 click 'Assign an Aetherling' at 387,400
+ 555.4s #680 click card c106 at 420,360
+ 556.2s #681 click 'Herbalism' at 109,103
+ 556.4s #682 click 'Assign an Aetherling' at 947,400
+ 556.5s #683 click card c2 at 420,635
+ 556.7s #684 click 'Close' at 1232,163
+ 558.2s #685 click 'Sanctum' at 109,81
+ 558.4s #686 click 'Claim' at 1521,189
+ 558.4s #687 CLAIMED goal 36 voltaic
+ 558.8s #688 click 'Cooking' at 109,395
+ 559.0s #689 click 'Grilled Minnow' at 387,748
+ 559.8s #690 goal 37: circ-work (Put a Voltaic Aetherling to work in Circuitry)
+ 560.1s #691 click 'Sanctum' at 109,81
+ 560.3s #692 click 'Claim' at 1521,189
+ 560.3s #693 CLAIMED goal 37 circ-work
+ 561.3s #694 goal 38: upgrades3 (Build 3 upgrades in Sanctum Works)
+ 561.6s #695 click 'Claim' at 1521,189
+ 561.6s #696 CLAIMED goal 38 upgrades3
+ 562.5s #697 goal 39: species15 (Log 15 species in the Aether-Log)
+ 562.8s #698 click 'Claim' at 1521,189
+ 562.8s #699 CLAIMED goal 39 species15
+ 563.3s #700 click 'Inventory' at 109,794
+ 563.5s #701 click 'Tidewort' at 928,331
+ 563.6s #702 click 'Sell all but 10' at 1335,382
+ 563.7s #703 sold tidewort: +1763 gold
+ 564.5s #704 goal 40: slot3 (Open a third work slot in any skill (skill level 25))
+ 564.8s #705 click 'Sanctum' at 109,81
+ 565.0s #706 click 'Claim' at 1521,189
+ 565.1s #707 CLAIMED goal 40 slot3
+ 565.5s #708 click 'Aether-Log' at 109,817
+ 565.7s #709 click 'Milestones' at 559,167
+ 565.8s #710 click 'Claim' at 409,580
+ 566.7s #711 goal 41: bred10 (Lay 10 eggs in the Genesis Pods)
+ 568.1s #712 click 'Mining' at 109,235
+ 568.2s #713 click 'Assign an Aetherling' at 947,400
+ 568.5s #714 click card c39 at 978,755
+ 568.7s #715 click 'Close' at 1232,163
+ 573.1s #716 click 'Inventory' at 109,794
+ 573.3s #717 click 'Brass Gear' at 928,599
+ 573.5s #718 click 'Sell all but 10' at 1335,360
+ 573.5s #719 sold brass-gear: +1323 gold
+ 592.8s #720 click 'Genesis Pods' at 109,572
+ 593.1s #721 click 'Hatch' at 372,893
+ 597.9s #722 click 'Click to continue' at 800,450
+ 598.8s #723 click 'Choose parent A' at 617,79
+ 600.6s #724 click card c66 at 1047,729
+ 601.2s #725 click 'Choose parent B' at 1201,79
+ 601.4s #726 click card c105 at 407,360
+ 601.6s #727 click 'Close' at 1232,163
+ 602.1s #728 click 'Close' at 1232,163
+ 602.6s #729 click 'Tier 4 ·' at 872,300
+ 602.8s #730 click 'Lay an egg' at 1438,510
+ 602.8s #731 laid an egg: c66 + c105, tier 4
+ 602.9s #732 time's up after 480 laps
+ 603.4s #733 click 'Sanctum' at 109,81

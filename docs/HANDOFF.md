@@ -3,6 +3,11 @@
 For the next session (local or cloud, any model). Read this, then `docs/DECISIONS.md` (the long record of what was
 decided and why) and `README.md` (how to run things).
 
+## Start here: open play-test feedback
+
+`docs/bridge_bugs.md` has 5 concrete bugs from the latest automated play-test run, with repro steps and
+screenshots. Fix those first, before anything else in this file.
+
 ## Ground rules
 
 - Work in `godot/` on branch `godot-rebuild`. The web build on `main` (`src/`, `electron/`, top-level files) is
