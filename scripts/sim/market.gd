@@ -175,6 +175,7 @@ static func stock(s: Dictionary, now: float) -> Dictionary:
 	var w := window(now)
 	if int(state(s).stock.get("window", -1)) != w:
 		state(s).stock = roll_stock(s, w)
+	_reprice(s, state(s).stock)
 	return state(s).stock
 
 
@@ -222,8 +223,11 @@ static func _offer(s: Dictionary, p: Dictionary, rng: RandomNumberGenerator) -> 
 			var best := pool.filter(func(it): return int(it.tier) >= top - 1)
 			var pick: Dictionary = best[rng.randi_range(0, best.size() - 1)]
 			var qty := rng.randi_range(int(p.qty[0]), int(p.qty[1]))
-			var each := maxi(int(pick.sell) + 1, ceili(float(buy_price(pick.id)) * float(p.discount)))
-			return {"kind": "item", "item": pick.id, "qty": qty, "gold": each * qty, "discount": 1.0 - float(p.discount)}
+			# priced by the lot, not per unit: rounding each 3-gold Scrap up would undo the whole discount. Still
+			# more than selling the lot back, so an offer can never be flipped for profit.
+			var full: int = buy_price(pick.id) * qty
+			var gold: int = maxi(int(pick.sell) * qty + 1, ceili(full * float(p.discount)))
+			return {"kind": "item", "item": pick.id, "qty": qty, "gold": gold, "discount": 1.0 - float(gold) / full}
 		"boost":
 			var list: Array = cfg().boosts.list
 			var b: Dictionary = list[rng.randi_range(0, list.size() - 1)]
@@ -232,6 +236,14 @@ static func _offer(s: Dictionary, p: Dictionary, rng: RandomNumberGenerator) -> 
 			var qty := ceili(rng.randi_range(int(p.qty[0]), int(p.qty[1])) * growth(s))
 			return {"kind": "item", "item": "aether-crystal", "qty": qty, "gold": qty * int(p.goldEach)}
 	return {}
+
+
+## A boost offer follows the boost's current price (it grows with each island cleared), so its discount stays
+## true for the whole window instead of keeping the price from when the stock was rolled.
+static func _reprice(s: Dictionary, st: Dictionary) -> void:
+	for o in st.get("offers", []):
+		if o.get("kind", "") == "boost" and not o.get("limited", false):
+			o.gold = ceili(boost_price(s, o.boost) * (1.0 - float(o.discount)))
 
 
 static func _limited(s: Dictionary, rng: RandomNumberGenerator) -> Dictionary:

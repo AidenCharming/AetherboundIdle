@@ -164,7 +164,7 @@ func _offer_card(o: Dictionary, i: int) -> Control:
 	cv.add_child(h)
 	var row := UI.hbox(8)
 	row.add_child(UI.amount("gold", float(o.gold), float(o.gold), 20))
-	if float(o.get("discount", 0.0)) > 0.0:
+	if roundi(float(o.get("discount", 0.0)) * 100.0) > 0:
 		row.add_child(UI.chip("-%d%%" % roundi(float(o.discount) * 100.0), Palette.GOOD, 12))
 	row.add_child(UI.spacer())
 	row.add_child(UI.chip("%d left" % int(o.left), Palette.GOLD if int(o.left) > 0 else Palette.DANGER, 12))

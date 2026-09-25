@@ -243,3 +243,38 @@ func test_buying_nothing_is_refused() -> void:
 		t.ok(Market.buy(s, id, qty) != "", "qty %d is refused" % qty)
 	t.eq(float(s.gold), 1e6, "no gold taken")
 	t.eq(GameState.count(s, id), before, "no items added")
+
+
+## Every discounted offer really costs less than the Boosts and wares tabs (cheap items used to round the discount
+## away per unit), never less than selling it back, and a boost offer follows the boost's price as islands clear.
+func test_stock_discounts_are_real() -> void:
+	var s := _game(1e9)
+	var items := 0
+	for w in 200:
+		for o in Market.roll_stock(s, w).offers:
+			if o.get("limited", false) or not o.has("discount"):
+				continue
+			if o.kind == "item":
+				items += 1
+				var full: int = Market.buy_price(o.item) * int(o.qty)
+				t.ok(int(o.gold) < full, "%d× %s costs %d, less than %d" % [int(o.qty), o.item, int(o.gold), full])
+				t.ok(int(o.gold) > int(Data.items[o.item].sell) * int(o.qty), "and more than it sells back for")
+				t.near(float(o.discount), 1.0 - float(o.gold) / full, 0.0001, "the chip shows the true discount")
+	t.ok(items > 0, "item offers were rolled")
+	var boost := {}
+	var now := 0.0
+	for w in 200:
+		now = w * Market.window_seconds() + 1.0
+		for o in Market.stock(s, now).offers:
+			if o.kind == "boost":
+				boost = o
+		if not boost.is_empty():
+			break
+	t.ok(not boost.is_empty(), "a boost offer turned up")
+	if boost.is_empty():
+		return
+	var before := int(boost.gold)
+	_clear(s, 2)
+	Market.stock(s, now)
+	t.eq(int(boost.gold), ceili(Market.boost_price(s, boost.boost) * (1.0 - float(boost.discount))), "priced from today's boost price")
+	t.ok(int(boost.gold) > before, "which went up with the clears")
