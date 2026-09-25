@@ -11,20 +11,26 @@ var asserts := 0
 var _errors := ErrorCounter.new()
 
 
-## Counts script errors. A runtime error aborts the test it happens in without adding a failure, so the runner
+## Counts script errors and push_errors from game code. A runtime error aborts the test it happens in without adding a failure, so the runner
 ## compares the count before and after each test (and each load) instead.
 class ErrorCounter extends Logger:
 	var count := 0
 	var last := ""
 	var warnings: Array[String] = []
+	var expected: Array[String] = []   # error texts the current test triggers on purpose
 
 	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool,
 			error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
 		if error_type == ERROR_TYPE_WARNING:
 			warnings.append("%s (%s:%d)" % [rationale if rationale != "" else code, file, line])
-		elif error_type == ERROR_TYPE_SCRIPT:
+		elif error_type == ERROR_TYPE_SCRIPT or (error_type == ERROR_TYPE_ERROR and function == "push_error"):
+			# a push_error from game code fails the test too (engine messages, like the headless shader
+			# compiler's, don't), unless the test said it expects it
+			var text := rationale if rationale != "" else code
+			if expected.any(func(e): return e in text):
+				return
 			count += 1
-			last = "%s (%s:%d in %s)" % [rationale if rationale != "" else code, file, line, function]
+			last = "%s (%s:%d in %s)" % [text, file, line, function]
 
 
 func _ready() -> void:
@@ -54,6 +60,7 @@ func _ready() -> void:
 			current = "%s::%s" % [f.get_basename(), test_name]
 			var before := failures.size()
 			var errors_before_test := _errors.count
+			_errors.expected.clear()
 			suite.call(test_name)
 			if _errors.count > errors_before_test:
 				failures.append("%s: script error: %s" % [current, _errors.last])
@@ -92,6 +99,11 @@ func _collect_scripts(dir: String, into: Array[String]) -> void:
 			into.append(dir.path_join(f))
 	for d in DirAccess.get_directories_at(dir):
 		_collect_scripts(dir.path_join(d), into)
+
+
+## For a test that triggers an error on purpose: an error containing `text` doesn't fail it.
+func expect_error(text: String) -> void:
+	_errors.expected.append(text)
 
 
 func ok(cond: bool, msg := "") -> void:

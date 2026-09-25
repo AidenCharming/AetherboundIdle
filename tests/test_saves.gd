@@ -129,6 +129,14 @@ func test_import_keeps_the_old_game_and_refuses_damage() -> void:
 	damaged.expedition = "broken"
 	t.ok(Game.import_text(JSON.stringify(damaged)) != "", "a damaged save is refused")
 	t.eq(int(Game.state.aether), 111, "the game in play is untouched")
+	# shapes that would stop migrate itself with an error are refused before it runs (review 3 #2)
+	var listed: Dictionary = GameState.new_game()
+	listed.creatures = []
+	t.ok(Game.import_text(JSON.stringify(listed)) != "", "creatures as a list are refused")
+	var bad_one: Dictionary = GameState.new_game()
+	bad_one.creatures = {"c1": 5}
+	t.ok(Game.import_text(JSON.stringify(bad_one)) != "", "a creature that is not a record is refused")
+	t.eq(int(Game.state.aether), 111, "still untouched")
 	var other: Dictionary = GameState.new_game()
 	other.aether = 999
 	t.eq(Game.import_text(JSON.stringify(other)), "", "a good save imports")
@@ -137,4 +145,33 @@ func test_import_keeps_the_old_game_and_refuses_damage() -> void:
 	t.ok(json.parse(FileAccess.get_file_as_string(Game.pre_import_path(N))) == OK and int(json.data.aether) == 111, "the old game was kept")
 	Game.delete_slot(N)
 	t.ok(not FileAccess.file_exists(Game.pre_import_path(N)), "deleting the slot removes the pre-import copy")
+	_end(keep)
+
+
+## Each launch keeps the previous session copy too, so a bad state saved and then relaunched can still be undone
+## from a launch earlier; a load that falls back to a session copy tells the player (review 3 #3).
+func test_session_copies_rotate_and_a_fallback_is_announced() -> void:
+	var keep := _begin()
+	var was_running := Game.running
+	Game.state.aether = 1000
+	Game.save_game()
+	Game.start_slot(N)            # launch 1: session = 1000
+	Game.state.aether = 2000
+	Game.save_game()
+	Game.start_slot(N)            # launch 2: session = 2000, prev = 1000
+	var json := JSON.new()
+	t.ok(json.parse(FileAccess.get_file_as_string(Game.session_prev_path(N))) == OK and int(json.data.aether) == 1000, "the previous session copy is kept")
+	t.eq(Game.notifications.size(), 0, "a normal load says nothing")
+	for path in [Game.slot_path(N), Game.backup_path(N), Game.tmp_path(N)]:
+		if FileAccess.file_exists(path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Game.start_slot(N)
+	t.eq(int(Game.state.aether), 2000, "loaded from the session copy")
+	t.ok(Game.notifications.size() > 0 and "could not be read" in str(Game.notifications[0].text), "and the player is told")
+	Game.delete_slot(N)
+	t.ok(not FileAccess.file_exists(Game.session_prev_path(N)), "deleting the slot removes the previous session copy")
+	Game.running = was_running
+	Game.set_process(was_running)
+	Game.notifications.clear()
+	Game.unread = 0
 	_end(keep)

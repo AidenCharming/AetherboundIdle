@@ -49,6 +49,12 @@ func session_path(n: int) -> String:
 	return "user://slot_%d.session.json" % n
 
 
+## The session copy before this one: if a bug saved a bad state and the game was restarted, the newer session
+## copy holds the bad state too, and this one is still a launch older.
+func session_prev_path(n: int) -> String:
+	return "user://slot_%d.session.prev.json" % n
+
+
 ## The game as it was just before an import replaced it.
 func pre_import_path(n: int) -> String:
 	return "user://slot_%d.pre-import.json" % n
@@ -57,7 +63,7 @@ func pre_import_path(n: int) -> String:
 ## Where a slot's save can be, in the order to try them. A .tmp only survives when a crash hit between
 ## removing the main file and renaming .tmp into place, and then it is the newest good save.
 func _slot_paths(n: int) -> Array:
-	return [slot_path(n), tmp_path(n), backup_path(n), session_path(n)]
+	return [slot_path(n), tmp_path(n), backup_path(n), session_path(n), session_prev_path(n)]
 
 
 ## Starts playing a save slot: loads it, or begins a new game there when it is empty or `fresh` is set.
@@ -72,7 +78,13 @@ func start_slot(n: int, fresh := false) -> void:
 	if fresh or not load_game():
 		new_game()
 	elif _readable(slot_path(n)):
+		if _readable(session_path(n)):
+			DirAccess.copy_absolute(ProjectSettings.globalize_path(session_path(n)), ProjectSettings.globalize_path(session_prev_path(n)))
 		DirAccess.copy_absolute(ProjectSettings.globalize_path(slot_path(n)), ProjectSettings.globalize_path(session_path(n)))
+	if loaded_from in [session_path(n), session_prev_path(n)]:
+		# the main save and its backup could not be read: say that progress since then is gone
+		var which := "the start of your last session" if loaded_from == session_path(n) else "the start of the session before last"
+		_notify("Your save could not be read, so it was loaded from %s. Progress since then is lost." % which, Data.ui_icon("bell"), Palette.GOLD)
 	var now := now_sec()
 	var away := now - float(state.lastSeen)
 	_last_tick = now
@@ -316,12 +328,18 @@ func _parse_file(path: String) -> Variant:
 
 
 func load_game() -> bool:
+	loaded_from = ""
 	for path in _slot_paths(slot):
 		var parsed: Variant = _parse_file(path)
 		if parsed is Dictionary and parsed.has("version"):
 			_adopt(parsed)
+			loaded_from = path
 			return true
 	return false
+
+
+## Which file the last load_game read (a slot's main file unless it fell back to a copy).
+var loaded_from := ""
 
 
 func _adopt(parsed: Dictionary) -> void:
@@ -422,6 +440,13 @@ func import_text(text: String) -> String:
 	var parsed: Variant = JSON.parse_string(json)
 	if not (parsed is Dictionary) or not parsed.has("version") or not parsed.has("creatures"):
 		return "That does not look like an Aetherbound save."
+	# migrate itself stops with an error on some bad shapes (creatures as a list), so check those first
+	for key in ["creatures", "items", "skills", "expedition", "collection", "rng"]:
+		if parsed.has(key) and not (parsed[key] is Dictionary):
+			return "That save is damaged (%s), so it was not loaded." % key
+	for c: Variant in parsed.creatures.values():
+		if not (c is Dictionary):
+			return "That save is damaged (creatures), so it was not loaded."
 	# migrate a copy first, and only adopt it when the result has the shape a game needs
 	var trial: Dictionary = GameState.migrate(_fix_numbers(parsed.duplicate(true)))
 	for key in ["creatures", "items", "skills", "expedition", "collection"]:

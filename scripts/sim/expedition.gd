@@ -97,6 +97,9 @@ static func dev_next_wave(s: Dictionary, kind: String) -> String:
 		return "Start an expedition first."
 	if not kind in ["boss", "shiny", "rare"]:
 		return "No such wave."
+	if s.expedition.battle.phase == "rest":
+		# resting after a wipe (or a clear), everyone is still knocked out: start a fresh run first
+		_new_run(s, null)
 	var b: Dictionary = s.expedition.battle
 	b.devNext = kind
 	b.phase = "gap"

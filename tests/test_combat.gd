@@ -446,3 +446,13 @@ func test_dev_next_wave() -> void:
 			"boss":
 				t.ok(first.get("boss", false), "the boss wave")
 	t.ok(Expedition.dev_next_wave(s, "nope") != "", "an unknown kind is refused")
+	# during the rest after a wipe, everyone is knocked out: the forced wave comes with a fresh, healthy party
+	var b: Dictionary = s.expedition.battle
+	b.phase = "rest"
+	for a in b.allies:
+		a.hp = 0.0
+		a.alive = false
+	t.eq(Expedition.dev_next_wave(s, "shiny"), "", "forced during the rest")
+	t.ok(s.expedition.battle.allies.all(func(a): return a.alive and float(a.hp) > 0.0), "the party is back on its feet")
+	Expedition.step(s, 1.0, rng)
+	t.ok(s.expedition.battle.enemies[0].shiny, "and the forced wave still comes")
