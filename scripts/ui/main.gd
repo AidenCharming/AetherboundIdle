@@ -507,6 +507,17 @@ func _dev_modal() -> void:
 		Game.info("Granted %s" % Data.species_list[sp.selected].name)))
 	v.add_child(UI.label("Grant an Aetherling", "H3"))
 	v.add_child(row)
+	# sprite tests: every form, rarity and shiny of the picked species, or of all of them
+	var per_species: int = Data.tuning.creature.formLevels.size() * Data.max_rarity() * 2
+	var all_row := UI.flow(8, 8)
+	all_row.add_child(UI.button("This species: every form, rarity and shiny (%d)" % per_species, "", func():
+		var n := Game.dev_grant_all(Data.species_list[sp.selected].id)
+		Game.info("Granted %d %s" % [n, Data.species_list[sp.selected].name])))
+	var total := per_species * Data.species_list.size()
+	all_row.add_child(UI.button("Every Aetherling, every form, rarity and shiny (%s)" % F.format_num(total), "", func():
+		Modal.confirm("Grant every Aetherling?", "Adds %s Aetherlings to this save (every species in Forms 1 to 3, Dim to Zenith, plain and shiny) and fills the Aether-Log. The Nexus gets slow with this many." % F.format_num(total), "Grant them all", func():
+			Game.info("Granted %s Aetherlings" % F.format_num(Game.dev_grant_all())))))
+	v.add_child(all_row)
 	v.add_child(UI.label("Resources", "H3"))
 	var res := UI.flow(8, 8)
 	for pair in [["aether", 1000], ["aether", 100000], ["gold", 1000], ["gold", 100000]]:

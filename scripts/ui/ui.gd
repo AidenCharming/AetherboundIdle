@@ -221,6 +221,31 @@ static func clear(node: Node) -> void:
 		c.queue_free()
 
 
+const PAGE := 120
+
+
+## Fills `box` with make.call(item) for the first `page` items and a "Show more" button for the next page, so
+## a long roster (thousands of Aetherlings) builds a page of cards, not all of them at once.
+static func fill_paged(box: Container, items: Array, make: Callable, page := PAGE, from := 0) -> void:
+	var to := mini(items.size(), from + page)
+	for i in range(from, to):
+		box.add_child(make.call(items[i]))
+	if to < items.size():
+		var more := button("Show %d more (%d left)" % [mini(page, items.size() - to), items.size() - to], "Ghost")
+		more.pressed.connect(func():
+			box.remove_child(more)
+			more.queue_free()
+			fill_paged(box, items, make, page, to))
+		box.add_child(more)
+
+
+## Sorts `items` by key.call(item), highest first, working each key out once rather than once per comparison.
+static func sort_by_key(items: Array, key: Callable) -> Array:
+	var keyed := items.map(func(it): return [key.call(it), it])
+	keyed.sort_custom(func(a, b): return a[0] > b[0])
+	return keyed.map(func(k): return k[1])
+
+
 ## Icon + amount, e.g. [log] 12. `need` > 0 turns it red when the player has less.
 static func amount(id: String, qty: float, need := -1.0, size := 22) -> HBoxContainer:
 	var h := hbox(4)

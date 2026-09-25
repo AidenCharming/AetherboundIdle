@@ -81,23 +81,23 @@ func _fill() -> void:
 	var custom := _custom_sort()
 	if not custom.is_empty():
 		var key: Callable = custom.key
-		var keyed := list.map(func(c): return [float(key.call(c)), int(c.level), c])
-		keyed.sort_custom(func(a, b): return [a[0], a[1]] > [b[0], b[1]])
-		list = keyed.map(func(k): return k[2])
+		list = UI.sort_by_key(list, func(c): return [float(key.call(c)), int(c.level)])
 	else:
 		match _sort:
 			"rarity":
-				list.sort_custom(func(a, b): return [int(a.rarity), int(a.level)] > [int(b.rarity), int(b.level)])
+				list = UI.sort_by_key(list, func(c): return [int(c.rarity), int(c.level)])
 			"level":
-				list.sort_custom(func(a, b): return int(a.level) > int(b.level))
+				list = UI.sort_by_key(list, func(c): return int(c.level))
 			"name":
-				list.sort_custom(func(a, b): return Creatures.display_name(a) < Creatures.display_name(b))
+				var named := list.map(func(c): return [Creatures.display_name(c), c])
+				named.sort_custom(func(a, b): return a[0] < b[0])
+				list = named.map(func(k): return k[1])
 			_:
-				list.sort_custom(func(a, b): return Creatures.power_rating(a) + int(a.rarity) * 5 > Creatures.power_rating(b) + int(b.rarity) * 5)
+				list = UI.sort_by_key(list, func(c): return Creatures.power_rating(c) + int(c.rarity) * 5)
 	if list.is_empty():
 		_grid.add_child(UI.label("No Aetherling fits here yet.", "Dim"))
 		return
-	for c in list:
+	UI.fill_paged(_grid, list, func(c):
 		var note: String = ""
 		if custom.has("note"):
 			note = custom.note.call(c)
@@ -109,7 +109,7 @@ func _fill() -> void:
 		card.picked.connect(func(id):
 			_on_pick.call(id)
 			_modal.close())
-		_grid.add_child(card)
+		return card)
 
 
 func _custom_sort() -> Dictionary:

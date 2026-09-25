@@ -99,7 +99,8 @@ func refresh() -> void:
 	if selected != "" and GameState.creature(Game.state, selected).is_empty():
 		selected = ""
 	if selected == "" and not Game.state.creatures.is_empty():
-		selected = _sorted_list()[0].id if not _sorted_list().is_empty() else ""
+		var first := _sorted_list()
+		selected = first[0].id if not first.is_empty() else ""
 	_update_chips()
 	_fill_grid()
 	_fill_detail()
@@ -121,18 +122,19 @@ func _sorted_list() -> Array:
 	var q := _search.text.strip_edges().to_lower() if _search else ""
 	if q != "":
 		list = list.filter(func(c): return q in Creatures.display_name(c).to_lower() or q in Data.species[c.species].name.to_lower())
+	var order := {}
+	for i in Data.species_list.size():
+		order[Data.species_list[i].id] = i
 	match _sort:
 		"level":
-			list.sort_custom(func(a, b): return int(a.level) > int(b.level) if a.level != b.level else int(a.rarity) > int(b.rarity))
+			return UI.sort_by_key(list, func(c): return [int(c.level), int(c.rarity)])
 		"species":
-			list.sort_custom(func(a, b): return Data.species_list.find(Data.species[a.species]) < Data.species_list.find(Data.species[b.species]))
+			return UI.sort_by_key(list, func(c): return [-int(order[c.species]), int(c.rarity), int(c.level)])
 		"new":
-			list.sort_custom(func(a, b): return int(a.id.substr(1)) > int(b.id.substr(1)))
+			return UI.sort_by_key(list, func(c): return int(c.id.substr(1)))
 		"power":
-			list.sort_custom(func(a, b): return Creatures.power_rating(a) > Creatures.power_rating(b))
-		_:
-			list.sort_custom(func(a, b): return [int(a.rarity), int(a.level)] > [int(b.rarity), int(b.level)])
-	return list
+			return UI.sort_by_key(list, func(c): return Creatures.power_rating(c))
+	return UI.sort_by_key(list, func(c): return [int(c.rarity), int(c.level)])
 
 
 func _fill_grid() -> void:
@@ -142,7 +144,7 @@ func _fill_grid() -> void:
 	UI.clear(_count)
 	_count.add_child(UI.chip("%d / %d shown" % [list.size(), Game.state.creatures.size()], Palette.TEXT_DIM, 12))
 	_count.add_child(UI.chip("+%s Aether/min" % F.format_num(Economy.aether_per_min(Game.state)), Palette.AETHER, 12))
-	for c in list:
+	UI.fill_paged(_grid, list, func(c):
 		var card := CreatureCard.make(c, c.id == selected)
 		card.picked.connect(func(id):
 			selected = id
@@ -150,7 +152,7 @@ func _fill_grid() -> void:
 				if other is CreatureCard:
 					other.theme_type_variation = "TileOn" if other.cid == id else "Tile"
 			_fill_detail())
-		_grid.add_child(card)
+		return card)
 
 
 # ---------------------------------------------------------------- detail panel

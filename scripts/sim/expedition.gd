@@ -52,6 +52,7 @@ static func set_party_member(s: Dictionary, slot: int, c: Dictionary) -> String:
 	if old != "" and s.creatures.has(old) and (c.is_empty() or old != c.id):
 		s.creatures[old].job = {}
 	party[slot] = c.id if not c.is_empty() else ""
+	GameState.roster_changed()
 	_compact_party(s)
 	if GameState.party(s).is_empty():
 		stop(s)
@@ -61,6 +62,7 @@ static func set_party_member(s: Dictionary, slot: int, c: Dictionary) -> String:
 static func remove_from_party(s: Dictionary, c: Dictionary) -> void:
 	s.expedition.party.erase(c.id)
 	c.job = {}
+	GameState.roster_changed()
 	_compact_party(s)
 	if GameState.party(s).is_empty():
 		stop(s)
@@ -335,6 +337,7 @@ static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, even
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
 	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild", int(w.get("form", 0)))
 	s.creatures[c.id] = c
+	GameState.roster_changed()
 	s.counters.captures = int(s.counters.captures) + 1
 	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
 	if c.shiny:

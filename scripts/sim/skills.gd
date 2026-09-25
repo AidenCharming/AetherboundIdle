@@ -28,13 +28,12 @@ static func action_unlocked(s: Dictionary, skill_id: String, action_id: String) 
 ## Every aura given by a working creature: [{giver, group, key, scope, value}].
 static func active_auras(s: Dictionary) -> Array:
 	var out := []
-	for c in s.creatures.values():
-		if c.job.get("kind", "") != "skill":
-			continue
-		for a in Traits.auras_of(c):
-			a.giver = c.id
-			a.skill = c.job.id
-			out.append(a)
+	for skill in Data.skill_list:
+		for c in GameState.workers(s, skill.id):
+			for a in Traits.auras_of(c):
+				a.giver = c.id
+				a.skill = c.job.id
+				out.append(a)
 	return out
 
 
@@ -288,6 +287,7 @@ static func assign(s: Dictionary, c: Dictionary, skill_id: String) -> String:
 		slot += 1
 	unassign(s, c)
 	c.job = {"kind": "skill", "id": skill_id, "slot": slot}
+	GameState.roster_changed()
 	c.progress = 0.0
 	c.overclock = 0
 	return ""
@@ -297,6 +297,7 @@ static func unassign(s: Dictionary, c: Dictionary) -> void:
 	if c.job.get("kind", "") == "party":
 		s.expedition.party.erase(c.id)
 	c.job = {}
+	GameState.roster_changed()
 	c.progress = 0.0
 	c.overclock = 0
 	c.erase("stalled")

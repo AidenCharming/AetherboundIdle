@@ -255,3 +255,54 @@ func test_work_rates_rank_speed_output_and_secondary_finds() -> void:
 	t.near(lucky.output, plain.output, 0.001, "luck doesn't add product")
 	t.ok(lucky.secondary > plain.secondary * 2.0, "luck multiplies rare finds")
 	t.near(plain.secondary, 3600000.0 / plain.cooldown * float(chop.rare.chance), 0.001, "a plain worker finds rares at the base rate")
+
+
+func test_dev_grant_all_gives_every_form_rarity_and_shiny() -> void:
+	Game.state = GameState.new_game()
+	var n: int = Game.dev_grant_all("emberfang")
+	var forms: int = Data.tuning.creature.formLevels.size()
+	t.eq(n, forms * Data.max_rarity() * 2)
+	var combos := {}
+	for c in Game.state.creatures.values():
+		if c.species == "emberfang":
+			combos["%d/%d/%s" % [Creatures.form_of(c), int(c.rarity), c.shiny]] = true
+	t.eq(combos.size(), n, "each combination exactly once")
+	var before: int = Game.state.creatures.size()
+	t.eq(Game.dev_grant_all(), forms * Data.max_rarity() * 2 * Data.species_list.size())
+	t.eq(Game.state.creatures.size(), before + forms * Data.max_rarity() * 2 * Data.species_list.size())
+
+
+## The roster index (workers per skill, perch holders) always matches a scan of the roster.
+func test_roster_index_follows_every_change() -> void:
+	var s := GameState.new_game()
+	for i in 12:
+		var c := Creatures.make(s, "tuskcub", 1 + i % 4, 5, false, [], "test")
+		s.creatures[c.id] = c
+		GameState.roster_changed()
+	var check := func(what: String):
+		for skill in Data.skill_list:
+			var scan: Array = s.creatures.values().filter(func(c): return c.job.get("kind", "") == "skill" and c.job.id == skill.id)
+			t.eq(GameState.workers(s, skill.id).size(), scan.size(), "%s: %s workers" % [what, skill.id])
+		var benched: Array = s.creatures.values().filter(func(c): return Creatures.is_benched(c))
+		var n := mini(benched.size(), int(GameState.upgrade_value(s, "perches")))
+		t.eq(Economy.perched(s).size(), n, "%s: perched" % what)
+		for c in Economy.perched(s):
+			t.ok(Creatures.is_benched(c), "%s: only resting ones perch" % what)
+	check.call("start")
+	var ids: Array = s.creatures.keys()
+	Skills.assign(s, s.creatures[ids[1]], "woodcutting")
+	check.call("assigned")
+	Expedition.set_party_member(s, 0, s.creatures[ids[2]])
+	check.call("party")
+	Skills.unassign(s, s.creatures[ids[1]])
+	check.call("unassigned")
+	Economy.release(s, s.creatures[ids[3]])
+	check.call("released")
+	# the best emitter perches first
+	var best: Dictionary = Economy.perched(s)[0]
+	for c in s.creatures.values():
+		if Creatures.is_benched(c):
+			t.ok(Creatures.bench_rate_per_min(c) <= Creatures.bench_rate_per_min(best))
+	# a different save gets its own index
+	var s2 := GameState.new_game()
+	t.eq(Economy.perched(s2).size(), 1)

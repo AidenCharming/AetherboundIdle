@@ -5,14 +5,34 @@ extends RefCounted
 
 
 ## Benched creatures that sit on a perch, rarest (highest emission) first.
+## The resting Aetherlings on the perches (kept by GameState's roster index).
 static func perched(s: Dictionary) -> Array:
-	var benched: Array = s.creatures.values().filter(func(c): return Creatures.is_benched(c))
-	benched.sort_custom(func(a, b):
-		var ra := Creatures.bench_rate_per_min(a)
-		var rb := Creatures.bench_rate_per_min(b)
-		return ra > rb if ra != rb else a.id < b.id)
+	return GameState.perched(s)
+
+
+## Works out the perch holders: the best emitters, highest rate first (ties by id).
+static func find_perched(s: Dictionary) -> Array:
+	# one pass keeping the best n (n is the perch count, small): a full sort of thousands resting was most
+	# of a frame, and so was working out each one's rate once per comparison
 	var n := int(GameState.upgrade_value(s, "perches"))
-	return benched.slice(0, n)
+	var best := []   # [rate, id, creature], best first
+	for c in s.creatures.values():
+		if not Creatures.is_benched(c):
+			continue
+		var r := Creatures.bench_rate_per_min(c)
+		if best.size() >= n and not _ahead(r, c.id, best[-1]):
+			continue
+		var i := best.size()
+		while i > 0 and _ahead(r, c.id, best[i - 1]):
+			i -= 1
+		best.insert(i, [r, c.id, c])
+		if best.size() > n:
+			best.pop_back()
+	return best.map(func(e): return e[2])
+
+
+static func _ahead(rate: float, id: String, e: Array) -> bool:
+	return rate > float(e[0]) or (rate == float(e[0]) and id < String(e[1]))
 
 
 static func bench_aether_per_min(s: Dictionary) -> float:
@@ -68,6 +88,7 @@ static func buy_upgrade(s: Dictionary, id: String) -> String:
 	if not GameState.pay(s, nxt.cost):
 		return "Not enough materials."
 	s.upgrades[id] = GameState.upgrade_level(s, id) + 1
+	GameState.roster_changed()   # more perches
 	GameState.sync_pods(s)
 	return ""
 
@@ -80,6 +101,7 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	var value := Creatures.release_value(c)
 	Skills.unassign(s, c)
 	s.creatures.erase(c.id)
+	GameState.roster_changed()
 	GameState.add_item(s, "aether", value)
 	# the rarest (and shinies) leave Aether Pearls behind
 	var pearls := int(Data.rarity(int(c.rarity)).get("releasePearls", 0)) + (int(Data.tuning.pearls.shinyRelease) if c.get("shiny", false) else 0)

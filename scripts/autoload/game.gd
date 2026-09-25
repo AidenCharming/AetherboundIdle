@@ -665,6 +665,25 @@ func dev_grant(species_id: String, rarity: int, level: int, shiny: bool, form :=
 	changed.emit()
 
 
+## For sprite and effect tests: every form x every rarity x plain and shiny, of one species or (empty id) of
+## every species. Each is logged in the Aether-Log like a normal catch, without a toast per creature.
+## Returns how many were granted.
+func dev_grant_all(species_id := "") -> int:
+	var ids: Array = [species_id] if species_id != "" else Data.species_list.map(func(sp): return sp.id)
+	var form_levels: Array = Data.tuning.creature.formLevels
+	var n := 0
+	for id in ids:
+		for form in form_levels.size():
+			for rarity in range(1, Data.max_rarity() + 1):
+				for shiny in [false, true]:
+					var c := Creatures.make(state, id, rarity, int(form_levels[form]), shiny, [], "dev", form + 1)
+					state.creatures[c.id] = c
+					Collection.on_owned(state, c)
+					n += 1
+	changed.emit()
+	return n
+
+
 func dev_add(id: String, qty: float) -> void:
 	GameState.add_item(state, id, qty)
 	changed.emit()
