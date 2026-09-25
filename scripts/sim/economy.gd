@@ -104,6 +104,32 @@ static func uses(id: String) -> Array:
 	return out
 
 
+## Where the item comes from, at base odds (traits and boosts raise the chances): a skill action that makes it,
+## an action's rare drop or treasure (chance per action), an island's loot (chance per wild Aetherling beaten,
+## with the amount), a boss's reward (every win) and the Market. Each is a Dictionary with a "kind".
+static func sources(id: String) -> Array:
+	var out := []
+	for sk in Data.skill_list:
+		for a in sk.actions:
+			if a.outputs.has(id):
+				out.append({"kind": "make", "name": a.name, "skill": sk.id, "level": int(a.level), "qty": int(a.outputs[id])})
+			for k in ["rare", "treasure"]:
+				if a.has(k) and a[k].item == id:
+					out.append({"kind": k, "name": a.name, "skill": sk.id, "level": int(a.level), "chance": float(a[k].chance)})
+	for z in Data.zone_list:
+		for l in z.loot:
+			if l.item == id:
+				out.append({"kind": "loot", "zone": z.id, "name": z.name, "chance": float(l.chance), "qty": [int(l.qty[0]), int(l.qty[1])]})
+		var bl: Dictionary = z.bossLoot
+		if bl.items.has(id):
+			out.append({"kind": "boss", "zone": z.id, "name": z.boss.name, "island": z.name, "qty": int(bl.items[id])})
+		if id == "aether-pearl" and float(bl.get("pearlChance", 0.0)) > 0.0:
+			out.append({"kind": "boss", "zone": z.id, "name": z.boss.name, "island": z.name, "qty": 1, "chance": float(bl.pearlChance)})
+	if Market.sells(id):
+		out.append({"kind": "market", "name": "Market", "price": Market.buy_price(id)})
+	return out
+
+
 static func next_upgrade(s: Dictionary, id: String) -> Dictionary:
 	var u: Dictionary = Data.upgrades[id]
 	var lv := GameState.upgrade_level(s, id)

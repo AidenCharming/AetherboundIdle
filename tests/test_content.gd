@@ -139,3 +139,14 @@ func _version_less(a: String, b: String) -> bool:
 		if int(x[i]) != int(y[i]):
 			return int(x[i]) < int(y[i])
 	return false
+
+
+func test_item_sources_cover_skills_islands_bosses_and_the_market() -> void:
+	var kinds := Economy.sources("oak-log").map(func(x): return x.kind)
+	for k in ["make", "loot", "boss", "market"]:
+		t.ok(k in kinds, "oak-log comes from a %s source: %s" % [k, kinds])
+	var rare := Economy.sources("seedcache").filter(func(x): return x.kind == "rare")
+	t.ok(not rare.is_empty() and float(rare[0].chance) > 0.0, "a rare find has its chance")
+	for z in Data.zone_list:
+		for l in z.loot:
+			t.ok(Economy.sources(l.item).any(func(x): return x.kind == "loot" and x.zone == z.id), "%s lists %s" % [l.item, z.name])

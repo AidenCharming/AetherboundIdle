@@ -1018,3 +1018,20 @@ func test_patch_notes_list_every_version_and_filter_by_kind() -> void:
 	pn._pick("")
 	t.eq(pn._list.get_child_count(), Data.patch_notes.size(), "All shows them all again")
 	pn.free()
+
+
+func test_rail_says_when_a_goal_is_ready_to_claim() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var s := Game.state
+	s.goals.index = 0   # the first goal: put the Sproutlet to work in Woodcutting
+	main._refresh_rail()
+	var sn: Dictionary = main._nav_buttons["sanctum:"]
+	t.ok(not sn.extra.visible and sn.button.tooltip_text == "", "nothing to claim yet")
+	Game.assign(str(s.creatures.keys()[0]), "woodcutting")
+	main._refresh_rail()
+	t.ok(sn.extra.visible, "a claim chip on the Sanctum")
+	t.ok(sn.button.tooltip_text.contains(Data.goals[0].text), "the tooltip names the goal: %s" % sn.button.tooltip_text)
+	main.free()
+	_teardown()

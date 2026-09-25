@@ -339,13 +339,23 @@ func _refresh_rail() -> void:
 		nb.button.tooltip_text = "" if usable else "Needs a %s Aetherling" % Data.types[skill.type].name
 	var ready_count := Game.ready_eggs().size()
 	_set_extra(_nav_buttons["pods:"], "%d ready" % ready_count if ready_count > 0 else "", Palette.GOLD)
+	_nav_buttons["pods:"].button.tooltip_text = "%d egg%s ready to hatch" % [ready_count, "" if ready_count == 1 else "s"] if ready_count > 0 else ""
+	# Overseer Vance's goal, once done, waits on the Sanctum to be claimed: say so on the rail
+	var sn: Dictionary = _nav_buttons.get("sanctum:", {})
+	if not sn.is_empty():
+		var goal := Goals.current(s)
+		var done := not goal.is_empty() and Goals.is_done(s, goal)
+		_set_extra(sn, "claim!" if done else "", Palette.GOLD)
+		sn.button.tooltip_text = "Goal ready to claim: %s" % goal.text if done else ""
 	var ex: Dictionary = _nav_buttons["expeditions:"]
 	# shinies waiting for a vessel matter more than the wave count: gold, and they pulse (see _process)
 	_pending_flash = not s.expedition.pending.is_empty()
 	if _pending_flash:
 		_set_extra(ex, "%d to bind!" % s.expedition.pending.size(), Palette.GOLD)
+		ex.button.tooltip_text = "Shinies waiting for a vessel: %s" % ", ".join(s.expedition.pending.map(func(w): return Data.species[w.species].name))
 	else:
 		ex.extra.modulate.a = 1.0
+		ex.button.tooltip_text = ""
 		var wave := ""
 		if Expedition.is_running(s) and not s.expedition.battle.is_empty():
 			wave = "wave %d" % int(s.expedition.battle.wave) if s.expedition.battle.phase != "rest" else "resting"

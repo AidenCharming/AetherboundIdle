@@ -47,7 +47,9 @@ func _ready() -> void:
 	row.add_child(right)
 	var dp := UI.panel("Glass")
 	_detail = UI.vbox(12)
-	dp.add_child(_detail)
+	# the detail scrolls: an item made in many places has a long "Where to get it" list
+	dp.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	dp.add_child(UI.scroll(_detail))
 	right.add_child(dp)
 	right.add_child(_market_links())
 	refresh()
@@ -154,6 +156,7 @@ func _fill_detail() -> void:
 	if it.has("desc"):
 		_detail.add_child(UI.wrap_label(it.desc, "Dim"))
 	_detail.add_child(_uses_box(selected))
+	_detail.add_child(_sources_box(selected))
 	if it.has("vessel"):
 		var line := []
 		for r in [1, 3, 5, 7]:
@@ -215,6 +218,59 @@ func _uses_box(id: String) -> Control:
 			"shatter":
 				tex = Data.ui_icon("aether")
 		v.add_child(UI.hbox(10, [UI.icon(tex, 22), UI.wrap_label(line, "Dim", 360)]))
+	return v
+
+
+## Where to get more: every skill action, rare drop, island and boss that gives it, with the base chance.
+func _sources_box(id: String) -> Control:
+	var v := UI.vbox(5)
+	var found := Economy.sources(id)
+	v.add_child(UI.label("Where to get it", "Small", Palette.GOOD))
+	if found.is_empty():
+		v.add_child(UI.wrap_label("Only from goals, milestones and other rewards.", "Faint", 360))
+		return v
+	var s := Game.state
+	for src: Dictionary in found:
+		var tex: Texture2D
+		var line := ""
+		var chip := ""
+		var chip_col := Palette.AETHER
+		var open := true
+		match src.kind:
+			"make":
+				tex = Data.ui_icon(src.skill)
+				line = "%s · %s Lv %d" % [src.name, Data.skills[src.skill].name, int(src.level)]
+				chip = "×%d" % int(src.qty)
+				open = int(s.skills[src.skill].level) >= int(src.level)
+			"rare", "treasure":
+				tex = Data.ui_icon(src.skill)
+				line = "%s while doing %s · %s Lv %d" % ["Rare find" if src.kind == "rare" else "Treasure", src.name, Data.skills[src.skill].name, int(src.level)]
+				chip = F.pct(src.chance)
+				chip_col = Palette.GOLD
+				open = int(s.skills[src.skill].level) >= int(src.level)
+			"loot":
+				tex = Data.ui_icon("expeditions")
+				var q: Array = src.qty
+				line = "%s · per wild Aetherling beaten (%s)" % [src.name, str(q[0]) if q[0] == q[1] else "%d-%d" % [q[0], q[1]]]
+				chip = F.pct(src.chance)
+				open = Expedition.zone_unlocked(s, src.zone)
+			"boss":
+				tex = Data.ui_icon("expeditions")
+				line = "%s, boss of %s · ×%d a win" % [src.name, src.island, int(src.qty)]
+				chip = F.pct(src.chance) if src.has("chance") else "every win"
+				chip_col = Palette.GOLD
+				open = Expedition.zone_unlocked(s, src.zone)
+			"market":
+				tex = Data.ui_icon("market")
+				line = "Market · %s gold each" % F.format_num(src.price)
+				chip = "buy"
+				open = Market.for_sale(s, id)
+		var row := UI.hbox(10, [UI.icon(tex, 22), UI.wrap_label(line, "Dim", 300), UI.chip(chip, chip_col if open else Palette.TEXT_FAINT, 14)])
+		if not open:
+			row.modulate.a = 0.55
+			row.tooltip_text = "Not reached yet"
+		v.add_child(row)
+	v.add_child(UI.wrap_label("Base chances: traits and boosts can raise them.", "Faint", 360))
 	return v
 
 

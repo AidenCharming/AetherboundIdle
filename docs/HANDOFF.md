@@ -25,7 +25,8 @@ decided and why) and `README.md` (how to run things).
   `project.godot` (`config/version`, shown on the title screen) and `export_presets.cfg` (`file_version`,
   `product_version`) in the same change. Semantic: minor (0.3.0 -> 0.4.0) for new systems, balance passes, UI
   reworks or new art sets; patch (0.3.0 -> 0.3.1) for smaller fixes. Note the new number in `docs/DECISIONS.md`.
-  Current: 0.3.0 (2026-09-25).
+  Current: 0.6.0 (2026-09-25). **Every version bump also adds its entry to `data/patch_notes.json`** (shown on
+  the title screen; a test checks the newest entry matches the version).
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
   what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the
@@ -63,6 +64,17 @@ All commands run from the repo root.
 - `Sfx.play` and `Music` do nothing headless; tests read `Sfx.last_played` and `Music.wanted()`.
 - A wrapping Label measured before its container gives it a width reports thousands of pixels of height.
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
+
+## Latest (2026-09-25, fourth session, v0.6.0)
+
+- **Patch notes** on the title screen (`data/patch_notes.json`, `PatchNotes` widget): every version, "Area: text"
+  entries under New / QOL / Bugfixes / Balancing, filter chips. Add an entry with each version bump.
+- **Sound switches** per kind in Options > Audio (rare finds, notifications, battle, interface).
+- **Inventory "Where to get it"**: skills, rare finds, island drop chances, bosses, Market (`Economy.sources`).
+- **Sanctum "claim!" chip** on the rail when Vance's goal is done (tooltip names it). The designer asked for "a
+  tooltip on the nexus for missions ready to collect"; read as this. Confirm with them it's what they meant.
+- Godot on the designer's PC: `D:\GameDev\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe`
+  (not on PATH in Git Bash).
 
 ## Latest (2026-09-25, third session, v0.4.1)
 

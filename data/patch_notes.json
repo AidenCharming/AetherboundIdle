@@ -6,9 +6,13 @@
 		"notes": {
 			"New": [
 				["UI", "Patch notes on the title screen: every version's changes, sorted by kind."],
-				["Options", "Sound effects have their own switches: rare finds, notifications, battle, work and menu sounds."],
-				["Inventory", "Click an item to see where it comes from, with each island's drop chance."],
-				["UI", "A dot on the Sanctum and Aether-Log tabs when a goal or milestone is ready to claim, with a tooltip listing them."]
+				["Options", "Sound effects have their own switches: rare finds, notifications, battle and interface sounds."],
+				["Inventory", "Click an item to see where it comes from: skills, rare finds, each island's drop chance, bosses and the Market."],
+				["Sanctum", "The Sanctum tab shows a gold \"claim!\" chip when Overseer Vance's goal is done, and its tooltip names the goal."]
+			],
+			"QOL": [
+				["UI", "Tooltips on the Genesis Pods and Expeditions tabs say how many eggs are ready and which shinies wait for a vessel."],
+				["Inventory", "The item panel scrolls, so long lists fit."]
 			]
 		}
 	},

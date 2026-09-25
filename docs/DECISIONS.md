@@ -776,3 +776,20 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
   literal in `scripts/ui/` (theme fonts and boxes, helper arguments and defaults, overrides, minimum sizes, offsets,
   drawn pixels, tween distances) was raised ×1.2 and rounded to whole pixels; `project.godot` is 1920×1080. The
   default window stays 1600×900 (a 1920 window doesn't fit a 1080p desktop with a taskbar). 155 tests.
+
+## Patch notes, sound switches, item sources, claim chip (0.6.0, designer's requests, 2026-09-25)
+
+- **Patch notes on the title screen.** `data/patch_notes.json` holds every Godot version newest first (0.2.0 on;
+  the 0.1.x builds were the web game). Each change is `[area, text]`, shown as "Area: text" (UI, Nexus,
+  Expeditions, ...), grouped as New / QOL / Bugfixes / Balancing, with filter chips (`PatchNotes` widget, right
+  side of the title). **Add an entry with every version bump**: a test checks the newest entry matches
+  `config/version`, the order, the kinds and that each area has a colour (`PatchNotes.AREA_COLORS`).
+- **A switch per kind of sound** (Options > Audio): rare finds, notifications, battle, interface (`Sfx.GROUPS`,
+  options `sfx_rare`, `sfx_notify`, `sfx_battle`, `sfx_ui`). Sounds are grouped by name (`Sfx.GROUP_OF`; `hit_*`
+  and `cast_*` are battle, anything unlisted is interface). Switching a kind on plays one of its sounds.
+- **Where to get it** (Inventory detail): `Economy.sources(id)` lists skill actions that make the item, rare finds
+  and treasure (chance per action), island loot (chance per wild beaten, amount), boss rewards and the Market, at
+  base odds. Sources not reached yet are dimmed. The detail panel now scrolls.
+- **Ready to claim:** the Sanctum rail tab shows a gold "claim!" chip when Overseer Vance's goal is done, with the
+  goal in its tooltip; the Pods and Expeditions chips got tooltips too. The Aether-Log already had its claim chip.
+  160 tests.
