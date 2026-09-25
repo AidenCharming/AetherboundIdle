@@ -10,6 +10,7 @@ const RESOLUTIONS := [Vector2i(1280, 720), Vector2i(1366, 768), Vector2i(1600, 9
 const FPS_CAPS := [30, 60, 90, 120, 144, 165, 240, 0]   # 0 = unlimited
 const WINDOW_MODES := ["Windowed", "Borderless fullscreen", "Exclusive fullscreen"]
 const UI_SCALES := [0.85, 1.0, 1.15, 1.3]
+const WINDOW_KEYS := ["window_mode", "resolution"]   ## only these move or resize the window
 
 var values := {
 	"master": 0.8,
@@ -32,6 +33,7 @@ var values := {
 }
 
 var _focused := true
+var _last_fullscreen := 1   # the fullscreen mode Alt+Enter / F11 goes back to
 var save_delay := 0.4   ## seconds of quiet before a change is written (a dragged slider changes every frame)
 var _save_timer: Timer
 var save_count := 0   ## writes of options.cfg so far (the tests check the debounce with it)
@@ -46,6 +48,7 @@ func _ready() -> void:
 	add_child(_save_timer)
 	load_options()
 	apply()
+	_apply_window()
 
 
 func _ensure_buses() -> void:
@@ -64,6 +67,8 @@ func get_value(key: String) -> Variant:
 func set_value(key: String, v: Variant) -> void:
 	values[key] = v
 	apply()
+	if key in WINDOW_KEYS:
+		_apply_window(key == "resolution")   # picking a size is a request to leave a maximized window
 	_save_timer.start(save_delay)   # restarts on every change: one write once the player lets go
 	options_changed.emit()
 
@@ -114,15 +119,30 @@ func _apply_audio() -> void:
 		AudioServer.set_bus_mute(i, float(pair[1]) <= 0.001)
 
 
+## VSync, the frame-rate cap and the interface scale: safe to apply on any change or focus change, since none
+## of them touches the window itself (that would undo a window the player maximized).
 func _apply_display() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED)
 	Engine.max_fps = FPS_CAPS[clampi(int(values.fps_cap), 0, FPS_CAPS.size() - 1)] if _focused else int(values.background_fps)
+	var tree := get_tree()
+	if tree and tree.root:
+		tree.root.content_scale_factor = UI_SCALES[clampi(int(values.ui_scale), 0, UI_SCALES.size() - 1)]
+
+
+## The window mode and size: at start-up and when the player changes one of them, never on other options or on
+## alt-tab. A maximized window stays maximized.
+func _apply_window(resize_maximized := false) -> void:
+	if DisplayServer.get_name() == "headless":
+		return
 	var mode := int(values.window_mode)
 	match mode:
 		0:
-			if DisplayServer.window_get_mode() != DisplayServer.WINDOW_MODE_WINDOWED:
+			var now := DisplayServer.window_get_mode()
+			if now == DisplayServer.WINDOW_MODE_MINIMIZED or (now == DisplayServer.WINDOW_MODE_MAXIMIZED and not resize_maximized):
+				return   # the player's own maximize (or a minimized window) wins over the size setting
+			if now != DisplayServer.WINDOW_MODE_WINDOWED:
 				DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 			var res: Vector2i = RESOLUTIONS[clampi(int(values.resolution), 0, RESOLUTIONS.size() - 1)]
 			var screen := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen())
@@ -134,10 +154,23 @@ func _apply_display() -> void:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 		2:
 			DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN)
-	var tree := get_tree()
-	if tree and tree.root:
-		tree.root.content_scale_factor = UI_SCALES[clampi(int(values.ui_scale), 0, UI_SCALES.size() - 1)]
 
+
+## Alt+Enter and F11 switch between a window and fullscreen (the fullscreen kind last used, borderless at first).
+func toggle_fullscreen() -> void:
+	var mode := int(values.window_mode)
+	if mode != 0:
+		_last_fullscreen = mode
+		set_value("window_mode", 0)
+	else:
+		set_value("window_mode", _last_fullscreen)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_F11 or (event.keycode == KEY_ENTER and event.alt_pressed):
+			get_viewport().set_input_as_handled()
+			toggle_fullscreen()
 
 func _notification(what: int) -> void:
 	match what:

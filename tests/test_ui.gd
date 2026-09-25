@@ -641,3 +641,20 @@ func _first_button(root: Node) -> Button:
 		if b:
 			return b
 	return null
+
+
+## Alt+Enter / F11 flip between a window and the fullscreen kind used last, and back.
+func test_fullscreen_toggle_goes_back_and_forth() -> void:
+	var was: int = Options.get_value("window_mode")
+	Options.values.window_mode = 2
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 0, "to a window")
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 2, "back to the same fullscreen")
+	var key := InputEventKey.new()
+	key.keycode = KEY_F11
+	key.pressed = true
+	Options._input(key)
+	t.eq(int(Options.get_value("window_mode")), 0, "F11 does it too")
+	Options.values.window_mode = was
+	Options.flush()
