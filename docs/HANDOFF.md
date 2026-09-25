@@ -79,6 +79,9 @@ This session's branch (`claude/vigilant-meitner-d7539t`) started from before las
   benchmark's exact island pick, the hold-the-rebuild-while-the-mouse-is-down, the Nexus dropdowns, sorting
   and Put to work menu.
 
+**Next session: rarity balancing (designer's pick).** Read this file, then work on the early-game balance
+item below; the designer runs the bug-test benchmark locally.
+
 **Still open:** the early-game balance item below (a Luminous party at Lv 1-3 beating Old Thicketroll; breeding
 two Steadys into Gleaming) was not touched; `month_probe --split` can measure it.
 
