@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.3j)
+## Where things stand (2026-09-25, v0.6.4)
 
-- Current version **0.6.3j**. All 169 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.6.4**. All 169 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
@@ -17,22 +17,19 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 
 ## Open: code and balance
 
-1. **Rarity and early-game balance (next session, designer's pick).**
-   - Rare rarities show up too often on expeditions: the wild rarity odds (`rarityWeights` per zone in
-     `data/zones.json`) and the Glimmer Lure.
-   - A Luminous Mossgear party at Lv 1–3 beats Old Thicketroll; breeding two Steadys gives Gleaming; many
-     Minor/Major traits. Candidates: a gentler Dim → Faint → Steady `statMultiplier` ramp in `data/rarities.json`,
-     breeding `mutationPlusOne` / `ceilingByTier`, trait strength odds, Mossgear's lean.
-   - The last benchmark's party (three at Lv 10) failed Smoldering Caldera (Lv 15–25) for 4 minutes.
-   - Measure with `tests/balance_probe.tscn`, `month_probe --split` and the month probe.
-2. **Achievements page (designer asked for it on the to-do list, 2026-09-25; plan it with the designer before
+1. **Achievements page (designer asked for it on the to-do list, 2026-09-25; plan it with the designer before
    building, it's a new system).** Each skill already records the real time it reached each level
    (`skills.<id>.levelTimes`); levels gained offline all get the same "now" stamp, which would need spreading
    across the time away if a page shows them. `docs/cosmetics.md` has milestone-style rewards to build on.
-3. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
+2. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
    rebuilding everything on each `Game.changed` at 600: the Aether-Log (~40 ms), Expeditions and skill pages
    (~25 ms), Market (~18 ms).
 ## Open: for the designer
+
+- **Play-test the 0.6.4 rarity pass:** rarer wild rarities (a Gleaming in Whisperleaf is about 1 in 400),
+  fewer traits on catches, rarer egg mutations, a half-strength Glimmer Lure, a weaker Old Thicketroll (Dims
+  win at level 7) and a smaller attack-speed edge from rarity. The last benchmark party (three at Lv 10)
+  failing Smoldering Caldera (Lv 15–25) is expected: that island's calibration party is Faint at Lv 23.
 
 - **Sound and music (designer's playtest, 2026-09-25):** `rare_appear` works but feels "meh"; the type attack
   sounds and the sounds and music in general may need real recordings from an open-source (CC0) library instead

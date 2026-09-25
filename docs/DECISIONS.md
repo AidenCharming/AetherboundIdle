@@ -456,8 +456,8 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     and levels a party on the hardest island it can clear, with XP from real battles. `--calibrate` finds
     each island's strength for a target party, and `--rates` measures party XP along the target timeline
     for curve fitting.
-  - **Result:** every skill reaches 99 between day 28.5 and day 33. Islands are first cleared on days
-    1, 1, 1, 2, 3, 5, 5, 7, 11 and about 24, with the party at level 98–100 by day 30.
+  - **Result (0.6.4):** every skill reaches 99 between day 27 and day 32. Islands are first cleared on days
+    1, 1, 1, 2, 3, 6, 6, 11, 15 and 22, with the party at level 96–99 by day 30–33.
   - **The first boss is a wall, not a formality.** Play-testing showed Old Thicketroll falling to a
     level 2–4 party (one Faint, two Dim). Early on, levels add little (level 1 to 8 is about +40% power),
     so an island's gate is its boss's strength against the party's rarity. Old Thicketroll's multipliers
@@ -467,6 +467,17 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     its level-16 boss, all-Faint wins from about 10), so it is unchanged. The month probe's `_combat`
     rounds party levels down to multiples of 3, which is why the level-4 target had really been tested
     at level 3.
+  - **Rarity is a lucky find, not a skip (0.6.4, designer's call).** A Steady trio or one Luminous at level
+    1–3 beat Old Thicketroll while an all-Dim party needed level 10. Two causes: rarer wilds were common,
+    and rarity sped up attacks by 8% a tier (`cooldown.rarityTerm`, the work-speed term) against 1.2% a
+    level, so one rarity step outran seven levels. Combat now has its own `combat.attackRarityTerm` (0.03);
+    work speed is unchanged. Wild `rarityWeights` above Dim were cut on every island (Whisperleaf 88/11/1,
+    plus a 0.25 Gleaming so it can be a very rare find), the Glimmer Lure went from +100% to +50%, and Old
+    Thicketroll's multipliers went ×0.8 (health 2.48, power 0.99, guard 1.04). Designer's target: Dims win
+    at level 6–7, a Gleaming at level 3. Measured (`balance_probe -- --grid`, wins of 8): Dim trio 1 at
+    level 6, 7 at level 7; Faint trio 8 from level 4; one Gleaming with two Dims 8 from level 3; a Steady
+    trio still wins at any level (three 1% finds). The stat multipliers per rarity are unchanged. Every
+    later island was rescaled back to waves x1.45 and boss x1.30 (`month_probe --split`).
   - **Levels matter in a fight** (designer's play-test: a level 5–6 Dim/Faint party cleared Fractured Quarry
     and its boss easily, and nearly beat a level-24 Caldera wild). Two causes: one rarity step (×1.3 stats)
     was worth about ten levels, and islands scale their wilds down (`enemyMult` below 1), so a nameplate's
@@ -523,7 +534,8 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
 
 ### Breeding
 - **The pool-trait roll** (an open question in the reference, blocking its Phase 2): a new creature rolls
-  0/1/2/3 pool traits with weights 35/40/20/5; strength Minor 65%, Moderate 28%, Major 7%; a trait of the
+  0/1/2/3 pool traits with weights 55/33/10/2 (0.6.4, was 35/40/20/5: the designer saw too many traits on
+  catches); strength Minor 72%, Moderate 24%, Major 4% (was 65/28/7); a trait of the
   creature's own type is 3× as likely; Void-only traits only on Void creatures and at Moderate minimum.
   Offspring inherit each parent trait with 40% chance, at the same strength or (15%) one step stronger, never
   weaker (the designer's rule: no step down), fill up with fresh
@@ -549,7 +561,8 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     away from it, never below the weaker parent. Each tier above the first lifts that centre by
     `centreLiftPerTier` (0.05 of a rarity step), so a tier sharing its ceiling with the one below still has
     better odds.
-  - **Mutation:** two rolls (+1 at 15%, +2 at 2.5%, halved for the top two rarities) can pass the ceiling.
+  - **Mutation:** two rolls (+1 at 8%, +2 at 1%, halved for the top two rarities; 0.6.4, was 15% and 2.5%,
+    which let two Steadys make a Gleaming too often) can pass the ceiling.
     The full odds are shown before laying.
   - **Examples:** with tier 1 materials, Dim + Dim → Faint 25%; Dim + Faint → Faint 49%, Steady 9%;
     Faint + Faint → never Dim, Steady 15%. Two Resplendents on tier 10 → Zenith about half the time.

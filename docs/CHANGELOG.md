@@ -10,6 +10,25 @@ Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` h
   both are open in `HANDOFF.md`, with sourcing sounds and music from an open-source library.
 - The Chunk 1 recipes are final as they are in the game (closed by the designer).
 
+## 0.6.4 (2026-09-25): rarity and early-game balance
+
+- **The designer's reports:** rare rarities showed up too often on expeditions, a Luminous Mossgear at
+  Lv 1–3 carried a party past Old Thicketroll, two Steadys bred Gleamings, and caught creatures had traits
+  too often. `balance_probe -- --grid` (new) showed a Steady trio winning at level 1 while an all-Dim
+  party needed level 10: rarity also sped up attacks by 8% a tier against 1.2% a level.
+- Combat attack speed now uses its own `combat.attackRarityTerm` (0.03 a tier); work speed keeps
+  `cooldown.rarityTerm`. The rarity stat multipliers are unchanged.
+- Wild `rarityWeights` above Dim cut on every island (Whisperleaf 80/17/3 to 88/11/1, plus a 0.25 Gleaming
+  as a very rare find); Glimmer Lure +100% to +50%; breeding `mutationPlusOne` 0.15 to 0.08 and
+  `mutationPlusTwo` 0.025 to 0.01; fresh pool-trait counts 35/40/20/5 to 55/33/10/2 (a catch has a trait
+  45% of the time, was 65%); strengths 65/28/7 to 72/24/4.
+- Old Thicketroll ×0.8 (health 2.48, power 0.99, guard 1.04): a Dim trio wins 7 of 8 at level 7, one
+  Gleaming with two Dims 8 of 8 at level 3 (the designer's targets). Every later island's `enemyMult` and
+  boss `mult` were rescaled back to waves x1.45 and boss x1.30 (`month_probe --split`).
+- Month probe: every skill at 99 on days 27–32, Zenith Spire first cleared on day 22 (was about 24).
+- Tests: the two-Dims-make-a-Faint odds (now about 21%) and the lure test (1.25× more non-Dims) follow the
+  new numbers. The balance probe gained the designer's early outlier parties.
+
 ## Bridge benchmark fixes (2026-09-25)
 
 - The 2026-09-25 `--movie` run failed only on "fps fell below 20" (median 10). Movie Maker writes a 1080p PNG

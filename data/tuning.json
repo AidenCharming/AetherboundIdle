@@ -216,6 +216,7 @@
 		"rareAnnounceChance": 0.1,
 		"baseAttackMs": 2400,
 		"minAttackMs": 700,
+		"attackRarityTerm": 0.03,
 		"wheelStrong": 1.5,
 		"wheelWeak": 0.75,
 		"voidDealt": 1.25,

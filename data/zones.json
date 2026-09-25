@@ -18,7 +18,8 @@
 		"rarityWeights": [
 			88,
 			11,
-			1
+			1,
+			0.25
 		],
 		"species": {
 			"sproutlet": 3,
@@ -35,7 +36,7 @@
 			"level": 7,
 			"ability": "thorn-roll",
 			"lean": "guard",
-			"mult": {"health": 3.1, "power": 1.24, "guard": 1.3},
+			"mult": {"health": 2.48, "power": 0.99, "guard": 1.04},
 			"rarity": 1
 		},
 		"loot": [
@@ -101,7 +102,7 @@
 			2,
 			3
 		],
-		"enemyMult": 0.6,
+		"enemyMult": 0.708,
 		"rarityWeights": [
 			80,
 			16,
@@ -124,9 +125,9 @@
 			"ability": "tusk-charge",
 			"lean": "power",
 			"mult": {
-				"health": 2.22,
-				"power": 0.69,
-				"guard": 0.69
+				"health": 2.1,
+				"power": 0.653,
+				"guard": 0.653
 			},
 			"rarity": 1
 		},
@@ -193,7 +194,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.01,
+		"enemyMult": 1.114,
 		"rarityWeights": [
 			70,
 			22,
@@ -217,9 +218,9 @@
 			"ability": "searing-swipe",
 			"lean": "power",
 			"mult": {
-				"health": 3.48,
-				"power": 1.01,
-				"guard": 0.96
+				"health": 3.453,
+				"power": 1.002,
+				"guard": 0.953
 			},
 			"rarity": 1
 		},
@@ -294,7 +295,7 @@
 			2,
 			3
 		],
-		"enemyMult": 0.96,
+		"enemyMult": 1.172,
 		"rarityWeights": [
 			62,
 			26,
@@ -318,9 +319,9 @@
 			"ability": "hydro-jet",
 			"lean": "health",
 			"mult": {
-				"health": 4.65,
-				"power": 1.22,
-				"guard": 1.22
+				"health": 4.006,
+				"power": 1.051,
+				"guard": 1.051
 			},
 			"rarity": 1
 		},
@@ -378,7 +379,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.3,
+		"enemyMult": 1.399,
 		"rarityWeights": [
 			55,
 			28,
@@ -463,7 +464,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.44,
+		"enemyMult": 1.529,
 		"rarityWeights": [
 			50,
 			28,
@@ -494,9 +495,9 @@
 			"ability": "dark-eclipse",
 			"lean": "guard",
 			"mult": {
-				"health": 9.11,
-				"power": 2.19,
-				"guard": 2.09
+				"health": 9.741,
+				"power": 2.342,
+				"guard": 2.235
 			},
 			"rarity": 1
 		},
@@ -568,7 +569,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.33,
+		"enemyMult": 1.376,
 		"rarityWeights": [
 			44,
 			30,
@@ -596,9 +597,9 @@
 			"ability": "leaf-shield",
 			"lean": "guard",
 			"mult": {
-				"health": 11.65,
-				"power": 2.64,
-				"guard": 2.48
+				"health": 10.843,
+				"power": 2.457,
+				"guard": 2.308
 			},
 			"rarity": 1
 		},
@@ -671,7 +672,7 @@
 			3,
 			3
 		],
-		"enemyMult": 1.66,
+		"enemyMult": 1.847,
 		"rarityWeights": [
 			40,
 			30,
@@ -700,9 +701,9 @@
 			"ability": "stone-crunch",
 			"lean": "power",
 			"mult": {
-				"health": 14.28,
-				"power": 3.07,
-				"guard": 2.83
+				"health": 13.298,
+				"power": 2.859,
+				"guard": 2.636
 			},
 			"rarity": 1
 		},
@@ -775,7 +776,7 @@
 			3,
 			3
 		],
-		"enemyMult": 1.61,
+		"enemyMult": 1.688,
 		"rarityWeights": [
 			35,
 			30,
@@ -804,9 +805,9 @@
 			"ability": "mist-veil",
 			"lean": "health",
 			"mult": {
-				"health": 15.55,
-				"power": 3.18,
-				"guard": 2.96
+				"health": 15.789,
+				"power": 3.229,
+				"guard": 3.006
 			},
 			"rarity": 1
 		},
@@ -880,7 +881,7 @@
 			3,
 			3
 		],
-		"enemyMult": 1.95,
+		"enemyMult": 2.417,
 		"rarityWeights": [
 			30,
 			28,
@@ -912,9 +913,9 @@
 			"ability": "shadow-strike",
 			"lean": "power",
 			"mult": {
-				"health": 22.88,
-				"power": 4.25,
-				"guard": 3.93
+				"health": 23.056,
+				"power": 4.283,
+				"guard": 3.96
 			},
 			"rarity": 1
 		},

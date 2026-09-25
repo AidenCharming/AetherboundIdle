@@ -3,6 +3,10 @@ extends Node
 ## godot --headless --path godot res://tests/balance_probe.tscn
 
 func _ready() -> void:
+	if "--grid" in OS.get_cmdline_user_args():
+		grid()
+		get_tree().quit()
+		return
 	var cases := [
 		["whisperleaf-hollow", [["sproutlet", 1, 1]]],
 		["whisperleaf-hollow", [["sproutlet", 1, 4]]],
@@ -40,6 +44,24 @@ func _ready() -> void:
 		print("%-20s %-50s wins %d/5  avg wave %.1f  avg run %.0fs  kills/min %.1f  xp/run %.0f  levels/run %.2f  min/level %.1f" % [cs[0], str(cs[1]), res.wins, res.wave, res.secs, res.kpm, res.xp, res.levels,
 			F.xp_to_next(F.creature_curve(), cs[1][0][2]) / maxf(1.0, res.xp / res.secs * 60.0)])
 	get_tree().quit()
+
+
+## `-- --grid`: Old Thicketroll's gate as a table: wins out of 8 for a Whisperleaf trio of one rarity at each
+## level, and for one creature of that rarity carrying two Dims of the same level.
+func grid() -> void:
+	var levels := [1, 2, 3, 4, 5, 6, 7, 8, 10]
+	var head := "%-26s" % "whisperleaf-hollow"
+	for lv in levels:
+		head += "  lv%-3d" % lv
+	print(head)
+	for carry in [false, true]:
+		for r in range(1, 6):
+			var line := "%-26s" % ("%s%s" % [Data.rarity(r).name, " + 2 Dim" if carry else " trio"])
+			for lv in levels:
+				var o := 1 if carry else r
+				var res := probe("whisperleaf-hollow", [["sproutlet", r, lv], ["brambletrundle", o, lv], ["buzzbud", o, lv]], 8)
+				line += "  %d/8  " % int(res.wins)
+			print(line)
 
 
 func probe(zone: String, party_spec: Array, runs: int) -> Dictionary:

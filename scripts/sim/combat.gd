@@ -11,9 +11,13 @@ static func tempo(t: String) -> Dictionary:
 	return Data.tuning.combat.tempo[t]
 
 
+## Like work speed (F.intrinsic_term), but rarity has its own, smaller term in a fight
+## (`combat.attackRarityTerm`), so a rare find doesn't also out-speed several levels.
 static func attack_interval(level: int, rarity: int, form: int) -> float:
 	var cb: Dictionary = Data.tuning.combat
-	return maxf(float(cb.minAttackMs), float(cb.baseAttackMs) / (1.0 + F.intrinsic_term(level, rarity, form)))
+	var cd: Dictionary = Data.tuning.cooldown
+	var term: float = cd.levelTerm * (level - 1) + float(cb.attackRarityTerm) * (rarity - 1) + cd.formTerm[form - 1]
+	return maxf(float(cb.minAttackMs), float(cb.baseAttackMs) / (1.0 + term))
 
 
 ## A party member as a fighter.

@@ -1,5 +1,20 @@
 [
 	{
+		"version": "0.6.4",
+		"date": "2026-09-25",
+		"title": "Lucky finds feel lucky",
+		"notes": {
+			"Balancing": [
+				["Expeditions", "Wild Aetherlings rarer than Dim turn up less often on every island. A Gleaming can now appear in Whisperleaf Hollow, as a very rare find."],
+				["Expeditions", "Rarity makes an Aetherling attack a little faster instead of a lot faster, so levels count for more in a fight. Every island's waves and boss were rebalanced to match."],
+				["Expeditions", "Old Thicketroll is weaker: a party of Dims at level 7 can now beat him."],
+				["Nexus", "Caught and hatched Aetherlings have traits less often, and strong traits are rarer."],
+				["Breeding", "Eggs jump past their expected rarity less often."],
+				["Market", "The Glimmer Lure now makes rarer wild Aetherlings 50% more common, down from twice as common."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3j",
 		"date": "2026-09-25",
 		"title": "Every final form painted",
