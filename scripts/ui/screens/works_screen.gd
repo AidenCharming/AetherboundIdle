@@ -8,13 +8,13 @@ var _tick := 0.0
 
 
 func _ready() -> void:
-	var v := UI.vbox(16)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(19)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	var sc := UI.scroll(m)
 	sc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(sc)
 	v.add_child(UI.header("Sanctum Works", "Build up the Sanctum itself: more pods, more perches, more Aether, longer time away.", Data.ui_icon("works")))
-	_list = UI.flow(16, 16)
+	_list = UI.flow(19, 19)
 	v.add_child(_list)
 	refresh()
 
@@ -35,24 +35,24 @@ func refresh() -> void:
 	for u in Data.upgrade_list:
 		var lv := GameState.upgrade_level(s, u.id)
 		var card := UI.panel("Glass")
-		card.custom_minimum_size = Vector2(380, 250)
-		var cv := UI.vbox(10)
+		card.custom_minimum_size = Vector2(456, 300)
+		var cv := UI.vbox(12)
 		card.add_child(cv)
-		var h := UI.hbox(12)
+		var h := UI.hbox(14)
 		var pearl: bool = u.get("pearl", false)
-		h.add_child(UI.icon(Data.item_icon("aether-pearl") if pearl else Data.ui_icon(_icon(u.id)), 52))
+		h.add_child(UI.icon(Data.item_icon("aether-pearl") if pearl else Data.ui_icon(_icon(u.id)), 62))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(u.name, "H2"))
-		tv.add_child(UI.chip("Maxed" if lv >= u.levels.size() else "Level %d / %d" % [lv, u.levels.size()], Palette.GOOD if lv >= u.levels.size() else (Palette.AETHER if lv > 0 else Palette.AETHER_DEEP.lightened(0.3)), 12))
+		tv.add_child(UI.chip("Maxed" if lv >= u.levels.size() else "Level %d / %d" % [lv, u.levels.size()], Palette.GOOD if lv >= u.levels.size() else (Palette.AETHER if lv > 0 else Palette.AETHER_DEEP.lightened(0.3)), 14))
 		h.add_child(tv)
 		cv.add_child(h)
 		cv.add_child(UI.wrap_label(u.blurb, "Dim"))
 		if pearl and lv == 0 and GameState.count(s, "aether-pearl") < 1:
 			cv.add_child(UI.wrap_label("Aether Pearls come from the last two islands' bosses (rarely), releasing Resplendent and Zenith Aetherlings, and finding or releasing shinies.", "Faint"))
-		var pips := UI.hbox(4)
+		var pips := UI.hbox(5)
 		for i in u.levels.size():
 			var pip := ColorRect.new()
-			pip.custom_minimum_size = Vector2(26, 6)
+			pip.custom_minimum_size = Vector2(31, 7)
 			pip.color = Palette.AETHER if i < lv else Color(1, 1, 1, 0.12)
 			pips.add_child(pip)
 		cv.add_child(pips)
@@ -61,8 +61,8 @@ func refresh() -> void:
 		if nxt.is_empty():
 			cv.add_child(UI.label("Complete: %s" % _fmt(u.id, now), "H3", Palette.GOOD))
 		else:
-			cv.add_child(UI.hbox(8, [UI.label(_fmt(u.id, now), "H3"), UI.label("next", "Faint"), UI.label(_fmt(u.id, float(nxt.value)), "H3", Palette.AETHER)]))
-			cv.add_child(UI.cost_row(nxt.cost, 22))
+			cv.add_child(UI.hbox(10, [UI.label(_fmt(u.id, now), "H3"), UI.label("next", "Faint"), UI.label(_fmt(u.id, float(nxt.value)), "H3", Palette.AETHER)]))
+			cv.add_child(UI.cost_row(nxt.cost, 26))
 			var b := UI.button("Build", "Primary", func(): Game.buy_upgrade(u.id))
 			cv.add_child(b)
 			_builds[u.id] = b

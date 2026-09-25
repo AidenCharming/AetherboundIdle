@@ -14,7 +14,7 @@ var closing := false   ## fading out: it no longer counts as open and lets every
 var _dim: ColorRect
 
 
-static func open(content: Control, title := "", width := 560.0, close_button := true) -> Modal:
+static func open(content: Control, title := "", width := 672.0, close_button := true) -> Modal:
 	var m := Modal.new()
 	m._build(content, title, width, close_button)
 	var host: Control = layer if layer and is_instance_valid(layer) else null
@@ -40,10 +40,10 @@ func _build(content: Control, title: String, width: float, close_button: bool) -
 	panel = UI.panel("Modal")
 	panel.custom_minimum_size.x = width
 	center.add_child(panel)
-	body = UI.vbox(14)
+	body = UI.vbox(17)
 	panel.add_child(body)
 	if title != "" or close_button:
-		var head := UI.hbox(10)
+		var head := UI.hbox(12)
 		if title != "":
 			head.add_child(UI.label(title, "H2"))
 		head.add_child(UI.spacer())
@@ -102,9 +102,9 @@ func close() -> void:
 
 ## Yes/no dialog.
 static func confirm(title: String, text: String, yes_text: String, on_yes: Callable, danger := false) -> Modal:
-	var v := UI.vbox(18)
-	v.add_child(UI.wrap_label(text, "Dim", 420))
-	var row := UI.hbox(10)
+	var v := UI.vbox(22)
+	v.add_child(UI.wrap_label(text, "Dim", 504))
+	var row := UI.hbox(12)
 	row.add_child(UI.spacer())
 	# Lambdas capture local variables by value when they are created, so the modal (opened after its buttons
 	# exist) is kept in a Dictionary, which the lambdas share by reference.
@@ -114,7 +114,7 @@ static func confirm(title: String, text: String, yes_text: String, on_yes: Calla
 		box.m.close()
 		on_yes.call()))
 	v.add_child(row)
-	box.m = open(v, title, 480)
+	box.m = open(v, title, 576)
 	return box.m
 
 

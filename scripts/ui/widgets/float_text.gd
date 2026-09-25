@@ -3,17 +3,17 @@ extends RefCounted
 ## Small rising "+1 [icon]" pickups and damage numbers.
 
 
-static func spawn(parent: Control, at: Vector2, text: String, color := Palette.TEXT, tex: Texture2D = null, size := 16, rise := 46.0, centered := false) -> void:
+static func spawn(parent: Control, at: Vector2, text: String, color := Palette.TEXT, tex: Texture2D = null, size := 19, rise := 55.0, centered := false) -> void:
 	if not is_instance_valid(parent):
 		return
-	var h := UI.hbox(4)
+	var h := UI.hbox(5)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if tex:
-		h.add_child(UI.icon(tex, size + 4))
+		h.add_child(UI.icon(tex, size + 5))
 	var l := UI.label(text, "Num", color)
 	l.add_theme_font_size_override("font_size", size)
 	l.add_theme_color_override("font_outline_color", Color(0.05, 0.04, 0.1, 0.9))
-	l.add_theme_constant_override("outline_size", 5)
+	l.add_theme_constant_override("outline_size", 6)
 	h.add_child(l)
 	parent.add_child(h)
 	h.position = at - Vector2(h.get_combined_minimum_size().x * 0.5 if centered else 16.0, 10)

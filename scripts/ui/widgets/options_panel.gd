@@ -12,13 +12,13 @@ const PAGES := [["audio", "Audio"], ["display", "Display"], ["gameplay", "Gamepl
 
 static func open_modal() -> Modal:
 	var p := OptionsPanel.new()
-	return Modal.open(p, "Options", 720)
+	return Modal.open(p, "Options", 864)
 
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 16)
-	custom_minimum_size = Vector2(660, 460)
-	_tabs = UI.hbox(8)
+	add_theme_constant_override("separation", 19)
+	custom_minimum_size = Vector2(792, 552)
+	_tabs = UI.hbox(10)
 	add_child(_tabs)
 	for pair in PAGES:
 		var b := UI.button(pair[1], "ChipOn" if pair[0] == _current else "Chip")
@@ -26,7 +26,7 @@ func _ready() -> void:
 			_current = pair[0]
 			_rebuild())
 		_tabs.add_child(b)
-	_page = UI.vbox(14)
+	_page = UI.vbox(17)
 	add_child(UI.panel("Inset", _page))
 	_rebuild()
 
@@ -73,16 +73,16 @@ func _rebuild() -> void:
 ## one (Esc cancels, Backspace clears). A key already used moves to this page.
 func _controls_page() -> void:
 	_page.add_child(_note("Each page of the sidebar opens with a key, shown on its tab. Click a key and press a new one: Esc cancels, Backspace or Delete leaves the page without a key. Esc always opens the menu."))
-	var list := UI.vbox(4)
+	var list := UI.vbox(5)
 	for pair in Options.tab_list():
-		var h := UI.hbox(12)
+		var h := UI.hbox(14)
 		var l := UI.label(pair[1])
-		l.custom_minimum_size.x = 250
+		l.custom_minimum_size.x = 300
 		h.add_child(l)
 		var code := Options.keybind(pair[0])
 		var text := "Press a key…" if _capturing == pair[0] else (Options.key_name(code) if code != 0 else "None")
 		var b := UI.button(text, "ChipOn" if _capturing == pair[0] else "Chip")
-		b.custom_minimum_size.x = 150
+		b.custom_minimum_size.x = 180
 		b.focus_mode = Control.FOCUS_NONE
 		b.tooltip_text = "Click, then press the key for %s" % pair[1]
 		var tab: String = pair[0]
@@ -92,9 +92,9 @@ func _controls_page() -> void:
 		h.add_child(b)
 		list.add_child(h)
 	var sc := UI.scroll(list)
-	sc.custom_minimum_size.y = 300
+	sc.custom_minimum_size.y = 360
 	_page.add_child(sc)
-	var row := UI.hbox(10)
+	var row := UI.hbox(12)
 	row.add_child(UI.spacer())
 	row.add_child(UI.button("Reset to defaults", "", func():
 		_capturing = ""
@@ -124,13 +124,13 @@ func _input(event: InputEvent) -> void:
 ## A wrapped note with a fixed width. A wrapping label that is measured before its container has given
 ## it a width reports a height of thousands of pixels, and switching the window mode can make that stick.
 func _note(text: String) -> Label:
-	return UI.wrap_label(text, "Faint", 600)
+	return UI.wrap_label(text, "Faint", 720)
 
 
 func _row(title: String) -> HBoxContainer:
-	var h := UI.hbox(12)
+	var h := UI.hbox(14)
 	var l := UI.label(title)
-	l.custom_minimum_size.x = 250
+	l.custom_minimum_size.x = 300
 	h.add_child(l)
 	_page.add_child(h)
 	return h
@@ -144,9 +144,9 @@ func _slider(title: String, key: String) -> void:
 	s.step = 0.01
 	s.value = float(Options.get_value(key))
 	s.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	s.custom_minimum_size.y = 24
+	s.custom_minimum_size.y = 29
 	var pct := UI.label("%d%%" % roundi(s.value * 100), "Num")
-	pct.custom_minimum_size.x = 52
+	pct.custom_minimum_size.x = 62
 	pct.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	s.value_changed.connect(func(v):
 		pct.text = "%d%%" % roundi(v * 100)

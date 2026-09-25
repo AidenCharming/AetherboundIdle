@@ -18,35 +18,35 @@ var _treasure: Button
 
 
 func _ready() -> void:
-	var row := UI.hbox(18)
-	var m := UI.margin(row, 26, 10, 26, 20)
+	var row := UI.hbox(22)
+	var m := UI.margin(row, 31, 12, 31, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var left := UI.vbox(12)
+	var left := UI.vbox(14)
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(left)
-	var head := UI.hbox(10)
+	var head := UI.hbox(12)
 	head.add_child(UI.header("Inventory", "Sell what you don't need. Keep what the next tier needs.", Data.ui_icon("inventory")))
 	head.add_child(UI.spacer())
 	# the worth on top, the two ways to sell many at once under it
-	var sells := UI.vbox(6)
-	_worth = UI.hbox(6)
+	var sells := UI.vbox(7)
+	_worth = UI.hbox(7)
 	_worth.alignment = BoxContainer.ALIGNMENT_END
 	sells.add_child(_worth)
 	_treasure = UI.button("Sell treasure", "", _sell_treasure, Data.ui_icon("gold"))
 	_treasure.tooltip_text = "Sell every finding that no recipe, build or pod uses (locked ones stay)."
-	sells.add_child(UI.hbox(8, [_treasure, UI.button("Sell in bulk…", "Gold", _bulk_sell, Data.ui_icon("gold"))]))
+	sells.add_child(UI.hbox(10, [_treasure, UI.button("Sell in bulk…", "Gold", _bulk_sell, Data.ui_icon("gold"))]))
 	head.add_child(sells)
 	left.add_child(head)
-	_cats = UI.flow(6, 6)
+	_cats = UI.flow(7, 7)
 	left.add_child(_cats)
-	_grid = UI.flow(10, 10)
+	_grid = UI.flow(12, 12)
 	left.add_child(UI.scroll(_grid))
-	var right := UI.vbox(14)
-	right.custom_minimum_size.x = 380
+	var right := UI.vbox(17)
+	right.custom_minimum_size.x = 456
 	row.add_child(right)
 	var dp := UI.panel("Glass")
-	_detail = UI.vbox(10)
+	_detail = UI.vbox(12)
 	dp.add_child(_detail)
 	right.add_child(dp)
 	right.add_child(_market_links())
@@ -81,7 +81,7 @@ func _fill_grid() -> void:
 			continue
 		any = true
 		var b := UI.button("", "TileOn" if it.id == selected else "Tile")
-		b.custom_minimum_size = Vector2(112, 128)
+		b.custom_minimum_size = Vector2(134, 154)
 		b.tooltip_text = it.name
 		b.pressed.connect(func():
 			selected = it.id
@@ -91,30 +91,30 @@ func _fill_grid() -> void:
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		v.offset_top = 16
 		v.offset_bottom = -6
-		v.add_theme_constant_override("separation", 4)
-		var ic := UI.icon(Data.item_icon(it.id), 58)
+		v.add_theme_constant_override("separation", 5)
+		var ic := UI.icon(Data.item_icon(it.id), 70)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(ic)
 		if Market.is_locked(s, it.id):
-			var lk := UI.icon(Data.ui_icon("lock"), 18)
+			var lk := UI.icon(Data.ui_icon("lock"), 22)
 			lk.position = Vector2(86, 6)
 			lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			b.add_child(lk)
 		# the name: bright, bold and allowed two lines, so "Verdant Seedcache" isn't cut to "Verdant Seedcac…"
 		var name_lbl := UI.label(it.name, "", Palette.TEXT if it.id == selected else Palette.TEXT_DIM.lightened(0.15))
 		name_lbl.add_theme_font_override("font", ThemeFactory.bold_font())
-		name_lbl.add_theme_font_size_override("font_size", 13)
+		name_lbl.add_theme_font_size_override("font_size", 16)
 		name_lbl.add_theme_constant_override("line_spacing", -2)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		name_lbl.max_lines_visible = 2
 		name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		name_lbl.custom_minimum_size = Vector2(100, 40)
+		name_lbl.custom_minimum_size = Vector2(120, 48)
 		v.add_child(name_lbl)
 		b.add_child(v)
 		# how many, as a pill on the top-left corner of the tile
-		var count := UI.chip(F.format_num(n), Palette.GOLD if it.category in ["rare", "treasure"] else Palette.AETHER, 12)
+		var count := UI.chip(F.format_num(n), Palette.GOLD if it.category in ["rare", "treasure"] else Palette.AETHER, 14)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		count.position = Vector2(6, 6)
 		b.add_child(count)
@@ -126,7 +126,7 @@ func _fill_grid() -> void:
 	_treasure.disabled = tv <= 0
 	UI.clear(_worth)
 	_worth.add_child(UI.label("Everything would sell for", "Dim"))
-	_worth.add_child(UI.amount("gold", worth, -1, 20))
+	_worth.add_child(UI.amount("gold", worth, -1, 24))
 
 
 func _fill_detail() -> void:
@@ -137,11 +137,11 @@ func _fill_detail() -> void:
 		return
 	var it: Dictionary = Data.items[selected]
 	var n := int(GameState.count(s, selected))
-	var h := UI.hbox(14)
-	h.add_child(UI.icon(Data.item_icon(selected), 84))
+	var h := UI.hbox(17)
+	h.add_child(UI.icon(Data.item_icon(selected), 101))
 	var hv := UI.vbox(2)
 	hv.add_child(UI.label(it.name, "H2"))
-	hv.add_child(UI.hbox(6, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 12), UI.chip(it.category.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 12)]))
+	hv.add_child(UI.hbox(7, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 14), UI.chip(it.category.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 14)]))
 	hv.add_child(UI.label("You have %s" % F.format_num(n), "Dim"))
 	h.add_child(hv)
 	h.add_child(UI.spacer())
@@ -161,7 +161,7 @@ func _fill_detail() -> void:
 		_detail.add_child(UI.wrap_label("Bind chance: " + " · ".join(line), "Faint"))
 	_detail.add_child(UI.sep())
 	if it.has("aether"):
-		var row := UI.hbox(8)
+		var row := UI.hbox(10)
 		row.add_child(UI.button("Shatter 1", "Primary", func(): Game.shatter(selected, 1)))
 		row.add_child(UI.button("Shatter all (+%s Aether)" % F.format_num(float(it.aether) * n), "", func(): Game.shatter(selected, n)))
 		_detail.add_child(row)
@@ -173,26 +173,26 @@ func _fill_detail() -> void:
 	qty.min_value = 1
 	qty.max_value = n
 	qty.value = n
-	qty.custom_minimum_size.x = 120
+	qty.custom_minimum_size.x = 144
 	var price := UI.label("", "Num", Palette.GOLD)
 	var upd := func(v: float): price.text = "= %s gold" % F.format_num(float(it.sell) * v)
 	upd.call(qty.value)
 	qty.value_changed.connect(upd)
-	_detail.add_child(UI.hbox(10, [UI.label("Sell", "Dim"), qty, price]))
-	var row2 := UI.hbox(8)
+	_detail.add_child(UI.hbox(12, [UI.label("Sell", "Dim"), qty, price]))
+	var row2 := UI.hbox(10)
 	row2.add_child(UI.button("Sell", "Gold", func(): Game.sell(selected, int(qty.value))))
 	row2.add_child(UI.button("Sell all but 10", "", func(): Game.sell(selected, maxi(0, n - 10))))
 	_detail.add_child(row2)
-	_detail.add_child(UI.hbox(6, [UI.label("Sells for", "Dim"), UI.amount("gold", float(it.sell), -1, 18), UI.label("each", "Dim")]))
+	_detail.add_child(UI.hbox(7, [UI.label("Sells for", "Dim"), UI.amount("gold", float(it.sell), -1, 22), UI.label("each", "Dim")]))
 
 
 ## What the item is for: each recipe (with its skill's icon and level), Works build, pod material, or a note that
 ## it's treasure, only worth its gold.
 func _uses_box(id: String) -> Control:
-	var v := UI.vbox(4)
+	var v := UI.vbox(5)
 	var used := Economy.uses(id)
 	if used.is_empty():
-		var row := UI.hbox(8, [UI.icon(Data.ui_icon("gold"), 20), UI.wrap_label("Treasure: nothing uses it, so sell it for gold. \"Sell treasure\" sells all of these at once.", "", 300)])
+		var row := UI.hbox(10, [UI.icon(Data.ui_icon("gold"), 24), UI.wrap_label("Treasure: nothing uses it, so sell it for gold. \"Sell treasure\" sells all of these at once.", "", 360)])
 		(row.get_child(1) as Label).add_theme_color_override("font_color", Palette.GOLD)
 		v.add_child(row)
 		return v
@@ -214,7 +214,7 @@ func _uses_box(id: String) -> Control:
 				tex = Data.ui_icon("health")
 			"shatter":
 				tex = Data.ui_icon("aether")
-		v.add_child(UI.hbox(8, [UI.icon(tex, 18), UI.wrap_label(line, "Dim", 300)]))
+		v.add_child(UI.hbox(10, [UI.icon(tex, 22), UI.wrap_label(line, "Dim", 360)]))
 	return v
 
 
@@ -235,9 +235,9 @@ func _buy_row(it: Dictionary) -> void:
 	var price := Market.buy_price(it.id)
 	if not Market.for_sale(s, it.id):
 		var need := Market.unlock_clears(it.id)
-		_detail.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("The Market stocks it once you clear %s" % Data.zone_list[mini(need, Data.zone_list.size()) - 1].name, "Faint")]))
+		_detail.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("lock"), 19), UI.label("The Market stocks it once you clear %s" % Data.zone_list[mini(need, Data.zone_list.size()) - 1].name, "Faint")]))
 		return
-	var row := UI.hbox(8, [UI.label("Buy", "Dim"), UI.amount("gold", price, price, 18), UI.label("each", "Faint"), UI.spacer()])
+	var row := UI.hbox(10, [UI.label("Buy", "Dim"), UI.amount("gold", price, price, 22), UI.label("each", "Faint"), UI.spacer()])
 	for n in [1, 10, 100]:
 		var b := UI.button("+%d" % n, "", func(): Game.market_buy(it.id, n))
 		b.disabled = float(s.gold) < price * n
@@ -249,13 +249,13 @@ func _buy_row(it: Dictionary) -> void:
 ## Sell many items at once: this category (or everything but vessels and rare finds), up to a tier, keeping
 ## some of each. Locked items always stay.
 func _bulk_sell() -> void:
-	var v := UI.vbox(12)
+	var v := UI.vbox(14)
 	var cat_name := "everything (but vessels and rare finds)"
 	for pair in CATEGORIES:
 		if pair[0] == category and category != "":
 			cat_name = pair[1].to_lower()
-	v.add_child(UI.wrap_label("Sells %s you have. Locked items always stay: lock one from its detail panel. Choose a category on the page first to sell only that." % cat_name, "Dim", 520))
-	var row := UI.hbox(8, [UI.label("Tiers up to", "Dim")])
+	v.add_child(UI.wrap_label("Sells %s you have. Locked items always stay: lock one from its detail panel. Choose a category on the page first to sell only that." % cat_name, "Dim", 624))
+	var row := UI.hbox(10, [UI.label("Tiers up to", "Dim")])
 	var tier_ob := OptionButton.new()
 	tier_ob.add_item("Every tier", 0)
 	for t in range(1, 11):
@@ -271,7 +271,7 @@ func _bulk_sell() -> void:
 	v.add_child(row)
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
-	var icons := UI.flow(4, 4)
+	var icons := UI.flow(5, 5)
 	v.add_child(icons)
 	var box := {}
 	var go := UI.button("Sell", "Gold")
@@ -285,7 +285,7 @@ func _bulk_sell() -> void:
 		preview.text = "%s items of %d kinds · %s gold" % [F.format_num(n), c.size(), F.format_num(Market.bulk_value(c))]
 		UI.clear(icons)
 		for id in c.keys().slice(0, 24):
-			var ic := UI.icon(Data.item_icon(id), 28)
+			var ic := UI.icon(Data.item_icon(id), 34)
 			ic.tooltip_text = "%s× %s" % [F.format_num(int(c[id])), Data.item_name(id)]
 			icons.add_child(ic)
 		go.disabled = c.is_empty()
@@ -296,13 +296,13 @@ func _bulk_sell() -> void:
 		box.m.close()
 		Game.bulk_sell(cands.call()))
 	v.add_child(go)
-	box.m = Modal.open(v, "Sell in bulk", 600)
+	box.m = Modal.open(v, "Sell in bulk", 720)
 
 
 func _market_links() -> Control:
-	var v := UI.vbox(10)
-	v.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("market"), 22), UI.label("Market", "H3")]))
-	v.add_child(UI.wrap_label("Vessels, materials, boosts, extra work slots and a stock that changes every few hours. Eggs have a market of their own.", "Faint", 320))
+	var v := UI.vbox(12)
+	v.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("market"), 26), UI.label("Market", "H3")]))
+	v.add_child(UI.wrap_label("Vessels, materials, boosts, extra work slots and a stock that changes every few hours. Eggs have a market of their own.", "Faint", 384))
 	v.add_child(UI.hbox(8, [UI.button("Open the Market", "Gold", func(): Main.go("market"), Data.ui_icon("market")),
 		UI.button("Egg Market", "", func(): Main.go("eggmarket"), Data.ui_icon("egg-market"))]))
 	return UI.panel("Glass", v)

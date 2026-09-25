@@ -200,16 +200,16 @@ func _input(event: InputEvent) -> void:
 
 func _build_rail() -> Control:
 	var rail := UI.panel("Rail")
-	rail.custom_minimum_size.x = 276
-	var v := UI.vbox(6)
+	rail.custom_minimum_size.x = 331
+	var v := UI.vbox(7)
 	rail.add_child(v)
-	var logo := UI.hbox(8)
-	logo.add_child(UI.icon(APP_ICON, 32))
+	var logo := UI.hbox(10)
+	logo.add_child(UI.icon(APP_ICON, 38))
 	var title_lbl := UI.label("Aetherbound", "H2")
 	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
-	title_lbl.add_theme_constant_override("shadow_outline_size", 10)
+	title_lbl.add_theme_constant_override("shadow_outline_size", 12)
 	logo.add_child(title_lbl)
-	v.add_child(UI.margin(logo, 6, 8, 0, 10))
+	v.add_child(UI.margin(logo, 7, 10, 0, 12))
 	_rail_list = UI.vbox(2)
 	v.add_child(UI.scroll(_rail_list))
 	var menu := UI.button("Menu", "Ghost", open_pause_menu, Data.ui_icon("settings"))
@@ -244,31 +244,31 @@ func _fill_rail() -> void:
 
 func _section(text: String) -> void:
 	var l := UI.label(text.to_upper(), "Faint")
-	l.add_theme_font_size_override("font_size", 12)
-	_rail_list.add_child(UI.margin(l, 12, 12, 0, 2))
+	l.add_theme_font_size_override("font_size", 14)
+	_rail_list.add_child(UI.margin(l, 14, 14, 0, 2))
 
 
 func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> void:
 	var b := UI.button("", "Nav")
-	b.custom_minimum_size.y = 38
-	var h := UI.hbox(7)
+	b.custom_minimum_size.y = 46
+	var h := UI.hbox(8)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	h.offset_left = 10
 	h.offset_right = -6
-	h.add_child(UI.icon(Data.ui_icon(icon_name), 24))
+	h.add_child(UI.icon(Data.ui_icon(icon_name), 29))
 	var l := UI.label(text)
 	l.add_theme_font_override("font", ThemeFactory.bold_font())
-	l.add_theme_font_size_override("font_size", 15)
+	l.add_theme_font_size_override("font_size", 18)
 	l.clip_text = true
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	l.custom_minimum_size.x = 40
+	l.custom_minimum_size.x = 48
 	h.add_child(l)
 	var cap := _keycap()
 	h.add_child(cap)
-	var extra := UI.chip("", Palette.AETHER, 11)
-	extra.custom_minimum_size.x = 26
+	var extra := UI.chip("", Palette.AETHER, 13)
+	extra.custom_minimum_size.x = 31
 	(extra.get_child(0) as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	extra.visible = false
 	h.add_child(extra)
@@ -282,19 +282,19 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 ## A small key drawn in code (a rounded cap with a deeper bottom edge) showing a tab's shortcut.
 func _keycap() -> PanelContainer:
 	var cap := PanelContainer.new()
-	var sb := ThemeFactory.box(Color(0.12, 0.13, 0.25, 0.9), 4, 1, Color(Palette.TEXT_DIM, 0.55), 0)
-	sb.border_width_bottom = 3
-	sb.content_margin_left = 4
-	sb.content_margin_right = 4
+	var sb := ThemeFactory.box(Color(0.12, 0.13, 0.25, 0.9), 5, 1, Color(Palette.TEXT_DIM, 0.55), 0)
+	sb.border_width_bottom = 4
+	sb.content_margin_left = 5
+	sb.content_margin_right = 5
 	sb.content_margin_top = 0
 	sb.content_margin_bottom = 0
 	cap.add_theme_stylebox_override("panel", sb)
 	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var kl := UI.label("", "Small", Palette.TEXT_DIM)
-	kl.add_theme_font_size_override("font_size", 10)
+	kl.add_theme_font_size_override("font_size", 12)
 	kl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	kl.custom_minimum_size.x = 11
+	kl.custom_minimum_size.x = 13
 	cap.add_child(kl)
 	return cap
 
@@ -378,15 +378,15 @@ func _fill_boosts() -> void:
 		p.tooltip_text = "%s: %s\n%s left" % [b.name, b.desc, F.format_seconds(left)]
 		p.mouse_filter = Control.MOUSE_FILTER_STOP
 		p.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: show_screen("market"))
-		p.add_child(UI.hbox(4, [UI.icon(Data.ui_icon(b.icon), 20), UI.label(F.format_seconds(left), "Small", Palette.AETHER)]))
+		p.add_child(UI.hbox(5, [UI.icon(Data.ui_icon(b.icon), 24), UI.label(F.format_seconds(left), "Small", Palette.AETHER)]))
 		_boosts_box.add_child(p)
 
 
 # ---------------------------------------------------------------- top bar
 
 func _build_top_bar() -> Control:
-	var bar := UI.hbox(10)
-	var m := UI.margin(bar, 18, 12, 18, 6)
+	var bar := UI.hbox(12)
+	var m := UI.margin(bar, 22, 14, 22, 7)
 	_top.aether = _chip("aether", "Aether: your main currency. Perched Aetherlings and the Resonance Extractor make it.")
 	_top.gold = _chip("gold", "Gold: from selling items, scavenging and expeditions.")
 	_top.vessels = _chip("vessel", "Aether Vessels: bind wild Aetherlings on expeditions.")
@@ -395,13 +395,13 @@ func _build_top_bar() -> Control:
 		bar.add_child(_top[k].panel)
 	_top.vessels.panel.gui_input.connect(func(e): if e is InputEventMouseButton and e.pressed: show_screen("inventory"))
 	bar.add_child(UI.spacer())
-	_boosts_box = UI.hbox(6)
+	_boosts_box = UI.hbox(7)
 	bar.add_child(_boosts_box)
-	_top.working = UI.chip("", Palette.GOOD, 14)
+	_top.working = UI.chip("", Palette.GOOD, 17)
 	_top.working.tooltip_text = "Aetherlings working in skills"
 	_top.working.mouse_filter = Control.MOUSE_FILTER_PASS
 	bar.add_child(_top.working)
-	_top.perched = UI.chip("", Palette.AETHER, 14)
+	_top.perched = UI.chip("", Palette.AETHER, 17)
 	_top.perched.tooltip_text = "Aetherlings resting on the perches, making Aether"
 	_top.perched.mouse_filter = Control.MOUSE_FILTER_PASS
 	bar.add_child(_top.perched)
@@ -418,7 +418,7 @@ func _build_top_bar() -> Control:
 	sb.border_width_bottom = 1
 	sb.border_color = Palette.LINE_STRONG
 	sb.shadow_color = Color(0, 0, 0.04, 0.35)
-	sb.shadow_size = 6
+	sb.shadow_size = 7
 	band.add_theme_stylebox_override("panel", sb)
 	band.add_child(m)
 	return band
@@ -428,10 +428,10 @@ func _chip(icon_name: String, tip: String) -> Dictionary:
 	var p := UI.panel("Pill")
 	p.tooltip_text = tip
 	p.mouse_filter = Control.MOUSE_FILTER_PASS
-	var h := UI.hbox(8)
-	h.add_child(UI.icon(Data.ui_icon(icon_name), 24))
+	var h := UI.hbox(10)
+	h.add_child(UI.icon(Data.ui_icon(icon_name), 29))
 	var v := UI.label("0", "Num")
-	v.add_theme_font_size_override("font_size", 18)
+	v.add_theme_font_size_override("font_size", 22)
 	h.add_child(v)
 	var sub := UI.label("", "Small", Palette.AETHER.darkened(0.1))
 	h.add_child(sub)
@@ -506,12 +506,12 @@ func go_tab(tab: String) -> void:
 # ---------------------------------------------------------------- menus and summaries
 
 func open_pause_menu() -> void:
-	var v := UI.vbox(10)
-	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.offline_cap_hours(Game.state)), "Faint", 380))
+	var v := UI.vbox(12)
+	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.offline_cap_hours(Game.state)), "Faint", 456))
 	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var add := func(text: String, variation: String, cb: Callable):
 		var b := UI.button(text, variation, cb)
-		b.custom_minimum_size.y = 44
+		b.custom_minimum_size.y = 53
 		v.add_child(b)
 	add.call("Resume", "Primary", func(): box.m.close())
 	add.call("Options", "", func(): OptionsPanel.open_modal())
@@ -524,7 +524,7 @@ func open_pause_menu() -> void:
 	add.call("Save and return to title", "", func(): _leave(false))
 	if OS.get_name() != "Web":
 		add.call("Save and quit to desktop", "Ghost", func(): _leave(true))
-	box.m = Modal.open(v, "Slot %d" % Game.slot, 440)
+	box.m = Modal.open(v, "Slot %d" % Game.slot, 528)
 
 
 func _leave(quit: bool) -> void:
@@ -541,15 +541,15 @@ func _leave(quit: bool) -> void:
 
 
 func _backup_modal() -> void:
-	var v := UI.vbox(12)
-	v.add_child(UI.wrap_label("Copy your save as text to keep it somewhere safe, or paste a saved text to restore it into this slot. Saves also live in the game's user folder:", "Dim", 560))
+	var v := UI.vbox(14)
+	v.add_child(UI.wrap_label("Copy your save as text to keep it somewhere safe, or paste a saved text to restore it into this slot. Saves also live in the game's user folder:", "Dim", 672))
 	v.add_child(UI.label(ProjectSettings.globalize_path("user://"), "Faint"))
 	var te := TextEdit.new()
-	te.custom_minimum_size = Vector2(600, 150)
+	te.custom_minimum_size = Vector2(720, 180)
 	te.wrap_mode = TextEdit.LINE_WRAPPING_BOUNDARY
 	te.placeholder_text = "Paste a save here to restore it"
 	v.add_child(te)
-	var row := UI.hbox(10)
+	var row := UI.hbox(12)
 	row.add_child(UI.button("Copy save to clipboard", "Primary", func():
 		DisplayServer.clipboard_set(Game.export_text())
 		Game.info("Save copied to the clipboard")))
@@ -567,14 +567,14 @@ func _backup_modal() -> void:
 				show_screen("sanctum")
 				_fill_rail(), true)))
 	v.add_child(row)
-	Modal.open(v, "Back up or restore", 660)
+	Modal.open(v, "Back up or restore", 792)
 
 
 func _dev_modal() -> void:
-	var v := UI.vbox(12)
-	v.add_child(UI.wrap_label("Testing shortcuts. Anything done here counts like normal play in this save slot.", "Faint", 560))
+	var v := UI.vbox(14)
+	v.add_child(UI.wrap_label("Testing shortcuts. Anything done here counts like normal play in this save slot.", "Faint", 672))
 	# grant a creature: one row (the dialog is wide enough for it)
-	var row := UI.hbox(8)
+	var row := UI.hbox(10)
 	var sp := OptionButton.new()
 	for i in Data.species_list.size():
 		sp.add_item(Data.species_list[i].name, i)
@@ -608,7 +608,7 @@ func _dev_modal() -> void:
 	v.add_child(row)
 	# sprite tests: every form, rarity and shiny of the picked species, or of all of them
 	var per_species: int = Data.tuning.creature.formLevels.size() * Data.max_rarity() * 2
-	var all_row := UI.flow(8, 8)
+	var all_row := UI.flow(10, 10)
 	all_row.add_child(UI.button("This species: every form, rarity and shiny (%d)" % per_species, "", func():
 		var n := Game.dev_grant_all(Data.species_list[sp.selected].id)
 		Game.info("Granted %d %s" % [n, Data.species_list[sp.selected].name])))
@@ -618,7 +618,7 @@ func _dev_modal() -> void:
 			Game.info("Granted %s Aetherlings" % F.format_num(Game.dev_grant_all())))))
 	v.add_child(all_row)
 	v.add_child(UI.label("Resources", "H3"))
-	var res := UI.flow(8, 8)
+	var res := UI.flow(10, 10)
 	for pair in [["aether", 1000], ["aether", 100000], ["gold", 1000], ["gold", 100000]]:
 		res.add_child(UI.button("+%s %s" % [F.format_num(pair[1]), Data.item_name(pair[0])], "", func(): Game.dev_add(pair[0], pair[1])))
 	res.add_child(UI.button("+50 of every item", "", func():
@@ -626,13 +626,13 @@ func _dev_modal() -> void:
 			Game.dev_add(it.id, 50)))
 	v.add_child(res)
 	v.add_child(UI.label("Expedition", "H3"))
-	var ex := UI.flow(8, 8)
+	var ex := UI.flow(10, 10)
 	for pair in [["boss", "Next wave: boss"], ["shiny", "Next wave: a shiny"], ["rare", "Next wave: the rarest rarity"]]:
 		ex.add_child(UI.button(pair[1], "", func(): Game.dev_next_wave(pair[0])))
 	ex.add_child(UI.button("Rarity preview", "", func(): RarityPreview.open()))
 	v.add_child(ex)
 	v.add_child(UI.label("Time", "H3"))
-	var ff := UI.flow(8, 8)
+	var ff := UI.flow(10, 10)
 	for h in [1, 4, 12]:
 		ff.add_child(UI.button("Fast-forward %dh" % h, "", func(): Game.dev_fast_forward(h)))
 	ff.add_child(UI.button("Finish all eggs", "", func():
@@ -642,7 +642,7 @@ func _dev_modal() -> void:
 		Game.changed.emit()))
 	v.add_child(ff)
 	v.add_child(UI.label("Skill level", "H3"))
-	var sr := UI.hbox(8)
+	var sr := UI.hbox(10)
 	var sk := OptionButton.new()
 	for i in Data.skill_list.size():
 		sk.add_item(Data.skill_list[i].name, i)
@@ -654,32 +654,32 @@ func _dev_modal() -> void:
 	sr.add_child(sl)
 	sr.add_child(UI.button("Set", "", func(): Game.dev_skill_level(Data.skill_list[sk.selected].id, int(sl.value))))
 	v.add_child(sr)
-	Modal.open(v, "Developer tools", 920)
+	Modal.open(v, "Developer tools", 1104)
 
 
 func _open_notifications() -> void:
 	Game.unread = 0
 	_update_bell()
-	var v := UI.vbox(6)
+	var v := UI.vbox(7)
 	if Game.notifications.is_empty():
 		v.add_child(UI.label("Nothing yet. Level-ups, captures and rare finds show up here.", "Dim"))
 	for n in Game.notifications:
-		var h := UI.hbox(10)
+		var h := UI.hbox(12)
 		if n.icon:
-			h.add_child(UI.icon(n.icon, 22))
+			h.add_child(UI.icon(n.icon, 26))
 		h.add_child(UI.wrap_label(n.text, ""))
 		h.add_child(UI.label(F.format_seconds(Game.now_sec() - n.time) + " ago", "Faint"))
 		v.add_child(h)
 	var sc := UI.scroll(v)
-	sc.custom_minimum_size = Vector2(560, 420)
-	Modal.open(sc, "Notifications", 620)
+	sc.custom_minimum_size = Vector2(672, 504)
+	Modal.open(sc, "Notifications", 744)
 
 
 func _show_summary(s: Dictionary) -> void:
 	Game.last_offline_summary = {}
 	if float(s.get("usedSeconds", 0.0)) < 60.0:
 		return
-	var root := UI.vbox(16)
+	var root := UI.vbox(19)
 	# headline: how long, and whether the Sanctum worked the whole time
 	var head := UI.vbox(2)
 	head.add_child(UI.label("You were away for %s" % F.format_seconds(s.elapsed), "H1"))
@@ -687,7 +687,7 @@ func _show_summary(s: Dictionary) -> void:
 		"Your Sanctum worked for the first %s. Build the Dream Anchor in Sanctum Works to cover longer." % F.format_seconds(s.usedSeconds), "Dim", 820))
 	root.add_child(head)
 	# big tiles: Aether, gold, tasks
-	var tiles := UI.hbox(12)
+	var tiles := UI.hbox(14)
 	if s.aether > 0.5:
 		tiles.add_child(_summary_tile(Data.ui_icon("aether"), F.format_num(s.aether), "Aether", Palette.AETHER))
 	if s.gold > 0.5:
@@ -698,18 +698,18 @@ func _show_summary(s: Dictionary) -> void:
 	if eggs > 0:
 		tiles.add_child(_summary_tile(Data.ui_icon("pods"), str(eggs), "Eggs ready", Palette.GOOD))
 	root.add_child(tiles)
-	var cols := UI.hbox(18)
+	var cols := UI.hbox(22)
 	root.add_child(cols)
 	# left: what was made and used
-	var left := UI.vbox(10)
-	left.custom_minimum_size.x = 440
+	var left := UI.vbox(12)
+	left.custom_minimum_size.x = 528
 	cols.add_child(left)
 	if not s.gained.is_empty():
 		left.add_child(UI.label("Gathered and crafted", "H3"))
 		var g := GridContainer.new()
 		g.columns = 3
-		g.add_theme_constant_override("h_separation", 8)
-		g.add_theme_constant_override("v_separation", 8)
+		g.add_theme_constant_override("h_separation", 10)
+		g.add_theme_constant_override("v_separation", 10)
 		var ids: Array = s.gained.keys()
 		ids.sort_custom(func(a, b): return s.gained[a] > s.gained[b])
 		for id in ids:
@@ -719,22 +719,22 @@ func _show_summary(s: Dictionary) -> void:
 		left.add_child(UI.label("Used up", "H3"))
 		var g2 := GridContainer.new()
 		g2.columns = 3
-		g2.add_theme_constant_override("h_separation", 8)
-		g2.add_theme_constant_override("v_separation", 8)
+		g2.add_theme_constant_override("h_separation", 10)
+		g2.add_theme_constant_override("v_separation", 10)
 		for id in s.used:
 			g2.add_child(_summary_item(id, s.used[id], Palette.TEXT_DIM, "-"))
 		left.add_child(g2)
 	# right: level-ups and highlights
-	var right := UI.vbox(10)
-	right.custom_minimum_size.x = 380
+	var right := UI.vbox(12)
+	right.custom_minimum_size.x = 456
 	right.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cols.add_child(right)
 	if not s.levels.is_empty():
 		right.add_child(UI.label("Level ups", "H3"))
 		for id in s.levels:
 			var lv: Array = s.levels[id]
-			var row := UI.hbox(10)
-			row.add_child(UI.icon(Data.ui_icon(id), 28))
+			var row := UI.hbox(12)
+			row.add_child(UI.icon(Data.ui_icon(id), 34))
 			row.add_child(UI.label(Data.skills[id].name, ""))
 			row.add_child(UI.spacer())
 			row.add_child(UI.label(str(int(lv[0])), "Num", Palette.AETHER.darkened(0.15)))
@@ -768,7 +768,7 @@ func _show_summary(s: Dictionary) -> void:
 	if not moments.is_empty():
 		right.add_child(UI.label("Highlights", "H3"))
 		for m in moments.slice(0, 8):
-			right.add_child(UI.hbox(8, [UI.icon(m[0], 22), UI.wrap_label(m[1], "", 300)]))
+			right.add_child(UI.hbox(10, [UI.icon(m[0], 26), UI.wrap_label(m[1], "", 360)]))
 			right.get_child(right.get_child_count() - 1).get_child(1).add_theme_color_override("font_color", m[2])
 		if moments.size() > 8:
 			right.add_child(UI.label("…and %d more" % (moments.size() - 8), "Faint"))
@@ -777,12 +777,12 @@ func _show_summary(s: Dictionary) -> void:
 		var total := 0
 		for k in order:
 			total += int(caught[k].n)
-		right.add_child(UI.hbox(8, [UI.label("Bound", "H3"), UI.chip("%d Aetherlings" % total, Palette.AETHER)]))
-		var bf := UI.flow(8, 8)
+		right.add_child(UI.hbox(10, [UI.label("Bound", "H3"), UI.chip("%d Aetherlings" % total, Palette.AETHER)]))
+		var bf := UI.flow(10, 10)
 		for k in order.slice(0, 12):
 			var c: Dictionary = caught[k]
-			var cell := UI.hbox(6)
-			var por := CreaturePortrait.make(c.species, 1, c.rarity, c.shiny, 44)
+			var cell := UI.hbox(7)
+			var por := CreaturePortrait.make(c.species, 1, c.rarity, c.shiny, 53)
 			por.bob = false
 			cell.add_child(por)
 			var cv := UI.vbox(0)
@@ -795,7 +795,7 @@ func _show_summary(s: Dictionary) -> void:
 			right.add_child(UI.label("…and %d more kinds" % (order.size() - 12), "Faint"))
 	# actions
 	var box := {}   # the modal, for the buttons (lambdas capture locals by value)
-	var act := UI.hbox(10)
+	var act := UI.hbox(12)
 	act.add_child(UI.spacer())
 	if eggs > 0:
 		act.add_child(UI.button("%d egg%s ready to hatch" % [eggs, "" if eggs == 1 else "s"], "Gold", func():
@@ -807,14 +807,14 @@ func _show_summary(s: Dictionary) -> void:
 	# tall enough for the longer column, up to what fits on screen (then it scrolls)
 	var left_h: int = ceili(s.gained.size() / 3.0) * 66 + (40 + ceili(s.used.size() / 3.0) * 66 if not s.used.is_empty() else 0)
 	var right_h: int = s.levels.size() * 54 + (40 + mini(moments.size(), 8) * 34 if not moments.is_empty() else 0) + (44 + ceili(mini(order.size(), 12) / 3.0) * 62 if not order.is_empty() else 0)
-	sc.custom_minimum_size = Vector2(880, clampi(260 + maxi(left_h, right_h), 320, 660))
-	box.m = Modal.open(sc, "Welcome back", 940)
+	sc.custom_minimum_size = Vector2(1056, clampi(312 + maxi(left_h, right_h), 384, 792))
+	box.m = Modal.open(sc, "Welcome back", 1128)
 
 
 ## A big number tile for the welcome-back summary.
 func _summary_tile(tex: Texture2D, value: String, caption: String, col: Color) -> PanelContainer:
-	var h := UI.hbox(12)
-	h.add_child(UI.icon(tex, 38))
+	var h := UI.hbox(14)
+	h.add_child(UI.icon(tex, 46))
 	var v := UI.vbox(0)
 	var big := UI.label(value, "H1", col)
 	v.add_child(big)
@@ -827,24 +827,24 @@ func _summary_tile(tex: Texture2D, value: String, caption: String, col: Color) -
 
 ## One item in the summary: icon, amount and name.
 func _summary_item(id: String, qty: float, col: Color, prefix := "+") -> PanelContainer:
-	var h := UI.hbox(8)
-	h.add_child(UI.icon(Data.item_icon(id) if Data.items.has(id) else Data.ui_icon(id), 30))
+	var h := UI.hbox(10)
+	h.add_child(UI.icon(Data.item_icon(id) if Data.items.has(id) else Data.ui_icon(id), 36))
 	var v := UI.vbox(0)
 	v.add_child(UI.label(prefix + F.format_num(qty), "Num", col))
 	var nm := UI.label(Data.item_name(id), "Faint")
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-	nm.custom_minimum_size.x = 80
+	nm.custom_minimum_size.x = 96
 	v.add_child(nm)
 	h.add_child(v)
 	var p := UI.panel("Inset", h)
-	p.custom_minimum_size.x = 140
+	p.custom_minimum_size.x = 168
 	return p
 
 
 func _welcome() -> void:
-	var v := UI.vbox(14)
-	var h := UI.hbox(16)
-	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 120)
+	var v := UI.vbox(17)
+	var h := UI.hbox(19)
+	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 144)
 	h.add_child(p)
 	h.add_child(UI.wrap_label("Welcome to your Sanctum, Architect. I'm Overseer Vance.\n\nThis little Sproutlet is your first Aetherling. "
 		+ "Put it to work chopping wood, send it exploring to bind new Aetherlings, and when you have a few, "
@@ -854,4 +854,4 @@ func _welcome() -> void:
 	v.add_child(UI.button("Let's start: open Woodcutting", "Primary", func():
 		box.m.close()
 		show_screen("skill", "woodcutting")))
-	box.m = Modal.open(v, "A new Sanctum", 620, false)
+	box.m = Modal.open(v, "A new Sanctum", 744, false)

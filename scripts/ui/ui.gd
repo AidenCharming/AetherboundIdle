@@ -35,7 +35,7 @@ static func rich(bbcode: String, fit := true) -> RichTextLabel:
 	return r
 
 
-static func icon(tex: Texture2D, size := 24) -> TextureRect:
+static func icon(tex: Texture2D, size := 29) -> TextureRect:
 	var r := TextureRect.new()
 	r.texture = tex
 	r.custom_minimum_size = Vector2(size, size)
@@ -47,7 +47,7 @@ static func icon(tex: Texture2D, size := 24) -> TextureRect:
 
 ## The "you own this species" badge. With `corner` (the size of the picture it sits on) it is placed on
 ## that picture's bottom-right corner.
-static func owned_mark(size := 20, corner := Vector2.ZERO) -> TextureRect:
+static func owned_mark(size := 24, corner := Vector2.ZERO) -> TextureRect:
 	var r := icon(Data.ui_icon("owned"), size)
 	r.size = Vector2(size, size)
 	r.mouse_filter = Control.MOUSE_FILTER_STOP
@@ -69,12 +69,12 @@ static func draw_pips(ci: CanvasItem, at: Vector2, n: int, r: float, col: Color,
 
 
 ## A small number chip in the nameplates' style: a rounded pill tinted with `color` (level, dex number).
-static func chip(text: String, color: Color, font_size := 11) -> PanelContainer:
+static func chip(text: String, color: Color, font_size := 13) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := ThemeFactory.box(Color(color, 0.18), 99, 1, Color(color, 0.65), 0)
-	sb.content_margin_left = 7
-	sb.content_margin_right = 7
+	var sb := ThemeFactory.box(Color(color, 0.18), 119, 1, Color(color, 0.65), 0)
+	sb.content_margin_left = 8
+	sb.content_margin_right = 8
 	sb.content_margin_top = 1
 	sb.content_margin_bottom = 1
 	p.add_theme_stylebox_override("panel", sb)
@@ -97,12 +97,12 @@ static func set_chip(p: PanelContainer, text: String, color: Color) -> void:
 
 
 ## A count against a target as a chip: gold when done, aether while going.
-static func count_chip(have: float, need: float, font_size := 12) -> PanelContainer:
+static func count_chip(have: float, need: float, font_size := 14) -> PanelContainer:
 	var done := have >= need
 	return chip("%s / %s" % [F.format_num(have), F.format_num(need)], Palette.GOOD if done else Palette.AETHER, font_size)
 
 
-static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
+static func hbox(gap := 12, children: Array = []) -> HBoxContainer:
 	var b := HBoxContainer.new()
 	b.add_theme_constant_override("separation", gap)
 	for c in children:
@@ -110,7 +110,7 @@ static func hbox(gap := 10, children: Array = []) -> HBoxContainer:
 	return b
 
 
-static func vbox(gap := 10, children: Array = []) -> VBoxContainer:
+static func vbox(gap := 12, children: Array = []) -> VBoxContainer:
 	var b := VBoxContainer.new()
 	b.add_theme_constant_override("separation", gap)
 	for c in children:
@@ -118,7 +118,7 @@ static func vbox(gap := 10, children: Array = []) -> VBoxContainer:
 	return b
 
 
-static func grid(columns: int, hsep := 12, vsep := 12) -> GridContainer:
+static func grid(columns: int, hsep := 14, vsep := 14) -> GridContainer:
 	var g := GridContainer.new()
 	g.columns = columns
 	g.add_theme_constant_override("h_separation", hsep)
@@ -127,7 +127,7 @@ static func grid(columns: int, hsep := 12, vsep := 12) -> GridContainer:
 
 
 ## A flow of cards that wraps to the width available.
-static func flow(hsep := 12, vsep := 12) -> HFlowContainer:
+static func flow(hsep := 14, vsep := 14) -> HFlowContainer:
 	var f := HFlowContainer.new()
 	f.add_theme_constant_override("h_separation", hsep)
 	f.add_theme_constant_override("v_separation", vsep)
@@ -195,7 +195,7 @@ static func button(text: String, variation := "", callback: Callable = Callable(
 	return b
 
 
-static func bar(color: Color, height := 10, show_pct := false) -> ProgressBar:
+static func bar(color: Color, height := 12, show_pct := false) -> ProgressBar:
 	var p := ProgressBar.new()
 	p.min_value = 0.0
 	p.max_value = 1.0
@@ -203,7 +203,7 @@ static func bar(color: Color, height := 10, show_pct := false) -> ProgressBar:
 	p.show_percentage = show_pct
 	p.custom_minimum_size.y = height
 	p.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	p.add_theme_stylebox_override("fill", ThemeFactory.box(color, 99, 0, Palette.LINE, 0))
+	p.add_theme_stylebox_override("fill", ThemeFactory.box(color, 119, 0, Palette.LINE, 0))
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return p
 
@@ -222,7 +222,7 @@ static func scroll(child: Control, horizontal := false) -> ScrollContainer:
 	gutter.add_child(child)
 	s.add_child(gutter)
 	var vbar := s.get_v_scroll_bar()
-	var fit := func(): gutter.add_theme_constant_override("margin_right", 12 if vbar.visible else 0)
+	var fit := func(): gutter.add_theme_constant_override("margin_right", 14 if vbar.visible else 0)
 	vbar.visibility_changed.connect(fit)
 	fit.call()
 	return s
@@ -267,16 +267,16 @@ static func sort_by_key(items: Array, key: Callable) -> Array:
 
 
 ## Icon + amount, e.g. [log] 12. `need` > 0 turns it red when the player has less.
-static func amount(id: String, qty: float, need := -1.0, size := 22) -> HBoxContainer:
+static func amount(id: String, qty: float, need := -1.0, size := 26) -> HBoxContainer:
 	var h := ItemTip.new()
 	h.item = id
-	h.add_theme_constant_override("separation", 4)
+	h.add_theme_constant_override("separation", 5)
 	h.mouse_filter = Control.MOUSE_FILTER_STOP
 	var ic := icon(Data.item_icon(id), size)
 	ic.mouse_filter = Control.MOUSE_FILTER_PASS
 	h.add_child(ic)
 	var l := label(F.format_num(qty), "Num")
-	l.add_theme_font_size_override("font_size", 15)
+	l.add_theme_font_size_override("font_size", 18)
 	if need >= 0.0:
 		l.add_theme_color_override("font_color", Palette.TEXT if GameState.count(Game.state, id) + 1e-6 >= need else Palette.DANGER)
 	h.add_child(l)
@@ -288,16 +288,16 @@ static func amount(id: String, qty: float, need := -1.0, size := 22) -> HBoxCont
 ## what the item is used for, or that it's only worth its gold.
 static func item_tooltip(id: String) -> Control:
 	var it: Dictionary = Data.items.get(id, {})
-	var v := vbox(6)
+	var v := vbox(7)
 	if it.is_empty():
 		v.add_child(label(Data.item_name(id)))
 		return v
-	var head := hbox(10)
-	head.add_child(icon(Data.item_icon(id), 40))
+	var head := hbox(12)
+	head.add_child(icon(Data.item_icon(id), 48))
 	var names := vbox(0)
 	var n := label(it.name, "", Palette.TEXT)
 	n.add_theme_font_override("font", ThemeFactory.bold_font())
-	n.add_theme_font_size_override("font_size", 16)
+	n.add_theme_font_size_override("font_size", 19)
 	names.add_child(n)
 	names.add_child(label("Tier %d · %s" % [int(it.tier), str(it.category).capitalize()], "Faint"))
 	head.add_child(names)
@@ -305,7 +305,7 @@ static func item_tooltip(id: String) -> Control:
 	if not Game.state.is_empty():
 		v.add_child(label("You have %s" % F.format_num(GameState.count(Game.state, id)), "Dim"))
 	if str(it.get("desc", "")) != "":
-		v.add_child(wrap_label(it.desc, "Faint", 280))
+		v.add_child(wrap_label(it.desc, "Faint", 336))
 	var used := Economy.uses(id)
 	if used.is_empty():
 		v.add_child(label("Only worth its gold: %d each" % int(it.sell), "", Palette.GOLD))
@@ -325,8 +325,8 @@ static func item_tooltip(id: String) -> Control:
 
 
 ## A row of cost chips for {id: qty}.
-static func cost_row(cost: Dictionary, size := 20) -> HFlowContainer:
-	var f := flow(10, 4)
+static func cost_row(cost: Dictionary, size := 24) -> HFlowContainer:
+	var f := flow(12, 5)
 	for id in cost:
 		f.add_child(amount(id, float(cost[id]), float(cost[id]), size))
 	return f
@@ -335,13 +335,13 @@ static func cost_row(cost: Dictionary, size := 20) -> HFlowContainer:
 static func type_badge(type_id: String, small := false) -> PanelContainer:
 	var p := PanelContainer.new()
 	var c := Data.type_color(type_id)
-	var sb := ThemeFactory.box(Color(c, 0.22), 99, 1, Color(c, 0.7), 8)
+	var sb := ThemeFactory.box(Color(c, 0.22), 119, 1, Color(c, 0.7), 10)
 	sb.content_margin_top = 2
 	sb.content_margin_bottom = 2
 	p.add_theme_stylebox_override("panel", sb)
 	var l := label(Data.types[type_id].name, "Small", c.lightened(0.35))
 	if small:
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 14)
 	p.add_child(l)
 	return p
 
@@ -349,7 +349,7 @@ static func type_badge(type_id: String, small := false) -> PanelContainer:
 static func rarity_badge(tier: int) -> PanelContainer:
 	var p := PanelContainer.new()
 	var c := Data.rarity_color(tier)
-	var sb := ThemeFactory.box(Color(c, 0.18), 99, 1, Color(c, 0.75), 8)
+	var sb := ThemeFactory.box(Color(c, 0.18), 119, 1, Color(c, 0.75), 10)
 	sb.content_margin_top = 2
 	sb.content_margin_bottom = 2
 	p.add_theme_stylebox_override("panel", sb)
@@ -359,26 +359,26 @@ static func rarity_badge(tier: int) -> PanelContainer:
 
 static func badge(text: String, color: Color) -> PanelContainer:
 	var p := PanelContainer.new()
-	var sb := ThemeFactory.box(color, 99, 0, Palette.LINE, 6)
+	var sb := ThemeFactory.box(color, 119, 0, Palette.LINE, 7)
 	sb.content_margin_top = 0
 	sb.content_margin_bottom = 0
 	p.add_theme_stylebox_override("panel", sb)
 	var l := label(text, "Small", Palette.INK)
-	l.add_theme_font_size_override("font_size", 12)
+	l.add_theme_font_size_override("font_size", 14)
 	p.add_child(l)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return p
 
 
 static func stat_line(icon_name: String, text: String, tip := "") -> HBoxContainer:
-	var h := hbox(6, [icon(Data.ui_icon(icon_name), 18), label(text, "Num")])
+	var h := hbox(7, [icon(Data.ui_icon(icon_name), 22), label(text, "Num")])
 	h.tooltip_text = tip
 	return h
 
 
 ## Shows `text` as a heading with an optional sub line.
-static func header(title: String, sub := "", tex: Texture2D = null, size := 44) -> HBoxContainer:
-	var h := hbox(14)
+static func header(title: String, sub := "", tex: Texture2D = null, size := 53) -> HBoxContainer:
+	var h := hbox(17)
 	if tex:
 		h.add_child(icon(tex, size))
 	var v := vbox(0)
@@ -386,7 +386,7 @@ static func header(title: String, sub := "", tex: Texture2D = null, size := 44) 
 	if sub != "":
 		# wraps rather than widening the screen: a long subtitle must not push a side panel off screen
 		var sl := wrap_label(sub, "Dim")
-		sl.custom_minimum_size.x = 260
+		sl.custom_minimum_size.x = 312
 		v.add_child(sl)
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		h.size_flags_horizontal = Control.SIZE_EXPAND_FILL

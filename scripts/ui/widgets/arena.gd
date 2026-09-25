@@ -47,7 +47,7 @@ func _ready() -> void:
 	_banner = UI.label("", "H1")
 	_banner.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_banner.add_theme_color_override("font_outline_color", Palette.INK)
-	_banner.add_theme_constant_override("outline_size", 10)
+	_banner.add_theme_constant_override("outline_size", 12)
 	_banner.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_banner.offset_top = 14
 	_banner.z_index = 6
@@ -169,65 +169,65 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	var edge := Palette.GOLD if boss else rc
 	var panel := PanelContainer.new()
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := ThemeFactory.box(Color(0.05, 0.055, 0.13, 0.84), 9, 1, Color(edge, 0.85), 0)
-	sb.content_margin_left = 7
-	sb.content_margin_right = 7
-	sb.content_margin_top = 4
-	sb.content_margin_bottom = 5
+	var sb := ThemeFactory.box(Color(0.05, 0.055, 0.13, 0.84), 11, 1, Color(edge, 0.85), 0)
+	sb.content_margin_left = 8
+	sb.content_margin_right = 8
+	sb.content_margin_top = 5
+	sb.content_margin_bottom = 6
 	sb.border_width_top = 2
 	sb.shadow_color = Color(0, 0, 0.04, 0.45)
-	sb.shadow_size = 4
+	sb.shadow_size = 5
 	sb.shadow_offset = Vector2(0, 2)
 	panel.add_theme_stylebox_override("panel", sb)
 	var v := UI.vbox(2)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.add_child(v)
-	var row := UI.hbox(4)
+	var row := UI.hbox(5)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
-		var mark := UI.owned_mark(14)
+		var mark := UI.owned_mark(17)
 		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(mark)
 	if bool(f.get("shiny", false)):
-		var sm := UI.icon(Data.ui_icon("shiny"), 14)
+		var sm := UI.icon(Data.ui_icon("shiny"), 17)
 		sm.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		row.add_child(sm)
 	var nm := UI.label(f.name, "Small", Color("ffe9a8") if bool(f.get("shiny", false)) else Palette.TEXT)
-	nm.add_theme_font_size_override("font_size", 14 if boss else 12)
+	nm.add_theme_font_size_override("font_size", 17 if boss else 14)
 	nm.clip_text = true
 	nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	nm.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	nm.custom_minimum_size.x = 30
+	nm.custom_minimum_size.x = 36
 	row.add_child(nm)
 	var lv := PanelContainer.new()
 	lv.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var lsb := ThemeFactory.box(Color(rc, 0.22), 99, 1, Color(rc, 0.7), 0)
-	lsb.content_margin_left = 5
-	lsb.content_margin_right = 5
+	var lsb := ThemeFactory.box(Color(rc, 0.22), 119, 1, Color(rc, 0.7), 0)
+	lsb.content_margin_left = 6
+	lsb.content_margin_right = 6
 	lv.add_theme_stylebox_override("panel", lsb)
 	var ll := UI.label("Lv %d" % int(f.level), "Small", rc.lightened(0.35))
-	ll.add_theme_font_size_override("font_size", 10)
+	ll.add_theme_font_size_override("font_size", 12)
 	lv.add_child(ll)
 	lv.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	v.add_child(row)
 	# the level chip sits beside the bars, so the name gets the plate's full width
-	var bars_row := UI.hbox(5)
+	var bars_row := UI.hbox(6)
 	bars_row.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bars_row.add_child(lv)
 	var bars := UI.vbox(2)
 	bars.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bars.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bars.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 7)
+	var hp := UI.bar(Palette.GOOD if side == 0 else Palette.DANGER, 8)
 	bars.add_child(hp)
-	var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.9), 3)
+	var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.9), 4)
 	sh.modulate.a = 0.0
 	bars.add_child(sh)
 	# party members show their progress to the next level, so XP from every kill is seen
 	var xpb: ProgressBar = null
 	if side == 0:
-		xpb = UI.bar(Palette.AETHER, 3)
+		xpb = UI.bar(Palette.AETHER, 4)
 		bars.add_child(xpb)
 	bars_row.add_child(bars)
 	v.add_child(bars_row)
@@ -236,7 +236,7 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	var pips := Control.new()
 	pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tier := int(f.rarity)
-	pips.draw.connect(func(): UI.draw_pips(pips, Vector2.ZERO, tier, 3.2, Data.rarity_color_live(tier)))
+	pips.draw.connect(func(): UI.draw_pips(pips, Vector2.ZERO, tier, 4.0, Data.rarity_color_live(tier)))
 	return {"panel": panel, "hp": hp, "shield": sh, "pips": pips, "sb": sb, "tier": tier, "boss": boss, "xp": xpb, "lv": ll}
 
 
@@ -517,7 +517,7 @@ func _on_event(e: Dictionary) -> void:
 			var eff: float = e.eff
 			if Options.get_value("damage_numbers"):
 				var col := Palette.GOLD if eff > 1.01 else (Palette.TEXT_FAINT if eff < 0.99 else Palette.TEXT)
-				FloatText.spawn(_fx, _number_at(def), _num(e.dmg) + ("!" if eff > 1.01 else ""), col, null, 18 if e.ability != "" else 15, 40.0, true)
+				FloatText.spawn(_fx, _number_at(def), _num(e.dmg) + ("!" if eff > 1.01 else ""), col, null, 22 if e.ability != "" else 18, 48.0, true)
 			# each type has its own hit sound; the pitch varies a little so a flurry doesn't drone
 			var dtype: String = e.get("dtype", "")
 			Sfx.play("hit_" + dtype if dtype != "" else "hit", randf_range(0.9, 1.12))
@@ -530,7 +530,7 @@ func _on_event(e: Dictionary) -> void:
 			var ab: Dictionary = Data.abilities[e.ability]
 			# starts above the name tag so it never crosses the fighter's own name
 			var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 6.0)
-			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 15, 26.0, true)
+			FloatText.spawn(_fx, at, ab.name, Data.type_color(ab.damageType) if Data.types.has(ab.damageType) else Palette.AETHER, null, 18, 31.0, true)
 			if Data.types.has(ab.damageType):
 				Sfx.play("cast_" + ab.damageType)
 			if motion:
@@ -542,27 +542,27 @@ func _on_event(e: Dictionary) -> void:
 		"heal":
 			var v := _view(e.side, e.index)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, _number_at(v), "+" + _num(e.amount), Palette.GOOD, null, 14, 34.0, true)
+				FloatText.spawn(_fx, _number_at(v), "+" + _num(e.amount), Palette.GOOD, null, 17, 41.0, true)
 		"thorns":
 			var v := _view(e.side, e.to)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
-				FloatText.spawn(_fx, _number_at(v), _num(e.dmg), Data.type_color("verdant"), null, 13, 30.0, true)
+				FloatText.spawn(_fx, _number_at(v), _num(e.dmg), Data.type_color("verdant"), null, 16, 36.0, true)
 		"party_xp":
 			# every kill's XP, over each party member it went to
 			for v in _allies:
 				if e.xp.has(v.cid) and not v.down:
 					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 22.0)
-					FloatText.spawn(_fx, at, "+%s XP" % _num(float(e.xp[v.cid])), Palette.AETHER, null, 13, 30.0, true)
+					FloatText.spawn(_fx, at, "+%s XP" % _num(float(e.xp[v.cid])), Palette.AETHER, null, 16, 36.0, true)
 		"creature_level":
 			for v in _allies:
 				if v.cid == e.creature:
 					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 40.0)
-					FloatText.spawn(_fx, at, "Level %d!" % int(e.level), Palette.GOLD, null, 17, 44.0, true)
+					FloatText.spawn(_fx, at, "Level %d!" % int(e.level), Palette.GOLD, null, 20, 53.0, true)
 		"captured":
 			var at := Vector2(size.x * 0.73, size.y * 0.35)
-			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 22, 60.0)
+			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 26, 72.0)
 		"escaped":
-			FloatText.spawn(_fx, Vector2(size.x * 0.73, size.y * 0.35), "Broke free", Palette.TEXT_FAINT, null, 16, 40.0)
+			FloatText.spawn(_fx, Vector2(size.x * 0.73, size.y * 0.35), "Broke free", Palette.TEXT_FAINT, null, 19, 48.0)
 		"creature_level":
 			for v in _allies:
 				if v.get("cid", "") == e.creature:

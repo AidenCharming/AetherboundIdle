@@ -20,20 +20,20 @@ var _window := -1   # the stock window on screen; buys pass it so a changed stoc
 
 
 func _ready() -> void:
-	var v := UI.vbox(14)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(17)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var head := UI.hbox(12)
+	var head := UI.hbox(14)
 	head.add_child(UI.header("Market", "Buy what you need. Everything sells back for a little less, so crafting stays the cheaper way.", Data.ui_icon("market")))
 	head.add_child(UI.spacer())
 	_gold = UI.label("", "Num", Palette.GOLD)
-	_gold.add_theme_font_size_override("font_size", 22)
-	head.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("gold"), 26), _gold]))
+	_gold.add_theme_font_size_override("font_size", 26)
+	head.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("gold"), 31), _gold]))
 	v.add_child(head)
-	_tabs = UI.hbox(8)
+	_tabs = UI.hbox(10)
 	v.add_child(_tabs)
-	_body = UI.vbox(14)
+	_body = UI.vbox(17)
 	var sc := UI.scroll(_body)
 	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(sc)
@@ -65,7 +65,7 @@ func refresh() -> void:
 		"vessels":
 			_fill_wares(Market.catalog("vessel"), [1, 10, 100])
 		"materials":
-			var cats := UI.flow(6, 6)
+			var cats := UI.flow(7, 7)
 			for c in MAT_CATS:
 				cats.add_child(UI.button(c[1], "ChipOn" if mat_cat == c[0] else "Chip", func():
 					mat_cat = c[0]
@@ -108,8 +108,8 @@ func _fill_stock() -> void:
 	var st := Market.stock(s, Game.now_sec())
 	var clock := UI.label("", "Dim")
 	_clocks.append({"label": clock, "fmt": "New stock in %s"})
-	_body.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("time"), 20), clock]))
-	var flow := UI.flow(16, 16)
+	_body.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("time"), 24), clock]))
+	var flow := UI.flow(19, 19)
 	for i in st.offers.size():
 		var o: Dictionary = st.offers[i]
 		if o.get("limited", false):
@@ -118,7 +118,7 @@ func _fill_stock() -> void:
 			flow.add_child(_offer_card(o, i))
 	UI.even_sizes(flow)
 	_body.add_child(flow)
-	_body.add_child(UI.wrap_label("Each offer can be bought a few times until the stock changes. Now and then a rare limited offer turns up: one only, and gone when the stock turns over.", "Faint", 600))
+	_body.add_child(UI.wrap_label("Each offer can be bought a few times until the stock changes. Now and then a rare limited offer turns up: one only, and gone when the stock turns over.", "Faint", 720))
 
 
 func _offer_icon(o: Dictionary, px: int) -> Control:
@@ -147,28 +147,28 @@ func _offer_title(o: Dictionary) -> String:
 
 func _offer_card(o: Dictionary, i: int) -> Control:
 	var card := UI.panel("Card")
-	card.custom_minimum_size = Vector2(300, 0)
-	var cv := UI.vbox(8)
+	card.custom_minimum_size = Vector2(360, 0)
+	var cv := UI.vbox(10)
 	card.add_child(cv)
-	var h := UI.hbox(12)
+	var h := UI.hbox(14)
 	h.add_child(_offer_icon(o, 52))
 	var tv := UI.vbox(2)
 	var title := UI.label(_offer_title(o), "H3")
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	title.custom_minimum_size.x = 190
+	title.custom_minimum_size.x = 228
 	tv.add_child(title)
 	if o.kind == "boost":
-		tv.add_child(UI.wrap_label(Market.boost_def(o.boost).desc, "Faint", 190))
+		tv.add_child(UI.wrap_label(Market.boost_def(o.boost).desc, "Faint", 228))
 	elif o.kind == "item" and o.item == "aether-crystal":
 		tv.add_child(UI.label("= %s Aether" % F.format_num(int(o.qty) * float(Data.items[o.item].aether)), "Faint", Palette.AETHER))
 	h.add_child(tv)
 	cv.add_child(h)
-	var row := UI.hbox(8)
-	row.add_child(UI.amount("gold", float(o.gold), float(o.gold), 20))
+	var row := UI.hbox(10)
+	row.add_child(UI.amount("gold", float(o.gold), float(o.gold), 24))
 	if roundi(float(o.get("discount", 0.0)) * 100.0) > 0:
-		row.add_child(UI.chip("-%d%%" % roundi(float(o.discount) * 100.0), Palette.GOOD, 12))
+		row.add_child(UI.chip("-%d%%" % roundi(float(o.discount) * 100.0), Palette.GOOD, 14))
 	row.add_child(UI.spacer())
-	row.add_child(UI.chip("%d left" % int(o.left), Palette.GOLD if int(o.left) > 0 else Palette.DANGER, 12))
+	row.add_child(UI.chip("%d left" % int(o.left), Palette.GOLD if int(o.left) > 0 else Palette.DANGER, 14))
 	cv.add_child(row)
 	var b := UI.button("Buy" if int(o.left) > 0 else "Sold out", "Gold", func(): Game.buy_offer(i, _window))
 	b.disabled = int(o.left) <= 0 or float(Game.state.gold) < float(o.gold)
@@ -181,13 +181,13 @@ func _offer_card(o: Dictionary, i: int) -> Control:
 ## A rare limited offer: a wide card with a running rainbow-gold frame and sparkles.
 func _limited_card(o: Dictionary, i: int) -> Control:
 	var card := PanelContainer.new()
-	var sb := ThemeFactory.box(Color(0.16, 0.12, 0.05, 0.92), 14, 0, Palette.LINE, 0)
-	sb.content_margin_left = 20
-	sb.content_margin_right = 20
-	sb.content_margin_top = 16
-	sb.content_margin_bottom = 16
+	var sb := ThemeFactory.box(Color(0.16, 0.12, 0.05, 0.92), 17, 0, Palette.LINE, 0)
+	sb.content_margin_left = 24
+	sb.content_margin_right = 24
+	sb.content_margin_top = 19
+	sb.content_margin_bottom = 19
 	card.add_theme_stylebox_override("panel", sb)
-	var h := UI.hbox(18)
+	var h := UI.hbox(22)
 	card.add_child(h)
 	var ic := _offer_icon(o, 84)
 	h.add_child(ic)
@@ -196,63 +196,63 @@ func _limited_card(o: Dictionary, i: int) -> Control:
 		ic.pivot_offset = Vector2(42, 42)
 		tw.tween_property(ic, "scale", Vector2(1.08, 1.08), 0.7).set_trans(Tween.TRANS_SINE)
 		tw.tween_property(ic, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
-	var tv := UI.vbox(4)
+	var tv := UI.vbox(5)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tv.add_child(UI.hbox(8, [UI.chip("LIMITED", Palette.GOLD, 12), UI.chip("1 only", Palette.AETHER, 12)]))
+	tv.add_child(UI.hbox(10, [UI.chip("LIMITED", Palette.GOLD, 14), UI.chip("1 only", Palette.AETHER, 14)]))
 	var name_l := UI.label(o.name, "H2", Palette.GOLD)
 	tv.add_child(name_l)
-	tv.add_child(UI.wrap_label(_offer_title(o) + " · " + String(o.blurb), "Dim", 420))
+	tv.add_child(UI.wrap_label(_offer_title(o) + " · " + String(o.blurb), "Dim", 504))
 	var clock := UI.label("", "Faint", Palette.GOLD)
 	_clocks.append({"label": clock, "fmt": "Gone in %s"})
 	tv.add_child(clock)
 	h.add_child(tv)
-	var bv := UI.vbox(8)
+	var bv := UI.vbox(10)
 	bv.alignment = BoxContainer.ALIGNMENT_CENTER
-	bv.add_child(UI.amount("gold", float(o.gold), float(o.gold), 24))
+	bv.add_child(UI.amount("gold", float(o.gold), float(o.gold), 29))
 	var b := UI.button("Buy now" if int(o.left) > 0 else "Snapped up", "Gold", func(): Game.buy_offer(i, _window))
-	b.custom_minimum_size.x = 160
+	b.custom_minimum_size.x = 192
 	b.disabled = int(o.left) <= 0 or float(Game.state.gold) < float(o.gold)
 	bv.add_child(b)
 	h.add_child(bv)
 	if int(o.left) <= 0:
 		card.modulate.a = 0.55
 		return card
-	return ShineFrame.wrap(card, 14)
+	return ShineFrame.wrap(card, 17)
 
 
 # ---------------------------------------------------------------- vessels and materials
 
 func _fill_wares(list: Array, amounts: Array) -> void:
 	var s := Game.state
-	var flow := UI.flow(14, 14)
+	var flow := UI.flow(17, 17)
 	for it in list:
 		var open := Market.for_sale(s, it.id)
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(290, 0)
-		var cv := UI.vbox(6)
+		card.custom_minimum_size = Vector2(348, 0)
+		var cv := UI.vbox(7)
 		card.add_child(cv)
-		var h := UI.hbox(10)
-		h.add_child(UI.icon(Data.item_icon(it.id), 44))
+		var h := UI.hbox(12)
+		h.add_child(UI.icon(Data.item_icon(it.id), 53))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(it.name, "H3"))
-		tv.add_child(UI.hbox(6, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 11), UI.label("you have", "Small", Palette.TEXT_DIM), UI.label(F.format_num(GameState.count(s, it.id)), "Num", Palette.TEXT)]))
+		tv.add_child(UI.hbox(7, [UI.chip("Tier %d" % int(it.tier), Palette.AETHER, 13), UI.label("you have", "Small", Palette.TEXT_DIM), UI.label(F.format_num(GameState.count(s, it.id)), "Num", Palette.TEXT)]))
 		h.add_child(tv)
 		cv.add_child(h)
 		if it.has("vessel"):
-			var chances := UI.flow(4, 4)
+			var chances := UI.flow(5, 5)
 			for r in [1, 3, 5, 7, 9]:
-				chances.add_child(UI.chip("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, it.id, r, []))], Data.rarity_color(r), 11))
+				chances.add_child(UI.chip("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, it.id, r, []))], Data.rarity_color(r), 13))
 			cv.add_child(chances)
 		if not open:
 			var need := Market.unlock_clears(it.id)
 			var zone_name: String = Data.zone_list[mini(need, Data.zone_list.size()) - 1].name
-			cv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("Clear %s to stock it" % zone_name, "Faint")]))
+			cv.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("lock"), 19), UI.label("Clear %s to stock it" % zone_name, "Faint")]))
 			card.modulate.a = 0.5
 			flow.add_child(card)
 			continue
 		var price := Market.buy_price(it.id)
-		cv.add_child(UI.hbox(8, [UI.amount("gold", price, price, 18), UI.label("each", "Dim"), UI.spacer(), UI.chip("sells for %s" % F.format_num(float(it.sell)), Palette.GOOD, 11)]))
-		var row := UI.hbox(6)
+		cv.add_child(UI.hbox(10, [UI.amount("gold", price, price, 22), UI.label("each", "Dim"), UI.spacer(), UI.chip("sells for %s" % F.format_num(float(it.sell)), Palette.GOOD, 13)]))
+		var row := UI.hbox(7)
 		for n in amounts:
 			var b := UI.button("Buy %s" % F.format_num(n), "Gold" if n == amounts[0] else "", func(): Game.market_buy(it.id, n))
 			b.disabled = float(s.gold) < price * n
@@ -268,34 +268,34 @@ func _fill_wares(list: Array, amounts: Array) -> void:
 
 func _fill_boosts() -> void:
 	var s := Game.state
-	_body.add_child(UI.wrap_label("Short boosts start the moment you buy them and keep running while you're away. Buying again adds more time, up to %d hours. Prices grow as the islands open up." % int(Market.cfg().boosts.maxHours), "Dim", 700))
-	var flow := UI.flow(16, 16)
+	_body.add_child(UI.wrap_label("Short boosts start the moment you buy them and keep running while you're away. Buying again adds more time, up to %d hours. Prices grow as the islands open up." % int(Market.cfg().boosts.maxHours), "Dim", 840))
+	var flow := UI.flow(19, 19)
 	for b in Market.cfg().boosts.list:
 		var card := UI.panel("Glass")
-		card.custom_minimum_size = Vector2(340, 0)
-		var cv := UI.vbox(8)
+		card.custom_minimum_size = Vector2(408, 0)
+		var cv := UI.vbox(10)
 		card.add_child(cv)
-		var h := UI.hbox(12)
-		h.add_child(UI.icon(Data.ui_icon(b.icon), 56))
+		var h := UI.hbox(14)
+		h.add_child(UI.icon(Data.ui_icon(b.icon), 67))
 		var tv := UI.vbox(2)
 		tv.add_child(UI.label(b.name, "H2"))
-		tv.add_child(UI.wrap_label(b.desc, "Dim", 230))
+		tv.add_child(UI.wrap_label(b.desc, "Dim", 276))
 		h.add_child(tv)
 		cv.add_child(h)
-		var bar := UI.bar(Palette.AETHER, 8)
+		var bar := UI.bar(Palette.AETHER, 10)
 		cv.add_child(bar)
 		var left := UI.label("", "Faint")
 		cv.add_child(left)
 		_boost_bars.append({"id": b.id, "bar": bar, "label": left})
 		var price := Market.boost_price(s, b.id)
-		var row := UI.hbox(8, [UI.amount("gold", price, price, 20), UI.spacer()])
+		var row := UI.hbox(10, [UI.amount("gold", price, price, 24), UI.spacer()])
 		var buy := UI.button("Buy (+%d min)" % int(b.minutes), "Gold", func(): Game.buy_boost(b.id))
 		buy.disabled = float(s.gold) < price or Market.boost_full(s, b.id)
 		if Market.boost_full(s, b.id):
 			buy.tooltip_text = "Already stocked up for %d hours." % int(Market.cfg().boosts.maxHours)
 		row.add_child(buy)
 		cv.add_child(row)
-		flow.add_child(ShineFrame.wrap(card, 16) if Market.boost_left(s, b.id) > 0.0 else card)
+		flow.add_child(ShineFrame.wrap(card, 19) if Market.boost_left(s, b.id) > 0.0 else card)
 	UI.even_sizes(flow)
 	_body.add_child(flow)
 
@@ -305,25 +305,25 @@ func _fill_boosts() -> void:
 func _fill_slots() -> void:
 	var s := Game.state
 	var need := int(Market.cfg().extraSlots.needLevel)
-	_body.add_child(UI.wrap_label("Past the fifth, a skill's work slots are bought, one skill at a time. A skill needs its five slots open (level %d) first." % need, "Dim", 700))
-	var flow := UI.flow(14, 14)
+	_body.add_child(UI.wrap_label("Past the fifth, a skill's work slots are bought, one skill at a time. A skill needs its five slots open (level %d) first." % need, "Dim", 840))
+	var flow := UI.flow(17, 17)
 	for skill in Data.skill_list:
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(330, 0)
-		var cv := UI.vbox(6)
+		card.custom_minimum_size = Vector2(396, 0)
+		var cv := UI.vbox(7)
 		card.add_child(cv)
-		var h := UI.hbox(10)
-		h.add_child(UI.icon(Data.ui_icon(skill.id), 40))
+		var h := UI.hbox(12)
+		h.add_child(UI.icon(Data.ui_icon(skill.id), 48))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(skill.name, "H3"))
-		tv.add_child(UI.hbox(6, [UI.chip("Lv %d" % int(s.skills[skill.id].level), Palette.AETHER, 11), UI.chip("%d slots" % GameState.slot_count(s, skill.id), Palette.GOOD, 11), UI.chip("%d bought" % Market.extra_slots(s, skill.id), Palette.GOLD, 11)]))
+		tv.add_child(UI.hbox(7, [UI.chip("Lv %d" % int(s.skills[skill.id].level), Palette.AETHER, 13), UI.chip("%d slots" % GameState.slot_count(s, skill.id), Palette.GOOD, 13), UI.chip("%d bought" % Market.extra_slots(s, skill.id), Palette.GOLD, 13)]))
 		h.add_child(tv)
 		cv.add_child(h)
 		var price := Market.next_slot_price(s, skill.id)
 		if price < 0:
 			cv.add_child(UI.label("Every extra slot is open", "H3", Palette.GOOD))
 		else:
-			var row := UI.hbox(8, [UI.amount("gold", price, price, 20), UI.spacer()])
+			var row := UI.hbox(10, [UI.amount("gold", price, price, 24), UI.spacer()])
 			var err := Market.slot_check(s, skill.id)
 			var b := UI.button("Buy a slot", "Gold", func(): _confirm_slot(skill.id, price))
 			b.disabled = err != ""

@@ -21,20 +21,20 @@ func setup(arg: String) -> void:
 
 
 func _ready() -> void:
-	var v := UI.vbox(16)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(19)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	var sc := UI.scroll(m)
 	sc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(sc)
 	# header
-	var head := UI.hbox(18)
+	var head := UI.hbox(22)
 	var hp := UI.panel("Glass", head)
 	v.add_child(hp)
-	head.add_child(UI.icon(Data.ui_icon(skill_id), 72))
-	var hv := UI.vbox(6)
+	head.add_child(UI.icon(Data.ui_icon(skill_id), 86))
+	var hv := UI.vbox(7)
 	hv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	head.add_child(hv)
-	var title := UI.hbox(12)
+	var title := UI.hbox(14)
 	title.add_child(UI.label(_skill.name, "H1"))
 	if _skill.type != null:
 		title.add_child(UI.type_badge(_skill.type))
@@ -43,30 +43,30 @@ func _ready() -> void:
 		title.add_child(UI.label("Open to every Aetherling", "Faint"))
 	hv.add_child(title)
 	hv.add_child(UI.label(_skill.blurb, "Dim"))
-	var xr := UI.hbox(12)
+	var xr := UI.hbox(14)
 	_level_label = UI.label("", "H2", Palette.AETHER)
 	xr.add_child(_level_label)
-	_xp_bar = UI.bar(Data.type_color(_skill.type) if _skill.type != null else Palette.AETHER, 12)
+	_xp_bar = UI.bar(Data.type_color(_skill.type) if _skill.type != null else Palette.AETHER, 14)
 	_xp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	xr.add_child(_xp_bar)
 	_xp_label = UI.label("", "Num", Palette.AETHER.lightened(0.2))
-	_xp_label.add_theme_font_size_override("font_size", 15)
+	_xp_label.add_theme_font_size_override("font_size", 18)
 	xr.add_child(_xp_label)
 	hv.add_child(xr)
-	_rate = UI.vbox(4)
-	_rate.custom_minimum_size.x = 260
+	_rate = UI.vbox(5)
+	_rate.custom_minimum_size.x = 312
 	head.add_child(_rate)
 	# slots
-	var sh := UI.hbox(12, [UI.label("Work slots", "H2")])
+	var sh := UI.hbox(14, [UI.label("Work slots", "H2")])
 	_fill_btn = UI.button("Fill empty slots", "", func(): Game.fill_slots(skill_id), Data.ui_icon("nexus"))
 	_fill_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	sh.add_child(_fill_btn)
 	v.add_child(sh)
-	_slots = UI.flow(14, 14)
+	_slots = UI.flow(17, 17)
 	v.add_child(_slots)
 	v.add_child(UI.label("What to work on", "H2"))
 	v.add_child(UI.label("Every worker in this skill does the selected task. Higher tiers open with skill level.", "Faint"))
-	_actions = UI.flow(14, 14)
+	_actions = UI.flow(17, 17)
 	v.add_child(_actions)
 	_fx = Control.new()
 	_fx.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -100,13 +100,13 @@ func _fill_slots() -> void:
 		if not fill.is_empty() else "No resting Aetherling can work here"
 	for i in maxi(levels.size(), open):
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(250, 214)
-		var cv := UI.vbox(6)
+		card.custom_minimum_size = Vector2(300, 257)
+		var cv := UI.vbox(7)
 		card.add_child(cv)
 		if i < ws.size():
 			var c: Dictionary = ws[i]
-			var top := UI.hbox(10)
-			var bub := WorkerBubble.make(c, skill_id, 84)
+			var top := UI.hbox(12)
+			var bub := WorkerBubble.make(c, skill_id, 101)
 			top.add_child(bub)
 			var tv := UI.vbox(2)
 			tv.add_child(UI.label(Creatures.display_name(c), "H3"))
@@ -120,12 +120,12 @@ func _fill_slots() -> void:
 				tv.add_child(UI.label("Off-specialty −%s" % F.pct(1.0 - eff), "Faint", Palette.DANGER))
 			top.add_child(tv)
 			cv.add_child(top)
-			var bar := UI.bar(Palette.AETHER, 8)
+			var bar := UI.bar(Palette.AETHER, 10)
 			cv.add_child(bar)
 			var note := UI.label("", "Small", Palette.AETHER.lightened(0.15))
 			cv.add_child(note)
 			_slot_bars.append({"cid": c.id, "bar": bar, "label": note, "cd": cd})
-			var row := UI.hbox(8)
+			var row := UI.hbox(10)
 			row.add_child(UI.button("Swap", "", func(): _pick(c.id)))
 			row.add_child(UI.button("Rest", "Ghost", func(): Game.bench(c.id)))
 			row.add_child(UI.spacer())
@@ -134,7 +134,7 @@ func _fill_slots() -> void:
 		elif i < open:
 			cv.alignment = BoxContainer.ALIGNMENT_CENTER
 			var usable: bool = _skill.type == null or Collection.owned_type(s, _skill.type)
-			cv.add_child(UI.icon(Data.ui_icon("nexus"), 42))
+			cv.add_child(UI.icon(Data.ui_icon("nexus"), 50))
 			var l := UI.label("Empty slot", "H3")
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			cv.add_child(l)
@@ -145,10 +145,10 @@ func _fill_slots() -> void:
 				cv.add_child(UI.wrap_label("You need a %s Aetherling. Find one on the expedition islands." % Data.types[_skill.type].name, "Faint"))
 		else:
 			cv.alignment = BoxContainer.ALIGNMENT_CENTER
-			card.custom_minimum_size.x = 150
+			card.custom_minimum_size.x = 180
 			card.modulate.a = 0.5
-			cv.add_child(UI.icon(Data.ui_icon("lock"), 36))
-			var l := UI.chip("Opens at Lv %d" % int(levels[i]), Palette.AETHER, 12)
+			cv.add_child(UI.icon(Data.ui_icon("lock"), 43))
+			var l := UI.chip("Opens at Lv %d" % int(levels[i]), Palette.AETHER, 14)
 			l.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			cv.add_child(l)
 		_slots.add_child(card)
@@ -156,17 +156,17 @@ func _fill_slots() -> void:
 	var price := Market.next_slot_price(s, skill_id)
 	if price >= 0 and int(s.skills[skill_id].level) >= int(Market.cfg().extraSlots.needLevel):
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(170, 214)
-		var cv := UI.vbox(8)
+		card.custom_minimum_size = Vector2(204, 257)
+		var cv := UI.vbox(10)
 		cv.alignment = BoxContainer.ALIGNMENT_CENTER
 		card.add_child(cv)
-		var ic := UI.icon(Data.ui_icon("work-slot"), 44)
+		var ic := UI.icon(Data.ui_icon("work-slot"), 53)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		cv.add_child(ic)
 		var l := UI.label("Extra slot", "H3")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		cv.add_child(l)
-		var amt := UI.amount("gold", price, price, 18)
+		var amt := UI.amount("gold", price, price, 22)
 		amt.alignment = BoxContainer.ALIGNMENT_CENTER
 		cv.add_child(amt)
 		var b := UI.button("Buy", "Gold", func(): Modal.confirm("Buy a %s slot?" % _skill.name, "%s gold for one more work slot here, for good." % F.format_num(price), "Buy the slot", func(): Game.buy_slot(skill_id)))
@@ -225,10 +225,10 @@ func _fill_actions() -> void:
 		var unlocked := int(a.level) <= int(s.skills[skill_id].level)
 		var selected: bool = a.id == current.id
 		var card := UI.button("", "TileOn" if selected else "Tile")
-		card.custom_minimum_size = Vector2(250, 236)
+		card.custom_minimum_size = Vector2(300, 283)
 		card.disabled = not unlocked
 		card.pressed.connect(func(): Game.set_action(skill_id, a.id))
-		var cv := UI.vbox(6)
+		var cv := UI.vbox(7)
 		cv.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		cv.offset_left = 14
@@ -237,24 +237,24 @@ func _fill_actions() -> void:
 		cv.offset_bottom = -12
 		card.add_child(cv)
 		var out: String = a.outputs.keys()[0]
-		var top := UI.hbox(12)
-		top.add_child(UI.icon(Data.item_icon(out), 56))
+		var top := UI.hbox(14)
+		top.add_child(UI.icon(Data.item_icon(out), 67))
 		var tv := UI.vbox(0)
 		tv.add_child(UI.label(a.name, "H3"))
 		tv.add_child(UI.label("Makes %s" % Data.item_name(out) if a.has("inputs") else Data.item_name(out), "Faint"))
 		tv.add_child(UI.label("Level %d" % int(a.level), "Small", Palette.AETHER if unlocked else Palette.DANGER))
 		top.add_child(tv)
 		cv.add_child(top)
-		var info := UI.hbox(14)
+		var info := UI.hbox(17)
 		info.add_child(UI.stat_line("time", F.format_ms(float(a.ms)), "Base time, before your worker's speed"))
 		info.add_child(UI.stat_line("xp", "%d XP" % int(a.xp)))
 		if a.has("gold"):
-			info.add_child(UI.amount("gold", float(a.gold), -1, 18))
+			info.add_child(UI.amount("gold", float(a.gold), -1, 22))
 		cv.add_child(info)
 		# the recipe, top to bottom: what one action uses, what it makes, what it can find besides; each line with
 		# how many you hold (an input turns red when you have too few)
 		cv.add_child(UI.spacer())
-		var hv := UI.vbox(3)
+		var hv := UI.vbox(4)
 		if a.has("inputs"):
 			hv.add_child(_section_head("Uses each time"))
 			for id in a.inputs:
@@ -280,29 +280,29 @@ func _fill_actions() -> void:
 ## A small caps heading inside the recipe box.
 func _section_head(text: String) -> Label:
 	var l := UI.label(text.to_upper(), "Faint")
-	l.add_theme_font_size_override("font_size", 11)
+	l.add_theme_font_size_override("font_size", 13)
 	return l
 
 
 ## One recipe line: item icon and name, a note (×2, or a drop chance) in `note_color`, and a live count of how
 ## many you hold on the right. With `need`, the count turns red while you hold fewer than one action uses.
 func _item_line(id: String, note: String, note_color: Color, need := 0.0) -> HBoxContainer:
-	var row := UI.hbox(6)
+	var row := UI.hbox(7)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	row.add_child(UI.icon(Data.item_icon(id), 22))
+	row.add_child(UI.icon(Data.item_icon(id), 26))
 	var name_l := UI.label(Data.item_name(id), "Dim")
 	name_l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_l.clip_text = true
 	name_l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	name_l.custom_minimum_size.x = 60
+	name_l.custom_minimum_size.x = 72
 	row.add_child(name_l)
 	var nl := UI.label(note, "Small", note_color)
 	nl.add_theme_font_override("font", ThemeFactory.bold_font())
 	row.add_child(nl)
 	var n := UI.label("", "Num")
-	n.add_theme_font_size_override("font_size", 15)
+	n.add_theme_font_size_override("font_size", 18)
 	n.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
-	n.custom_minimum_size.x = 40
+	n.custom_minimum_size.x = 48
 	n.tooltip_text = "You have this many"
 	row.add_child(n)
 	_have_labels.append({"id": id, "label": n, "last": -1.0, "need": need})
@@ -351,7 +351,7 @@ func _fill_rate() -> void:
 	for id in action.outputs:
 		_rate.add_child(UI.amount(id, per_h * float(action.outputs[id])))
 	for id in action.get("inputs", {}):
-		var row := UI.hbox(6, [UI.label("uses", "Small", Palette.TEXT_DIM), UI.amount(id, per_h * float(action.inputs[id]))])
+		var row := UI.hbox(7, [UI.label("uses", "Small", Palette.TEXT_DIM), UI.amount(id, per_h * float(action.inputs[id]))])
 		_rate.add_child(row)
 	_rate.add_child(UI.stat_line("xp", "%s XP/h" % F.format_num(xp_h)))
 	if Skills.affordable(s, action) <= 0:
@@ -401,10 +401,10 @@ func _on_event(e: Dictionary) -> void:
 					for id in e.items:
 						if id.begins_with("_"):
 							continue
-						FloatText.spawn(_fx, at + Vector2(0, n * -24), "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 16)
+						FloatText.spawn(_fx, at + Vector2(0, n * -24), "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 19)
 						n += 1
 					if e.items.has("_saved"):
-						FloatText.spawn(_fx, at + Vector2(0, -24), "saved!", Palette.GOOD, null, 13)
+						FloatText.spawn(_fx, at + Vector2(0, -24), "saved!", Palette.GOOD, null, 16)
 		"skill_level", "slot_unlocked", "action_unlocked":
 			if e.skill == skill_id:
 				refresh()

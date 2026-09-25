@@ -28,36 +28,36 @@ func _ready() -> void:
 	bg.modulate = Color(1, 1, 1, 0.55)
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
-	var row := UI.hbox(18)
-	var m := UI.margin(row, 24, 10, 24, 20)
+	var row := UI.hbox(22)
+	var m := UI.margin(row, 29, 12, 29, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var left := UI.vbox(14)
+	var left := UI.vbox(17)
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(left)
 	left.add_child(UI.header("Your Sanctum", "Every station on the islands, and who is working it. Click a station to manage it.", Data.ui_icon("sanctum")))
-	var flow := UI.flow(14, 14)
+	var flow := UI.flow(17, 17)
 	left.add_child(UI.scroll(flow))
 	for skill in Data.skill_list:
 		flow.add_child(_station(skill))
-	_side = UI.vbox(14)
-	_side.custom_minimum_size.x = 360
+	_side = UI.vbox(17)
+	_side.custom_minimum_size.x = 432
 	row.add_child(UI.scroll(_side))
-	_goal_box = UI.vbox(8)
+	_goal_box = UI.vbox(10)
 	_side.add_child(UI.panel("Glass", _goal_box))
-	var perch := UI.vbox(8)
-	var ph := UI.hbox(8, [UI.icon(Data.ui_icon("nexus"), 24), UI.label("Perches", "H3")])
+	var perch := UI.vbox(10)
+	var ph := UI.hbox(10, [UI.icon(Data.ui_icon("nexus"), 29), UI.label("Perches", "H3")])
 	ph.add_child(UI.spacer())
 	_perch_rate = UI.label("", "Num", Palette.AETHER)
 	ph.add_child(_perch_rate)
 	perch.add_child(ph)
 	perch.add_child(UI.wrap_label("Resting Aetherlings sit on the perches and gather Aether. Rarer ones gather far more.", "Faint"))
-	_perch_box = UI.flow(6, 6)
+	_perch_box = UI.flow(7, 7)
 	perch.add_child(_perch_box)
 	_side.add_child(UI.panel("Glass", perch))
-	_exp_box = UI.vbox(8)
+	_exp_box = UI.vbox(10)
 	_side.add_child(UI.panel("Glass", _exp_box))
-	_pods_box = UI.vbox(8)
+	_pods_box = UI.vbox(10)
 	_side.add_child(UI.panel("Glass", _pods_box))
 	_fx = Control.new()
 	_fx.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -69,9 +69,9 @@ func _ready() -> void:
 
 func _station(skill: Dictionary) -> Control:
 	var card := UI.button("", "Tile")
-	card.custom_minimum_size = Vector2(288, 176)
+	card.custom_minimum_size = Vector2(346, 211)
 	card.pressed.connect(func(): Main.go("skill", skill.id))
-	var v := UI.vbox(8)
+	var v := UI.vbox(10)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	v.offset_left = 14
@@ -79,9 +79,9 @@ func _station(skill: Dictionary) -> Control:
 	v.offset_top = 12
 	v.offset_bottom = -12
 	card.add_child(v)
-	var head := UI.hbox(10)
+	var head := UI.hbox(12)
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	head.add_child(UI.icon(Data.ui_icon(skill.id), 34))
+	head.add_child(UI.icon(Data.ui_icon(skill.id), 41))
 	var tv := UI.vbox(0)
 	tv.add_child(UI.label(skill.name, "H3"))
 	var sub := UI.label("", "Faint")
@@ -91,9 +91,9 @@ func _station(skill: Dictionary) -> Control:
 	var lvl := UI.label("", "H2", Palette.AETHER)
 	head.add_child(lvl)
 	v.add_child(head)
-	var xp := UI.bar(Data.type_color(skill.type) if skill.type != null else Palette.AETHER, 6)
+	var xp := UI.bar(Data.type_color(skill.type) if skill.type != null else Palette.AETHER, 7)
 	v.add_child(xp)
-	var workers := UI.hbox(6)
+	var workers := UI.hbox(7)
 	workers.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.add_child(workers)
 	_stations[skill.id] = {"card": card, "workers": workers, "level": lvl, "xp": xp, "sub": sub, "bubbles": {}}
@@ -126,7 +126,7 @@ func refresh() -> void:
 		var cols := mini(n, 5)
 		var room := 272 - (36 if ws.size() > 0 else 0)
 		var px := clampi(int((room - 6 * (cols - 1)) / float(cols)), 34, 58)
-		var grid := UI.grid(maxi(1, cols), 6, 6)
+		var grid := UI.grid(maxi(1, cols), 7, 7)
 		grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		st.workers.add_child(grid)
 		for c in ws:
@@ -137,7 +137,7 @@ func refresh() -> void:
 			grid.add_child(WorkerBubble.make({}, id, px))
 		if ws.size() > 0:
 			st.workers.add_child(UI.spacer())
-			st.workers.add_child(UI.icon(Data.item_icon(action.outputs.keys()[0]), 30))
+			st.workers.add_child(UI.icon(Data.item_icon(action.outputs.keys()[0]), 36))
 	_fill_side()
 
 
@@ -165,31 +165,31 @@ func _fill_goal() -> void:
 	_goal_key = _goal_state()
 	UI.clear(_goal_box)
 	var g := Goals.current(s)
-	var gh := UI.hbox(8, [UI.icon(Data.ui_icon("xp"), 22), UI.label("Overseer Vance", "H3")])
+	var gh := UI.hbox(10, [UI.icon(Data.ui_icon("xp"), 26), UI.label("Overseer Vance", "H3")])
 	gh.add_child(UI.spacer())
-	gh.add_child(UI.chip("Goal %d / %d" % [mini(int(s.goals.index) + 1, Data.goals.size()), Data.goals.size()], Palette.GOLD, 13))
+	gh.add_child(UI.chip("Goal %d / %d" % [mini(int(s.goals.index) + 1, Data.goals.size()), Data.goals.size()], Palette.GOLD, 16))
 	_goal_box.add_child(gh)
 	if g.is_empty():
 		_goal_box.add_child(UI.wrap_label("You've done everything I had planned. The Sanctum is yours, Architect: chase the rarities and the hidden recipes.", "Dim"))
 	else:
 		_goal_box.add_child(UI.wrap_label(g.text, ""))
 		var p := Goals.progress(s, g)
-		var pb := UI.bar(Palette.GOLD, 8)
+		var pb := UI.bar(Palette.GOLD, 10)
 		pb.value = float(p[0]) / maxf(1.0, float(p[1]))
 		_goal_box.add_child(pb)
-		var rrow := UI.hbox(8)
+		var rrow := UI.hbox(10)
 		rrow.add_child(UI.label("Reward", "Small", Palette.GOLD))
 		for k in g.reward:
 			if k == "items":
 				for id in g.reward.items:
-					rrow.add_child(UI.amount(id, g.reward.items[id], -1, 18))
+					rrow.add_child(UI.amount(id, g.reward.items[id], -1, 22))
 			else:
-				rrow.add_child(UI.amount(k, g.reward[k], -1, 18))
+				rrow.add_child(UI.amount(k, g.reward[k], -1, 22))
 		rrow.add_child(UI.spacer())
 		if Goals.is_done(s, g):
 			rrow.add_child(UI.button("Claim", "Gold", func(): Game.claim_goal()))
 		else:
-			rrow.add_child(UI.count_chip(p[0], p[1], 13))
+			rrow.add_child(UI.count_chip(p[0], p[1], 16))
 		_goal_box.add_child(rrow)
 
 
@@ -198,32 +198,32 @@ func _fill_side_rest(s: Dictionary) -> void:
 	UI.clear(_perch_box)
 	var perched := Economy.perched(s)
 	for c in perched:
-		var por := CreaturePortrait.of(c, 60)
+		var por := CreaturePortrait.of(c, 72)
 		por.glow_scale = 0.6
 		var wrapper := Control.new()
-		wrapper.custom_minimum_size = Vector2(60, 60)
+		wrapper.custom_minimum_size = Vector2(72, 72)
 		wrapper.tooltip_text = "%s · %s Aether/min" % [Creatures.display_name(c), F.format_num(Creatures.bench_rate_per_min(c))]
 		wrapper.mouse_filter = Control.MOUSE_FILTER_PASS
 		wrapper.add_child(por)
 		_perch_box.add_child(wrapper)
 	for i in int(GameState.upgrade_value(s, "perches")) - perched.size():
-		var e := WorkerBubble.make({}, "woodcutting", 60)
+		var e := WorkerBubble.make({}, "woodcutting", 72)
 		e.tooltip_text = "Empty perch: any resting Aetherling sits here"
 		_perch_box.add_child(e)
 	_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
 	_fill_expedition()
 	# pods
 	UI.clear(_pods_box)
-	_pods_box.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("pods"), 24), UI.label("Genesis Pods", "H3")]))
+	_pods_box.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("pods"), 29), UI.label("Genesis Pods", "H3")]))
 	var now := Game.now_sec()
-	var eggs := UI.hbox(8)
+	var eggs := UI.hbox(10)
 	for egg in s.pods:
 		if egg.is_empty():
-			var e := WorkerBubble.make({}, "woodcutting", 46)
+			var e := WorkerBubble.make({}, "woodcutting", 55)
 			e.tooltip_text = "Empty pod"
 			eggs.add_child(e)
 		else:
-			var ev := EggView.make(egg, 46)
+			var ev := EggView.make(egg, 55)
 			ev.tooltip_text = "Ready to hatch!" if Breeding.is_ready(egg, now) else "Hatches in " + F.format_seconds(Breeding.remaining(egg, now))
 			eggs.add_child(ev)
 	_pods_box.add_child(eggs)
@@ -243,19 +243,19 @@ func _fill_expedition() -> void:
 	_exp_status = null
 	_exp_log = null
 	_exp_key = _expedition_key()
-	_exp_box.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("expeditions"), 24), UI.label("Expedition", "H3")]))
+	_exp_box.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("expeditions"), 29), UI.label("Expedition", "H3")]))
 	if Expedition.is_running(s) and not s.expedition.battle.is_empty():
 		var b: Dictionary = s.expedition.battle
 		_exp_status = UI.label("", "Dim")
 		_exp_box.add_child(_exp_status)
-		var party := UI.hbox(6)
+		var party := UI.hbox(7)
 		for f in b.allies:
 			var pv := UI.vbox(2)
-			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), 54)
+			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), 65)
 			por.bob = false
 			pv.add_child(por)
-			var hp := UI.bar(Palette.GOOD, 5)
-			hp.custom_minimum_size.x = 54
+			var hp := UI.bar(Palette.GOOD, 6)
+			hp.custom_minimum_size.x = 65
 			pv.add_child(hp)
 			_exp_hp.append(hp)
 			party.add_child(pv)
@@ -306,7 +306,7 @@ func _update_expedition() -> void:
 			var l := UI.label(e.text, "Faint", e.color)
 			l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			l.custom_minimum_size.x = 40
+			l.custom_minimum_size.x = 48
 			l.tooltip_text = e.text
 			l.mouse_filter = Control.MOUSE_FILTER_PASS
 			_exp_log.add_child(l)
@@ -341,7 +341,7 @@ func _on_event(e: Dictionary) -> void:
 				for id in e.items:
 					if id.begins_with("_"):
 						continue
-					FloatText.spawn(_fx, at, "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 15, 30.0)
+					FloatText.spawn(_fx, at, "+%d" % int(e.items[id]), Palette.TEXT, Data.item_icon(id), 18, 36.0)
 					break
 		"skill_level", "slot_unlocked", "captured", "evolved", "wiped", "run_complete":
 			_fill_side()

@@ -13,19 +13,19 @@ var _pod_views: Array = []   # [{egg, bar, label, button}]
 
 
 func _ready() -> void:
-	var v := UI.vbox(16)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(19)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	var sc := UI.scroll(m)
 	sc.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(sc)
 	v.add_child(UI.header("Genesis Pods", "Pair two Aetherlings to lay an egg. Materials set how rare it can be; the parents' own rarity sets the odds.", Data.ui_icon("pods")))
-	_bench = UI.vbox(14)
+	_bench = UI.vbox(17)
 	v.add_child(UI.panel("Glass", _bench))
-	var ph := UI.hbox(10)
+	var ph := UI.hbox(12)
 	ph.add_child(UI.label("Pods", "H2"))
 	ph.add_child(UI.spacer())
 	v.add_child(ph)
-	_pods = UI.flow(14, 14)
+	_pods = UI.flow(17, 17)
 	v.add_child(_pods)
 	refresh()
 
@@ -52,12 +52,12 @@ func refresh() -> void:
 func _fill_bench() -> void:
 	var s := Game.state
 	UI.clear(_bench)
-	var row := UI.hbox(22)
+	var row := UI.hbox(26)
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	_bench.add_child(row)
 	row.add_child(_parent_slot(0))
-	var mid := UI.vbox(6)
-	mid.custom_minimum_size.x = 330
+	var mid := UI.vbox(7)
+	mid.custom_minimum_size.x = 396
 	mid.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_child(mid)
 	row.add_child(_parent_slot(1))
@@ -70,11 +70,11 @@ func _fill_bench() -> void:
 		return
 	# offspring
 	mid.add_child(UI.label("Could hatch", "Faint"))
-	var outs := UI.hbox(12)
+	var outs := UI.hbox(14)
 	outs.alignment = BoxContainer.ALIGNMENT_CENTER
 	for o in Breeding.preview(s, a, b):
 		var ov := UI.vbox(2)
-		var p := CreaturePortrait.make(o.species, 1, 1, false, 92)
+		var p := CreaturePortrait.make(o.species, 1, 1, false, 110)
 		p.set_silhouette(not o.known)
 		ov.add_child(p)
 		var nm: String = Data.species[o.species].name if o.known else ("A secret hybrid!" if o.special else "An unknown hybrid")
@@ -89,7 +89,7 @@ func _fill_bench() -> void:
 	# tiers
 	_bench.add_child(UI.sep())
 	_bench.add_child(UI.label("Materials", "H3"))
-	var tier_row := UI.flow(8, 8)
+	var tier_row := UI.flow(10, 10)
 	for t in range(1, Breeding.tier_count() + 1):
 		var ok := GameState.can_afford(s, Breeding.cost(a, b, t))
 		var btn := UI.button("Tier %d · up to %s" % [t, Data.rarity(Breeding.ceiling(t)).name], "ChipOn" if t == tier else "Chip")
@@ -100,9 +100,9 @@ func _fill_bench() -> void:
 		tier_row.add_child(btn)
 	_bench.add_child(tier_row)
 	var cost := Breeding.cost(a, b, tier)
-	var cr := UI.hbox(14)
+	var cr := UI.hbox(17)
 	cr.add_child(UI.label("Cost", "Faint"))
-	cr.add_child(UI.cost_row(cost, 24))
+	cr.add_child(UI.cost_row(cost, 29))
 	cr.add_child(UI.spacer())
 	var secs := Breeding.hatch_seconds(a, b, tier, s)
 	cr.add_child(UI.stat_line("time", "Hatches in " + F.format_seconds(secs)))
@@ -110,7 +110,7 @@ func _fill_bench() -> void:
 	# odds
 	var odds := Breeding.rarity_odds(a, b, tier, s)
 	_bench.add_child(_odds_bar(odds))
-	var legend := UI.flow(14, 4)
+	var legend := UI.flow(17, 5)
 	for i in odds.size():
 		if odds[i] > 0.00005:
 			legend.add_child(UI.label("%s %s" % [Data.rarities[i].name, F.pct(odds[i]) if odds[i] >= 0.001 else "<0.1%"], "Small", Data.rarity_color(i + 1)))
@@ -121,14 +121,14 @@ func _fill_bench() -> void:
 	if mb > 0:
 		legend.add_child(UI.label("Geneticist +%s mutation" % F.pct(mb), "Small", Palette.AETHER))
 	_bench.add_child(legend)
-	var go := UI.hbox(10)
+	var go := UI.hbox(12)
 	go.add_child(UI.wrap_label("Materials: %s for %s parents. Parents aren't used up and keep their jobs." % [
 		", ".join([Data.types[Data.species[a.species].types[0]].name, Data.types[Data.species[b.species].types[0]].name]), "both"], "Faint"))
 	var err := Breeding.check(s, a, b, tier)
 	var lay := UI.button("Lay an egg", "Primary", func():
 		if Game.breed(parent_a, parent_b, tier):
 			refresh())
-	lay.custom_minimum_size = Vector2(200, 46)
+	lay.custom_minimum_size = Vector2(240, 55)
 	lay.disabled = err != ""
 	lay.tooltip_text = err
 	go.add_child(lay)
@@ -143,10 +143,10 @@ func _parent_slot(which: int) -> Control:
 	var id := parent_a if which == 0 else parent_b
 	var c := GameState.creature(Game.state, id)
 	var card := UI.button("", "Tile")
-	card.custom_minimum_size = Vector2(210, 250)
+	card.custom_minimum_size = Vector2(252, 300)
 	card.pressed.connect(func(): _pick(which))
 	card.tooltip_text = "Choose parent %s" % ("A" if which == 0 else "B")
-	var v := UI.vbox(4)
+	var v := UI.vbox(5)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	v.offset_top = 12
@@ -154,7 +154,7 @@ func _parent_slot(which: int) -> Control:
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(v)
 	if c.is_empty():
-		var e := WorkerBubble.make({}, "woodcutting", 150)
+		var e := WorkerBubble.make({}, "woodcutting", 180)
 		e.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		e.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.add_child(e)
@@ -162,7 +162,7 @@ func _parent_slot(which: int) -> Control:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(l)
 	else:
-		var p := CreaturePortrait.of(c, 160)
+		var p := CreaturePortrait.of(c, 192)
 		p.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(p)
 		var l := UI.label(Creatures.display_name(c), "H3")
@@ -171,7 +171,7 @@ func _parent_slot(which: int) -> Control:
 		var r := UI.label("%s · Lv %d" % [Data.rarity(int(c.rarity)).name, int(c.level)], "Faint", Data.rarity_color(int(c.rarity)))
 		r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(r)
-		var tl := UI.chip("%d pool trait%s" % [c.traits.size(), "" if c.traits.size() == 1 else "s"], Palette.AETHER_DEEP.lightened(0.25), 11)
+		var tl := UI.chip("%d pool trait%s" % [c.traits.size(), "" if c.traits.size() == 1 else "s"], Palette.AETHER_DEEP.lightened(0.25), 13)
 		tl.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(tl)
 	return card
@@ -200,7 +200,7 @@ func _pick(which: int) -> void:
 
 func _odds_bar(odds: Array) -> Control:
 	var bar := Control.new()
-	bar.custom_minimum_size = Vector2(0, 18)
+	bar.custom_minimum_size = Vector2(0, 22)
 	bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	bar.draw.connect(func():
 		var w := bar.size.x
@@ -226,33 +226,33 @@ func _fill_pods() -> void:
 		var all := UI.button("Hatch all %d" % ready_list.size(), "Gold", func():
 			for i in Game.ready_eggs():
 				Game.hatch(i))
-		all.custom_minimum_size = Vector2(180, 200)
+		all.custom_minimum_size = Vector2(216, 240)
 		_pods.add_child(all)
 	for i in s.pods.size():
 		var egg: Dictionary = s.pods[i]
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(220, 280)
-		var v := UI.vbox(6)
+		card.custom_minimum_size = Vector2(264, 336)
+		var v := UI.vbox(7)
 		v.alignment = BoxContainer.ALIGNMENT_CENTER
 		card.add_child(v)
-		var pod_chip := UI.chip("Pod %d" % (i + 1), Palette.AETHER, 12)
+		var pod_chip := UI.chip("Pod %d" % (i + 1), Palette.AETHER, 14)
 		pod_chip.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(pod_chip)
 		if egg.is_empty():
-			var e := WorkerBubble.make({}, "woodcutting", 120)
+			var e := WorkerBubble.make({}, "woodcutting", 144)
 			e.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			v.add_child(e)
 			var l := UI.label("Empty", "Dim")
 			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			v.add_child(l)
 		else:
-			var ev := EggView.make(egg, 150)
+			var ev := EggView.make(egg, 180)
 			ev.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 			v.add_child(ev)
 			var tl := UI.label("", "Dim")
 			tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 			v.add_child(tl)
-			var bar := UI.bar(Palette.AETHER, 8)
+			var bar := UI.bar(Palette.AETHER, 10)
 			v.add_child(bar)
 			var btn := UI.button("", "Gold")
 			btn.pressed.connect(func():
@@ -266,11 +266,11 @@ func _fill_pods() -> void:
 	var more := Economy.next_upgrade(s, "genesis-pods")
 	if not more.is_empty():
 		var lock := UI.panel("CardFlat")
-		lock.custom_minimum_size = Vector2(220, 280)
-		var lv := UI.vbox(8)
+		lock.custom_minimum_size = Vector2(264, 336)
+		var lv := UI.vbox(10)
 		lv.alignment = BoxContainer.ALIGNMENT_CENTER
 		lock.add_child(lv)
-		lv.add_child(UI.icon(Data.ui_icon("lock"), 36))
+		lv.add_child(UI.icon(Data.ui_icon("lock"), 43))
 		var l := UI.wrap_label("Build another pod in Sanctum Works", "Faint")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		lv.add_child(l)

@@ -55,7 +55,7 @@ func _draw() -> void:
 	track.border_color = Palette.LINE_STRONG.lerp(Color(Palette.AETHER, 0.7), _t)
 	if _t > 0.0:
 		track.shadow_color = Color(Palette.AETHER_DEEP, 0.45 * _t)
-		track.shadow_size = 8
+		track.shadow_size = 10
 	if has_focus():
 		track.border_color = Palette.AETHER
 		track.set_border_width_all(2)

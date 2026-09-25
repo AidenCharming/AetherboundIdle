@@ -28,17 +28,17 @@ static func pick(title: String, filter: Callable, on_pick: Callable, note: Calla
 	p._on_pick = on_pick
 	p._sort = sort
 	p._build()
-	p._modal = Modal.open(p, title, 980)
+	p._modal = Modal.open(p, title, 1176)
 	return p._modal
 
 
 func _build() -> void:
-	add_theme_constant_override("separation", 12)
-	custom_minimum_size = Vector2(920, 560)
-	var bar := UI.hbox(8)
+	add_theme_constant_override("separation", 14)
+	custom_minimum_size = Vector2(1104, 672)
+	var bar := UI.hbox(10)
 	_search = LineEdit.new()
 	_search.placeholder_text = "Search by name…"
-	_search.custom_minimum_size.x = 240
+	_search.custom_minimum_size.x = 288
 	_search.text_changed.connect(func(_t): _fill())
 	bar.add_child(_search)
 	var chips: Array = [["best", "Best fit", ""]] if _sorts.is_empty() else _sorts.map(func(o): return [o.id, o.label, o.get("tip", "")])
@@ -62,9 +62,9 @@ func _build() -> void:
 		_fill())
 	bar.add_child(_busy_btn)
 	add_child(bar)
-	_grid = UI.flow(10, 10)
+	_grid = UI.flow(12, 12)
 	var sc := UI.scroll(_grid)
-	sc.custom_minimum_size.y = 500
+	sc.custom_minimum_size.y = 600
 	add_child(sc)
 	_fill()
 

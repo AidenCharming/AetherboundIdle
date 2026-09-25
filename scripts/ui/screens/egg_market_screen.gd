@@ -12,20 +12,20 @@ var _window := -1   # the stock window on screen (see MarketScreen._window)
 
 
 func _ready() -> void:
-	var v := UI.vbox(14)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(17)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var head := UI.hbox(12)
+	var head := UI.hbox(14)
 	head.add_child(UI.header("Egg Market", "Buy an egg of a type you own. It hatches in a Genesis Pod like any bred egg.", Data.ui_icon("egg-market")))
 	head.add_child(UI.spacer())
 	_pods = UI.label("", "Dim")
-	head.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("pods"), 22), _pods]))
+	head.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("pods"), 26), _pods]))
 	_gold = UI.label("", "Num", Palette.GOLD)
-	_gold.add_theme_font_size_override("font_size", 22)
-	head.add_child(UI.hbox(8, [UI.icon(Data.ui_icon("gold"), 26), _gold]))
+	_gold.add_theme_font_size_override("font_size", 26)
+	head.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("gold"), 31), _gold]))
 	v.add_child(head)
-	_body = UI.vbox(16)
+	_body = UI.vbox(19)
 	var sc := UI.scroll(_body)
 	sc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	v.add_child(sc)
@@ -45,7 +45,7 @@ func refresh() -> void:
 	if not f.is_empty():
 		_body.add_child(_featured_card(f))
 	# grade chips: the ones on sale, then the next one locked
-	var chips := UI.flow(6, 6)
+	var chips := UI.flow(7, 7)
 	chips.add_child(UI.label("Grade", "Dim"))
 	var grades := Market.grades()
 	for i in grades.size():
@@ -60,11 +60,11 @@ func refresh() -> void:
 			chips.add_child(lock)
 			break
 	_body.add_child(chips)
-	var flow := UI.flow(16, 16)
+	var flow := UI.flow(19, 19)
 	for t in Data.type_list:
 		flow.add_child(_egg_card(t.id))
 	_body.add_child(flow)
-	_body.add_child(UI.wrap_label("A market egg holds a random base Aetherling of its type, with fresh traits. Its grade sets the lowest rarity it can be. Market eggs can hatch shiny at the usual chance, but they don't count toward the shiny pity.", "Faint", 760))
+	_body.add_child(UI.wrap_label("A market egg holds a random base Aetherling of its type, with fresh traits. Its grade sets the lowest rarity it can be. Market eggs can hatch shiny at the usual chance, but they don't count toward the shiny pity.", "Faint", 912))
 	_tick()
 
 
@@ -91,14 +91,14 @@ func _tick() -> void:
 
 ## The chance of each rarity as pills in the rarity colours.
 func _odds_row(g: int) -> HFlowContainer:
-	var row := UI.flow(4, 4)
+	var row := UI.flow(5, 5)
 	var odds := Market.egg_odds(g)
 	var total := 0.0
 	for w in odds:
 		total += float(w)
 	for i in odds.size():
 		if float(odds[i]) > 0.0:
-			row.add_child(UI.chip("%s %d%%" % [Data.rarity(i + 1).name, roundi(float(odds[i]) / total * 100.0)], Data.rarity_color(i + 1), 11))
+			row.add_child(UI.chip("%s %d%%" % [Data.rarity(i + 1).name, roundi(float(odds[i]) / total * 100.0)], Data.rarity_color(i + 1), 13))
 	return row
 
 
@@ -113,20 +113,20 @@ func _egg_card(type_id: String) -> Control:
 	var s := Game.state
 	var owned := type_id in Market.egg_types(s)
 	var card := UI.panel("Glass")
-	card.custom_minimum_size = Vector2(330, 0)
-	var cv := UI.vbox(8)
+	card.custom_minimum_size = Vector2(396, 0)
+	var cv := UI.vbox(10)
 	card.add_child(cv)
-	var h := UI.hbox(14)
+	var h := UI.hbox(17)
 	var egg := _egg(type_id, 72)
 	h.add_child(egg)
-	var tv := UI.vbox(4)
+	var tv := UI.vbox(5)
 	tv.add_child(UI.label("%s egg" % Data.types[type_id].name, "H2", Data.type_color(type_id).lightened(0.3)))
 	var badge := UI.type_badge(type_id, true)
 	badge.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	tv.add_child(badge)
 	var mates := UI.hbox(2)
 	for sp in Market.base_species(type_id):
-		var por := CreaturePortrait.make(sp, 1, 1, false, 34)
+		var por := CreaturePortrait.make(sp, 1, 1, false, 41)
 		por.bob = false
 		por.tooltip_text = Data.species[sp].name
 		mates.add_child(por)
@@ -134,14 +134,14 @@ func _egg_card(type_id: String) -> Control:
 	h.add_child(tv)
 	cv.add_child(h)
 	if not owned:
-		cv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("Own a %s Aetherling first" % Data.types[type_id].name, "Faint")]))
+		cv.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("lock"), 19), UI.label("Own a %s Aetherling first" % Data.types[type_id].name, "Faint")]))
 		card.modulate.a = 0.5
 		return card
 	var g: Dictionary = Market.grades()[grade]
 	cv.add_child(_odds_row(grade))
 	cv.add_child(UI.stat_line("time", "Hatches in %s" % F.format_seconds(float(g.minutes) * 60.0)))
 	var price := Market.egg_price(grade)
-	var row := UI.hbox(8, [UI.amount("gold", price, price, 20), UI.spacer()])
+	var row := UI.hbox(10, [UI.amount("gold", price, price, 24), UI.spacer()])
 	var err := Market.egg_check(s, type_id, grade)
 	var b := UI.button("Buy egg", "Gold", func(): Game.buy_egg(type_id, grade))
 	b.disabled = err != ""
@@ -155,13 +155,13 @@ func _egg_card(type_id: String) -> Control:
 func _featured_card(f: Dictionary) -> Control:
 	var s := Game.state
 	var card := PanelContainer.new()
-	var sb := ThemeFactory.box(Color(0.12, 0.08, 0.2, 0.92), 14, 0, Palette.LINE, 0)
+	var sb := ThemeFactory.box(Color(0.12, 0.08, 0.2, 0.92), 17, 0, Palette.LINE, 0)
 	for side in ["left", "right"]:
 		sb.set("content_margin_" + side, 22)
-	sb.content_margin_top = 16
-	sb.content_margin_bottom = 16
+	sb.content_margin_top = 19
+	sb.content_margin_bottom = 19
 	card.add_theme_stylebox_override("panel", sb)
-	var h := UI.hbox(20)
+	var h := UI.hbox(24)
 	card.add_child(h)
 	var egg := _egg(f.type, 96)
 	h.add_child(egg)
@@ -172,23 +172,23 @@ func _featured_card(f: Dictionary) -> Control:
 		tw.tween_property(egg, "rotation", -0.08, 0.7).set_trans(Tween.TRANS_SINE)
 		tw.tween_property(egg, "rotation", 0.0, 0.35).set_trans(Tween.TRANS_SINE)
 		tw.tween_interval(1.2)
-	var por := CreaturePortrait.make(f.species, 1, int(Market.grades()[int(f.grade)].floor), false, 72)
+	var por := CreaturePortrait.make(f.species, 1, int(Market.grades()[int(f.grade)].floor), false, 86)
 	h.add_child(por)
-	var tv := UI.vbox(4)
+	var tv := UI.vbox(5)
 	tv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	tv.add_child(UI.hbox(8, [UI.chip("FEATURED", Palette.GOLD, 12), UI.chip("1 only", Palette.AETHER, 12)]))
+	tv.add_child(UI.hbox(10, [UI.chip("FEATURED", Palette.GOLD, 14), UI.chip("1 only", Palette.AETHER, 14)]))
 	var g: Dictionary = Market.grades()[int(f.grade)]
 	tv.add_child(UI.label("A %s %s egg" % [g.name, Data.species[f.species].name], "H2", Palette.GOLD))
-	tv.add_child(UI.wrap_label("Holds a %s for certain, %s or rarer." % [Data.species[f.species].name, Data.rarity(int(g.floor)).name], "Dim", 420))
+	tv.add_child(UI.wrap_label("Holds a %s for certain, %s or rarer." % [Data.species[f.species].name, Data.rarity(int(g.floor)).name], "Dim", 504))
 	tv.add_child(_odds_row(int(f.grade)))
 	_clock = UI.label("", "Faint", Palette.GOLD)
 	tv.add_child(_clock)
 	h.add_child(tv)
-	var bv := UI.vbox(8)
+	var bv := UI.vbox(10)
 	bv.alignment = BoxContainer.ALIGNMENT_CENTER
-	bv.add_child(UI.amount("gold", float(f.gold), float(f.gold), 24))
+	bv.add_child(UI.amount("gold", float(f.gold), float(f.gold), 29))
 	var b := UI.button("Snapped up" if sold else "Buy now", "Gold", func(): Game.buy_featured_egg(_window))
-	b.custom_minimum_size.x = 160
+	b.custom_minimum_size.x = 192
 	b.disabled = sold or float(s.gold) < float(f.gold) or Breeding.free_pod(s) < 0
 	if Breeding.free_pod(s) < 0 and not sold:
 		b.tooltip_text = "Every Genesis Pod is busy."
@@ -197,4 +197,4 @@ func _featured_card(f: Dictionary) -> Control:
 	if sold:
 		card.modulate.a = 0.55
 		return card
-	return ShineFrame.wrap(card, 14)
+	return ShineFrame.wrap(card, 17)

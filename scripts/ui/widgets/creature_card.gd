@@ -42,17 +42,17 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	v.offset_top = 8
 	v.offset_bottom = -8
 	add_child(v)
-	var top := UI.hbox(4)
+	var top := UI.hbox(5)
 	top.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var lv := UI.chip("Lv %d" % int(c.level), Palette.AETHER, 11)
+	var lv := UI.chip("Lv %d" % int(c.level), Palette.AETHER, 13)
 	top.add_child(lv)
 	top.add_child(UI.spacer())
 	if c.shiny:
-		top.add_child(UI.icon(Data.ui_icon("shiny"), 16))
+		top.add_child(UI.icon(Data.ui_icon("shiny"), 19))
 	if c.get("locked", false):
-		top.add_child(UI.icon(Data.ui_icon("lock"), 14))
+		top.add_child(UI.icon(Data.ui_icon("lock"), 17))
 	v.add_child(top)
-	var por := CreaturePortrait.of(c, w - 34)
+	var por := CreaturePortrait.of(c, w - 41)
 	por.bob = false
 	por.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	v.add_child(por)
@@ -61,7 +61,7 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	name_lbl.clip_text = true
 	if compact:
-		name_lbl.add_theme_font_size_override("font_size", 15)
+		name_lbl.add_theme_font_size_override("font_size", 18)
 	v.add_child(name_lbl)
 	var r := UI.label(Data.rarity(int(c.rarity)).name, "Faint", Data.rarity_color(int(c.rarity)))
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -72,7 +72,7 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 		var lines := [[status_text(c), status_color(c)]]
 		if note != "":
 			lines.push_front([note, Palette.TEXT_DIM])
-			custom_minimum_size.y += 18.0
+			custom_minimum_size.y += 22.0
 		for pair in lines:
 			var st := UI.label(pair[0], "Faint", pair[1])
 			st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -85,18 +85,18 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 ## Extra lines under the card (trait bonuses for a job, in the worker picker). The card grows to fit; every
 ## card in such a picker gets this call, so they share the wider size even with no lines.
 func add_perks(lines: Array) -> void:
-	custom_minimum_size.x = maxf(custom_minimum_size.x, 176.0)
+	custom_minimum_size.x = maxf(custom_minimum_size.x, 211.0)
 	if lines.is_empty():
 		return
 	var v: VBoxContainer = get_child(0)
 	for line in lines:
 		var l := UI.label(line, "Small", Palette.GOOD)
-		l.add_theme_font_size_override("font_size", 12)
+		l.add_theme_font_size_override("font_size", 14)
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		l.clip_text = true
 		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 		v.add_child(l)
-	custom_minimum_size.y += 18.0 * lines.size() + 4.0
+	custom_minimum_size.y += 22.0 * lines.size() + 5.0
 	tooltip_text += "\n" + "\n".join(lines)
 
 

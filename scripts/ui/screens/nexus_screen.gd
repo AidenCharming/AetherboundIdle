@@ -19,28 +19,28 @@ func setup(arg: String) -> void:
 
 
 func _ready() -> void:
-	var row := UI.hbox(18)
-	var m := UI.margin(row, 26, 10, 26, 20)
+	var row := UI.hbox(22)
+	var m := UI.margin(row, 31, 12, 31, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var left := UI.vbox(12)
+	var left := UI.vbox(14)
 	left.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(left)
-	var head := UI.hbox(12)
+	var head := UI.hbox(14)
 	head.add_child(UI.header("Nexus", "Every Aetherling you have. Resting ones sit on the perches and gather Aether.", Data.ui_icon("nexus")))
-	_count = UI.hbox(6)
+	_count = UI.hbox(7)
 	head.add_child(_count)
 	head.add_child(UI.button("Bulk release", "", _bulk_release))
 	left.add_child(head)
 	# search and the three choices on one row (play-test feedback: three rows of chips took a third of the
 	# column): type, what it's doing, and the order
 	var filters := UI.panel("CardFlat")
-	_filter_bar = UI.hbox(8)
+	_filter_bar = UI.hbox(10)
 	filters.add_child(_filter_bar)
 	_search = LineEdit.new()
 	_search.placeholder_text = "Search…"
 	_search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_search.custom_minimum_size.x = 140
+	_search.custom_minimum_size.x = 168
 	_search.text_changed.connect(func(_t): _fill_grid())
 	_filter_bar.add_child(_search)
 	var types := [["All types", ""]]
@@ -50,11 +50,11 @@ func _ready() -> void:
 	_dropdown("Show", [["Everyone", ""], ["Working", "skill"], ["On an expedition", "party"], ["Resting", "rest"], ["Shiny", "shiny"], ["Locked", "locked"]], "status")
 	_dropdown("Sort", [["Rarity", "rarity"], ["Level", "level"], ["Species", "species"], ["Newest", "new"], ["Power", "power"]], "sort")
 	left.add_child(filters)
-	_grid = UI.flow(12, 12)
+	_grid = UI.flow(14, 14)
 	left.add_child(UI.scroll(_grid))
 	var dp := UI.panel("Glass")
-	dp.custom_minimum_size.x = 430
-	_detail = UI.vbox(10)
+	dp.custom_minimum_size.x = 516
+	_detail = UI.vbox(12)
 	dp.add_child(UI.scroll(_detail))
 	row.add_child(dp)
 	refresh()
@@ -138,8 +138,8 @@ func _fill_grid() -> void:
 	CreatureCard.refresh_perched()
 	var list := _sorted_list()
 	UI.clear(_count)
-	_count.add_child(UI.chip("%d / %d shown" % [list.size(), Game.state.creatures.size()], Palette.TEXT_DIM, 12))
-	_count.add_child(UI.chip("+%s Aether/min" % F.format_num(Economy.aether_per_min(Game.state)), Palette.AETHER, 12))
+	_count.add_child(UI.chip("%d / %d shown" % [list.size(), Game.state.creatures.size()], Palette.TEXT_DIM, 14))
+	_count.add_child(UI.chip("+%s Aether/min" % F.format_num(Economy.aether_per_min(Game.state)), Palette.AETHER, 14))
 	UI.fill_paged(_grid, list, func(c):
 		var card := CreatureCard.make(c, c.id == selected)
 		card.picked.connect(func(id):
@@ -163,10 +163,10 @@ func _fill_detail() -> void:
 		return
 	var sp: Dictionary = Data.species[c.species]
 	var form := Creatures.form_of(c)
-	var por := CreaturePortrait.of(c, 230)
+	var por := CreaturePortrait.of(c, 276)
 	por.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_detail.add_child(por)
-	var name_row := UI.hbox(8)
+	var name_row := UI.hbox(10)
 	name_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	name_row.add_child(UI.label(Creatures.display_name(c), "H1"))
 	var rn := UI.button("Rename", "Ghost", func(): _rename(c))
@@ -176,7 +176,7 @@ func _fill_detail() -> void:
 	var sl := UI.label(sub, "Dim")
 	sl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_detail.add_child(sl)
-	var badges := UI.hbox(6)
+	var badges := UI.hbox(7)
 	badges.alignment = BoxContainer.ALIGNMENT_CENTER
 	badges.add_child(UI.rarity_badge(int(c.rarity)))
 	for t in sp.types:
@@ -186,7 +186,7 @@ func _fill_detail() -> void:
 	if sp.kind == "special":
 		badges.add_child(UI.badge("SECRET RECIPE", Palette.AETHER))
 	_detail.add_child(badges)
-	var status := UI.chip(CreatureCard.status_text(c), CreatureCard.status_color(c), 13)
+	var status := UI.chip(CreatureCard.status_text(c), CreatureCard.status_color(c), 16)
 	status.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	_detail.add_child(status)
 	var desc: String = sp.forms[form - 1].get("desc", "")
@@ -195,34 +195,34 @@ func _fill_detail() -> void:
 		dl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		_detail.add_child(dl)
 	# level
-	var lv := UI.hbox(10)
+	var lv := UI.hbox(12)
 	lv.add_child(UI.label("Level %d" % int(c.level), "H3"))
-	_xp_bar = UI.bar(Palette.AETHER, 8)
+	_xp_bar = UI.bar(Palette.AETHER, 10)
 	_xp_bar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	_xp_bar.value = F.level_progress(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel)
 	lv.add_child(_xp_bar)
 	var levels: Array = Data.tuning.creature.formLevels
 	if form < F.form_for_level(int(c.level)) and int(c.level) < int(Data.tuning.creature.maxLevel):
-		lv.add_child(UI.chip("Evolves at its next level", Palette.GOLD, 11))
+		lv.add_child(UI.chip("Evolves at its next level", Palette.GOLD, 13))
 	elif form < levels.size():
-		lv.add_child(UI.chip("Evolves at Lv %d" % int(levels[form]), Palette.GOLD, 11))
+		lv.add_child(UI.chip("Evolves at Lv %d" % int(levels[form]), Palette.GOLD, 13))
 	_detail.add_child(lv)
 	# stats
 	var st := Creatures.stats(c)
-	var sr := UI.hbox(18)
+	var sr := UI.hbox(22)
 	sr.alignment = BoxContainer.ALIGNMENT_CENTER
 	sr.add_child(UI.stat_line("health", F.format_num(st.health), "Health"))
 	sr.add_child(UI.stat_line("power", F.format_num(st.power), "Power"))
 	sr.add_child(UI.stat_line("guard", F.format_num(st.guard), "Guard"))
-	sr.add_child(UI.chip("Leans %s" % sp.statLean.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 11))
+	sr.add_child(UI.chip("Leans %s" % sp.statLean.capitalize(), Palette.AETHER_DEEP.lightened(0.3), 13))
 	_detail.add_child(UI.panel("Inset", sr))
 	# jobs
 	_detail.add_child(UI.label("Work", "H3"))
-	var wk := UI.vbox(4)
+	var wk := UI.vbox(5)
 	wk.add_child(UI.stat_line(sp.primarySkill, "Best at %s" % Data.skills[sp.primarySkill].name, "Its specialty: it works fastest here"))
 	wk.add_child(UI.stat_line(sp.secondaryAptitude, "Good at %s, +%s speed" % [Data.skills[sp.secondaryAptitude].name, F.pct(Data.tuning.skills.secondaryAptitudeBonus)]))
 	_detail.add_child(wk)
-	var actions := UI.flow(8, 8)
+	var actions := UI.flow(10, 10)
 	var assign := MenuButton.new()
 	assign.text = "Put to work"
 	assign.theme_type_variation = "Primary"
@@ -277,7 +277,7 @@ func _fill_detail() -> void:
 		var trait_def: Dictionary = Data.traits[t.id]
 		var col: String = {"minor": "#a9aed6", "moderate": "#62b6ff", "major": "#ffd166"}[t.s]
 		_detail.add_child(UI.rich("[b]%s[/b] [color=%s](%s)[/color]\n%s" % [trait_def.name, col, t.s.capitalize(), Traits.describe(t.id, t.s)]))
-	var bottom := UI.hbox(8)
+	var bottom := UI.hbox(10)
 	bottom.add_child(UI.button("Attune traits", "", func(): _attune(c)))
 	bottom.add_child(UI.spacer())
 	bottom.add_child(UI.button("Release (+%d Aether)" % Creatures.release_value(c), "Danger", func(): _release(c)))
@@ -296,14 +296,14 @@ func _join_party(c: Dictionary) -> void:
 
 
 func _rename(c: Dictionary) -> void:
-	var v := UI.vbox(12)
+	var v := UI.vbox(14)
 	var le := LineEdit.new()
 	le.text = c.get("nick", "")
 	le.placeholder_text = Data.form_name(c.species, Creatures.form_of(c))
 	le.max_length = 20
 	v.add_child(le)
 	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
-	var row := UI.hbox(8)
+	var row := UI.hbox(10)
 	row.add_child(UI.button("Clear nickname", "Ghost", func():
 		box.m.close()
 		Game.rename(c.id, "")))
@@ -315,7 +315,7 @@ func _rename(c: Dictionary) -> void:
 	le.text_submitted.connect(func(t):
 		box.m.close()
 		Game.rename(c.id, t))
-	box.m = Modal.open(v, "Nickname", 420)
+	box.m = Modal.open(v, "Nickname", 504)
 	le.grab_focus.call_deferred()
 
 
@@ -326,8 +326,8 @@ static var _bulk := {}
 func _bulk_release() -> void:
 	var o := Economy.BULK_DEFAULTS.duplicate()
 	o.merge(_bulk, true)
-	var v := UI.vbox(10)
-	v.add_child(UI.wrap_label("Release many Aetherlings at once for Aether. Locked ones and the expedition party always stay, and so do the best of each species (as many as you choose).", "Dim", 700))
+	var v := UI.vbox(12)
+	v.add_child(UI.wrap_label("Release many Aetherlings at once for Aether. Locked ones and the expedition party always stay, and so do the best of each species (as many as you choose).", "Dim", 840))
 	var rar_pick := func(value: int) -> OptionButton:
 		var ob := OptionButton.new()
 		for i in Data.rarities.size():
@@ -337,9 +337,9 @@ func _bulk_release() -> void:
 	var from: OptionButton = rar_pick.call(int(o.minRarity))
 	var to: OptionButton = rar_pick.call(int(o.maxRarity))
 	# the filters and the switches each sit on an inset card, like the Options pages
-	var filters := UI.vbox(12)
+	var filters := UI.vbox(14)
 	v.add_child(UI.panel("Inset", filters))
-	filters.add_child(UI.hbox(8, [UI.label("Rarity from", "Dim"), from, UI.label("to", "Dim"), to]))
+	filters.add_child(UI.hbox(10, [UI.label("Rarity from", "Dim"), from, UI.label("to", "Dim"), to]))
 	var ty := OptionButton.new()
 	ty.add_item("Any type")
 	var type_ids: Array = Data.types.keys()
@@ -357,13 +357,13 @@ func _bulk_release() -> void:
 	lvl.max_value = Data.tuning.creature.maxLevel
 	lvl.value = int(o.maxLevel)
 	lvl.tooltip_text = "0 means any level"
-	filters.add_child(UI.hbox(8, [UI.label("Type", "Dim"), ty, UI.label("Species", "Dim"), spo, UI.label("Up to level (0 = any)", "Dim"), lvl]))
+	filters.add_child(UI.hbox(10, [UI.label("Type", "Dim"), ty, UI.label("Species", "Dim"), spo, UI.label("Up to level (0 = any)", "Dim"), lvl]))
 	var keep := SpinBox.new()
 	keep.min_value = 0
 	keep.max_value = 10
 	keep.value = int(o.keepPerSpecies)
-	filters.add_child(UI.hbox(8, [UI.label("Keep the best", "Dim"), keep, UI.label("of each species (rarity, then level)", "Dim")]))
-	var switches := UI.vbox(14)
+	filters.add_child(UI.hbox(10, [UI.label("Keep the best", "Dim"), keep, UI.label("of each species (rarity, then level)", "Dim")]))
+	var switches := UI.vbox(17)
 	v.add_child(UI.panel("Inset", switches))
 	var shinies := ToggleSwitch.new()
 	shinies.text = "Release shinies too"
@@ -378,11 +378,11 @@ func _bulk_release() -> void:
 	switches.add_child(working)
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
-	var kept_lbl := UI.wrap_label("", "Faint", 700)
+	var kept_lbl := UI.wrap_label("", "Faint", 840)
 	v.add_child(kept_lbl)
-	var who := UI.flow(6, 6)
+	var who := UI.flow(7, 7)
 	var who_sc := UI.scroll(who)
-	who_sc.custom_minimum_size = Vector2(700, 150)
+	who_sc.custom_minimum_size = Vector2(840, 180)
 	v.add_child(who_sc)
 	var box := {}
 	var go := UI.button("Release", "Danger")
@@ -406,7 +406,7 @@ func _bulk_release() -> void:
 			kept_lbl.text = "Nobody matches these settings. " + kept_lbl.text
 		UI.clear(who)
 		UI.fill_paged(who, UI.sort_by_key(list, func(c): return [int(c.rarity), int(c.level)]), func(c):
-			var por := CreaturePortrait.of(c, 44)
+			var por := CreaturePortrait.of(c, 53)
 			por.bob = false
 			por.tooltip_text = "%s · %s · Lv %d%s" % [Creatures.display_name(c), Data.rarity(int(c.rarity)).name, int(c.level), " · shiny" if c.shiny else ""]
 			return por, 60)
@@ -422,8 +422,8 @@ func _bulk_release() -> void:
 	go.pressed.connect(func():
 		box.m.close()
 		Game.bulk_release(opts.call()))
-	v.add_child(UI.hbox(8, [UI.spacer(), go]))
-	box.m = Modal.open(v, "Bulk release", 760)
+	v.add_child(UI.hbox(10, [UI.spacer(), go]))
+	box.m = Modal.open(v, "Bulk release", 912)
 
 
 func _release(c: Dictionary) -> void:
@@ -441,9 +441,9 @@ static func _mult(m: float) -> String:
 
 
 func _attune(c: Dictionary) -> void:
-	var v := UI.vbox(12)
+	var v := UI.vbox(14)
 	var locks := {}
-	var body := UI.vbox(8)
+	var body := UI.vbox(10)
 	var at: Dictionary = Data.tuning.attunement
 	v.add_child(UI.wrap_label("Attunement rerolls this Aetherling's pool traits with Aether. Lock up to %d traits to keep them. A lock multiplies the cost by its strength: Minor ×%s, Moderate ×%s, Major ×%s. The signature trait never changes." % [
 		int(at.maxLocks), _mult(Traits.lock_mult("minor")), _mult(Traits.lock_mult("moderate")), _mult(Traits.lock_mult("major"))], "Dim", 520))
@@ -458,13 +458,13 @@ func _attune(c: Dictionary) -> void:
 			# a trait row: its name and strength, what it does, and a Lock pill that turns gold when locked
 			var card := PanelContainer.new()
 			card.theme_type_variation = "Inset"
-			var row_t := UI.hbox(12)
+			var row_t := UI.hbox(14)
 			card.add_child(row_t)
 			var txt := UI.vbox(2)
 			txt.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			var name_row := UI.hbox(8, [UI.label(trait_def.name), UI.chip(t.s.capitalize(), Palette.AETHER, 11)])
+			var name_row := UI.hbox(10, [UI.label(trait_def.name), UI.chip(t.s.capitalize(), Palette.AETHER, 13)])
 			txt.add_child(name_row)
-			txt.add_child(UI.wrap_label(Traits.describe(t.id, t.s), "Dim", 360))
+			txt.add_child(UI.wrap_label(Traits.describe(t.id, t.s), "Dim", 432))
 			row_t.add_child(txt)
 			var locked_now := locks.has(t.id)
 			var cb := UI.button("Locked ×%s" % _mult(Traits.lock_mult(t.s)) if locked_now else "Lock ×%s" % _mult(Traits.lock_mult(t.s)),
@@ -486,7 +486,7 @@ func _attune(c: Dictionary) -> void:
 				fill_ref.call(fill_ref))
 			body.add_child(card)
 		var cost := Traits.attune_cost(cr, locks.keys(), Game.state)
-		var row := UI.hbox(10)
+		var row := UI.hbox(12)
 		row.add_child(UI.label("Cost", "Faint"))
 		row.add_child(UI.amount("aether", cost, cost))
 		row.add_child(UI.spacer())
@@ -499,5 +499,5 @@ func _attune(c: Dictionary) -> void:
 				fill_ref.call(fill_ref)))
 		body.add_child(row)
 	fill.call(fill)
-	var m := Modal.open(v, "Attune %s" % Creatures.display_name(c), 620)
+	var m := Modal.open(v, "Attune %s" % Creatures.display_name(c), 744)
 	m.closed.connect(func(): _fill_detail())

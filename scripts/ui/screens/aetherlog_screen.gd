@@ -11,16 +11,16 @@ var _completion: Label
 
 
 func _ready() -> void:
-	var v := UI.vbox(14)
-	var m := UI.margin(v, 26, 10, 26, 20)
+	var v := UI.vbox(17)
+	var m := UI.margin(v, 31, 12, 31, 24)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
-	var head := UI.hbox(12)
+	var head := UI.hbox(14)
 	head.add_child(UI.header("Aether-Log", "Everything you have found, and a few hints about what you haven't.", Data.ui_icon("aetherlog")))
 	_completion = UI.label("", "H1", Palette.GOLD)
 	head.add_child(_completion)
 	v.add_child(head)
-	_tabs = UI.hbox(8)
+	_tabs = UI.hbox(10)
 	v.add_child(_tabs)
 	for pair in [["dex", "Creaturedex"], ["recipes", "Recipes"], ["milestones", "Milestones"]]:
 		var b := UI.button(pair[1], "Chip")
@@ -29,7 +29,7 @@ func _ready() -> void:
 			tab = pair[0]
 			refresh())
 		_tabs.add_child(b)
-	_body = UI.vbox(14)
+	_body = UI.vbox(17)
 	v.add_child(UI.scroll(_body))
 	refresh()
 
@@ -58,19 +58,19 @@ func refresh() -> void:
 func _dex() -> void:
 	var s := Game.state
 	# every collection track at a glance; each counts toward the completion figure
-	var stats := UI.flow(10, 8)
+	var stats := UI.flow(12, 10)
 	for t in Data.collection.tracks:
 		var p := Collection.progress(s, t.id)
 		var total := Collection.total(t.id)
-		var chip := UI.panel("Inset", UI.hbox(8, [UI.label(t.name, "Dim"), UI.label("%d / %d" % [p, total], "Num")]))
+		var chip := UI.panel("Inset", UI.hbox(10, [UI.label(t.name, "Dim"), UI.label("%d / %d" % [p, total], "Num")]))
 		chip.tooltip_text = t.blurb
 		stats.add_child(chip)
 	_body.add_child(stats)
 	for group in [["base", "Wild species"], ["hybrid", "Hybrids"], ["special", "Secret hybrids"]]:
 		var list := Data.species_list.filter(func(sp): return sp.kind == group[0])
 		var owned := list.filter(func(sp): return Collection.is_owned(s, sp.id)).size()
-		_body.add_child(UI.hbox(10, [UI.label(group[1], "H2"), UI.label("%d / %d" % [owned, list.size()], "Dim")]))
-		var f := UI.flow(10, 10)
+		_body.add_child(UI.hbox(12, [UI.label(group[1], "H2"), UI.label("%d / %d" % [owned, list.size()], "Dim")]))
+		var f := UI.flow(12, 12)
 		for sp in list:
 			f.add_child(_entry(sp))
 		_body.add_child(f)
@@ -82,9 +82,9 @@ func _entry(sp: Dictionary) -> Control:
 	var seen: bool = owned or s.collection.seen.has(sp.id)
 	var entry: Dictionary = s.collection.species.get(sp.id, {})
 	var card := UI.button("", "Tile")
-	card.custom_minimum_size = Vector2(150, 206)
+	card.custom_minimum_size = Vector2(180, 247)
 	card.pressed.connect(func(): _detail(sp))
-	var v := UI.vbox(4)
+	var v := UI.vbox(5)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	v.offset_left = 8
@@ -98,7 +98,7 @@ func _entry(sp: Dictionary) -> Control:
 	var best_form := 1
 	for f in entry.get("forms", []):
 		best_form = maxi(best_form, int(f))
-	var p := CreaturePortrait.make(sp.id, best_form, 1, false, 110)
+	var p := CreaturePortrait.make(sp.id, best_form, 1, false, 132)
 	p.bob = false
 	p.set_silhouette(not owned)
 	p.modulate.a = 1.0 if owned else (0.8 if seen else 0.45)
@@ -110,7 +110,7 @@ func _entry(sp: Dictionary) -> Control:
 	v.add_child(name_lbl)
 	# rarity dots and shiny star
 	var dots := Control.new()
-	dots.custom_minimum_size = Vector2(134, 12)
+	dots.custom_minimum_size = Vector2(161, 14)
 	var rar: Array = entry.get("rarities", [])
 	var shiny: bool = entry.get("shiny", false)
 	dots.draw.connect(func():
@@ -130,29 +130,29 @@ func _detail(sp: Dictionary) -> void:
 	var owned := Collection.is_owned(s, sp.id)
 	var seen: bool = owned or s.collection.seen.has(sp.id)
 	var entry: Dictionary = s.collection.species.get(sp.id, {})
-	var v := UI.vbox(12)
-	var forms := UI.hbox(18)
+	var v := UI.vbox(14)
+	var forms := UI.hbox(22)
 	forms.alignment = BoxContainer.ALIGNMENT_CENTER
 	for f in [1, 2, 3]:
-		var fv := UI.vbox(4)
+		var fv := UI.vbox(5)
 		var have: bool = f in entry.get("forms", [])
-		var p := CreaturePortrait.make(sp.id, f, 1, false, 170)
+		var p := CreaturePortrait.make(sp.id, f, 1, false, 204)
 		p.set_silhouette(not have)
 		fv.add_child(p)
 		var l := UI.label(sp.forms[f - 1].name if have else "Form %d" % f, "H3")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		fv.add_child(l)
 		if have and sp.forms[f - 1].has("desc"):
-			var d := UI.wrap_label(sp.forms[f - 1].desc, "Faint", 170)
-			d.custom_minimum_size.x = 170
+			var d := UI.wrap_label(sp.forms[f - 1].desc, "Faint", 204)
+			d.custom_minimum_size.x = 204
 			fv.add_child(d)
 		forms.add_child(fv)
 	v.add_child(forms)
 	if not seen:
-		v.add_child(UI.wrap_label(_where(sp), "Dim", 560))
-		Modal.open(v, "???", 700)
+		v.add_child(UI.wrap_label(_where(sp), "Dim", 672))
+		Modal.open(v, "???", 840)
 		return
-	var badges := UI.hbox(6)
+	var badges := UI.hbox(7)
 	for t in sp.types:
 		badges.add_child(UI.type_badge(t))
 	badges.add_child(UI.label("Specialist: %s · Knack: %s · Leans %s" % [Data.skills[sp.primarySkill].name, Data.skills[sp.secondaryAptitude].name, sp.statLean.capitalize()], "Dim"))
@@ -161,15 +161,15 @@ func _detail(sp: Dictionary) -> void:
 		var sig: Dictionary = Data.traits[sp.signatureTrait]
 		var ab: Dictionary = Data.abilities[sp.ability]
 		v.add_child(UI.rich("[b]%s[/b] (signature): %s\n[b]%s[/b] (%s): %s" % [sig.name, Traits.describe(sig.id, sig.strength), ab.name, ab.tempo, Describe.ability(ab)]))
-		var rrow := UI.hbox(6, [UI.label("Rarities owned:", "Faint")])
+		var rrow := UI.hbox(7, [UI.label("Rarities owned:", "Faint")])
 		for r in range(1, Data.max_rarity() + 1):
 			if r in entry.rarities:
 				rrow.add_child(UI.rarity_badge(r))
 		v.add_child(rrow)
 		# shiny look
 		var pal: Dictionary = Data.types[sp.types[0]].shiny
-		var sh := UI.hbox(12)
-		var sp_por := CreaturePortrait.make(sp.id, 1, 1, true, 110)
+		var sh := UI.hbox(14)
+		var sp_por := CreaturePortrait.make(sp.id, 1, 1, true, 132)
 		sp_por.set_silhouette(not entry.shiny)
 		sh.add_child(sp_por)
 		var shv := UI.vbox(2)
@@ -177,8 +177,8 @@ func _detail(sp: Dictionary) -> void:
 		shv.add_child(UI.label("Caught!" if entry.shiny else "Not found yet. About 1 in %d encounters, 1 in %d hatches." % [roundi(1.0 / Data.tuning.shiny.encounterRate), roundi(1.0 / Data.tuning.shiny.hatchRate)], "Faint"))
 		sh.add_child(shv)
 		v.add_child(sh)
-	v.add_child(UI.wrap_label(_where(sp), "Dim", 560))
-	Modal.open(v, sp.name, 700)
+	v.add_child(UI.wrap_label(_where(sp), "Dim", 672))
+	Modal.open(v, sp.name, 840)
 
 
 func _where(sp: Dictionary) -> String:
@@ -203,17 +203,17 @@ func _recipes() -> void:
 	var s := Game.state
 	_body.add_child(UI.label("Type pairs", "H2"))
 	_body.add_child(UI.wrap_label("Any two Aetherlings of these two types make the pair's hybrid, unless they are a secret pair.", "Faint"))
-	var g := UI.grid(3, 18, 10)
+	var g := UI.grid(3, 22, 12)
 	for key in Data.default_hybrids:
 		var id: String = Data.default_hybrids[key]
 		var types: Array = key.split("+")
-		var h := UI.hbox(8)
+		var h := UI.hbox(10)
 		h.add_child(UI.type_badge(types[0], true))
 		h.add_child(UI.label("+", "Faint"))
 		h.add_child(UI.type_badge(types[1], true))
 		h.add_child(UI.label("makes", "Faint"))
 		var known: bool = id in s.collection.recipes
-		var p := CreaturePortrait.make(id, 1, 1, false, 44)
+		var p := CreaturePortrait.make(id, 1, 1, false, 53)
 		p.bob = false
 		p.set_silhouette(not known)
 		h.add_child(p)
@@ -222,23 +222,23 @@ func _recipes() -> void:
 	_body.add_child(g)
 	_body.add_child(UI.label("Secret recipes", "H2"))
 	var found: int = s.collection.recipes.filter(func(id): return Data.species[id].kind == "special").size()
-	_body.add_child(UI.count_chip(found, Data.special_list.size(), 13))
+	_body.add_child(UI.count_chip(found, Data.special_list.size(), 16))
 	_body.add_child(UI.wrap_label("Each is one exact pair of species. Collection milestones reveal a few pairs outright.", "Dim"))
-	var f := UI.flow(12, 12)
+	var f := UI.flow(14, 14)
 	for r in Data.special_list:
 		var known: bool = r.result in s.collection.recipes
 		var revealed: bool = known or r.result in s.collection.revealed
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(360, 120)
-		var h := UI.hbox(12)
-		var p := CreaturePortrait.make(r.result, 1, 1, false, 84)
+		card.custom_minimum_size = Vector2(432, 144)
+		var h := UI.hbox(14)
+		var p := CreaturePortrait.make(r.result, 1, 1, false, 101)
 		p.bob = false
 		p.set_silhouette(not known)
 		h.add_child(p)
-		var cv := UI.vbox(4)
+		var cv := UI.vbox(5)
 		cv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		cv.add_child(UI.label(Data.species[r.result].name if known else "Secret hybrid", "H3" if known else "Dim"))
-		var tp := UI.hbox(4)
+		var tp := UI.hbox(5)
 		for t in Data.species[r.result].types:
 			tp.add_child(UI.type_badge(t, true))
 		cv.add_child(tp)
@@ -259,18 +259,18 @@ func _milestones() -> void:
 		var p := Collection.progress(s, t.id)
 		var total := Collection.total(t.id)
 		var card := UI.panel("Glass")
-		var v := UI.vbox(8)
+		var v := UI.vbox(10)
 		card.add_child(v)
-		var h := UI.hbox(10)
+		var h := UI.hbox(12)
 		var names := UI.vbox(0, [UI.label(t.name, "H2"), UI.label(t.blurb, "Faint")])
 		h.add_child(names)
 		h.add_child(UI.spacer())
 		h.add_child(UI.label("%d / %d" % [p, total], "Num"))
 		v.add_child(h)
-		var bar := UI.bar(Palette.GOLD, 10)
+		var bar := UI.bar(Palette.GOLD, 12)
 		bar.value = float(p) / maxf(1.0, float(total))
 		v.add_child(bar)
-		var ms := UI.flow(14, 14)
+		var ms := UI.flow(17, 17)
 		for i in t.milestones.size():
 			var m: Dictionary = t.milestones[i]
 			var target := Collection.milestone_target(t.id, m)
@@ -280,29 +280,29 @@ func _milestones() -> void:
 			var mc := PanelContainer.new()
 			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not claimable else Color(Palette.GOLD, 0.10), 14, 1,
 				Color(Palette.GOLD, 0.7) if claimable else Palette.LINE, 14)
-			sb.content_margin_top = 12
-			sb.content_margin_bottom = 12
+			sb.content_margin_top = 14
+			sb.content_margin_bottom = 14
 			mc.add_theme_stylebox_override("panel", sb)
-			mc.custom_minimum_size.x = 150
-			var mv := UI.vbox(8)
+			mc.custom_minimum_size.x = 180
+			var mv := UI.vbox(10)
 			mc.add_child(mv)
 			var title := UI.label("All %d" % target if str(m.at) == "all" else "At %d" % target, "H3", Palette.GOLD if claimable else Palette.TEXT)
 			mv.add_child(title)
-			var mbar := UI.bar(Palette.GOOD if claimed else Palette.AETHER, 4)
+			var mbar := UI.bar(Palette.GOOD if claimed else Palette.AETHER, 5)
 			mbar.value = clampf(float(p) / maxf(1.0, float(target)), 0.0, 1.0)
 			mv.add_child(mbar)
-			var rr := UI.vbox(6)
+			var rr := UI.vbox(7)
 			var r: Dictionary = m.reward
 			for k in ["aether", "gold"]:
 				if r.has(k):
-					rr.add_child(UI.amount(k, float(r[k]), -1, 20))
+					rr.add_child(UI.amount(k, float(r[k]), -1, 24))
 			for id in r.get("items", {}):
-				rr.add_child(UI.amount(id, float(r.items[id]), -1, 20))
+				rr.add_child(UI.amount(id, float(r.items[id]), -1, 24))
 			if r.has("title"):
-				rr.add_child(UI.wrap_label("Title: " + r.title, "Small", 122))
+				rr.add_child(UI.wrap_label("Title: " + r.title, "Small", 146))
 				(rr.get_child(rr.get_child_count() - 1) as Label).add_theme_color_override("font_color", Palette.GOLD)
 			if r.has("revealRecipe"):
-				rr.add_child(UI.wrap_label("Reveals %d secret pair%s" % [int(r.revealRecipe), "" if int(r.revealRecipe) == 1 else "s"], "Small", 122))
+				rr.add_child(UI.wrap_label("Reveals %d secret pair%s" % [int(r.revealRecipe), "" if int(r.revealRecipe) == 1 else "s"], "Small", 146))
 				(rr.get_child(rr.get_child_count() - 1) as Label).add_theme_color_override("font_color", Palette.AETHER)
 			mv.add_child(rr)
 			var foot := UI.spacer()
@@ -314,12 +314,12 @@ func _milestones() -> void:
 			elif claimable:
 				mv.add_child(UI.button("Claim", "Gold", func(): Game.claim_milestone(t.id, i)))
 			else:
-				mv.add_child(UI.chip("%d to go" % (target - p), Palette.AETHER, 11))
+				mv.add_child(UI.chip("%d to go" % (target - p), Palette.AETHER, 13))
 			ms.add_child(mc)
 		v.add_child(ms)
 		_body.add_child(card)
 	if not s.collection.titles.is_empty():
-		var tv := UI.hbox(10, [UI.label("Your title", "H3")])
+		var tv := UI.hbox(12, [UI.label("Your title", "H3")])
 		var ob := OptionButton.new()
 		ob.add_item("None", 0)
 		for i in s.collection.titles.size():

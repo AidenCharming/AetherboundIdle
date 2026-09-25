@@ -56,7 +56,7 @@ func _ready() -> void:
 	grad.set_color(1, Color(1, 1, 1, 0))
 	_particles.color_ramp = grad
 	add_child(_particles)
-	_caption = UI.vbox(6)
+	_caption = UI.vbox(7)
 	_caption.alignment = BoxContainer.ALIGNMENT_CENTER
 	_caption.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_caption)
@@ -151,7 +151,7 @@ func _play_hatch(res: Dictionary) -> void:
 	var c: Dictionary = res.creature
 	var rarity := int(c.rarity)
 	var rc := Data.rarity_color(rarity)
-	var ev := EggView.make(egg, 300)
+	var ev := EggView.make(egg, 360)
 	ev.position = Vector2(-150, -150)
 	ev.pivot_offset = Vector2(150, 150)
 	_stage.add_child(ev)
@@ -195,7 +195,7 @@ func _hatch_caption(c: Dictionary, events: Array) -> void:
 	var title_lbl := UI.label(Data.form_name(c.species, 1), "Title")
 	title_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title_lbl.add_theme_color_override("font_outline_color", Palette.INK)
-	title_lbl.add_theme_constant_override("outline_size", 10)
+	title_lbl.add_theme_constant_override("outline_size", 12)
 	_caption.add_child(title_lbl)
 	var line := "%s%s · %s" % ["Shiny " if c.shiny else "", Data.rarity(int(c.rarity)).name, " / ".join(sp.types.map(func(t): return Data.types[t].name))]
 	var rl := UI.label(line, "H2", Data.rarity_color(int(c.rarity)))
@@ -216,7 +216,7 @@ func _play_evolve(e: Dictionary) -> void:
 	if c.is_empty():
 		_next()
 		return
-	var old := CreaturePortrait.make(e.species, int(e.from), int(c.rarity), bool(c.shiny), 300)
+	var old := CreaturePortrait.make(e.species, int(e.from), int(c.rarity), bool(c.shiny), 360)
 	old.plate = false
 	old.position = Vector2(-150, -150)
 	_stage.add_child(old)
@@ -273,7 +273,7 @@ func _burst(color: Color, rarity: int) -> void:
 
 
 func _show_creature(c: Dictionary, _rc: Color) -> void:
-	var p := CreaturePortrait.of(c, 300)
+	var p := CreaturePortrait.of(c, 360)
 	p.plate = false
 	p.position = Vector2(-150, -150)
 	p.pivot_offset = Vector2(150, 150)
@@ -284,7 +284,7 @@ func _show_creature(c: Dictionary, _rc: Color) -> void:
 	tw.tween_property(p, "scale", Vector2.ONE, 0.2)
 	if c.get("shiny", false):
 		for i in 10:
-			var sp := UI.icon(Data.ui_icon("shiny"), 30)
+			var sp := UI.icon(Data.ui_icon("shiny"), 36)
 			sp.position = Vector2(randf_range(-170, 150), randf_range(-170, 140))
 			sp.modulate.a = 0.0
 			_stage.add_child(sp)

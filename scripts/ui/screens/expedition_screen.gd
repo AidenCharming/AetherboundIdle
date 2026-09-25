@@ -33,32 +33,32 @@ func _ready() -> void:
 	var s := Game.state
 	if zone_id == "":
 		zone_id = s.expedition.zone if s.expedition.zone != "" else Data.zone_list[0].id
-	var row := UI.hbox(10)
-	var m := UI.margin(row, 12, 8, 12, 10)
+	var row := UI.hbox(12)
+	var m := UI.margin(row, 14, 10, 14, 12)
 	m.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	add_child(m)
 	# zones: a list that folds to a slim strip (the choice is remembered in Options)
-	var zl := UI.vbox(8)
-	zl.custom_minimum_size.x = 268
-	var zh := UI.hbox(6)
-	zh.add_child(UI.header("Expeditions", "", Data.ui_icon("expeditions"), 38))
+	var zl := UI.vbox(10)
+	zl.custom_minimum_size.x = 322
+	var zh := UI.hbox(7)
+	zh.add_child(UI.header("Expeditions", "", Data.ui_icon("expeditions"), 46))
 	zh.get_child(0).size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var zfold := _fold_button("‹", func(): _set_open("exp_zones_open", false))
 	zfold.tooltip_text = "Hide the island list"
 	zh.add_child(zfold)
 	zl.add_child(zh)
-	_zones = UI.vbox(8)
+	_zones = UI.vbox(10)
 	zl.add_child(UI.scroll(_zones))
 	row.add_child(zl)
 	var zstrip := _strip("›", "Show the island list", Data.ui_icon("expeditions"), func(): _set_open("exp_zones_open", true))
 	row.add_child(zstrip)
 	_folds.zones = [zl, zstrip]
 	# centre: arena + log
-	var mid := UI.vbox(8)
+	var mid := UI.vbox(10)
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	row.add_child(mid)
 	_arena_host = PanelContainer.new()
-	var sb := ThemeFactory.box(Color(0, 0, 0, 0), 20, 1, Palette.LINE, 0, 14)
+	var sb := ThemeFactory.box(Color(0, 0, 0, 0), 24, 1, Palette.LINE, 0, 17)
 	_arena_host.add_theme_stylebox_override("panel", sb)
 	_arena_host.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	_arena_host.clip_contents = true
@@ -67,31 +67,31 @@ func _ready() -> void:
 	_arena_host.add_child(_sky)
 	_arena = Arena.new()
 	_arena_host.add_child(_arena)
-	_preview = UI.vbox(10)
-	_arena_host.add_child(UI.margin(_preview, 28, 22, 28, 22))
+	_preview = UI.vbox(12)
+	_arena_host.add_child(UI.margin(_preview, 34, 26, 34, 26))
 	# under the battle: one panel with the tabs (Party, Auto-bind, Supplies) and the run controls on the same row
-	var bottom := UI.vbox(8)
-	var top := UI.hbox(8)
-	_tabs_box = UI.hbox(8)
+	var bottom := UI.vbox(10)
+	var top := UI.hbox(10)
+	_tabs_box = UI.hbox(10)
 	top.add_child(_tabs_box)
 	top.add_child(UI.spacer())
-	_controls = UI.hbox(10)
+	_controls = UI.hbox(12)
 	top.add_child(_controls)
 	bottom.add_child(top)
-	_bind = UI.vbox(8)
+	_bind = UI.vbox(10)
 	bottom.add_child(_bind)
 	mid.add_child(UI.panel("Glass", bottom))
 	# right: shinies waiting for a vessel, then the expedition log filling the column; it folds to a strip
-	var rcol := UI.vbox(8)
-	rcol.custom_minimum_size.x = 340
+	var rcol := UI.vbox(10)
+	rcol.custom_minimum_size.x = 408
 	row.add_child(rcol)
-	_right = UI.vbox(12)
+	_right = UI.vbox(14)
 	rcol.add_child(_right)
 	var logp := UI.panel("Glass")
 	logp.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	var lv := UI.vbox(8)
+	var lv := UI.vbox(10)
 	logp.add_child(lv)
-	var lh := UI.hbox(8, [UI.icon(Data.ui_icon("aetherlog"), 22), UI.label("Expedition log", "H3"), UI.spacer()])
+	var lh := UI.hbox(10, [UI.icon(Data.ui_icon("aetherlog"), 26), UI.label("Expedition log", "H3"), UI.spacer()])
 	var lfold := _fold_button("›", func(): _set_open("exp_log_open", false))
 	lfold.tooltip_text = "Hide the log"
 	lh.add_child(lfold)
@@ -101,14 +101,14 @@ func _ready() -> void:
 	var clip := Control.new()
 	clip.clip_contents = true
 	clip.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	clip.custom_minimum_size.x = 44
-	_log_mini = UI.vbox(6)
+	clip.custom_minimum_size.x = 53
+	_log_mini = UI.vbox(7)
 	_log_mini.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	clip.add_child(_log_mini)
 	_log_strip.add_child(clip)
 	row.add_child(_log_strip)
 	_folds.log = [rcol, _log_strip]
-	_log = UI.vbox(4)
+	_log = UI.vbox(5)
 	var lsc := UI.scroll(_log)
 	lsc.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	lv.add_child(lsc)
@@ -133,11 +133,11 @@ func _fill_zones() -> void:
 		var unlocked := Expedition.zone_unlocked(s, z.id)
 		var zs := Expedition.zone_state(s, z.id)
 		var card := UI.button("", "TileOn" if z.id == zone_id else "Tile")
-		card.custom_minimum_size = Vector2(262, 92)
+		card.custom_minimum_size = Vector2(314, 110)
 		card.pressed.connect(func():
 			zone_id = z.id
 			refresh())
-		var v := UI.vbox(3)
+		var v := UI.vbox(4)
 		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		v.offset_left = 14
@@ -145,11 +145,11 @@ func _fill_zones() -> void:
 		v.offset_top = 10
 		v.offset_bottom = -10
 		card.add_child(v)
-		var h := UI.hbox(8)
+		var h := UI.hbox(10)
 		h.add_child(_fit(UI.label(z.name, "H3")))
 		h.add_child(UI.type_badge(z.type, true))
 		v.add_child(h)
-		var zl := UI.hbox(6, [UI.chip("Lv %d–%d" % [int(z.levels[0]), int(z.levels[1])], Data.type_color(z.type), 11), _fit(UI.label("Boss: %s" % z.boss.name, "Small", Palette.TEXT_DIM))])
+		var zl := UI.hbox(7, [UI.chip("Lv %d–%d" % [int(z.levels[0]), int(z.levels[1])], Data.type_color(z.type), 13), _fit(UI.label("Boss: %s" % z.boss.name, "Small", Palette.TEXT_DIM))])
 		v.add_child(zl)
 		card.tooltip_text = "%s\nLevels %d–%d · Boss: %s" % [z.name, int(z.levels[0]), int(z.levels[1]), z.boss.name]
 		var fill := Control.new()
@@ -166,7 +166,7 @@ func _fill_zones() -> void:
 func _fit(l: Label) -> Label:
 	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	l.custom_minimum_size.x = 40
+	l.custom_minimum_size.x = 48
 	return l
 
 
@@ -191,11 +191,11 @@ func _zone_status(z: Dictionary, zs: Dictionary, unlocked: bool) -> HBoxContaine
 		dot = Palette.AETHER
 		hollow = true
 	var d := Panel.new()
-	d.custom_minimum_size = Vector2(8, 8)
+	d.custom_minimum_size = Vector2(10, 10)
 	d.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	d.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	d.add_theme_stylebox_override("panel", ThemeFactory.box(Color(dot, 0.0) if hollow else dot, 99, 2 if hollow else 0, dot, 0))
-	var h := UI.hbox(7, [d, _fit(UI.label(text, "Faint", col))])
+	d.add_theme_stylebox_override("panel", ThemeFactory.box(Color(dot, 0.0) if hollow else dot, 119, 2 if hollow else 0, dot, 0))
+	var h := UI.hbox(8, [d, _fit(UI.label(text, "Faint", col))])
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return h
 
@@ -214,14 +214,14 @@ func _fill_preview() -> void:
 	_preview.add_child(UI.label(z.name, "H1"))
 	_preview.add_child(UI.wrap_label(z.blurb, "Dim"))
 	_preview.add_child(UI.label("Aetherlings seen here", "H3"))
-	var natives := UI.flow(10, 10)
+	var natives := UI.flow(12, 12)
 	var total := 0.0
 	for id in z.species:
 		total += float(z.species[id])
 	for id in z.species:
 		var seen: bool = s.collection.seen.has(id)
 		var v := UI.vbox(2)
-		var p := CreaturePortrait.make(id, 1, 1, false, 84)
+		var p := CreaturePortrait.make(id, 1, 1, false, 101)
 		p.bob = false
 		p.set_silhouette(not seen)
 		v.add_child(p)
@@ -229,32 +229,32 @@ func _fill_preview() -> void:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(l)
 		if Collection.is_owned(s, id):
-			p.add_child(UI.owned_mark(26, Vector2(84, 84)))
+			p.add_child(UI.owned_mark(31, Vector2(84, 84)))
 		var pl := UI.label(F.pct(float(z.species[id]) / total), "Faint")
 		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(pl)
 		natives.add_child(v)
 	_preview.add_child(natives)
-	var boss := UI.hbox(14)
-	var bp := CreaturePortrait.make(z.boss.model, int(z.boss.form), 3, false, 110)
+	var boss := UI.hbox(17)
+	var bp := CreaturePortrait.make(z.boss.model, int(z.boss.form), 3, false, 132)
 	bp.set_silhouette(not Expedition.zone_state(s, z.id).cleared and int(Expedition.zone_state(s, z.id).bestWave) < int(z.waves))
 	boss.add_child(bp)
 	var bv := UI.vbox(2)
 	bv.add_child(UI.label("Boss: " + z.boss.name, "H3", Palette.GOLD))
 	bv.add_child(UI.label("Level %d · waits after %d waves" % [int(z.boss.level), int(z.waves)], "Dim"))
-	var loot := UI.hbox(8, [UI.label("First-clear and repeat reward:", "Faint")])
-	loot.add_child(UI.amount("gold", float(z.bossLoot.gold), -1, 18))
+	var loot := UI.hbox(10, [UI.label("First-clear and repeat reward:", "Faint")])
+	loot.add_child(UI.amount("gold", float(z.bossLoot.gold), -1, 22))
 	for id in z.bossLoot.items:
-		loot.add_child(UI.amount(id, float(z.bossLoot.items[id]), -1, 18))
+		loot.add_child(UI.amount(id, float(z.bossLoot.items[id]), -1, 22))
 	bv.add_child(loot)
 	if z.has("firstClearCreature"):
 		bv.add_child(UI.label("First clear also brings a Void Aetherling home.", "Faint", Data.type_color("void")))
 	boss.add_child(bv)
 	_preview.add_child(boss)
-	var loot2 := UI.hbox(8, [UI.label("Found along the way:", "Faint")])
-	loot2.add_child(UI.amount("gold", float(z.gold[1]), -1, 18))
+	var loot2 := UI.hbox(10, [UI.label("Found along the way:", "Faint")])
+	loot2.add_child(UI.amount("gold", float(z.gold[1]), -1, 22))
 	for l in z.loot:
-		loot2.add_child(UI.icon(Data.item_icon(l.item), 22))
+		loot2.add_child(UI.icon(Data.item_icon(l.item), 26))
 	_preview.add_child(loot2)
 
 
@@ -278,7 +278,7 @@ func _fill_controls() -> void:
 		var lk := UI.label("Locked", "Dim")
 		lk.tooltip_text = "Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name
 		lk.mouse_filter = Control.MOUSE_FILTER_PASS
-		_controls.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), lk]))
+		_controls.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("lock"), 19), lk]))
 	var rep := ToggleSwitch.new()
 	rep.text = "Repeat"
 	rep.tooltip_text = "Start the next run by itself when one ends."
@@ -304,22 +304,22 @@ func _fill_right() -> void:
 
 ## A slim strip standing in for a folded panel: an unfold button and the panel's icon.
 func _strip(arrow: String, tip: String, tex: Texture2D, on_open: Callable) -> VBoxContainer:
-	var v := UI.vbox(10)
-	v.custom_minimum_size.x = 44
+	var v := UI.vbox(12)
+	v.custom_minimum_size.x = 53
 	# one button: the panel's icon with a small arrow on its corner, pointing the way the panel opens
 	var b := _fold_button("", on_open)
-	b.custom_minimum_size = Vector2(42, 46)
+	b.custom_minimum_size = Vector2(50, 55)
 	b.tooltip_text = tip
 	var center := CenterContainer.new()
 	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	b.add_child(center)
-	var ic := UI.icon(tex, 26)
+	var ic := UI.icon(tex, 31)
 	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	center.add_child(ic)
 	var arr := UI.label(arrow, "", Palette.AETHER)
-	arr.add_theme_font_size_override("font_size", 18)
-	arr.add_theme_constant_override("outline_size", 6)
+	arr.add_theme_font_size_override("font_size", 22)
+	arr.add_theme_constant_override("outline_size", 7)
 	arr.add_theme_color_override("font_outline_color", Palette.BG_DEEP)
 	arr.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	arr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -340,8 +340,8 @@ func _strip(arrow: String, tip: String, tex: Texture2D, on_open: Callable) -> VB
 ## The small square button that folds or unfolds a panel.
 func _fold_button(arrow: String, on_press: Callable) -> Button:
 	var b := UI.button(arrow, "Chip", on_press)
-	b.add_theme_font_size_override("font_size", 22)
-	b.custom_minimum_size = Vector2(38, 38)
+	b.add_theme_font_size_override("font_size", 26)
+	b.custom_minimum_size = Vector2(46, 46)
 	return b
 
 
@@ -362,45 +362,45 @@ func _apply_folds() -> void:
 
 func _party_tab() -> VBoxContainer:
 	var s := Game.state
-	var pv := UI.vbox(6)
+	var pv := UI.vbox(7)
 	var party := GameState.party(s)
 	var party_size: int = Data.tuning.combat.partySize
 	var locked := Expedition.party_locked(s)
 	if locked:
-		pv.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), UI.label("Locked during the run: stop it to change the party.", "Faint")]))
+		pv.add_child(UI.hbox(7, [UI.icon(Data.ui_icon("lock"), 19), UI.label("Locked during the run: stop it to change the party.", "Faint")]))
 	else:
 		pv.add_child(UI.label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
-	var row := UI.hbox(10)
+	var row := UI.hbox(12)
 	_xp_rows.clear()
 	for i in party_size:
-		var card := UI.vbox(4)
+		var card := UI.vbox(5)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		if i < party.size():
 			var c: Dictionary = party[i]
-			var h := UI.hbox(8)
-			var por := CreaturePortrait.of(c, 50)
+			var h := UI.hbox(10)
+			var por := CreaturePortrait.of(c, 60)
 			por.bob = false
 			h.add_child(por)
 			var cv := UI.vbox(0)
 			var nm := UI.label(Creatures.display_name(c), "H3")
 			nm.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-			nm.custom_minimum_size.x = 60
+			nm.custom_minimum_size.x = 72
 			cv.add_child(nm)
 			var st := Creatures.stats(c)
-			var lv := UI.chip("Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)), 11)
-			cv.add_child(UI.hbox(8, [lv, _mini_stat("health", st.health)]))
-			cv.add_child(UI.hbox(10, [_mini_stat("power", st.power), _mini_stat("guard", st.guard)]))
+			var lv := UI.chip("Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)), 13)
+			cv.add_child(UI.hbox(10, [lv, _mini_stat("health", st.health)]))
+			cv.add_child(UI.hbox(12, [_mini_stat("power", st.power), _mini_stat("guard", st.guard)]))
 			cv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			h.add_child(cv)
 			card.add_child(h)
 			# XP toward the next level, filling with every kill
-			var xb := UI.bar(Palette.AETHER, 6)
+			var xb := UI.bar(Palette.AETHER, 7)
 			xb.mouse_filter = Control.MOUSE_FILTER_STOP
 			card.add_child(xb)
 			_xp_rows.append({"cid": c.id, "bar": xb, "lv": lv, "level": -1})
 			_update_xp_row(_xp_rows[-1])
 			if not locked:
-				card.add_child(UI.hbox(4, [UI.button("Swap", "Ghost", func(): _pick_party(i)), UI.button("Remove", "Ghost", func(): Game.bench(c.id))]))
+				card.add_child(UI.hbox(5, [UI.button("Swap", "Ghost", func(): _pick_party(i)), UI.button("Remove", "Ghost", func(): Game.bench(c.id))]))
 		elif not locked:
 			card.add_child(UI.button("Add an Aetherling", "", func(): _pick_party(i)))
 		else:
@@ -422,7 +422,7 @@ func _fill_bottom() -> void:
 		tabs.add_child(b)
 	# every tab is built and the panel keeps the tallest one's height, so switching tabs doesn't resize it
 	for tab in ["party", "autobind", "supplies"]:
-		var box := UI.vbox(8)
+		var box := UI.vbox(10)
 		box.visible = tab == _bottom_tab
 		_bind.add_child(box)
 		_bottom_into(tab, box)
@@ -445,8 +445,8 @@ func _bottom_into(tab: String, parent: VBoxContainer) -> void:
 		parent.add_child(_party_tab())
 		return
 	if tab == "supplies":
-		var sv := UI.vbox(8)
-		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 560))
+		var sv := UI.vbox(10)
+		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 672))
 		var ob := OptionButton.new()
 		ob.add_item("Best meal available", 0)
 		var meals := Data.item_list.filter(func(it): return it.category == "meal")
@@ -457,18 +457,18 @@ func _bottom_into(tab: String, parent: VBoxContainer) -> void:
 		ob.item_selected.connect(func(i): Game.state.expedition.meal = "" if i == 0 else meals[i - 1].id)
 		sv.add_child(ob)
 		if GameState.count(s, Expedition.pick_meal(s)) < 1:
-			var nm := UI.wrap_label("No meals. Cook some in Cooking (a Pyric Aetherling): the first islands' wild Aetherlings drop Minnows and Sunfish, and the Market sells fish and meals.", "Small", 560)
+			var nm := UI.wrap_label("No meals. Cook some in Cooking (a Pyric Aetherling): the first islands' wild Aetherlings drop Minnows and Sunfish, and the Market sells fish and meals.", "Small", 672)
 			nm.add_theme_color_override("font_color", Palette.DANGER)
 			sv.add_child(nm)
 		parent.add_child(sv)
 		return
 	var ab: Dictionary = s.expedition.autobind
-	var cols := UI.hbox(16)
+	var cols := UI.hbox(19)
 	parent.add_child(cols)
-	var bv := UI.vbox(4)
+	var bv := UI.vbox(5)
 	bv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cols.add_child(bv)
-	var bv2 := UI.vbox(6)
+	var bv2 := UI.vbox(7)
 	cols.add_child(bv2)
 	var en := ToggleSwitch.new()
 	en.text = "Throw vessels"
@@ -483,18 +483,18 @@ func _bottom_into(tab: String, parent: VBoxContainer) -> void:
 	bv.add_child(ns)
 	var best := Expedition.choose_vessel(s, {"shiny": true, "species": "", "rarity": 1})
 	if best == "":
-		bv.add_child(UI.wrap_label("No vessels! Fabrication makes them; the Market sells them.", "Small", 260))
+		bv.add_child(UI.wrap_label("No vessels! Fabrication makes them; the Market sells them.", "Small", 312))
 		bv.get_child(bv.get_child_count() - 1).add_theme_color_override("font_color", Palette.DANGER)
 	else:
 		# the chance per rarity, each a pill in that rarity's colour
-		bv.add_child(UI.hbox(6, [UI.label("Bind chance with", "Faint"), UI.icon(Data.item_icon(best), 18), UI.label(Data.item_name(best), "Faint")]))
+		bv.add_child(UI.hbox(7, [UI.label("Bind chance with", "Faint"), UI.icon(Data.item_icon(best), 22), UI.label(Data.item_name(best), "Faint")]))
 		var flow := HFlowContainer.new()
 		flow.name = "BindChances"
-		flow.custom_minimum_size.x = 260
-		flow.add_theme_constant_override("h_separation", 6)
-		flow.add_theme_constant_override("v_separation", 6)
+		flow.custom_minimum_size.x = 312
+		flow.add_theme_constant_override("h_separation", 7)
+		flow.add_theme_constant_override("v_separation", 7)
 		for r in [1, 2, 3, 4, 5]:
-			var c := UI.chip("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, GameState.party(s)))], Data.rarity_color(r), 13)
+			var c := UI.chip("%s %s" % [Data.rarity(r).name, F.pct(Expedition.bind_chance(s, best, r, GameState.party(s)))], Data.rarity_color(r), 16)
 			c.tooltip_text = "Chance a %s vessel binds a %s Aetherling" % [Data.item_name(best), Data.rarity(r).name]
 			c.mouse_filter = Control.MOUSE_FILTER_STOP
 			flow.add_child(c)
@@ -526,20 +526,20 @@ func _bottom_into(tab: String, parent: VBoxContainer) -> void:
 ## A labelled, fixed-width dropdown row for the Auto-bind column.
 func _small_choice(parent: Control, title: String) -> OptionButton:
 	var l := UI.label(title, "Dim")
-	l.custom_minimum_size.x = 56
+	l.custom_minimum_size.x = 67
 	var o := OptionButton.new()
-	o.custom_minimum_size.x = 200
+	o.custom_minimum_size.x = 240
 	o.clip_text = true
 	o.fit_to_longest_item = false
-	parent.add_child(UI.hbox(8, [l, o]))
+	parent.add_child(UI.hbox(10, [l, o]))
 	return o
 
 
 func _pending_panel() -> PanelContainer:
 	var s := Game.state
-	var pd := UI.vbox(8)
+	var pd := UI.vbox(10)
 	var n: int = s.expedition.pending.size()
-	var head := UI.hbox(8, [UI.icon(Data.ui_icon("shiny"), 24), UI.label("%d waiting to be bound" % n, "H3", Palette.GOLD)])
+	var head := UI.hbox(10, [UI.icon(Data.ui_icon("shiny"), 29), UI.label("%d waiting to be bound" % n, "H3", Palette.GOLD)])
 	head.add_child(UI.spacer())
 	head.add_child(UI.button("Throw at all", "Gold", func():
 		for i in range(Game.state.expedition.pending.size() - 1, -1, -1):
@@ -548,12 +548,12 @@ func _pending_panel() -> PanelContainer:
 			if v != "":
 				Game.retry_pending(i, v)))
 	pd.add_child(head)
-	pd.add_child(UI.wrap_label("They wait until you throw a vessel. Out of vessels? Fabrication makes them; the Market sells them.", "Faint", 320))
-	var grid := UI.flow(6, 6)
+	pd.add_child(UI.wrap_label("They wait until you throw a vessel. Out of vessels? Fabrication makes them; the Market sells them.", "Faint", 384))
+	var grid := UI.flow(7, 7)
 	for i in s.expedition.pending.size():
 		var w: Dictionary = s.expedition.pending[i]
 		var cell := UI.vbox(2)
-		var por := CreaturePortrait.make(w.species, int(w.get("form", F.form_for_level(int(w.level)))), int(w.rarity), bool(w.shiny), 52)
+		var por := CreaturePortrait.make(w.species, int(w.get("form", F.form_for_level(int(w.level)))), int(w.rarity), bool(w.shiny), 62)
 		por.bob = false
 		por.tooltip_text = "%s%s %s" % ["Shiny " if w.shiny else "", Data.rarity(int(w.rarity)).name, Data.species[w.species].name]
 		cell.add_child(por)
@@ -567,7 +567,7 @@ func _pending_panel() -> PanelContainer:
 	var sb: StyleBoxFlat = panel.get_theme_stylebox("panel").duplicate()
 	sb.border_color = Palette.GOLD
 	sb.set_border_width_all(2)
-	sb.set_content_margin_all(12)
+	sb.set_content_margin_all(14)
 	panel.add_theme_stylebox_override("panel", sb)
 	var tw := panel.create_tween().set_loops()
 	tw.tween_method(func(k: float): sb.border_color = Palette.GOLD.lerp(Color(Palette.GOLD, 0.25), k), 0.0, 1.0, 0.6)
@@ -632,18 +632,18 @@ func _render_log() -> void:
 	_log_whens.clear()
 	_whens_left = 1.0
 	if Game.battle_log.is_empty():
-		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 300))
+		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 360))
 		return
 	var now := Game.now_sec()
 	for e in Game.battle_log.slice(0, 40):
 		var col: Color = e.color
 		var card := _log_card(col, 8)
-		var h := UI.hbox(8)
+		var h := UI.hbox(10)
 		h.add_child(_log_icon(e, 30, 22))
 		var l := UI.label(e.text, "", col)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		l.custom_minimum_size.x = 60
+		l.custom_minimum_size.x = 72
 		l.tooltip_text = e.text
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		h.add_child(l)
@@ -669,13 +669,13 @@ func _render_log() -> void:
 ## A log line's card, edged on the left in the line's colour.
 func _log_card(col: Color, pad: int) -> PanelContainer:
 	var card := PanelContainer.new()
-	var sb := ThemeFactory.box(Color(col, 0.07), 8, 0, Palette.LINE, 0)
-	sb.border_width_left = 3
+	var sb := ThemeFactory.box(Color(col, 0.07), 10, 0, Palette.LINE, 0)
+	sb.border_width_left = 4
 	sb.border_color = Color(col, 0.8)
 	sb.content_margin_left = pad
 	sb.content_margin_right = pad
-	sb.content_margin_top = 4
-	sb.content_margin_bottom = 4
+	sb.content_margin_top = 5
+	sb.content_margin_bottom = 5
 	card.add_theme_stylebox_override("panel", sb)
 	return card
 
@@ -715,4 +715,4 @@ func _update_xp_row(r: Dictionary) -> void:
 
 func _mini_stat(icon_name: String, value: float) -> HBoxContainer:
 	var l := UI.label(F.format_num(value), "Small", Palette.TEXT)
-	return UI.hbox(3, [UI.icon(Data.ui_icon(icon_name), 14), l])
+	return UI.hbox(4, [UI.icon(Data.ui_icon(icon_name), 17), l])

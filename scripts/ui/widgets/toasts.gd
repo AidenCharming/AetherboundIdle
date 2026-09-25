@@ -7,7 +7,7 @@ const LIFE := 4.5
 
 
 func _ready() -> void:
-	add_theme_constant_override("separation", 8)
+	add_theme_constant_override("separation", 10)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	Game.toast.connect(show_toast)
 
@@ -20,19 +20,19 @@ func show_toast(text: String, tex: Texture2D, color: Color) -> void:
 		remove_child(old)
 		old.queue_free()
 	var p := PanelContainer.new()
-	var sb := ThemeFactory.box(Color(0.08, 0.09, 0.2, 0.94), 14, 1, Color(color, 0.55), 12, 12)
-	sb.border_width_left = 4
+	var sb := ThemeFactory.box(Color(0.08, 0.09, 0.2, 0.94), 17, 1, Color(color, 0.55), 14, 14)
+	sb.border_width_left = 5
 	p.add_theme_stylebox_override("panel", sb)
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var h := UI.hbox(10)
+	var h := UI.hbox(12)
 	if tex:
-		h.add_child(UI.icon(tex, 26))
+		h.add_child(UI.icon(tex, 31))
 	var l := UI.label(text, "", Palette.TEXT)
 	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	l.custom_minimum_size.x = 280
+	l.custom_minimum_size.x = 336
 	h.add_child(l)
 	p.add_child(h)
-	p.custom_minimum_size.x = 340
+	p.custom_minimum_size.x = 408
 	add_child(p)
 	p.modulate.a = 0.0
 	var tw := p.create_tween()

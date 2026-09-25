@@ -10,7 +10,7 @@ var _sparks: Array = []   # [{pos (0..1), phase, size}]
 
 
 ## The card with the frame laid over its full rect (a container's padding would inset it otherwise).
-static func wrap(card: Control, corner := 14.0) -> Control:
+static func wrap(card: Control, corner := 17.0) -> Control:
 	var holder := MarginContainer.new()
 	holder.size_flags_horizontal = card.size_flags_horizontal
 	holder.add_child(card)

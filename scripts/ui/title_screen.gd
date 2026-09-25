@@ -47,35 +47,35 @@ func _ready() -> void:
 
 
 func _build_menu() -> void:
-	var root := UI.margin(UI.vbox(0), 96, 70, 60, 50)
+	var root := UI.margin(UI.vbox(0), 115, 84, 72, 60)
 	root.set_anchors_and_offsets_preset(Control.PRESET_LEFT_WIDE)
-	root.custom_minimum_size.x = 620
+	root.custom_minimum_size.x = 744
 	add_child(root)
 	var col: VBoxContainer = root.get_child(0)
-	col.add_theme_constant_override("separation", 10)
+	col.add_theme_constant_override("separation", 12)
 	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(UI.spacer(true))
 	var logo := UI.label("Aetherbound", "Title")
-	logo.add_theme_font_size_override("font_size", 92)
+	logo.add_theme_font_size_override("font_size", 110)
 	logo.add_theme_color_override("font_color", Color("f3f1ff"))
 	logo.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.55))
-	logo.add_theme_constant_override("shadow_outline_size", 22)
+	logo.add_theme_constant_override("shadow_outline_size", 26)
 	logo.add_theme_constant_override("shadow_offset_x", 0)
 	logo.add_theme_constant_override("shadow_offset_y", 0)
 	logo.add_theme_color_override("font_outline_color", Palette.INK)
-	logo.add_theme_constant_override("outline_size", 10)
+	logo.add_theme_constant_override("outline_size", 12)
 	col.add_child(logo)
 	var sub := UI.label("I   D   L   E", "H2", Palette.AETHER)
-	sub.add_theme_font_size_override("font_size", 24)
-	col.add_child(UI.margin(sub, 8, -14, 0, 0))
+	sub.add_theme_font_size_override("font_size", 29)
+	col.add_child(UI.margin(sub, 10, -17, 0, 0))
 	col.add_child(UI.label("Collect Aetherlings. Put them to work. Breed the impossible.", "Dim"))
-	col.add_child(UI.spacer(false, 26))
+	col.add_child(UI.spacer(false, 31))
 	var last := _last_slot()
 	if last > 0:
 		var info := Game.slot_info(last)
 		var cont := _menu_button("Continue", "Primary", func(): _start(last, false))
 		col.add_child(cont)
-		col.add_child(UI.margin(UI.label("%s · %s played · last seen %s" % [_slot_title(last, info), F.format_seconds(info.playSeconds), _ago(info.lastSeen)], "Faint"), 6, -4, 0, 6))
+		col.add_child(UI.margin(UI.label("%s · %s played · last seen %s" % [_slot_title(last, info), F.format_seconds(info.playSeconds), _ago(info.lastSeen)], "Faint"), 7, -5, 0, 7))
 	col.add_child(_menu_button("New Game", "" if last > 0 else "Primary", func(): _slots_modal("new")))
 	col.add_child(_menu_button("Load Game", "", func(): _slots_modal("load")))
 	col.add_child(_menu_button("Options", "", func(): OptionsPanel.open_modal()))
@@ -88,10 +88,10 @@ func _build_menu() -> void:
 
 func _menu_button(text: String, variation: String, cb: Callable) -> Button:
 	var b := UI.button(text, variation, cb)
-	b.custom_minimum_size = Vector2(320, 52)
+	b.custom_minimum_size = Vector2(384, 62)
 	b.size_flags_horizontal = Control.SIZE_SHRINK_BEGIN
 	b.add_theme_font_override("font", ThemeFactory.head_font())
-	b.add_theme_font_size_override("font_size", 21)
+	b.add_theme_font_size_override("font_size", 25)
 	b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	b.mouse_entered.connect(func(): Sfx.play("click", 1.4))
 	return b
@@ -118,8 +118,8 @@ func _ago(unix: float) -> String:
 # ---------------------------------------------------------------- save slots
 
 func _slots_modal(mode: String) -> void:
-	var row := UI.hbox(16)
-	var m: Modal = Modal.open(row, "Choose a save slot" if mode == "new" else "Load a game", 1060)
+	var row := UI.hbox(19)
+	var m: Modal = Modal.open(row, "Choose a save slot" if mode == "new" else "Load a game", 1272)
 	_fill_slots(row, mode, m)
 
 
@@ -128,8 +128,8 @@ func _fill_slots(row: HBoxContainer, mode: String, m: Modal) -> void:
 	for n in range(1, Game.SLOTS + 1):
 		var info := Game.slot_info(n)
 		var card := UI.panel("Card")
-		card.custom_minimum_size = Vector2(320, 330)
-		var v := UI.vbox(8)
+		card.custom_minimum_size = Vector2(384, 396)
+		var v := UI.vbox(10)
 		card.add_child(v)
 		v.add_child(UI.label(_slot_title(n, info), "H2"))
 		if info.is_empty():
@@ -169,7 +169,7 @@ func _slot_title(n: int, info: Dictionary) -> String:
 
 
 func _rename_slot(n: int, info: Dictionary, row: HBoxContainer, mode: String, slots_modal: Modal) -> void:
-	var v := UI.vbox(12)
+	var v := UI.vbox(14)
 	var le := LineEdit.new()
 	le.text = info.get("name", "")
 	le.placeholder_text = "Slot %d" % n
@@ -180,13 +180,13 @@ func _rename_slot(n: int, info: Dictionary, row: HBoxContainer, mode: String, sl
 		box.m.close()
 		Game.rename_slot(n, t)
 		_fill_slots(row, mode, slots_modal)
-	var r := UI.hbox(8)
+	var r := UI.hbox(10)
 	r.add_child(UI.button("Clear name", "Ghost", func(): apply.call("")))
 	r.add_child(UI.spacer())
 	r.add_child(UI.button("Save", "Primary", func(): apply.call(le.text)))
 	v.add_child(r)
 	le.text_submitted.connect(func(t): apply.call(t))
-	box.m = Modal.open(v, "Name this save", 420)
+	box.m = Modal.open(v, "Name this save", 504)
 	le.grab_focus.call_deferred()
 
 
@@ -201,14 +201,14 @@ func _start(n: int, fresh: bool) -> void:
 
 
 func _credits() -> void:
-	var v := UI.vbox(10)
+	var v := UI.vbox(12)
 	v.add_child(UI.rich("[b]Aetherbound Idle[/b], rebuilt in Godot %s.\n\n" % Engine.get_version_info().string
 		+ "[b]Creature art[/b]: the designer's approved Aetherling sprites.\n"
 		+ "[b]Background[/b]: the designer's approved Sanctum background.\n"
 		+ "[b]Icons, shaders, music and sound effects[/b]: generated in code for this project.\n"
 		+ "[b]Fonts[/b]: Fredoka (The Fredoka Project Authors) and Nunito (The Nunito Project Authors), SIL Open Font License 1.1.\n"
 		+ "[b]Engine[/b]: Godot Engine, MIT licence, godotengine.org."))
-	Modal.open(v, "Credits", 620)
+	Modal.open(v, "Credits", 744)
 
 
 # ---------------------------------------------------------------- drifting creatures
@@ -220,7 +220,7 @@ func _spawn_drifters() -> void:
 	for i in 7:
 		var sp: Dictionary = base[rng.randi_range(0, base.size() - 1)]
 		var depth := rng.randf_range(0.45, 1.0)
-		var p := CreaturePortrait.make(sp.id, rng.randi_range(1, 3), 1, rng.randf() < 0.15, 150.0 * depth)
+		var p := CreaturePortrait.make(sp.id, rng.randi_range(1, 3), 1, rng.randf() < 0.15, 180.0 * depth)
 		p.plate = false
 		p.modulate = Color(0.75 + 0.25 * depth, 0.75 + 0.25 * depth, 0.9 + 0.1 * depth, 0.35 + 0.55 * depth)
 		p.set_meta("speed", rng.randf_range(10.0, 26.0) * depth)

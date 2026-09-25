@@ -79,6 +79,17 @@ All commands run from the repo root.
 - **Ask the designer first:** whether to move the base layout from 1600x900 to 1920x1080 (the most common
   resolution, same 16:9 shape), so the usual screen draws 1:1 with no stretch. Everything would then look ~17%
   smaller unless sizes are raised to match; weigh that before the sharpness work above.
+- **1920x1080 base: IN PROGRESS on branch `wip/1920-base`** (designer chose "same size, sharper": rebase and
+  raise every size x1.2 so 1080p draws 1:1). Done there: every size literal the script could identify in `scripts/ui/`
+  scaled x1.2 and rounded (UI helper args and their defaults, theme fonts/boxes/constants, theme overrides,
+  `custom_minimum_size`, Modal widths, portrait/egg/bubble sizes, FloatText size/rise). **Not done yet:**
+  1. `project.godot`: viewport and window override 1600x900 -> 1920x1080 (until then the UI draws 1.2x too big).
+  2. Hand pass over pixel numbers the script left alone: dotted `offset_*` assignments, `position`/`size`/`Vector2`
+     offsets, `_draw` code and tween distances in `arena.gd`, `creature_portrait.gd`, `reveal.gd`, `shine_frame.gd`,
+     `sky.gd`, `worker_bubble.gd`, `float_text.gd`, `title_screen.gd`, `main.gd`, `expedition_screen.gd`; constants such
+     as `CreatureCard.W/H` (150x214). `UI.PAGE` is a count, leave it. Check `Options.RESOLUTIONS`/`UI_SCALES`.
+  3. The test that every screen fits beside the sidebar at 1600 -> 1920; tests + warnings; tour at 1920x1080 and
+     1280x720; version 0.5.0; `DECISIONS.md`. Then merge into `godot-rebuild`.
 
 ## Start here (2026-09-25, second session: merged into godot-rebuild)
 

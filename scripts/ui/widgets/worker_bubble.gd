@@ -18,7 +18,7 @@ static func make(c: Dictionary, skill: String, px: float) -> WorkerBubble:
 	w.mouse_filter = Control.MOUSE_FILTER_PASS
 	if not c.is_empty():
 		w.cid = c.id
-		w._portrait = CreaturePortrait.of(c, px - 10)
+		w._portrait = CreaturePortrait.of(c, px - 12)
 		w._portrait.position = Vector2(5, 5)
 		w._portrait.glow_scale = 0.5
 		w.add_child(w._portrait)
