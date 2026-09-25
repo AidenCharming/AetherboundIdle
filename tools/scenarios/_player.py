@@ -12,6 +12,7 @@ import contextlib
 import glob
 import shutil
 import subprocess
+import tempfile
 import json
 import math
 import os
@@ -405,7 +406,11 @@ class Ctx:
 
     def finish(self, scenario, extra=None):
         extra = extra or {}
-        fps_judged = not self.software_renderer()
+        # fps isn't judged on a software renderer, or under --movie: Movie Maker writes a 1080p PNG every frame,
+        # so the frame rate there measures the disk, not the game
+        fps_skip = ("software renderer %s" % self.renderer if self.software_renderer()
+                    else "Movie Maker run" if self.options.get("movie") else "")
+        fps_judged = not fps_skip
         fps_sorted = sorted(self.fps[3:] or self.fps)
         fps_min = fps_sorted[0] if fps_sorted else 0
         fps_med = statistics.median(fps_sorted) if fps_sorted else 0
@@ -428,7 +433,7 @@ class Ctx:
             "stuck": self.stuck_events, "ui_gaps": self.gaps, "notes": self.notes,
             "screens": self.screens,
             "fps": {"min": fps_min, "p10": fps_low, "median": fps_med, "samples": len(self.fps),
-                    "judged": fps_judged, "renderer": self.renderer, "threshold": self.min_fps},
+                    "judged": fps_judged, "not_judged_why": fps_skip, "renderer": self.renderer, "threshold": self.min_fps},
             "memory_mb": {"start": mem_start, "peak": mem_peak, "end": mem_end, "growth": round(mem_growth, 3)},
             "clips": self.clips, "steps": self.step,
         }
@@ -442,73 +447,90 @@ class Ctx:
 
 
 def _frame_no(path):
-    m = re.search(r"(\d+)\.png$", path)
+    m = re.search(r"(\d+)\.png$", path.strip())
     return int(m.group(1)) if m else None
 
 
 def process_movie(ctx, data, godot):
     """After a --movie run: keeps every 5th frame of each clip (up to 16), measures frame-to-frame change
-    with tools/frame_stats.gd, flags jumps, flicker and effects that never settle, deletes the rest."""
+    with tools/frame_stats.gd, flags jumps, flicker and effects that never settle, deletes the rest.
+    The report is rewritten even if this is interrupted, so a closed window never leaves clips unreported."""
     movie = os.path.join(ctx.out, "movie")
     frames = sorted((_frame_no(f), f) for f in glob.glob(os.path.join(movie, "frame*.png")) if _frame_no(f) is not None)
     if not frames:
         ctx.notes.append("--movie: no frames were written")
-    for c in data["clips"]:
-        mine = [f for n, f in frames if c["start"] <= n <= c["end"]]
-        if not mine:
-            c["verdict"] = "no frames recorded for this clip"
-            continue
-        stats = []
-        lst = os.path.join(ctx.out, "frames_%s.txt" % c["name"])
-        res = lst + ".json"
-        with open(lst, "w") as f:
-            f.write("\n".join(os.path.abspath(p) for p in mine[:600]))
-        try:
-            # this file is tools/scenarios/_player.py: the project root is three levels up
-            root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-            run = subprocess.run([godot, "--headless", "--path", root, "--script", "res://tools/frame_stats.gd", "--", lst, res],
-                                 timeout=600, capture_output=True, text=True, errors="replace")
-            if not os.path.exists(res):
-                # say why: Godot's last lines, not just "no such file"
-                tail = [l for l in (run.stdout + run.stderr).splitlines() if l.strip()][-3:]
-                raise RuntimeError("frame_stats wrote nothing, exit %s: %s" % (run.returncode, " | ".join(tail)))
-            with open(res) as f:
-                stats = json.load(f)
-        except Exception as e:  # the stats are a bonus: the sampled frames still go in the report
-            c["verdict"] = "frame stats unavailable (%s)" % e
+    try:
+        for i, c in enumerate(data["clips"]):
+            print("measuring clip %d of %d (%s)..." % (i + 1, len(data["clips"]), c["name"]), flush=True)
+            _process_clip(ctx, c, [f for n, f in frames if c["start"] <= n <= c["end"]], godot)
+    except KeyboardInterrupt:
+        for c in data["clips"]:
+            c.setdefault("verdict", "not measured (interrupted)")
+        print("interrupted: writing the report with the clips measured so far")
+    finally:
+        shutil.rmtree(movie, ignore_errors=True)
+        with open(os.path.join(ctx.out, "report.json"), "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=1, default=str)
+        with open(os.path.join(ctx.out, "report.md"), "w", encoding="utf-8") as f:
+            f.write(render_md(data))
+    return data
+
+
+def _process_clip(ctx, c, mine, godot):
+    if not mine:
+        c["verdict"] = "no frames recorded for this clip"
+        return
+    stats = []
+    lst = os.path.join(ctx.out, "frames_%s.txt" % c["name"])
+    res = lst + ".json"
+    cwd = None
+    with open(lst, "w", newline="\n") as f:  # "\n" only: Godot's split would leave a Windows "\r" on each path
+        f.write("\n".join(os.path.abspath(p) for p in mine[:600]))
+    try:
+        # frame_stats.gd only reads PNGs by absolute path, so it runs outside the project: opening the project
+        # would first scan and import every new asset, which can take minutes (and 200 frames take ~4 s)
+        script = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frame_stats.gd")
+        cwd = tempfile.mkdtemp(prefix="frame_stats_")
+        run = subprocess.run([godot, "--headless", "--script", script, "--", os.path.abspath(lst), os.path.abspath(res)],
+                             cwd=cwd, timeout=120, capture_output=True, text=True, errors="replace")
+        if not os.path.exists(res):
+            # say why: Godot's last lines, not just "no such file"
+            tail = [l for l in (run.stdout + run.stderr).splitlines() if l.strip()][-3:]
+            raise RuntimeError("frame_stats wrote nothing, exit %s: %s" % (run.returncode, " | ".join(tail)))
+        with open(res) as f:
+            stats = json.load(f)
+    except Exception as e:  # the stats are a bonus: the sampled frames still go in the report
+        c["verdict"] = "frame stats unavailable (%s)" % e
+    finally:
         for p in (lst, res):
             if os.path.exists(p):
                 os.remove(p)
-        diffs = [s["diff"] for s in stats if s.get("diff", -1) >= 0]
-        flags = []
-        if diffs:
-            med = statistics.median(diffs)
-            for i, s in enumerate(stats):
-                d = s.get("diff", -1)
-                if d > max(0.04, med * 6):
-                    flags.append("jump at frame %d (change %.3f, clip median %.3f)" % (_frame_no(s["path"]), d, med))
-            for i in range(1, len(stats) - 1):
-                a, b, cc = stats[i - 1].get("lum"), stats[i].get("lum"), stats[i + 1].get("lum")
-                if None not in (a, b, cc) and abs(b - a) > 0.05 and abs(cc - b) > 0.05 and (b - a) * (cc - b) < 0:
-                    flags.append("flicker at frame %d (brightness %.2f, %.2f, %.2f)" % (_frame_no(stats[i]["path"]), a, b, cc))
-            tail = diffs[-max(3, len(diffs) // 6):]
-            if c.get("settle") and tail and min(tail) > 0.01:
-                flags.append("still changing at the end of the clip (last diffs %s)" % ", ".join("%.3f" % d for d in tail[-4:]))
-        c["flags"] = flags[:12]
-        c["verdict"] = c.get("verdict") or ("%d frames; " % len(mine) + ("; ".join(flags[:6]) if flags else "no jumps, flicker or unsettled motion found"))
-        dest = os.path.join(ctx.out, "clips", c["name"])
-        os.makedirs(dest, exist_ok=True)
-        c["frames"] = []
-        for p in mine[::5][:16]:
-            q = os.path.join(dest, os.path.basename(p))
-            shutil.copy(p, q)
-            c["frames"].append(os.path.relpath(q, ctx.out))
-    shutil.rmtree(movie, ignore_errors=True)
-    with open(os.path.join(ctx.out, "report.json"), "w", encoding="utf-8") as f:
-        json.dump(data, f, indent=1, default=str)
-    with open(os.path.join(ctx.out, "report.md"), "w", encoding="utf-8") as f:
-        f.write(render_md(data))
-    return data
+        if cwd:
+            shutil.rmtree(cwd, ignore_errors=True)
+    diffs = [s["diff"] for s in stats if s.get("diff", -1) >= 0]
+    flags = []
+    if diffs:
+        med = statistics.median(diffs)
+        for s in stats:
+            d = s.get("diff", -1)
+            if d > max(0.04, med * 6):
+                flags.append("jump at frame %d (change %.3f, clip median %.3f)" % (_frame_no(s["path"]), d, med))
+        for i in range(1, len(stats) - 1):
+            a, b, cc = stats[i - 1].get("lum"), stats[i].get("lum"), stats[i + 1].get("lum")
+            if None not in (a, b, cc) and abs(b - a) > 0.05 and abs(cc - b) > 0.05 and (b - a) * (cc - b) < 0:
+                flags.append("flicker at frame %d (brightness %.2f, %.2f, %.2f)" % (_frame_no(stats[i]["path"]), a, b, cc))
+        tail = diffs[-max(3, len(diffs) // 6):]
+        if c.get("settle") and tail and min(tail) > 0.01:
+            flags.append("still changing at the end of the clip (last diffs %s)" % ", ".join("%.3f" % d for d in tail[-4:]))
+    c["flags"] = flags[:12]
+    c["verdict"] = c.get("verdict") or ("%d frames; " % len(mine) + ("; ".join(flags[:6]) if flags else "no jumps, flicker or unsettled motion found"))
+    dest = os.path.join(ctx.out, "clips", c["name"])
+    os.makedirs(dest, exist_ok=True)
+    c["frames"] = []
+    for p in mine[::5][:16]:
+        q = os.path.join(dest, os.path.basename(p))
+        shutil.copy(p, q)
+        c["frames"].append(os.path.relpath(q, ctx.out))
 
 
 def _fmt_s(s):
@@ -543,7 +565,7 @@ def render_md(d):
         w("- Overseer Vance: reached goal %d of %d (`%s`: %s)." % (g["index"] + 1, g["total"], g["id"], g.get("text", "")))
     w("- Screens covered: %d. Stuck: %d. UI gaps: %d." % (len(d["screens"]), len(d["stuck"]), len(d["ui_gaps"])))
     f = d["fps"]
-    judged = "" if f["judged"] else " (software renderer %s: not judged)" % f["renderer"]
+    judged = "" if f["judged"] else " (%s: not judged)" % f.get("not_judged_why", "software renderer " + f["renderer"])
     w("- fps: min %.0f, 10th percentile %.0f, median %.0f over %d samples%s." % (f["min"], f["p10"], f["median"], f["samples"], judged))
     m = d["memory_mb"]
     w("- Memory: %.0f MB at the start, %.0f peak, %.0f at the end (%+.0f%%).\n" % (m["start"], m["peak"], m["end"], m["growth"] * 100))

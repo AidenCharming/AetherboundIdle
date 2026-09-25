@@ -178,7 +178,7 @@ def summary_text(d, out):
         lines.append("  stuck: " + s["reason"][:150])
     f, m = d["fps"], d["memory_mb"]
     lines.append("fps min/median %.0f/%.0f%s   memory %.0f -> %.0f MB (peak %.0f)" % (
-        f["min"], f["median"], "" if f["judged"] else " (software renderer, not judged)", m["start"], m["end"], m["peak"]))
+        f["min"], f["median"], "" if f["judged"] else " (%s, not judged)" % f.get("not_judged_why", "software renderer"), m["start"], m["end"], m["peak"]))
     lines.append("skipped %.1f in-game hours; real time %.0f s" % (d["skipped_hours"], d["real_seconds"]))
     lines.append("report: " + os.path.join(out, "report.md"))
     return "\n".join(lines)

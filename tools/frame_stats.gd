@@ -13,8 +13,9 @@ func _init() -> void:
 	var paths := FileAccess.get_file_as_string(args[0]).split("\n", false)
 	var out := []
 	var prev := PackedByteArray()
-	for path in paths:
-		var img := Image.load_from_file(path.strip_edges())
+	for line in paths:
+		var path := line.strip_edges()
+		var img := Image.load_from_file(path)
 		if img == null or img.is_empty():
 			out.append({"path": path, "error": "unreadable"})
 			prev = PackedByteArray()

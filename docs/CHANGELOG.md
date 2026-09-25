@@ -3,6 +3,18 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## Bridge benchmark fixes (2026-09-25)
+
+- The 2026-09-25 `--movie` run failed only on "fps fell below 20" (median 10). Movie Maker writes a 1080p PNG
+  every frame, so under `--movie` the frame rate measures the disk, not the game: fps is no longer judged on
+  movie runs (the report says "Movie Maker run: not judged"). Run without `--movie` for a real fps check.
+- The movie clip step crashed on the third clip and never rewrote the report: the frame list was written with
+  Windows line endings, Godot kept the `` on each path, and the first "jump" flag hit a `None` frame number.
+  The list is now `
+`-only and both sides strip the paths. The step prints progress per clip, rewrites the
+  report even if it's interrupted, and runs `frame_stats.gd` outside the project (no asset scan, 120 s timeout).
+  Reprocessed, that run passes; its hatch reveal shows five jumps at the reveal's opening and burst.
+
 ## Cleanup (2026-09-25): art production wrapped up
 
 - Every sprite and icon is in the game, so the art docs (`art-pipeline.md`, `art-window-start.md`,

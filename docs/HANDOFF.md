@@ -8,11 +8,10 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 
 - Current version **0.6.3j**. All 169 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
-- The designer is painting in `D:\AI`: every prompt is written, and Form 3 and hybrid sprites are being generated
-  and reviewed there. Leave the art files alone (see the art rules below).
+- **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
-  bugtest_benchmark --movie`. 0.6.3a fixed the `--movie` frame stats (wrong project path) and the background
-  frame-rate cap on bridge games; the next full run should confirm both and that it passes.
+  bugtest_benchmark [--movie]`. The 2026-09-25 movie run passes once reprocessed (fps isn't judged under
+  `--movie`, and the clip step no longer crashes); a run without `--movie` is the real fps check.
 - Godot on the designer's PC: `D:\GameDev\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe`
   (not on PATH in Git Bash).
 
