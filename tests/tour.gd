@@ -114,6 +114,22 @@ func _run() -> void:
 		await _wait(0.4)
 		await _shot("expeditions_dialog")
 		_close_modals()
+	if _want("autobind"):
+		Main.go("expeditions")
+		await _wait(0.4)
+		for tab in ["autobind", "party", "supplies"]:
+			Main.instance._screen._bottom_tab = tab
+			Main.instance._screen._fill_bottom()
+			await _wait(0.4)
+			await _shot("bottom_" + tab)
+	if _want("attune"):
+		Main.go("nexus")
+		await _wait(0.4)
+		var c: Dictionary = Game.state.creatures.values().filter(func(x): return x.traits.size() >= 2)[0]
+		Main.instance._screen._attune(c)
+		await _wait(0.5)
+		await _shot("attune")
+		_close_modals()
 	if _want("shinies"):
 		Main.go("nexus")
 		var scr: Node = Main.instance._screen
