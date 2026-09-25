@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 149 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 150 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -365,6 +365,14 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Version 0.3.0 and a version rule (designer's request, 2026-09-25)
+- Bumped to **0.3.0** (`project.godot` `config/version`, shown on the title screen; `export_presets.cfg` file and
+  product version) for the 2026-09-25 bug-fix and balance work. From now on any major code, balance, UI or icon
+  change bumps the version in the same change (minor for big changes, patch for small ones); see `CLAUDE.md`.
+- **Merge fix:** a local commit (party XP event per kill, `8db3007`) and the cloud's `_party_xp` (refreshes a
+  fighter who levels mid-run) did the same job twice after the merge, and wild kills lost the `party_xp` event.
+  They are now one `_party_xp` that does both; the offline path calls it with an empty battle. 150 tests.
 
 ### Expeditions: bosses a match for their waves (play-test feedback, 2026-09-25)
 - **The problem:** a friend got stuck on later islands' waves until he levelled, then beat their bosses easily.

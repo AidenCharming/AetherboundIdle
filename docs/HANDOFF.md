@@ -21,6 +21,11 @@ decided and why) and `README.md` (how to run things).
   Game, TestBridge. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and
   balance are JSON in `data/`. Never hardcode balance numbers.
 - Commit as you go with clear messages, and keep `docs/DECISIONS.md` current (it states the test count).
+- **Version number (designer's request):** any major code, balance, UI or icon change bumps the version in
+  `project.godot` (`config/version`, shown on the title screen) and `export_presets.cfg` (`file_version`,
+  `product_version`) in the same change. Semantic: minor (0.3.0 -> 0.4.0) for new systems, balance passes, UI
+  reworks or new art sets; patch (0.3.0 -> 0.3.1) for smaller fixes. Note the new number in `docs/DECISIONS.md`.
+  Current: 0.3.0 (2026-09-25).
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
   what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the

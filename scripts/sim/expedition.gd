@@ -217,24 +217,6 @@ static func kill_xp(level: int, rarity: int, boss := false) -> float:
 	return xp
 
 
-## Combat XP for each party member, with their own bonuses. Reports a "party_xp" event ({cid: amount}) so the
-## arena can show what every kill gave, not only the level-ups.
-static func _give_party_xp(s: Dictionary, party: Array, xp: float, events: Array) -> void:
-	var gained := {}
-	for c in party:
-		var amount := xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp"))
-		var before := float(c.xp)
-		var cev := Creatures.add_xp(c, amount)
-		if float(c.xp) > before:
-			gained[c.id] = float(c.xp) - before
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
-	if not gained.is_empty():
-		events.append({"type": "party_xp", "xp": gained})
-
-
 static func _on_enemy_down(s: Dictionary, f: Dictionary, rng: RandomNumberGenerator, events: Array) -> void:
 	var b: Dictionary = s.expedition.battle
 	b.kills = int(b.kills) + 1
@@ -264,10 +246,15 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 
 
 ## Combat XP for each party member. One who levels or evolves mid-run fights at the new level at once: its
-## fighter in the live battle `b` is refreshed, so XP from every kill shows, not only after the boss.
+## fighter in the live battle `b` is refreshed, so XP from every kill shows, not only after the boss. Reports a
+## "party_xp" event ({cid: amount}) so the arena can show what every kill gave, not only the level-ups.
 static func _party_xp(s: Dictionary, party: Array, xp: float, events: Array, b: Dictionary) -> void:
+	var gained := {}
 	for c in party:
+		var before := float(c.xp)
 		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
+		if float(c.xp) > before:
+			gained[c.id] = float(c.xp) - before
 		if cev.is_empty():
 			continue
 		for e in cev:
@@ -277,6 +264,8 @@ static func _party_xp(s: Dictionary, party: Array, xp: float, events: Array, b: 
 		for f in b.get("allies", []):
 			if f.get("cid", "") == c.id:
 				Combat.refresh_ally(f, c)
+	if not gained.is_empty():
+		events.append({"type": "party_xp", "xp": gained})
 
 
 ## Picks the vessel the auto-bind settings allow for this encounter, or "" to let it go.
@@ -542,7 +531,7 @@ static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int
 	s.counters.kills = int(s.counters.kills) + n
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + n
-	_give_party_xp(s, party, xp, events)
+	_party_xp(s, party, xp, events, {})
 	GameState.add_item(s, "gold", roundi(n * (float(z.gold[0]) + float(z.gold[1])) / 2.0))
 	for l in z.loot:
 		var k := Rng.binomial(rng, n, float(l.chance))

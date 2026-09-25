@@ -43,7 +43,10 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
 8. **Session task list:** keep a task list with each task's percent done and estimated share of the 5-hour
    usage in its title (`[40%] Fix X (est. +3%)`), and post a one-line progress note after each task. See
    `docs/HANDOFF.md`.
-9. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
+9. **Version:** any major code, balance, UI or icon change bumps `config/version` in `project.godot` and
+   `file_version`/`product_version` in `export_presets.cfg` (minor for big changes, patch for small ones).
+   See `docs/HANDOFF.md`.
+10. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
    pushes art to the same branch), then push.
 
 ## Commands
