@@ -464,9 +464,14 @@ def process_movie(ctx, data, godot):
         with open(lst, "w") as f:
             f.write("\n".join(os.path.abspath(p) for p in mine[:600]))
         try:
-            root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            subprocess.run([godot, "--headless", "--path", root, "--script", "res://tools/frame_stats.gd", "--", lst, res],
-                           timeout=600, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # this file is tools/scenarios/_player.py: the project root is three levels up
+            root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+            run = subprocess.run([godot, "--headless", "--path", root, "--script", "res://tools/frame_stats.gd", "--", lst, res],
+                                 timeout=600, capture_output=True, text=True, errors="replace")
+            if not os.path.exists(res):
+                # say why: Godot's last lines, not just "no such file"
+                tail = [l for l in (run.stdout + run.stderr).splitlines() if l.strip()][-3:]
+                raise RuntimeError("frame_stats wrote nothing, exit %s: %s" % (run.returncode, " | ".join(tail)))
             with open(res) as f:
                 stats = json.load(f)
         except Exception as e:  # the stats are a bonus: the sampled frames still go in the report

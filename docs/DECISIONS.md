@@ -20,7 +20,9 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   GPUs and starts faster than Forward+.
 - **Base resolution 1920×1080** (was 1600×900 until 0.5.0; every UI size was raised ×1.2 then, so the most common
   screen draws 1:1 instead of stretched 1.2×), `canvas_items` stretch with `expand`, so it reflows from 1280×720 to 4K.
-  Options has window mode, window size, VSync, a frame-rate cap and an interface scale.
+  Options has window mode, window size, VSync, a frame-rate cap and an interface scale. On first run the window
+  is the largest listed size that fits 90% of the screen (1920×1080 at most) and, when that is smaller than
+  1920×1080, the interface scale starts at 1.15 (`Options.first_run_defaults`; a 1080p screen gets 1600×900).
   - **2D transforms snap to whole pixels.** At 1920×1080 the old 1600 layout was scaled 1.2×, and without snapping some
     glyphs land on pixel edges (sharp) and others between them (soft), so text looked unevenly blurry.
     Movement now steps in whole screen pixels.
@@ -46,7 +48,8 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   outcomes over many actions use binomial sampling. Expeditions run the real battle for up to 30 runs,
   then extrapolate the rest of the window from the kill and boss rates those runs produced.
 - **Saves:** three slots (`user://slot_1.json` … `slot_3.json`), each with a `.bak.json` copy of the
-  previous save; JSON, versioned, with a migration step that fills in anything a newer build adds. The
+  previous save, `.session.json` (the save as this launch started) and `.session.prev.json` (the launch before;
+  a load that falls back to either tells the player progress since then is lost); JSON, versioned, with a migration step that fills in anything a newer build adds. The
   64-bit random generator state is saved (as a string, since JSON numbers lose precision) and every
   committed roll (breeding, hatching, attunement, binding) saves at once, so a reload can never re-roll
   anything. Options are separate (`user://options.cfg`) and shared by all slots. On Windows `user://` is
@@ -65,7 +68,9 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 162 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 166 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+  in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
+  afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app

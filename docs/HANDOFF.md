@@ -4,13 +4,15 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.3)
+## Where things stand (2026-09-25, v0.6.3a)
 
-- Current version **0.6.3**. All 162 tests pass, zero warnings.
+- Current version **0.6.3a**. All 166 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+  done except its deferred #10–#12 (see the CHANGELOG).
 - The designer is painting in `D:\AI`: every prompt is written, and Form 3 and hybrid sprites are being generated
   and reviewed there. Leave the art files alone (see the art rules below).
-- The last benchmark run (`bridge_runs/bugtest_benchmark-20260925-131537`) found two bridge-side bugs, fixed in
-  0.6.1. **Re-run it to confirm it passes.**
+- **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
+  bugtest_benchmark --movie`. 0.6.3a fixed the `--movie` frame stats (wrong project path) and the background
+  frame-rate cap on bridge games; the next full run should confirm both and that it passes.
 - Godot on the designer's PC: `D:\GameDev\Godot_v4.7.2-stable_mono_win64\Godot_v4.7.2-stable_mono_win64_console.exe`
   (not on PATH in Git Bash).
 
@@ -27,9 +29,9 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 2. **Sharpness:** 512 px icons instead of 256 (`icon_runner.py finish --size`, sources in `D:\AI`), after the
    current art run. Font hinting none vs light made no difference at 1080p. The designer dislikes icons that look
    different sizes anywhere.
-3. **Windowed mode:** small text in 1280×720 windows (scaled to 67%); consider a bigger default Interface scale.
-4. **Benchmark `--movie`:** a clip was recorded but its frame stats file was missing; check on a full run.
-5. Performance, nice to have: screens that rebuild on every `Game.changed` could rebuild only what changed.
+3. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
+   rebuilding everything on each `Game.changed` at 600: the Aether-Log (~40 ms), Expeditions and skill pages
+   (~25 ms), Market (~18 ms).
 ## Open: for the designer
 
 - **Not yet seen or heard in the real game:** the shiny and rare entrance sounds (`shiny_appear`, `rare_appear`),

@@ -44,6 +44,9 @@ const TABS := [["nexus", "Nexus"], ["pods", "Genesis Pods"], ["expeditions", "Ex
 const RESERVED_KEYS := [KEY_ESCAPE, KEY_F11, KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK]
 
 var _focused := true
+## Played by the test bridge: a run left behind other windows keeps the full frame rate (it still mutes), so its
+## FPS numbers mean something.
+var full_fps_in_background := false
 var _last_fullscreen := 1   # the fullscreen mode Alt+Enter / F11 goes back to
 var save_delay := 0.4   ## seconds of quiet before a change is written (a dragged slider changes every frame)
 var _save_timer: Timer
@@ -218,7 +221,7 @@ func _apply_display() -> void:
 	if DisplayServer.get_name() == "headless":
 		return
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if values.vsync else DisplayServer.VSYNC_DISABLED)
-	Engine.max_fps = FPS_CAPS[clampi(int(values.fps_cap), 0, FPS_CAPS.size() - 1)] if _focused else int(values.background_fps)
+	Engine.max_fps = FPS_CAPS[clampi(int(values.fps_cap), 0, FPS_CAPS.size() - 1)] if _focused or full_fps_in_background else int(values.background_fps)
 	var tree := get_tree()
 	if tree and tree.root:
 		tree.root.content_scale_factor = UI_SCALES[clampi(int(values.ui_scale), 0, UI_SCALES.size() - 1)]

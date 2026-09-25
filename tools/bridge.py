@@ -99,6 +99,11 @@ def run_scenario(name, rest, opt, flag):
     player = importlib.import_module("_player")
     scenario = importlib.import_module(name)
     os.makedirs(out, exist_ok=True)
+    # Godot must not treat run output as project files: an open editor, and every headless start (the
+    # --movie frame stats), would first import each 1080p movie frame, which ran past the stats' timeout
+    for d in (os.path.join(ROOT, "bridge_runs"), out):
+        if os.path.commonpath([os.path.abspath(ROOT), d]) == os.path.abspath(ROOT):
+            open(os.path.join(d, ".gdignore"), "a").close()
     proc = None
     extra_args = []
     if movie:

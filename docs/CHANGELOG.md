@@ -3,6 +3,41 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3a (2026-09-25): third code review, Nexus speed, first-run window, version letters
+
+- **Version letters (designer's request):** the numbers climb slowly. Minor only for a new system, patch for a
+  rework or balance pass, a letter for small fixes (0.6.3a, exported as `0.6.3.1`). `test_content` orders
+  letters and checks the export matches.
+- **Third code review** (`docs/codereview.md`, v0.6.3):
+  - #1: the `--warnings` pass loaded cached scripts, so the autoloads' classes (most of `sim/`) were never
+    checked. Each script is compiled afresh (not the runner itself, whose fresh copy replaced it mid-call).
+    Proved by planting an unused local in `creatures.gd`.
+  - #5: a `push_error` from game code fails the test (engine messages, like the headless shader compiler's,
+    don't); `t.expect_error(text)` for one triggered on purpose.
+  - #2: an import whose containers or creatures aren't records is refused before `migrate` can stop on it.
+  - #3: `slot_N.session.prev.json` keeps the session copy from a launch earlier; a load that falls back to a
+    session copy notifies the player.
+  - #4: `dev_next_wave` during the rest after a wipe starts a fresh run first.
+  - #6: portraits animate (rarity frames, shiny glints, bob) only while on screen: scrolled-out Creaturedex
+    cards counted as visible.
+  - #7 (design call: reveal less): the Show bar's Form 2/3 keep a never-seen species at its Form 1 shape; its
+    page has no thumbnails.
+  - #8 / HANDOFF small text: first run picks the largest window that fits the screen (≤ 1920×1080) and the
+    1.15 interface scale when it's smaller. `power_rating` weights moved to `tuning.creature.powerRating`.
+  - #9 stale 1600×900 text; #10 `Sfx.sound_names()` and preview buttons that play with their group off.
+  - Still deferred to the designer: #10–#12 of the first review (dev tools in release builds,
+    `.claude/settings.json`, `levelTimes` on the wall clock).
+- **Nexus refresh (HANDOFF performance):** 109 ms → 12 ms a `Game.changed` with 600 Aetherlings. Cards carry
+  their look (`CreatureCard.look`); unchanged ones stay in the grid and are only moved into sorted order.
+  (Re-adding them to the tree was itself 50 ms, so they are never removed.)
+- **Benchmark `--movie` stats:** the stats step started Godot with `--path tools` (the root was worked out one
+  level short from `tools/scenarios/_player.py`), so `res://tools/frame_stats.gd` never loaded and the report
+  only said "no such file". Fixed; a failed stats run now reports Godot's last lines. The bridge also writes
+  `bridge_runs/.gdignore`, so Godot (and an open editor) stops importing run frames as project files.
+- **Bridge games keep their frame rate in the background** (designer noticed runs capped while unfocused):
+  `Options.full_fps_in_background`, set when started with `--bridge`. They still mute when unfocused.
+  Not confirmed on a full run yet (the designer runs benchmarks).
+
 ## 0.6.3 (2026-09-25): the Aether-Log species page and the Creaturedex Show bar
 
 - **Species page (designer asked for it).** The old page put three 204 px portraits in a row, each description

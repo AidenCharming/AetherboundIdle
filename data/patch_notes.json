@@ -1,5 +1,21 @@
 [
 	{
+		"version": "0.6.3a",
+		"date": "2026-09-25",
+		"title": "Smoother with a big collection",
+		"notes": {
+			"New": [
+				["Options", "On first launch the window fits your screen, and the text starts larger when the window is smaller than 1920×1080."],
+				["Saves", "If your save can't be read and an older copy is loaded instead, the game now tells you."]
+			],
+			"Bugfixes": [
+				["Nexus", "No more stutter on every capture or level-up with hundreds of Aetherlings: only the cards that changed are redrawn."],
+				["Aether-Log", "Creaturedex portraits scrolled out of view no longer animate in the background."],
+				["Aether-Log", "The Form 2 and Form 3 buttons no longer reveal the shapes of species you have never seen."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3",
 		"date": "2026-09-25",
 		"title": "A roomier Aether-Log",

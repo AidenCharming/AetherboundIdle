@@ -46,6 +46,8 @@ func _ready() -> void:
 	if not enabled:
 		set_process(false)
 		return
+	Options.full_fps_in_background = true
+	Options.apply()
 	var port := DEFAULT_PORT
 	for a in args:
 		if a.begins_with("--bridge-port="):
@@ -141,7 +143,8 @@ func _handle(r: Dictionary) -> Dictionary:
 		"modals":
 			return {"ok": true, "modals": modals_info(), "reveal": reveal_info()}
 		"focus":
-			# play as a player looking at the window: lift the background frame-rate cap (Options)
+			# play as a player looking at the window: lift the background frame-rate cap (Options). A bridge
+			# game does this from the start now; kept for older scenarios.
 			Options._focused = true
 			Options.apply()
 			return {"ok": true, "fps_cap": Engine.max_fps}
