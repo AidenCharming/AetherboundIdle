@@ -2,6 +2,9 @@ extends Control
 ## Sanctum Works: permanent upgrades built with gold and crafted parts.
 
 var _list: HFlowContainer
+var _levels := []        ## upgrade levels the cards were built for: they're rebuilt only when these change
+var _builds := {}        ## upgrade id -> its Build button, whose enabled state is kept current in place
+var _poll := 0.0
 
 
 func _ready() -> void:
@@ -16,10 +19,19 @@ func _ready() -> void:
 	refresh()
 
 
+## Rebuilding on every Game.changed (a capture mid-expedition) freed a Build button between mouse down and up,
+## losing the click; and gold earned by work never re-enabled one. So the cards are rebuilt only when an
+## upgrade level changes, and the Build buttons follow what you can afford a few times a second.
 func refresh() -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
+	var levels := Data.upgrade_list.map(func(u): return GameState.upgrade_level(s, u.id))
+	if levels == _levels and _list.get_child_count() > 0:
+		_update_builds()
+		return
+	_levels = levels
+	_builds.clear()
 	UI.clear(_list)
 	for u in Data.upgrade_list:
 		var lv := GameState.upgrade_level(s, u.id)
@@ -54,8 +66,22 @@ func refresh() -> void:
 			cv.add_child(UI.cost_row(nxt.cost, 22))
 			var b := UI.button("Build", "Primary", func(): Game.buy_upgrade(u.id))
 			b.disabled = not GameState.can_afford(s, nxt.cost)
+			_builds[u.id] = b
 			cv.add_child(b)
 		_list.add_child(card)
+
+
+func _process(delta: float) -> void:
+	_poll -= delta
+	if _poll <= 0.0:
+		_poll = 0.25
+		refresh()
+
+
+func _update_builds() -> void:
+	for id in _builds:
+		var nxt := Economy.next_upgrade(Game.state, id)
+		_builds[id].disabled = nxt.is_empty() or not GameState.can_afford(Game.state, nxt.cost)
 
 
 func _icon(id: String) -> String:

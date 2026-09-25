@@ -583,3 +583,32 @@ func test_a_closing_dialog_lets_go_of_the_mouse_at_once() -> void:
 	m.close()
 	t.eq(count.closed, 1, "closing twice closes once")
 	_teardown()
+
+
+## Bridge bugs 3 and 5: Works rebuilt its cards on every Game.changed (losing a Build click mid-press) and
+## gold earned without a Game.changed never re-enabled a Build button.
+func test_works_build_buttons_stay_put_and_follow_gold() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("works")
+	var works: Node = main._screen
+	Game.state.gold = 0.0
+	works.refresh()
+	var id: String = Data.upgrade_list[0].id
+	var b: Button = works._builds[id]
+	t.ok(b.disabled, "can't afford it with no gold")
+	Game.changed.emit()
+	t.ok(is_instance_valid(b) and not b.is_queued_for_deletion(), "a Game.changed doesn't rebuild the cards")
+	for it in Data.item_list:
+		GameState.add_item(Game.state, it.id, 1000)
+	Game.state.gold = 1.0e9
+	Game.state.aether = 1.0e9
+	works._process(1.0)
+	t.ok(not b.disabled, "gold earned quietly enables Build")
+	var before := GameState.upgrade_level(Game.state, id)
+	b.pressed.emit()
+	t.eq(GameState.upgrade_level(Game.state, id), before + 1)
+	t.ok(works._builds[id] != b, "building rebuilt the cards")
+	main.free()
+	_teardown()
