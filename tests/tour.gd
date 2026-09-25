@@ -96,6 +96,9 @@ func _run() -> void:
 	for m in Modal.layer.get_children():
 		m.queue_free()
 	await _wait(0.4)
+	GameState.add_item(Game.state, "sunken-trinket", 2)
+	GameState.add_item(Game.state, "seedcache", 1)
+	load("res://scripts/ui/screens/inventory_screen.gd").selected = "oak-log"
 	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["skill", "fishing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
 		var name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
 		if not _want(name):
