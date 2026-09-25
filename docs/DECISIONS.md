@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 123 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 128 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -365,6 +365,29 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Play-test feedback, first round (2026-09-25)
+A friend's first hours of play, reported with screenshots. Each change is its own commit.
+- **The window stays maximized.** `Options.apply()` ran on every option change and every alt-tab and set the
+  window size again, undoing a maximize. Window mode and size now apply only at start-up and when one of them
+  changes (`Options.WINDOW_KEYS`); picking a size still leaves a maximized window. **Alt+Enter and F11** switch
+  between a window and the fullscreen kind used last.
+- **Market stock discounts are real.** Material and vessel offers are priced by the lot (per-unit rounding ate
+  the 10% on 3-gold Scrap), never below the lot's sell-back value, and the chip shows the true discount. Boost
+  offers follow the boost's current price (it grows per island cleared) instead of the price at roll time.
+- **Attune locks cost by strength:** `attunement.lockMultByStrength` (Minor ×1.5, Moderate ×2.25, Major ×3)
+  replaces `lockMult` by count; two Major locks still cost ×9. The designer asked for Minor to be cheaper.
+- **UI:** `ToggleSwitch` (an anti-aliased, sliding switch drawn in code) replaces the pixel texture switch;
+  Attune uses Lock pills. The panel under the battle keeps the tallest tab's height. Folded panels show their
+  icon with an arrow. Binds and escapes in the log show the chance they had. The rail shows the game icon,
+  keycaps for number-key shortcuts, and the mouse's back/forward buttons walk page history. Tooltips are styled
+  cards (0.35 s delay); item chips show a rich card with what the item is for (`Economy.uses`). The Inventory
+  lists an item's uses, calls items nothing uses "treasure", and has **Sell treasure**; its tiles have bright,
+  two-line names and a count pill. Aether-Log milestone cards are roomier. Task cards read as a recipe:
+  Uses each time / Makes / Sometimes finds, with live counts.
+- **Windowed text:** checked at 1280×720. The font settings already render best (hinting light); text is small
+  because the 1600×900 layout is scaled to 80%. A bigger scale floor overflows the Expeditions page (its log
+  column is cut), so that needs the layout to reflow narrower first. Not changed.
 
 ### Code review fixes (2026-09-24)
 A review of the whole repo found save, purchase and correctness bugs; each fix is its own commit with a test.

@@ -47,6 +47,50 @@ All commands run from the repo root.
 - A wrapping Label measured before its container gives it a width reports thousands of pixels of height.
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
 
+## Start here: open play-test feedback (2026-09-25)
+
+A friend play-tested for about an hour; the designer relayed it with screenshots. Done so far is in
+`DECISIONS.md` ("Play-test feedback, first round"). **Still open, in a sensible order:**
+
+1. **Cooking soft-lock.** A Pyric cook can arrive before any Aqueous Aetherling, and every Cooking recipe needs
+   fish, so the cook has nothing to do. Check `data/skills.json` (cooking inputs) and the Market's fish stock
+   (`Market.for_sale`, `unlock_clears`); fix with a no-fish first recipe or fish on sale from the start. Ask
+   the designer which.
+2. **Wild forms.** Wild Aetherlings take their form from their level (`F.form_for_level` in `Combat.wild` /
+   the spawn code in `expedition.gd`), so later islands only spawn Form 2–3 and Form 1 needs breeding. The
+   designer wants each island to roll a mix of Form 1–3 weighted by the island's level (more variety too).
+   Put the weights in `data/` (zones or tuning), keep the stats honest for the form, check the month probe.
+3. **Balance (ask the designer before changing numbers; rule 7).** In one hour the friend had 35 Aetherlings
+   up to Gleaming (rarity 4 of 10) by breeding two Steadys, lots of Minor/Major trait rolls, and a Luminous-ish
+   Mossgear party at Lv 1–3 beat Old Thicketroll and nearly Granitusk. Look at: the rarity stat multipliers
+   (`F.stat_value`, `data/rarities.json`), breeding rarity odds (`Breeding.rarity_odds`, `breeding.stepWeight`,
+   `centreLiftPerTier`, `ceilingByTier`, mutations), trait strength odds, and Mossgear's stat lean. The
+   designer suggested a gentler Dim → Faint → Steady ramp. Measure with `tests/balance_probe.tscn` and the
+   month probe, then propose numbers.
+4. **Genesis Pods speed-up** should cost a bit more Aether: `breeding.speedUpAetherPerMinute` (data only).
+5. **Idle motion:** the friend likes the animated placeholder blob; give real creature sprites a gentle idle
+   (breathing / bob), off with Reduce motion. Find the blob's animation in `scripts/ui/widgets/` (portrait /
+   arena fighter) and reuse it.
+6. **Nexus filters:** rework the chip rows into a labelled "Filter" section with type icons, rarity pips (filter
+   by rarity), a shiny icon, status; keep the (fast) search box. `scripts/ui/screens/nexus_screen.gd`.
+7. **Nexus detail panel:** the "Put to work" menu shows huge skill icons (a PopupMenu with full-size icons:
+   set `icon_max_width` or scale the textures), and the Work section's text ("Specialist", "Knack for…",
+   "Can work", "Status") needs a clearer layout.
+8. **Worker picker:** drop the "Best time" sort (per-hour output already covers it). Add a "Fill empty slots"
+   on each skill page that uses that skill's last picker sort (so Woodcutting can fill by output and Mining by
+   secondary finds).
+9. **Breeding parent picker:** show each creature's status (working, on an expedition, resting) on its card.
+   Breeding doesn't take them off their job; say so in the picker.
+10. **Windowed mode, small text:** see DECISIONS; needs the Expeditions page (and others) to fit about
+    1390 px wide before an automatic interface-scale floor is possible.
+11. Keycaps exist only for the number-key pages; skill pages have no shortcuts. Ask whether they should.
+
+Tools that helped: `tests/tour.tscn` now takes `--size=WxH` and `--ui-scale=N`, and has shots named
+`autobind`, `attune`, `folded`, `tooltip`, `milestones` (run under `xvfb-run -a -s "-screen 0 1920x1400x24"`
+in the cloud). A new `class_name` needs `godot --headless --path . --import` before the tests see it.
+**The test runner exits 0 even when a test file fails to parse** (the parse errors print, the suite still
+passes); watch for `SCRIPT ERROR` in its output. Fixing that in `tests/test_runner.gd` would be worth it.
+
 ## Recently done (this session)
 
 **Code review fixes (2026-09-24),** one commit each, see `DECISIONS.md` ("Code review fixes"):
