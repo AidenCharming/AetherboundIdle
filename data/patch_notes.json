@@ -1,5 +1,16 @@
 [
 	{
+		"version": "0.6.3e",
+		"date": "2026-09-25",
+		"title": "A violet close button",
+		"notes": {
+			"New": [
+				["UI", "The close button on every window is newly painted in violet to match the rest of the interface."],
+				["Nexus", "Brambletide, Drizzlenub and Murkroot are painted in their final form."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3d",
 		"date": "2026-09-25",
 		"title": "Shared spoils",

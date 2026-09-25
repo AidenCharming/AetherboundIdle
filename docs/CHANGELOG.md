@@ -3,6 +3,18 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3e (2026-09-25): violet close button, 3 more Form 3 sprites
+
+- **Close button painted:** the ruby-red prompt looked out of place, so `build_icon_prompts.py` now asks for a
+  glossy violet button with a navy rim and a cream X, on the green key (violet is too close to magenta).
+  Candidate 7 of the second batch, installed at 512 px like the other painted icons (`icon_runner.py finish
+  --only close --size 512`); the SVG stays as the fallback.
+- Form 3 of Brambletide, Drizzlenub and Murkroot (from the dual-reference run). 29 of the 45 hybrids and specials
+  now have all three forms in the game; the other 16 are being redrawn.
+- `D:\AI\tools\batch_runner.py run --stage 3 --scratch`: draws Form 3 from text with no reference image (the
+  Form 1 graph), using a full-description prompt (`SCRATCH3` in `build_prompts.py`). For the 16 species whose
+  edits kept Form 2's pose through three runs (single reference, reworded, dual reference).
+
 ## 0.6.3d (2026-09-25): kill XP shared by the party, close button art slot
 
 - **Kill XP is split across the party (designer's report):** three Aetherlings each got the full XP a lone

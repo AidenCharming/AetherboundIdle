@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.3d)
+## Where things stand (2026-09-25, v0.6.3e)
 
-- Current version **0.6.3d**. All 168 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.6.3e**. All 168 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - The designer is painting in `D:\AI`: every prompt is written, and Form 3 and hybrid sprites are being generated
   and reviewed there. Leave the art files alone (see the art rules below).

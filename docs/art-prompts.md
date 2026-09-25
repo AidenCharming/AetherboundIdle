@@ -66,7 +66,7 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 23 | Hushflutter | Void | Hushflutter > Hushglide > Silentwing | base | green | structure | F1 [x]  F2 [x]  F3 [x] |
 | 24 | Netherpod | Void | Netherpod > Chasmshell > Astralcarapace | base | green | structure | F1 [x]  F2 [x]  F3 [x] |
 | 25 | Ashwood | Verdant/Pyric | Ashwood > Emberbark > Hearthtrunk | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 26 | Brambletide | Verdant/Aqueous | Brambletide > Briarripple > Thicketwave | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 26 | Brambletide | Verdant/Aqueous | Brambletide > Briarripple > Thicketwave | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 27 | Sproutfault | Verdant/Telluric | Sproutfault > Timbershale > Lumbercrag | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 28 | Mosscoil | Verdant/Voltaic | Mosscoil > Mossfuse > Canopygrid | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 29 | Mudskulker | Telluric/Aqueous | Mudskulker > Shaleflow > Bedrocktide | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
@@ -85,7 +85,7 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 42 | Cairnflit | Telluric/Voltaic | Cairnflit > Pumiceglide > Fluxwing | special | magenta | structure | F1 [x]  F2 [x]  F3 [ ] |
 | 43 | Flintlamb | Telluric/Voltaic | Flintlamb > Ampcurl > Mesahorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 44 | Coralpeep | Pyric/Aqueous | Coralpeep > Flarewade > Pyreplume | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
-| 45 | Drizzlenub | Pyric/Aqueous | Drizzlenub > Brooksoak > Lavabask | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 45 | Drizzlenub | Pyric/Aqueous | Drizzlenub > Brooksoak > Lavabask | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 46 | Coalgrub | Pyric/Voltaic | Coalgrub > Arcflicker > Blazefly | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 47 | Boltkit | Pyric/Voltaic | Boltkit > Brandtail > Scorchfox | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 48 | Eddyelver | Aqueous/Voltaic | Eddyelver > Kelpeel > Dynamoeel | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
@@ -100,13 +100,13 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 57 | Burrbolt | Verdant/Voltaic | Burrbolt > Quillspark > Stormbristle | special | magenta | cute | F1 [x]  F2 [x]  F3 [x] |
 | 58 | Cliffscorch | Telluric/Pyric | Cliffscorch > Kilnclaw > Pyrestinger | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 59 | Nettlemesa | Telluric/Pyric | Nettlemesa > Spurback > Spinehearth | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 60 | Murkroot | Void/Verdant | Murkroot > Palevine > Loamgrove | special | green | cute | F1 [x]  F2 [x]  F3 [ ] |
+| 60 | Murkroot | Void/Verdant | Murkroot > Palevine > Loamgrove | special | green | cute | F1 [x]  F2 [x]  F3 [x] |
 | 61 | Duskbloom | Void/Verdant | Duskbloom > Wanehop > Moonwarren | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 62 | Riftshale | Void/Telluric | Riftshale > Chasmclaw > Abyssburrow | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 63 | Nethershale | Void/Telluric | Nethershale > Grimplate > Umbralith | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
-| 64 | Wraithcoal | Void/Pyric | Wraithcoal > Ashgloam > Cinderwraith | special | green | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 65 | Duskflare | Void/Pyric | Duskflare > Wanescorch > Gloamfang | special | green | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 66 | Murkmire | Void/Aqueous | Murkmire > Murkveil > Abyssbloom | special | green | structure | F1 [x]  F2 [x]  F3 [ ] |
+| 64 | Wraithcoal | Void/Pyric | Wraithcoal > Ashgloam > Cinderwraith | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
+| 65 | Duskflare | Void/Pyric | Duskflare > Wanescorch > Gloamfang | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
+| 66 | Murkmire | Void/Aqueous | Murkmire > Murkveil > Abyssbloom | special | green | structure | F1 [x]  F2 [x]  F3 [x] |
 | 67 | Hollowstream | Void/Aqueous | Hollowstream > Stillgill > Palepool | special | green | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 68 | Wraithwire | Void/Voltaic | Wraithwire > Wanewire > Shadescythe | special | green | structure | F1 [x]  F2 [x]  F3 [ ] |
 | 69 | Duskvolt | Void/Voltaic | Duskvolt > Wanecoil > Gloomweaver | special | green | structure | F1 [x]  F2 [x]  F3 [ ] |
