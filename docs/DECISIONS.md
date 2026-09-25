@@ -65,7 +65,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 160 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 162 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -291,7 +291,12 @@ A creature-collecting idle game in five loops that feed each other:
    and titles; secret recipes show a hint until found. Every rarity of every species is its own entry:
    owning a species at a rarity you have not had before is announced ("New in the Aether-Log: Faint
    Buzzbud") and pays 5 × 2^(rarity − 1) Aether (Faint 10 … Zenith 1,280; `collection.json` `newRarity`).
-   The Creaturedex opens with a strip of all five tracks' counts (designer's request).
+   The Creaturedex opens with a strip of all five tracks' counts (designer's request). A Show bar under it
+   picks how the cards look: the best form found or Form 1/2/3 (a form not found is a silhouette), the
+   highest rarity owned with its frame and effects, and the shiny colours once a shiny was caught (all
+   on by default). A species' page shows one form at a time: a large portrait with the three forms as
+   thumbnails under it (opening on the highest found), and the form's name, level, stat multiplier and
+   description at full width beside it, then the species facts.
 
 Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, each paying a small reward.
 

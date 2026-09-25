@@ -162,6 +162,13 @@ func _run() -> void:
 		Main.instance._screen.refresh()
 		await _wait(0.6)
 		await _shot("milestones")
+	if _want("dexpage"):
+		# the species page for a species owned at its highest form
+		var best: Dictionary = Game.state.creatures.values().reduce(func(a, b): return a if Creatures.form_of(a) >= Creatures.form_of(b) else b)
+		AetherlogScreen._detail(Data.species[best.species])
+		await _wait(0.5)
+		await _shot("dexpage")
+		_close_modals()
 	if _want("attune"):
 		Main.go("nexus")
 		await _wait(0.4)

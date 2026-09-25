@@ -1035,3 +1035,88 @@ func test_rail_says_when_a_goal_is_ready_to_claim() -> void:
 	t.ok(sn.button.tooltip_text.contains(Data.goals[0].text), "the tooltip names the goal: %s" % sn.button.tooltip_text)
 	main.free()
 	_teardown()
+
+
+## Designer's request: the Aether-Log species page shows one form at a time, a large portrait with the three
+## forms as thumbnails, opening on the highest form found; a thumbnail click swaps the portrait and the text.
+func test_aetherlog_species_page_shows_one_form_at_a_time() -> void:
+	_setup()
+	var s := Game.state
+	var big_form := func(md: Modal) -> int:
+		for p in md.find_children("*", "CreaturePortrait", true, false):
+			if p.has_meta("big"):
+				return p.form
+		return 0
+	var thumbs := func(md: Modal) -> Array:
+		return md.find_children("*", "Button", true, false).filter(func(b): return b.has_meta("form"))
+	# unseen: silhouettes and ???, on Form 1
+	var sp: Dictionary = Data.species.emberfang
+	s.collection.seen.erase(sp.id)
+	s.collection.species.erase(sp.id)
+	var m: Modal = AetherlogScreen._detail(sp)
+	t.eq(big_form.call(m), 1, "an unseen species opens on Form 1")
+	t.eq(thumbs.call(m).size(), 3, "three form thumbnails")
+	t.ok(_find_label(m, sp.forms[0].name) == null, "an unseen species keeps its name hidden")
+	_teardown()
+	# seen, not owned
+	s.collection.seen[sp.id] = true
+	m = AetherlogScreen._detail(sp)
+	t.eq(big_form.call(m), 1, "a seen species opens on Form 1")
+	t.ok(_find_label(m, "Form 1") != null, "a form not found yet is named by its number")
+	_teardown()
+	# owned up to Form 2: opens there, its description is shown, and a click on Form 3 swaps
+	var c := Creatures.make(s, sp.id, 1, 25, false, [], "test")
+	s.creatures[c.id] = c
+	Collection.on_owned(s, c)
+	m = AetherlogScreen._detail(sp)
+	t.eq(big_form.call(m), 2, "opens on the highest form found")
+	t.ok(_find_label(m, sp.forms[1].desc) != null, "Form 2's description is shown")
+	var t3: Button = thumbs.call(m)[2]
+	t3.pressed.emit()
+	t.eq(big_form.call(m), 3, "a thumbnail click swaps the portrait")
+	t.eq(t3.theme_type_variation, "TileOn", "the chosen thumbnail is highlighted")
+	t.ok(_find_label(m, "Form 3: not discovered yet.") != null, "an undiscovered form says so")
+	t.ok(_find_label(m, sp.forms[1].desc) == null, "the text swaps with it")
+	_teardown()
+
+
+func _find_label(root: Node, text: String) -> Label:
+	for l in root.find_children("*", "Label", true, false):
+		if l.text == text:
+			return l
+	return null
+
+
+## Designer's request: the Creaturedex cards can show Form 1, 2 or 3 (or the best found), at the highest rarity
+## owned with its effects, and shiny once one was caught.
+func test_aetherlog_cards_show_chosen_form_rarity_and_shiny() -> void:
+	_setup()
+	var s := Game.state
+	var c := Creatures.make(s, "emberfang", 3, 25, true, [], "test")
+	s.creatures[c.id] = c
+	Collection.on_owned(s, c)
+	AetherlogScreen.tab = "dex"
+	var main := _main()
+	_teardown()
+	main.show_screen("aetherlog")
+	var screen: Node = main._screen
+	var card := func() -> CreaturePortrait:
+		for p in screen.find_children("*", "CreaturePortrait", true, false):
+			if p.has_meta("card_portrait") and p.species == "emberfang" and p.is_inside_tree() and not p.is_queued_for_deletion():
+				return p
+		return null
+	var p: CreaturePortrait = card.call()
+	t.eq([p.form, p.rarity, p.shiny, p.silhouette], [2, 3, true, false], "best form, highest rarity, shiny")
+	_find_button(screen, "Form 3").pressed.emit()
+	p = card.call()
+	t.eq([p.form, p.silhouette, p.shiny], [3, true, false], "a form not found is a plain silhouette")
+	_find_button(screen, "Form 1").pressed.emit()
+	_find_button(screen, "Highest rarity").pressed.emit()
+	_find_button(screen, "Shiny").pressed.emit()
+	p = card.call()
+	t.eq([p.form, p.rarity, p.shiny, p.silhouette], [1, 1, false, false], "rarity and shiny looks switch off")
+	AetherlogScreen.show_form = 0
+	AetherlogScreen.show_rarity = true
+	AetherlogScreen.show_shiny = true
+	main.free()
+	_teardown()

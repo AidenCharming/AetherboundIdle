@@ -1,5 +1,16 @@
 [
 	{
+		"version": "0.6.3",
+		"date": "2026-09-25",
+		"title": "A roomier Aether-Log",
+		"notes": {
+			"New": [
+				["Aether-Log", "The Creaturedex can show every card as Form 1, 2 or 3, at the highest rarity you have owned with its effects, and in shiny colours once you have caught a shiny."],
+				["Aether-Log", "A species' page shows one form at a time: a large portrait with the three forms as thumbnails, and its description and facts at full width beside it."]
+			]
+		}
+	},
+	{
 		"version": "0.6.2",
 		"date": "2026-09-25",
 		"title": "Hybrids and secret recipes get their pictures",

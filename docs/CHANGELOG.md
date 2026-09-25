@@ -3,6 +3,20 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3 (2026-09-25): the Aether-Log species page and the Creaturedex Show bar
+
+- **Species page (designer asked for it).** The old page put three 204 px portraits in a row, each description
+  squeezed into its column, so the columns came out uneven. Now it shows one form at a time: a 260 px portrait
+  on the left with the three forms as clickable thumbnails (silhouettes until found), opening on the highest
+  form found; on the right, at full width, the form's name, "Form N of 3 · grows into it at Lv X · stats ×Y"
+  (from `formLevels` / `formStatMult`), its description, then the types, skills, signature trait and ability,
+  rarities owned, shiny colours and where to find it.
+- **Show bar on the Creaturedex (designer's request).** Best form / Form 1 / Form 2 / Form 3, plus Highest
+  rarity (the card shows the top rarity owned, with its frame and shader) and Shiny (the shiny hue once one
+  is caught). A form not found shows as a plain silhouette.
+- The patch notes have an "Aether-Log" area colour. The tour has a `dexpage` shot.
+- Tests: `test_aetherlog_species_page_shows_one_form_at_a_time`, `test_aetherlog_cards_show_chosen_form_rarity_and_shiny`.
+
 ## 0.6.2 (2026-09-25): sprites for the 45 hybrids and specials
 
 - 103 creature sprites into `assets/creatures/`: Forms 1 and 2 of all 15 hybrids and 30 specials, and Form 3 of
