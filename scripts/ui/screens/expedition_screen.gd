@@ -228,7 +228,7 @@ func _fill_preview() -> void:
 		var l := UI.label(Data.species[id].name if seen else "???", "Small")
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		v.add_child(l)
-		if Collection.is_owned(s, id):
+		if Collection.is_form_owned(s, id, 1):
 			p.add_child(UI.owned_mark(31, Vector2(84, 84)))
 		var pl := UI.label(F.pct(float(z.species[id]) / total), "Faint")
 		pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

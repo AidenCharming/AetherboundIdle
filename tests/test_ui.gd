@@ -332,7 +332,7 @@ func test_arena_fighters_keep_one_size() -> void:
 	_teardown()
 
 
-## Species you own carry the owned badge in an island's list of Aetherlings; others don't.
+## Species whose Form 1 you have had carry the owned badge in an island's list of Aetherlings; others don't.
 func test_island_preview_marks_owned_species() -> void:
 	_setup()
 	var main := _main()
@@ -343,8 +343,8 @@ func test_island_preview_marks_owned_species() -> void:
 	Collection.on_owned(s, c)
 	main.show_screen("expeditions", "whisperleaf-hollow")
 	var marks: Array = main._screen._preview.find_children("*", "TextureRect", true, false).filter(
-		func(n): return n.tooltip_text == "You own this species")
-	var owned: Array = Data.zones["whisperleaf-hollow"].species.keys().filter(func(id): return Collection.is_owned(s, id))
+		func(n): return n.tooltip_text == "You have caught or bred this form")
+	var owned: Array = Data.zones["whisperleaf-hollow"].species.keys().filter(func(id): return Collection.is_form_owned(s, id, 1))
 	t.ok(owned.has("mossgear"), "Mossgear is owned")
 	t.eq(marks.size(), owned.size(), "one badge per owned species")
 	main.free()

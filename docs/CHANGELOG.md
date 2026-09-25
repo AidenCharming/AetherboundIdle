@@ -3,6 +3,16 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3g (2026-09-25): the owned mark is per form
+
+- **Owned mark (playtest question):** the mark on an island's Aetherling list and on wild fighters' name tags
+  was per species, and owning a Form 2 also logs Form 1 as found, so a wild Form 1 showed "owned" when only
+  its Form 2 had been caught. Each Aether-Log entry now also keeps `ownedForms` (forms actually had: caught,
+  bred, hatched or evolved into; `forms` still drives the log's pictures), and the mark uses
+  `Collection.is_form_owned`. Old saves start `ownedForms` from the roster's current forms
+  (`Collection.migrate`). Auto-bind's "new species" rule is still per species. Test:
+  `test_owned_mark_is_per_form`.
+
 ## 0.6.3f (2026-09-25): flatter, bigger painted close button
 
 - **Close button (designer's feedback):** the old round box still showed behind the painted icon (the icon

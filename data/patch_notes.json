@@ -1,5 +1,15 @@
 [
 	{
+		"version": "0.6.3g",
+		"date": "2026-09-25",
+		"title": "Form by form",
+		"notes": {
+			"Bugfixes": [
+				["Expeditions", "The owned mark on wild Aetherlings and on an island's list now means you have had that exact form: catching a later form no longer marks its first form."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3f",
 		"date": "2026-09-25",
 		"title": "A cleaner close",

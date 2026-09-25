@@ -137,6 +137,23 @@ func test_kill_xp_is_shared_by_the_party() -> void:
 	t.near(float(first.xp) - before, 7.5, 0.001, "two share it in halves")
 
 
+## Playtest question: catching a Form 2 must not mark its Form 1 as owned (the island list and wild name tags
+## show the mark per form). Evolving into a form, or an old save's roster, counts.
+func test_owned_mark_is_per_form() -> void:
+	var s := GameState.new_game()
+	var c := Creatures.make(s, "emberfang", 1, 30, false, [], "test")
+	s.creatures[c.id] = c
+	var form := Creatures.form_of(c)
+	t.ok(form >= 2, "a level-30 Emberfang is past Form 1")
+	Collection.on_owned(s, c)
+	t.ok(Collection.is_form_owned(s, "emberfang", form), "the caught form is marked")
+	t.ok(not Collection.is_form_owned(s, "emberfang", 1), "its Form 1 isn't")
+	t.ok(1 in s.collection.species.emberfang.forms, "though the log still shows Form 1 as found")
+	s.collection.species.emberfang.erase("ownedForms")
+	Collection.migrate(s)
+	t.eq(s.collection.species.emberfang.ownedForms, [form], "an old save starts from the roster's forms")
+
+
 func test_first_of_a_type_binds_free() -> void:
 	var s := GameState.new_game()
 	s.items.clear()

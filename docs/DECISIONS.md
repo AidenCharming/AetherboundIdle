@@ -68,7 +68,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 168 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 169 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints

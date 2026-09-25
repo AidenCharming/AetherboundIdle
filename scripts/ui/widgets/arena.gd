@@ -184,7 +184,7 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	panel.add_child(v)
 	var row := UI.hbox(5)
 	row.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	if side == 1 and not boss and Collection.is_owned(Game.state, f.species):
+	if side == 1 and not boss and Collection.is_form_owned(Game.state, f.species, int(f.get("form", 1))):
 		var mark := UI.owned_mark(17)
 		mark.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		mark.size_flags_vertical = Control.SIZE_SHRINK_CENTER

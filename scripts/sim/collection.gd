@@ -1,8 +1,10 @@
 class_name Collection
 extends RefCounted
 ## The Aether-Log: what the player has discovered, the collection tracks and their milestone rewards.
-## state.collection = {species: {id: {forms, rarities, shiny}}, recipes: [hybrid ids], revealed: [special ids],
+## state.collection = {species: {id: {forms, ownedForms, rarities, shiny}}, recipes: [hybrid ids], revealed: [special ids],
 ##                     claimed: {track: [milestone index]}, titles: [], seen: {species id: true}}
+## `forms` is every form shown in the log (owning a Form 2 counts Form 1 as found); `ownedForms` only the forms
+## the player has actually had (caught, bred, hatched or evolved into), which is what the "owned" mark means.
 
 
 ## Records a creature the player now owns. Returns events (new species, new recipe, discovery reward).
@@ -13,7 +15,7 @@ static func on_owned(s: Dictionary, c: Dictionary) -> Array:
 	var sp: Dictionary = Data.species[sp_id]
 	col.seen[sp_id] = true
 	if not col.species.has(sp_id):
-		col.species[sp_id] = {"forms": [], "rarities": [], "shiny": false}
+		col.species[sp_id] = {"forms": [], "ownedForms": [], "rarities": [], "shiny": false}
 		var reward: Dictionary = Data.collection.discovery[sp.kind]
 		GameState.add_item(s, "aether", float(reward.aether))
 		GameState.add_item(s, "gold", float(reward.gold))
@@ -26,6 +28,7 @@ static func on_owned(s: Dictionary, c: Dictionary) -> Array:
 	for f in range(1, form + 1):
 		if not (f in entry.forms):
 			entry.forms.append(f)
+	_add_owned_form(entry, form)
 	if not (int(c.rarity) in entry.rarities):
 		# a new rarity of a species already in the log is a log entry of its own (the first one is the discovery)
 		if not entry.rarities.is_empty():
@@ -53,10 +56,34 @@ static func on_evolved(s: Dictionary, c: Dictionary) -> void:
 	for f in range(1, form + 1):
 		if not (f in entry.forms):
 			entry.forms.append(f)
+	_add_owned_form(entry, form)
+
+
+static func _add_owned_form(entry: Dictionary, form: int) -> void:
+	if not entry.has("ownedForms"):
+		entry.ownedForms = []
+	if not (form in entry.ownedForms):
+		entry.ownedForms.append(form)
 
 
 static func is_owned(s: Dictionary, species_id: String) -> bool:
 	return s.collection.species.has(species_id)
+
+
+## Whether the player has had this exact form (the "owned" mark on islands and wild fighters). Catching a Form 2
+## doesn't mark the Form 1.
+static func is_form_owned(s: Dictionary, species_id: String, form: int) -> bool:
+	var entry: Dictionary = s.collection.species.get(species_id, {})
+	return form in entry.get("ownedForms", [])
+
+
+## Older saves have no `ownedForms`: start it from the forms in the roster now (released ones are forgotten).
+## Safe on every load: a form in the roster is always one the player has had.
+static func migrate(s: Dictionary) -> void:
+	for c in s.creatures.values():
+		var entry: Dictionary = s.collection.species.get(c.species, {})
+		if not entry.is_empty():
+			_add_owned_form(entry, Creatures.form_of(c))
 
 
 static func owned_type(s: Dictionary, type_id: String) -> bool:

@@ -45,13 +45,13 @@ static func icon(tex: Texture2D, size := 29) -> TextureRect:
 	return r
 
 
-## The "you own this species" badge. With `corner` (the size of the picture it sits on) it is placed on
+## The "you have had this form" badge (see `Collection.is_form_owned`). With `corner` (the size of the picture it sits on) it is placed on
 ## that picture's bottom-right corner.
 static func owned_mark(size := 24, corner := Vector2.ZERO) -> TextureRect:
 	var r := icon(Data.ui_icon("owned"), size)
 	r.size = Vector2(size, size)
 	r.mouse_filter = Control.MOUSE_FILTER_STOP
-	r.tooltip_text = "You own this species"
+	r.tooltip_text = "You have caught or bred this form"
 	if corner != Vector2.ZERO:
 		r.position = corner - Vector2(size, size) * 0.9
 	return r
