@@ -10,9 +10,7 @@ var _filter_status := ""
 var _sort := "rarity"
 var _search: LineEdit
 var _count: HBoxContainer
-var _type_row: HFlowContainer
-var _status_row: HFlowContainer
-var _sort_row: HFlowContainer
+var _filter_bar: HBoxContainer
 var _xp_bar: ProgressBar
 
 
@@ -34,28 +32,23 @@ func _ready() -> void:
 	head.add_child(_count)
 	head.add_child(UI.button("Bulk release", "", _bulk_release))
 	left.add_child(head)
+	# search and the three choices on one row (play-test feedback: three rows of chips took a third of the
+	# column): type, what it's doing, and the order
 	var filters := UI.panel("CardFlat")
-	var fv := UI.vbox(8)
-	filters.add_child(fv)
-	_type_row = UI.flow(6, 6)
-	fv.add_child(_type_row)
-	_status_row = UI.flow(6, 6)
-	fv.add_child(_status_row)
-	_sort_row = UI.flow(6, 6)
-	fv.add_child(_sort_row)
+	_filter_bar = UI.hbox(8)
+	filters.add_child(_filter_bar)
 	_search = LineEdit.new()
 	_search.placeholder_text = "Search…"
-	_search.custom_minimum_size.x = 180
+	_search.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	_search.custom_minimum_size.x = 140
 	_search.text_changed.connect(func(_t): _fill_grid())
-	_type_row.add_child(_search)
-	_chip(_type_row, "All types", "", "type")
-	for t in Data.type_list:
-		_chip(_type_row, t.name, t.id, "type")
-	for pair in [["All", ""], ["Working", "skill"], ["Expedition", "party"], ["Resting", "rest"], ["Shiny", "shiny"], ["Locked", "locked"]]:
-		_chip(_status_row, pair[0], pair[1], "status")
-	_sort_row.add_child(UI.label("Sort by", "Faint"))
-	for pair in [["Rarity", "rarity"], ["Level", "level"], ["Species", "species"], ["Newest", "new"], ["Power", "power"]]:
-		_chip(_sort_row, pair[0], pair[1], "sort")
+	_filter_bar.add_child(_search)
+	var types := [["All types", ""]]
+	for ty in Data.type_list:
+		types.append([ty.name, ty.id])
+	_dropdown("Type", types, "type")
+	_dropdown("Show", [["Everyone", ""], ["Working", "skill"], ["On an expedition", "party"], ["Resting", "rest"], ["Shiny", "shiny"], ["Locked", "locked"]], "status")
+	_dropdown("Sort", [["Rarity", "rarity"], ["Level", "level"], ["Species", "species"], ["Newest", "new"], ["Power", "power"]], "sort")
 	left.add_child(filters)
 	_grid = UI.flow(12, 12)
 	left.add_child(UI.scroll(_grid))
@@ -67,11 +60,18 @@ func _ready() -> void:
 	refresh()
 
 
-func _chip(parent: Container, text: String, value: String, group: String) -> void:
-	var b := UI.button(text, "Chip")
-	b.set_meta("group", group)
-	b.set_meta("value", value)
-	b.pressed.connect(func():
+## One filter as a dropdown: `pairs` are [label, value]; `group` is type, status or sort.
+func _dropdown(title: String, pairs: Array, group: String) -> void:
+	var ob := OptionButton.new()
+	ob.focus_mode = Control.FOCUS_NONE
+	ob.tooltip_text = title
+	var cur: String = {"type": _filter_type, "status": _filter_status, "sort": _sort}[group]
+	for i in pairs.size():
+		ob.add_item(("Sort: " if group == "sort" else "") + pairs[i][0], i)
+		if pairs[i][1] == cur:
+			ob.selected = i
+	ob.item_selected.connect(func(i):
+		var value: String = pairs[i][1]
 		match group:
 			"type":
 				_filter_type = value
@@ -79,18 +79,8 @@ func _chip(parent: Container, text: String, value: String, group: String) -> voi
 				_filter_status = value
 			"sort":
 				_sort = value
-		_update_chips()
 		_fill_grid())
-	parent.add_child(b)
-
-
-func _update_chips() -> void:
-	for row in [_type_row, _status_row, _sort_row]:
-		for b in row.get_children():
-			if not (b is Button):
-				continue
-			var cur: String = {"type": _filter_type, "status": _filter_status, "sort": _sort}[b.get_meta("group")]
-			b.theme_type_variation = "ChipOn" if b.get_meta("value") == cur else "Chip"
+	_filter_bar.add_child(ob)
 
 
 func refresh() -> void:
@@ -100,7 +90,6 @@ func refresh() -> void:
 		selected = ""
 	if selected == "" and not Game.state.creatures.is_empty():
 		selected = _sorted_list()[0].id if not _sorted_list().is_empty() else ""
-	_update_chips()
 	_fill_grid()
 	_fill_detail()
 
@@ -186,6 +175,9 @@ func _fill_detail() -> void:
 	if sp.kind == "special":
 		badges.add_child(UI.badge("SECRET RECIPE", Palette.AETHER))
 	_detail.add_child(badges)
+	var status := UI.chip(CreatureCard.status_text(c), CreatureCard.status_color(c), 13)
+	status.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	_detail.add_child(status)
 	var desc: String = sp.forms[form - 1].get("desc", "")
 	if desc != "":
 		var dl := UI.wrap_label(desc, "Faint")
@@ -214,11 +206,8 @@ func _fill_detail() -> void:
 	# jobs
 	_detail.add_child(UI.label("Work", "H3"))
 	var wk := UI.vbox(4)
-	wk.add_child(UI.stat_line(sp.primarySkill, "Specialist: %s" % Data.skills[sp.primarySkill].name, "Works fastest here"))
-	wk.add_child(UI.stat_line(sp.secondaryAptitude, "Knack for %s (+%s speed)" % [Data.skills[sp.secondaryAptitude].name, F.pct(Data.tuning.skills.secondaryAptitudeBonus)]))
-	var can := Data.skill_list.filter(func(sk): return Creatures.can_work(c, sk.id)).map(func(sk): return sk.name)
-	wk.add_child(UI.wrap_label("Can work: " + ", ".join(can), "Faint"))
-	wk.add_child(UI.label("Status: " + CreatureCard.status_text(c), "Dim"))
+	wk.add_child(UI.stat_line(sp.primarySkill, "Best at %s" % Data.skills[sp.primarySkill].name, "Its specialty: it works fastest here"))
+	wk.add_child(UI.stat_line(sp.secondaryAptitude, "Good at %s, +%s speed" % [Data.skills[sp.secondaryAptitude].name, F.pct(Data.tuning.skills.secondaryAptitudeBonus)]))
 	_detail.add_child(wk)
 	var actions := UI.flow(8, 8)
 	var assign := MenuButton.new()
@@ -227,10 +216,18 @@ func _fill_detail() -> void:
 	assign.flat = false
 	assign.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 	var pm := assign.get_popup()
+	assign.tooltip_text = "Choose a skill to work in"
 	var eligible := Data.skill_list.filter(func(sk): return Creatures.can_work(c, sk.id))
 	for i in eligible.size():
 		var sk: Dictionary = eligible[i]
-		pm.add_icon_item(Data.ui_icon(sk.id), "%s  (%d/%d slots)" % [sk.name, GameState.workers(Game.state, sk.id).size(), GameState.slot_count(Game.state, sk.id)], i)
+		var used := GameState.workers(Game.state, sk.id).size()
+		var slots := GameState.slot_count(Game.state, sk.id)
+		var here: bool = c.job.get("kind", "") == "skill" and c.job.id == sk.id
+		var tag := " · specialty" if sk.id == sp.primarySkill else ""
+		pm.add_icon_item(Data.ui_icon(sk.id), "%s   %d/%d%s%s" % [sk.name, used, slots, tag, " · working here" if here else (" · full" if used >= slots else "")], i)
+		# the icons are painted large: keep them the size of the text (they once filled the menu)
+		pm.set_item_icon_max_width(i, 22)
+		pm.set_item_disabled(i, here or used >= slots)
 	pm.id_pressed.connect(func(i): Game.assign(c.id, eligible[i].id))
 	actions.add_child(assign)
 	# the party is fixed while an expedition runs

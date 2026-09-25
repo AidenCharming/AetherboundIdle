@@ -782,3 +782,42 @@ func test_fill_empty_slots() -> void:
 	t.ok(not main._screen._fill_btn.visible, "no empty slot, no button")
 	main.free()
 	_teardown()
+
+
+## Play-test feedback: the Nexus filters took three rows of chips, and the Put-to-work menu showed each skill's
+## icon at its painted size. Filters are one row of dropdowns; the menu's icons are text-sized, and a full
+## skill can't be chosen.
+func test_nexus_filters_and_put_to_work_menu() -> void:
+	_setup()
+	var s := Game.state
+	var starter: Dictionary = s.creatures.values()[0]
+	var ember := Creatures.make(s, "emberfang", 1, 5, false, [], "test")
+	s.creatures[ember.id] = ember
+	var main := _main()
+	_teardown()
+	main.show_screen("nexus", starter.id)
+	var nexus: Node = main._screen
+	var drops: Array = nexus._filter_bar.get_children().filter(func(n): return n is OptionButton)
+	t.eq(drops.size(), 3, "type, show and sort dropdowns on one row")
+	var type_drop: OptionButton = drops[0]
+	var pyric := -1
+	for i in type_drop.item_count:
+		if type_drop.get_item_text(i) == Data.types.pyric.name:
+			pyric = i
+	type_drop.select(pyric)
+	type_drop.item_selected.emit(pyric)
+	var shown: Array = nexus._grid.get_children().filter(func(n): return n is CreatureCard).map(func(n): return n.cid)
+	t.eq(shown, [ember.id], "the Pyric filter shows only the Pyric one")
+	var mb: MenuButton = nexus._detail.find_children("*", "MenuButton", true, false)[0]
+	var pm := mb.get_popup()
+	t.ok(pm.item_count > 0)
+	for i in pm.item_count:
+		t.eq(pm.get_item_icon_max_width(i), 22, "%s's icon is text-sized" % pm.get_item_text(i))
+	Skills.assign(s, starter, "woodcutting")   # woodcutting's one slot is now taken, by this one
+	nexus._fill_detail()
+	pm = (nexus._detail.find_children("*", "MenuButton", true, false)[0] as MenuButton).get_popup()
+	for i in pm.item_count:
+		if pm.get_item_text(i).begins_with(Data.skills.woodcutting.name):
+			t.ok(pm.is_item_disabled(i), "can't pick the skill it already works in")
+	main.free()
+	_teardown()
