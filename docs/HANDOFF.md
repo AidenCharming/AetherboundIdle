@@ -76,6 +76,9 @@ All commands run from the repo root.
   (`theme_factory.gd`), turning off `2d/snap/snap_2d_transforms_to_pixel`, checking font oversampling at
   non-integer scales, and 512 px icons instead of 256 (`icon_runner.py finish --size`, sources in D:\AI).
   The designer also dislikes icons that look different sizes anywhere.
+- **Ask the designer first:** whether to move the base layout from 1600x900 to 1920x1080 (the most common
+  resolution, same 16:9 shape), so the usual screen draws 1:1 with no stretch. Everything would then look ~17%
+  smaller unless sizes are raised to match; weigh that before the sharpness work above.
 
 ## Start here (2026-09-25, second session: merged into godot-rebuild)
 

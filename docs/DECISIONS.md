@@ -765,3 +765,6 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 - The designer wants no uneven cards: a locked Market card was smaller than an open one. `UI.even_sizes(flow)` sets
   every card to the largest card's real size a frame after the flow is shown (earlier, before the theme and
   wrapping apply, the sizes are wrong). All five Market tabs use it. 155 tests.
+- Open question for the designer (ask before the sharpness work): move the base layout from 1600x900 to 1920x1080,
+  most players' resolution, so it draws 1:1 there instead of stretched 1.2x. It would make everything ~17% smaller
+  unless sizes are raised to match.
