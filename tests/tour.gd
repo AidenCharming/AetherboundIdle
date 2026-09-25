@@ -27,15 +27,15 @@ func _ready() -> void:
 	get_tree().quit()
 
 
-func _want(name: String) -> bool:
-	return only.is_empty() or name in only
+func _want(shot_name: String) -> bool:
+	return only.is_empty() or shot_name in only
 
 
-func _shot(name: String) -> void:
+func _shot(shot_name: String) -> void:
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
-	img.save_png(out.path_join(name + ".png"))
-	print("shot ", name)
+	img.save_png(out.path_join(shot_name + ".png"))
+	print("shot ", shot_name)
 
 
 func _tip_label(text: String) -> Label:
@@ -100,12 +100,12 @@ func _run() -> void:
 	GameState.add_item(Game.state, "seedcache", 1)
 	load("res://scripts/ui/screens/inventory_screen.gd").selected = "oak-log"
 	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["skill", "fishing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
-		var name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
-		if not _want(name):
+		var shot_name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
+		if not _want(shot_name):
 			continue
 		Main.go(screen[0], screen[1])
 		await _wait(1.2)
-		await _shot(name)
+		await _shot(shot_name)
 	if _want("picker"):
 		# the worker picker lists each creature's trait bonuses for the job
 		Main.go("skill", "woodcutting")
@@ -263,12 +263,12 @@ func _smoke() -> void:
 		Main.go("aetherlog")
 		await _wait(0.5)
 		await _shot("smoke_log_" + tab)
-	var log: Node = main._screen
-	log._detail(Data.species["sproutlet"])
+	var aether_log: Node = main._screen
+	aether_log._detail(Data.species["sproutlet"])
 	await _wait(0.3)
 	await _shot("smoke_dex_detail")
 	_close_modals()
-	log._detail(Data.species["sorrelcliff"])
+	aether_log._detail(Data.species["sorrelcliff"])
 	await _wait(0.2)
 	_close_modals()
 	Main.go("skill", "mining")

@@ -41,9 +41,11 @@ decided and why) and `README.md` (how to run things).
 All commands run from the repo root.
 
 - Import once after cloning: `godot --headless --path . --import`.
-- Tests: `godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null` (close stdin: with
-  `--debug` a script error waits at a debugger prompt), or `tools/check.sh [godot]`. Add `--verbose` to see
-  warnings; keep it at zero warnings. Tests that touch save files use slot 99 only, never the player's slots 1–3.
+- Tests: `godot --headless --path . res://tests/test_runner.tscn < /dev/null`, or `tools/check.sh [godot]`. Not
+  `--debug`: a script error then stops at a debugger prompt forever, even with stdin closed (seen on Windows).
+  The runner counts script errors, so a test that crashes fails instead of printing `ok`. Warnings only print
+  with `--debug`, so `-- --warnings` loads every script in `scripts/`, `tests/` and `tools/` in that mode without
+  running any and fails on any warning; `tools/check.sh` runs both. Keep it at zero warnings. Tests that touch save files use slot 99 only, never the player's slots 1–3.
 - Driving the running game (real clicks, errors, screenshots): `docs/TEST_BRIDGE.md`.
 - Screenshots: `godot --path . res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display;
   overwrites save slot 3).

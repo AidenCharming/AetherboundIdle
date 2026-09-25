@@ -55,7 +55,7 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
 |---|---|
 | Run the game | `godot --path .` (editor: `godot --path . -e`) |
 | Import (once after cloning) | `godot --headless --path . --import` |
-| Tests | `godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null` (add `--verbose` to see warnings; exit 0 = pass). Or `tools/check.sh [godot]` |
+| Tests | `godot --headless --path . res://tests/test_runner.tscn < /dev/null` (exit 0 = pass; not `--debug`, which hangs on a script error). Warnings: `godot --headless --debug --path . res://tests/test_runner.tscn -- --warnings < /dev/null`. Both: `tools/check.sh [godot]` |
 | Screenshot tour | `godot --path . res://tests/tour.tscn -- --out=DIR [--only=market,nexus,...]` (overwrites save slot 3) |
 | Pacing probe (~40 s) | `godot --headless --path . res://tests/month_probe.tscn -- --days=35 [--calibrate]` |
 | Test bridge | `python tools/bridge.py launch` then `new`, `buttons`, `click "…"`, `errors`, `screenshot`, `monkey` (plays in slot 2, "Autoplay Slot") |

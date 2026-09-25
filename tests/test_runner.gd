@@ -1,22 +1,46 @@
 extends Node
 ## Headless test runner. Runs every tests/test_*.gd: each public method named test_* is one test.
 ## Usage (from the repo root):  godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null
-## Exit code 0 when everything passes, 1 otherwise.
+## Exit code 0 when everything passes, 1 otherwise. Not with --debug: a script error there stops at a debugger
+## prompt forever. Warnings only print with --debug, so check them with the load-only mode, which runs no code:
+##   godot --headless --debug --path . res://tests/test_runner.tscn -- --warnings < /dev/null
 
 var failures: Array = []
 var current := ""
 var asserts := 0
+var _errors := ErrorCounter.new()
+
+
+## Counts script errors. A runtime error aborts the test it happens in without adding a failure, so the runner
+## compares the count before and after each test (and each load) instead.
+class ErrorCounter extends Logger:
+	var count := 0
+	var last := ""
+	var warnings: Array[String] = []
+
+	func _log_error(function: String, file: String, line: int, code: String, rationale: String, _editor_notify: bool,
+			error_type: int, _script_backtraces: Array[ScriptBacktrace]) -> void:
+		if error_type == ERROR_TYPE_WARNING:
+			warnings.append("%s (%s:%d)" % [rationale if rationale != "" else code, file, line])
+		elif error_type == ERROR_TYPE_SCRIPT:
+			count += 1
+			last = "%s (%s:%d in %s)" % [rationale if rationale != "" else code, file, line, function]
 
 
 func _ready() -> void:
 	var files := DirAccess.get_files_at("res://tests")
 	var total := 0
 	var started := Time.get_ticks_msec()
+	OS.add_logger(_errors)
+	if "--warnings" in OS.get_cmdline_user_args():
+		_check_warnings()
+		return
 	for f in files:
 		if not (f.begins_with("test_") and f.ends_with(".gd")) or f == "test_runner.gd":
 			continue
+		var errors_before := _errors.count
 		var script: GDScript = load("res://tests/" + f)
-		if script == null or not script.can_instantiate():
+		if script == null or not script.can_instantiate() or _errors.count > errors_before:
 			# a test file that does not compile is a failure, not a hang
 			failures.append("%s: does not compile" % f)
 			print("  FAIL  ", f, " (does not compile)")
@@ -29,7 +53,10 @@ func _ready() -> void:
 				continue
 			current = "%s::%s" % [f.get_basename(), test_name]
 			var before := failures.size()
+			var errors_before_test := _errors.count
 			suite.call(test_name)
+			if _errors.count > errors_before_test:
+				failures.append("%s: script error: %s" % [current, _errors.last])
 			total += 1
 			if failures.size() == before:
 				print("  ok    ", current)
@@ -39,6 +66,28 @@ func _ready() -> void:
 	for f in failures:
 		print("  - ", f)
 	get_tree().quit(0 if failures.is_empty() else 1)
+
+
+## Loads (compiles) every script without running any, and fails on any warning.
+func _check_warnings() -> void:
+	var paths: Array[String] = []
+	for dir in ["res://scripts", "res://tests", "res://tools"]:
+		_collect_scripts(dir, paths)
+	for p in paths:
+		load(p)
+	print("
+%d scripts loaded, %d warnings" % [paths.size(), _errors.warnings.size()])
+	for w in _errors.warnings:
+		print("  - ", w)
+	get_tree().quit(0 if _errors.warnings.is_empty() else 1)
+
+
+func _collect_scripts(dir: String, into: Array[String]) -> void:
+	for f in DirAccess.get_files_at(dir):
+		if f.ends_with(".gd"):
+			into.append(dir.path_join(f))
+	for d in DirAccess.get_directories_at(dir):
+		_collect_scripts(dir.path_join(d), into)
 
 
 func ok(cond: bool, msg := "") -> void:

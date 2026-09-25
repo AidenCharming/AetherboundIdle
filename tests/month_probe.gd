@@ -85,8 +85,8 @@ func run_skills() -> Array:
 		var cap_today: int = cap_history[maxi(0, cap_history.size() - 2)]   # a day behind the materials
 		var worker_r := maxi(1, cap_today - 1)
 		# Sanctum upgrades bought over the month
-		var perches := mini(16, 4 + day / 2)
-		var extractor: float = [0, 5, 15, 35, 75, 150, 300, 600][mini(7, day / 3)]
+		var perches := mini(16, 4 + floori(day / 2.0))
+		var extractor: float = [0, 5, 15, 35, 75, 150, 300, 600][mini(7, floori(day / 3.0))]
 		var aether_min := perches * float(Data.rarity(worker_r).benchAetherPerMin) + extractor
 		for id in WORKER:
 			busy[id] = 0.0
@@ -340,7 +340,7 @@ func _scale_zone(z: Dictionary, em0: float, bm0: Dictionary, f: float) -> void:
 
 ## Two real runs of an island for this party (cached on a grid of levels): wins, XP per second per member.
 func _combat(zone: String, rarity: int, level: int, runs := 2) -> Dictionary:
-	var lv := maxi(1, level / 3 * 3)
+	var lv := maxi(1, floori(level / 3.0) * 3)
 	var key := "%s|%d|%d|%d" % [zone, rarity, lv, runs]
 	if _combat_cache.has(key):
 		return _combat_cache[key]
