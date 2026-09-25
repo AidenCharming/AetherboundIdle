@@ -46,7 +46,8 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
    usage in its title (`[40%] Fix X (est. +3%)`), and post a one-line progress note after each task. See
    `docs/HANDOFF.md`.
 9. **Version:** any major code, balance, UI or icon change bumps `config/version` in `project.godot` and
-   `file_version`/`product_version` in `export_presets.cfg` (minor for big changes, patch for small ones).
+   `file_version`/`product_version` in `export_presets.cfg` (minor only for a new system, patch for a rework or
+   balance pass, a letter for small fixes: 0.6.3a, exported as 0.6.3.1).
    See `docs/HANDOFF.md`.
 10. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
    pushes art to the same branch), then push.

@@ -63,8 +63,11 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - Commit as you go. Keep the test count in `docs/DECISIONS.md` current, and add a `docs/CHANGELOG.md` entry for
   what you did.
 - **Version number (designer's request):** any major code, balance, UI or icon change bumps `config/version` in
-  `project.godot` and `file_version`/`product_version` in `export_presets.cfg`. Minor (0.6.0 → 0.7.0) for new
-  systems, balance passes, UI reworks or new art sets; patch (0.6.0 → 0.6.1) for smaller fixes. **Every bump also
+  `project.godot` and `file_version`/`product_version` in `export_presets.cfg`. Keep the numbers climbing slowly
+  (the designer doesn't want to reach 1.0 soon): minor (0.6 → 0.7) only for a new system or a big rework; patch
+  (0.6.3 → 0.6.4) for a balance pass, a UI rework or a new art set; a letter (0.6.3 → 0.6.3a → 0.6.3b) for small
+  fixes and tweaks. The export needs four numbers, so the letter is the fourth: 0.6.3a is `0.6.3.1`, 0.6.3b is
+  `0.6.3.2` (a test checks both files agree). **Every bump also
   adds an entry to `data/patch_notes.json`** (shown on the title screen; a test checks the newest matches). The
   notes are for players: no developer tools, code, data files or tooling.
 - **Art (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder

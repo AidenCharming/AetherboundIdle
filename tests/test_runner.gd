@@ -1,6 +1,6 @@
 extends Node
 ## Headless test runner. Runs every tests/test_*.gd: each public method named test_* is one test.
-## Usage (from the repo root):  godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null
+## Usage (from the repo root):  godot --headless --path . res://tests/test_runner.tscn < /dev/null
 ## Exit code 0 when everything passes, 1 otherwise. Not with --debug: a script error there stops at a debugger
 ## prompt forever. Warnings only print with --debug, so check them with the load-only mode, which runs no code:
 ##   godot --headless --debug --path . res://tests/test_runner.tscn -- --warnings < /dev/null
@@ -73,8 +73,12 @@ func _check_warnings() -> void:
 	var paths: Array[String] = []
 	for dir in ["res://scripts", "res://tests", "res://tools"]:
 		_collect_scripts(dir, paths)
+	# the autoloads and every class they use are compiled before the logger is added, so a plain load() would
+	# return the cached script and its warnings would never reach the logger: compile each one afresh
+	# (not this runner itself: a fresh copy of the running script replaces it mid-call)
 	for p in paths:
-		load(p)
+		if p != get_script().resource_path:
+			ResourceLoader.load(p, "", ResourceLoader.CACHE_MODE_IGNORE)
 	print("
 %d scripts loaded, %d warnings" % [paths.size(), _errors.warnings.size()])
 	for w in _errors.warnings:

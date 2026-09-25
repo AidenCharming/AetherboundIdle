@@ -132,13 +132,37 @@ func test_patch_notes_are_well_formed_and_start_at_this_version() -> void:
 				t.ok(PatchNotes.AREA_COLORS.has(e[0]), "v%s: area %s has a colour" % [p.version, e[0]])
 
 
+## Versions are major.minor.patch with an optional letter for small fixes: 0.6.3 < 0.6.3a < 0.6.3b < 0.6.4.
 func _version_less(a: String, b: String) -> bool:
-	var x := a.split(".")
-	var y := b.split(".")
-	for i in 3:
-		if int(x[i]) != int(y[i]):
-			return int(x[i]) < int(y[i])
+	var x := _version_parts(a)
+	var y := _version_parts(b)
+	for i in 4:
+		if x[i] != y[i]:
+			return x[i] < y[i]
 	return false
+
+
+func _version_parts(v: String) -> Array:
+	var parts := v.split(".")
+	var last := parts[2]
+	var letter := 0
+	if last.length() > 0 and last.unicode_at(last.length() - 1) >= 97:
+		letter = last.unicode_at(last.length() - 1) - 96
+		last = last.left(-1)
+	return [int(parts[0]), int(parts[1]), int(last), letter]
+
+
+func test_versions_order_with_letters_and_match_the_export() -> void:
+	t.ok(_version_less("0.6.3", "0.6.3a"), "a letter comes after the plain patch")
+	t.ok(_version_less("0.6.3a", "0.6.3b"), "b after a")
+	t.ok(_version_less("0.6.3z", "0.6.4"), "the next patch after any letter")
+	t.ok(_version_less("0.6.10", "0.7.0"), "numbers compare as numbers")
+	var v := str(ProjectSettings.get_setting("application/config/version"))
+	t.ok(RegEx.create_from_string(r"^\d+\.\d+\.\d+[a-z]?$").search(v) != null, "v%s is major.minor.patch with an optional letter" % v)
+	var cfg := FileAccess.get_file_as_string("res://export_presets.cfg")
+	var p: Array = _version_parts(v)
+	var four := "%d.%d.%d.%d" % p
+	t.ok(cfg.contains("file_version=\"%s\"" % four) and cfg.contains("product_version=\"%s\"" % four), "the export's version is %s (the letter as the fourth number)" % four)
 
 
 func test_item_sources_cover_skills_islands_bosses_and_the_market() -> void:
