@@ -128,6 +128,12 @@ func _sorted_list() -> Array:
 
 
 func _fill_grid() -> void:
+	# a capture or evolution refreshes the grid: keep the pages already shown and the scroll position
+	var shown := _grid.get_child_count()
+	var sc := _grid.get_parent()
+	while sc and not (sc is ScrollContainer):
+		sc = sc.get_parent()
+	var scroll_y: int = sc.scroll_vertical if sc else 0
 	UI.clear(_grid)
 	CreatureCard.refresh_perched()
 	var list := _sorted_list()
@@ -142,7 +148,9 @@ func _fill_grid() -> void:
 				if other is CreatureCard:
 					other.theme_type_variation = "TileOn" if other.cid == id else "Tile"
 			_fill_detail())
-		return card)
+		return card, UI.PAGE, 0, shown)
+	if sc:
+		(func(): sc.scroll_vertical = scroll_y).call_deferred()
 
 
 # ---------------------------------------------------------------- detail panel

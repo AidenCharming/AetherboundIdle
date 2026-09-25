@@ -124,6 +124,11 @@ static func go(screen: String, arg := "") -> void:
 		instance.show_screen(screen, arg)
 
 
+func _exit_tree() -> void:
+	if instance == self:
+		instance = null   # back at the title: don't leave a pointer to a freed node
+
+
 func show_screen(screen: String, arg := "", from_history := false) -> void:
 	if screen == current and arg == current_arg and _screen:
 		return

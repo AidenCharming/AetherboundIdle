@@ -226,8 +226,8 @@ const PAGE := 120
 
 ## Fills `box` with make.call(item) for the first `page` items and a "Show more" button for the next page, so
 ## a long roster (thousands of Aetherlings) builds a page of cards, not all of them at once.
-static func fill_paged(box: Container, items: Array, make: Callable, page := PAGE, from := 0) -> void:
-	var to := mini(items.size(), from + page)
+static func fill_paged(box: Container, items: Array, make: Callable, page := PAGE, from := 0, at_least := 0) -> void:
+	var to := mini(items.size(), from + maxi(page, at_least))
 	for i in range(from, to):
 		box.add_child(make.call(items[i]))
 	if to < items.size():
@@ -240,10 +240,13 @@ static func fill_paged(box: Container, items: Array, make: Callable, page := PAG
 
 
 ## Sorts `items` by key.call(item), highest first, working each key out once rather than once per comparison.
+## Stable: equal keys keep their input order, so cards don't shuffle between refreshes.
 static func sort_by_key(items: Array, key: Callable) -> Array:
-	var keyed := items.map(func(it): return [key.call(it), it])
-	keyed.sort_custom(func(a, b): return a[0] > b[0])
-	return keyed.map(func(k): return k[1])
+	var keyed := []
+	for i in items.size():
+		keyed.append([key.call(items[i]), i, items[i]])
+	keyed.sort_custom(func(a, b): return a[0] > b[0] or (a[0] == b[0] and a[1] < b[1]))
+	return keyed.map(func(k): return k[2])
 
 
 ## Icon + amount, e.g. [log] 12. `need` > 0 turns it red when the player has less.

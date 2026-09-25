@@ -142,6 +142,8 @@ static func _substep(allies: Array, enemies: Array, d: float, rng: RandomNumberG
 					f.abT = 0.0
 				else:
 					f.abT = f.abCdMs
+			if not f.alive:
+				continue   # knocked out by thorns during its own ability: no attack after that
 			f.atkT += d
 			if f.atkT >= f.atkMs:
 				f.atkT -= f.atkMs
