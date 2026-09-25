@@ -328,7 +328,10 @@ func _bulk_release() -> void:
 		return ob
 	var from: OptionButton = rar_pick.call(int(o.minRarity))
 	var to: OptionButton = rar_pick.call(int(o.maxRarity))
-	v.add_child(UI.hbox(8, [UI.label("Rarity from", "Dim"), from, UI.label("to", "Dim"), to]))
+	# the filters and the switches each sit on an inset card, like the Options pages
+	var filters := UI.vbox(12)
+	v.add_child(UI.panel("Inset", filters))
+	filters.add_child(UI.hbox(8, [UI.label("Rarity from", "Dim"), from, UI.label("to", "Dim"), to]))
 	var ty := OptionButton.new()
 	ty.add_item("Any type")
 	var type_ids: Array = Data.types.keys()
@@ -346,19 +349,25 @@ func _bulk_release() -> void:
 	lvl.max_value = Data.tuning.creature.maxLevel
 	lvl.value = int(o.maxLevel)
 	lvl.tooltip_text = "0 means any level"
-	v.add_child(UI.hbox(8, [UI.label("Type", "Dim"), ty, UI.label("Species", "Dim"), spo, UI.label("Up to level (0 = any)", "Dim"), lvl]))
+	filters.add_child(UI.hbox(8, [UI.label("Type", "Dim"), ty, UI.label("Species", "Dim"), spo, UI.label("Up to level (0 = any)", "Dim"), lvl]))
 	var keep := SpinBox.new()
 	keep.min_value = 0
 	keep.max_value = 10
 	keep.value = int(o.keepPerSpecies)
-	v.add_child(UI.hbox(8, [UI.label("Keep the best", "Dim"), keep, UI.label("of each species (rarity, then level)", "Dim")]))
-	var shinies := CheckButton.new()
+	filters.add_child(UI.hbox(8, [UI.label("Keep the best", "Dim"), keep, UI.label("of each species (rarity, then level)", "Dim")]))
+	var switches := UI.vbox(14)
+	v.add_child(UI.panel("Inset", switches))
+	var shinies := ToggleSwitch.new()
 	shinies.text = "Release shinies too"
+	shinies.tooltip_text = "Shinies stay unless this is on. Each shiny released also gives Aether Pearls."
 	shinies.button_pressed = bool(o.shinies)
-	var working := CheckButton.new()
+	shinies.focus_mode = Control.FOCUS_NONE
+	switches.add_child(shinies)
+	var working := ToggleSwitch.new()
 	working.text = "Release working ones too (they leave their jobs)"
 	working.button_pressed = bool(o.working)
-	v.add_child(UI.hbox(16, [shinies, working]))
+	working.focus_mode = Control.FOCUS_NONE
+	switches.add_child(working)
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
 	var kept_lbl := UI.wrap_label("", "Faint", 700)

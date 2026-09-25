@@ -709,6 +709,9 @@ A review of the whole repo found save, purchase and correctness bugs; each fix i
   rare drop (with the drop chance) and, for Fishing, the treasure. The earlier layout had only a small
   "You have N" line for the product and never showed how many rare drops you held.
 
+- **Every on/off control is a `ToggleSwitch`.** The theme blanks the CheckButton icon (so ToggleSwitch can
+  draw its own), which makes a plain CheckButton invisible; the bulk release window used two and got fixed.
+
 ## Dropped or not built
 
 - **Gear** (weapon, armor, charm) and the gear rarity ladder. Creature level, rarity, form, traits and

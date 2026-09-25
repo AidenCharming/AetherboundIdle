@@ -117,6 +117,10 @@ passes); watch for `SCRIPT ERROR` in its output. Fixing that in `tests/test_runn
 
 ## Recently done (this session)
 
+**Bulk release switches (0.3.1):** "Release shinies too" and "Release working ones too" were plain
+CheckButtons, whose icon the theme blanks, so they showed as bare text. They are `ToggleSwitch`es now, and the
+filters and switches each sit on an Inset card like the Options pages.
+
 **Code review fixes (2026-09-24),** one commit each, see `DECISIONS.md` ("Code review fixes"):
 - Saves are written atomically (`.tmp`, then rename); the backup is only ever a readable save, and a leftover
   `.tmp` is loaded before the backup. The slot-rename test no longer writes the player's slot 3 (slot 99 now).
