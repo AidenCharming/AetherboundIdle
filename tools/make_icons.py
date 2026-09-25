@@ -390,6 +390,12 @@ def ui_bell():
 <path d="M24 20 Q26 16 30 15" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/>"""
 
 
+def ui_close():
+    return f"""<circle cx="32" cy="32" r="24" fill="#c94f5e" {st()}/>
+<path d="M22 22 L42 42 M42 22 L22 42" stroke="{INK}" stroke-width="10" stroke-linecap="round"/>
+<path d="M22 22 L42 42 M42 22 L22 42" stroke="#fff4e8" stroke-width="5" stroke-linecap="round"/>"""
+
+
 def ui_lock():
     return f"""<path d="M20 28 L20 20 Q20 8 32 8 Q44 8 44 20 L44 28" stroke="{INK}" stroke-width="8" fill="none"/>
 <path d="M20 28 L20 20 Q20 8 32 8 Q44 8 44 20 L44 28" stroke="#aab4c2" stroke-width="4" fill="none"/>
@@ -506,7 +512,7 @@ UI = {'aether': ui_aether, 'gold': ui_gold, 'woodcutting': ui_axe, 'herbalism': 
       'circuitry': ui_bolt, 'aether-weaving': lambda: spool('#9d6bff', '#c5a8ff', '#6a3fd0'),
       'vessel-crafting': lambda: vessel('#b98bff', '#d8c0ff', '#7a50d0'), 'fabrication': ui_wrench,
       'sanctum': ui_home, 'nexus': ui_paw, 'pods': ui_egg, 'expeditions': ui_compass, 'aetherlog': ui_book,
-      'inventory': ui_bag, 'works': ui_cog, 'settings': lambda: gear('#8f98a6', '#c9d0da', '#5d6675'), 'bell': ui_bell,
+      'inventory': ui_bag, 'works': ui_cog, 'settings': lambda: gear('#8f98a6', '#c9d0da', '#5d6675'), 'bell': ui_bell, 'close': ui_close,
       'lock': ui_lock, 'health': ui_heart, 'power': ui_sword, 'guard': ui_shield, 'time': ui_clock, 'xp': ui_star,
       'upgrade': ui_up, 'shiny': ui_sparkle, 'vessel': lambda: vessel('#c9a36a', '#e0c58f', '#8f6f3a'),
       'meal': lambda: meal('#e0a36a', '#f0c49a', '#b07a42'), 'owned': ui_owned,

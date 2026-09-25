@@ -3,6 +3,20 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3d (2026-09-25): kill XP shared by the party, close button art slot
+
+- **Kill XP is split across the party (designer's report):** three Aetherlings each got the full XP a lone
+  one got for the same kill. `Expedition._party_xp` now divides a kill's total (and the boss's, and the
+  offline bulk total) evenly among the members standing. `tuning.combat.xpPerKill.base` 6 → 18 so a party
+  of three keeps its pace: the split alone left Zenith Spire uncleared at day 35 (party Lv 77); with the
+  tripled base it is back to day 22, Lv 100 by day 33. A solo or duo party now levels faster per member.
+  Test: `test_kill_xp_is_shared_by_the_party`.
+- **Close button art slot:** `Modal.close_x` draws `assets/icons/ui/close.png` when the designer drops one
+  in, and the drawn ✕ until then. New `close` UI icon: prompt in `tools/art/build_icon_prompts.py`,
+  placeholder `close.svg` from `tools/make_icons.py` (reference only; the button doesn't draw the SVG).
+- Fourth code review (`codereview_1.md`): #1 (`_end(keep)` missing in the session-copies test) was already
+  in place; #2-#4 are nits, left as they are.
+
 ## 0.6.3c (2026-09-25): species page names, round close button, tooltips clear of the pointer
 
 - **Species page (designer's feedback):** each form's name sits under its thumbnail ("Form N" until found);

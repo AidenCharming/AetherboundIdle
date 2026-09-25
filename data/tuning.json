@@ -228,7 +228,7 @@
 		"eatBelow": 0.6,
 		"partySize": 3,
 		"xpPerKill": {
-			"base": 6,
+			"base": 18,
 			"exp": 1.15
 		},
 		"bossXpMult": 6,

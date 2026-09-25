@@ -115,6 +115,28 @@ func test_every_kill_gives_party_xp() -> void:
 	t.eq(xp_events, kills, "one XP event per kill")
 
 
+## Designer's report: three Aetherlings each got the full 1k XP a lone one got for the same kill. A kill's
+## XP is a total, shared evenly by the party members standing.
+func test_kill_xp_is_shared_by_the_party() -> void:
+	var trio := _party_game([["emberfang", 1, 12], ["tuskcub", 1, 12], ["emberfang", 1, 12]])
+	var solo := _party_game([["emberfang", 1, 12]])
+	var ev := []
+	Expedition._party_xp(trio, GameState.party(trio), 30.0, ev, {})
+	var gained: Dictionary = ev.filter(func(e): return e.type == "party_xp")[0].xp
+	t.eq(gained.size(), 3, "every member gets a share")
+	for cid in gained:
+		t.near(float(gained[cid]), 10.0, 0.001, "a third each")
+	ev = []
+	Expedition._party_xp(solo, GameState.party(solo), 30.0, ev, {})
+	var one: Dictionary = ev.filter(func(e): return e.type == "party_xp")[0].xp
+	t.near(float(one.values()[0]), 30.0, 0.001, "a lone Aetherling gets it all")
+	var both := _party_game([["emberfang", 1, 12], ["tuskcub", 1, 12]])
+	var first: Dictionary = both.creatures.values()[0]
+	var before := float(first.xp)
+	Expedition._party_xp(both, GameState.party(both), 15.0, [], {})
+	t.near(float(first.xp) - before, 7.5, 0.001, "two share it in halves")
+
+
 func test_first_of_a_type_binds_free() -> void:
 	var s := GameState.new_game()
 	s.items.clear()

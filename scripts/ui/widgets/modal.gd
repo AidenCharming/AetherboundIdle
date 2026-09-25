@@ -5,6 +5,7 @@ extends Control
 
 signal closed
 
+const CLOSE_ICON := "res://assets/icons/ui/close.png"   ## the painted close button, when there is one
 static var layer: Control   ## set by the title and game scenes
 
 var panel: PanelContainer
@@ -23,8 +24,9 @@ static func open(content: Control, title := "", width := 672.0, close_button := 
 	return m
 
 
-## The round close button: a drawn cross that brightens on hover. Its tooltip is "Close", which is how tests
-## and the bridge's `click "Close"` find it.
+## The round close button: a drawn cross that brightens on hover. A painted icon dropped in as
+## assets/icons/ui/close.png replaces the cross (close.svg is its placeholder for the art pipeline, not drawn).
+## Its tooltip is "Close", which is how tests and the bridge's `click "Close"` find it.
 static func close_x(on_press: Callable) -> Button:
 	var b := Button.new()
 	b.tooltip_text = "Close"
@@ -38,7 +40,14 @@ static func close_x(on_press: Callable) -> Button:
 	b.pressed.connect(on_press)
 	b.mouse_entered.connect(b.queue_redraw)
 	b.mouse_exited.connect(b.queue_redraw)
+	var painted := CLOSE_ICON if ResourceLoader.exists(CLOSE_ICON) else ""
 	b.draw.connect(func():
+		if painted != "":
+			var tex := Data.texture(painted)
+			if tex:
+				b.draw_texture_rect(tex, Rect2(Vector2(4, 4), b.size - Vector2(8, 8)), false,
+					Color.WHITE if b.is_hovered() else Color(1, 1, 1, 0.8))
+				return
 		var c := b.size * 0.5
 		var r := 7.0
 		var col := Palette.TEXT if b.is_hovered() else Palette.TEXT_DIM

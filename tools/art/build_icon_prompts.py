@@ -203,6 +203,7 @@ I("settings", "ui", "Navigation", "m", "A single chunky steel-grey cog wheel wit
 
 # ----------------------------------------------------------------------------- interface: markers and stats
 I("bell", "ui", "Markers", "m", "A golden notification bell with a small round clapper at the bottom and a little loop on top.")
+I("close", "ui", "Markers", "m", "A round ruby-red button with a thick cream X cross in the middle and a white highlight shape near the top.", view="facing the viewer", note="The close button on every window (top-right corner). Shown at 40 px, so keep the X bold.")
 I("lock", "ui", "Markers", "m", "A chunky golden padlock with a steel shackle and a dark keyhole.", view="facing the viewer")
 I("health", "ui", "Stats", "g", "A plump glossy red heart shape with a white highlight shape near the top.", view="facing the viewer")
 I("power", "ui", "Stats", "m", "A short steel sword with a brass crossguard and a brown leather grip, pointing up diagonally.")

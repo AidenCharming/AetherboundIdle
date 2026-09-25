@@ -68,7 +68,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 167 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 168 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
@@ -285,7 +285,11 @@ A creature-collecting idle game in five loops that feed each other:
    Vessel Crafting, Fabrication).
 2. **Explore.** Ten islands of waves ending in a boss, fought automatically in real time by a party of
    three. Defeated wild Aetherlings can be bound with Aether Vessels (the only way to get base species).
-   Beating a boss opens the next island.
+   Beating a boss opens the next island. **Kill XP is shared** (designer's rule, 0.6.3d): each defeated
+   enemy's XP (`kill_xp`, by level and rarity) is a total split evenly among the party members still
+   standing, so a trio's members each get a third of what a lone Aetherling gets. `xpPerKill.base` went
+   6 → 18 with it, so a full party of three levels exactly as fast as before (month probe unchanged:
+   Zenith Spire day 22).
 3. **Breed.** Two parents plus Aether and element materials lay an egg in a Genesis Pod; its species comes
    from the parents (type-pair hybrids and 30 secret exact-pair recipes), its rarity from the materials'
    tier and the parents' rarity, with mutation, shiny and trait inheritance rolls. Eggs hatch with a

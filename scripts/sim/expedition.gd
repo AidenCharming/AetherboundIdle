@@ -272,14 +272,18 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 	try_capture(s, w, party, rng, events, b)
 
 
-## Combat XP for each party member. One who levels or evolves mid-run fights at the new level at once: its
+## Combat XP for the party: `xp` is the kill's total, shared evenly by the members given (the ones still
+## standing), so three Aetherlings each get a third of what one alone would. One who levels or evolves mid-run fights at the new level at once: its
 ## fighter in the live battle `b` is refreshed, so XP from every kill shows, not only after the boss. Reports a
 ## "party_xp" event ({cid: amount}) so the arena can show what every kill gave, not only the level-ups.
 static func _party_xp(s: Dictionary, party: Array, xp: float, events: Array, b: Dictionary) -> void:
+	if party.is_empty():
+		return
+	var share := xp / party.size()
 	var gained := {}
 	for c in party:
 		var before := float(c.xp)
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
+		var cev := Creatures.add_xp(c, share * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
 		if float(c.xp) > before:
 			gained[c.id] = float(c.xp) - before
 		if cev.is_empty():
@@ -540,7 +544,7 @@ static func offline(s: Dictionary, ms: float, rng: RandomNumberGenerator) -> Arr
 
 
 ## `n` wild defeats resolved in bulk: every encounter is still rolled (species, rarity, shiny pity, the
-## capture decision), but XP is added once per party member and loot is rolled as totals.
+## capture decision), but XP is shared out once and loot is rolled as totals.
 static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int, rng: RandomNumberGenerator, events: Array) -> void:
 	if n <= 0:
 		return
