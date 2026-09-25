@@ -8,7 +8,8 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
 ## Read these first
 
 * `docs/HANDOFF.md`: where things stand, what to check first, what's open for the designer.
-* `docs/DECISIONS.md`: every decision and why (balance numbers, systems, test count).
+* `docs/DECISIONS.md`: how each system works and why (balance numbers, systems, test count).
+* `docs/CHANGELOG.md`: everything done or fixed, newest first.
 * `docs/design.md`: the original design (systems, formulas, scope). `docs/content-data.md`: species, hybrids, traits.
 * `docs/TEST_BRIDGE.md`: drive the running game from a script (real clicks, errors, screenshots).
 
@@ -37,7 +38,8 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
    from a machine without the designer's `D:\AI` art folders (it wipes the "approved" marks).
 5. **Don't add systems that aren't in the design** without asking. Keep names as written in the docs.
 6. **Tests pass and stay at zero warnings** before any push. Keep the test count in `docs/DECISIONS.md` current,
-   and update `docs/HANDOFF.md` and `docs/DECISIONS.md` with what changed and why.
+   add what you did to `docs/CHANGELOG.md`, move it out of "Open" in `docs/HANDOFF.md`, and
+   update `docs/DECISIONS.md` when a system's rules change.
 7. **Pacing target:** one month to every skill at 99 and Zenith Spire cleared. Check balance changes with the
    month probe.
 8. **Session task list:** keep a task list with each task's percent done and estimated share of the 5-hour

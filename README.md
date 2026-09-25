@@ -5,7 +5,7 @@ ones, and breed rarer and hybrid forms. Built with Godot 4.7 (the earlier web ve
 
 What changed from the web version's design, and why: [`docs/DECISIONS.md`](docs/DECISIONS.md).
 
-See `docs/HANDOFF.md` for where things stand and what to check first.
+See `docs/HANDOFF.md` for where things stand and what is open, and `docs/CHANGELOG.md` for what was done or fixed.
 
 Bug testing with a script or a local Claude session driving the running game: [`docs/TEST_BRIDGE.md`](docs/TEST_BRIDGE.md).
 
