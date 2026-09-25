@@ -278,7 +278,7 @@ func _fill_controls() -> void:
 		lk.tooltip_text = "Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name
 		lk.mouse_filter = Control.MOUSE_FILTER_PASS
 		_controls.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), lk]))
-	var rep := CheckButton.new()
+	var rep := ToggleSwitch.new()
 	rep.text = "Repeat"
 	rep.tooltip_text = "Start the next run by itself when one ends."
 	rep.button_pressed = bool(s.expedition.autoRepeat)
@@ -387,7 +387,6 @@ func _party_tab() -> VBoxContainer:
 
 ## The panel under the battle: Party, Auto-bind and Supplies, as tabs.
 func _fill_bottom() -> void:
-	var s := Game.state
 	UI.clear(_bind)
 	UI.clear(_tabs_box)
 	var tabs := _tabs_box
@@ -396,10 +395,31 @@ func _fill_bottom() -> void:
 			_bottom_tab = pair[0]
 			_fill_bottom(), Data.ui_icon(pair[2]))
 		tabs.add_child(b)
-	if _bottom_tab == "party":
-		_bind.add_child(_party_tab())
+	# every tab is built and the panel keeps the tallest one's height, so switching tabs doesn't resize it
+	for tab in ["party", "autobind", "supplies"]:
+		var box := UI.vbox(8)
+		box.visible = tab == _bottom_tab
+		_bind.add_child(box)
+		_bottom_into(tab, box)
+	_fit_bottom.call_deferred()
+
+
+func _fit_bottom() -> void:
+	if not is_instance_valid(_bind):
 		return
-	if _bottom_tab == "supplies":
+	var h := 0.0
+	for c in _bind.get_children():
+		h = maxf(h, (c as Control).get_combined_minimum_size().y)
+	_bind.custom_minimum_size.y = h
+
+
+## One tab's content under the battle.
+func _bottom_into(tab: String, parent: VBoxContainer) -> void:
+	var s := Game.state
+	if tab == "party":
+		parent.add_child(_party_tab())
+		return
+	if tab == "supplies":
 		var sv := UI.vbox(8)
 		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 560))
 		var ob := OptionButton.new()
@@ -413,23 +433,23 @@ func _fill_bottom() -> void:
 		sv.add_child(ob)
 		if GameState.count(s, Expedition.pick_meal(s)) < 1:
 			sv.add_child(UI.label("No meals: cook some (Cooking needs a Pyric Aetherling)", "Small", Palette.DANGER))
-		_bind.add_child(sv)
+		parent.add_child(sv)
 		return
 	var ab: Dictionary = s.expedition.autobind
 	var cols := UI.hbox(16)
-	_bind.add_child(cols)
+	parent.add_child(cols)
 	var bv := UI.vbox(4)
 	bv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cols.add_child(bv)
 	var bv2 := UI.vbox(6)
 	cols.add_child(bv2)
-	var en := CheckButton.new()
+	var en := ToggleSwitch.new()
 	en.text = "Throw vessels"
 	en.tooltip_text = "After a win the party can throw a vessel. The first of each type you've never owned binds free; shinies are always tried."
 	en.button_pressed = bool(ab.get("enabled", true))
 	en.toggled.connect(func(on): Game.state.expedition.autobind.enabled = on)
 	bv.add_child(en)
-	var ns := CheckButton.new()
+	var ns := ToggleSwitch.new()
 	ns.text = "Always try new species"
 	ns.button_pressed = bool(ab.get("newSpecies", true))
 	ns.toggled.connect(func(on): Game.state.expedition.autobind.newSpecies = on)
