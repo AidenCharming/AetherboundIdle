@@ -150,7 +150,7 @@ func _fill_grid() -> void:
 			_fill_detail())
 		return card, UI.PAGE, 0, shown)
 	if sc:
-		(func(): sc.scroll_vertical = scroll_y).call_deferred()
+		sc.set_deferred("scroll_vertical", scroll_y)
 
 
 # ---------------------------------------------------------------- detail panel

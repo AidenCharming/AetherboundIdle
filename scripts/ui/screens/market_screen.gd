@@ -116,6 +116,7 @@ func _fill_stock() -> void:
 			_body.add_child(_limited_card(o, i))
 		else:
 			flow.add_child(_offer_card(o, i))
+	UI.even_sizes(flow)
 	_body.add_child(flow)
 	_body.add_child(UI.wrap_label("Each offer can be bought a few times until the stock changes. Now and then a rare limited offer turns up: one only, and gone when the stock turns over.", "Faint", 600))
 
@@ -259,6 +260,7 @@ func _fill_wares(list: Array, amounts: Array) -> void:
 			row.add_child(b)
 		cv.add_child(row)
 		flow.add_child(card)
+	UI.even_sizes(flow)
 	_body.add_child(flow)
 
 
@@ -294,6 +296,7 @@ func _fill_boosts() -> void:
 		row.add_child(buy)
 		cv.add_child(row)
 		flow.add_child(ShineFrame.wrap(card, 16) if Market.boost_left(s, b.id) > 0.0 else card)
+	UI.even_sizes(flow)
 	_body.add_child(flow)
 
 
@@ -330,6 +333,7 @@ func _fill_slots() -> void:
 			if int(s.skills[skill.id].level) < need:
 				card.modulate.a = 0.6
 		flow.add_child(card)
+	UI.even_sizes(flow)
 	_body.add_child(flow)
 
 

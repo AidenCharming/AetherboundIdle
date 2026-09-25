@@ -759,3 +759,9 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 2. **Hybrid art:** 45 hybrids × 3 forms, listed above.
 3. **Gear:** leave it out, or design a gear list for a later pass?
 4. **Pacing:** the curve targets about two months to 99 for a dedicated team. Faster or slower?
+
+## Even card sizes (v0.4.1)
+
+- The designer wants no uneven cards: a locked Market card was smaller than an open one. `UI.even_sizes(flow)` sets
+  every card to the largest card's real size a frame after the flow is shown (earlier, before the theme and
+  wrapping apply, the sizes are wrong). All five Market tabs use it. 155 tests.

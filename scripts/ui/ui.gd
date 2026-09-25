@@ -135,6 +135,23 @@ static func flow(hsep := 12, vsep := 12) -> HFlowContainer:
 	return f
 
 
+## Gives every child of a flow the size of the largest one, so a grid of cards stays even
+## (a locked card with less in it is as big as an open one). Call after the cards are added.
+static func even_sizes(box: Container) -> void:
+	# sizes settle only once the theme applies and nested flows have wrapped: measure a frame after entering the tree
+	if not box.is_inside_tree():
+		box.ready.connect(func() -> void: even_sizes(box), CONNECT_ONE_SHOT)
+		return
+	await box.get_tree().process_frame
+	if not is_instance_valid(box):
+		return
+	var biggest := Vector2.ZERO
+	for c in box.get_children():
+		biggest = biggest.max((c as Control).size)
+	for c in box.get_children():
+		(c as Control).custom_minimum_size = biggest
+
+
 static func panel(variation := "Glass", child: Control = null) -> PanelContainer:
 	var p := PanelContainer.new()
 	p.theme_type_variation = variation

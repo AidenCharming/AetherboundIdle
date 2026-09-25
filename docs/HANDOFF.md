@@ -64,6 +64,19 @@ All commands run from the repo root.
 - A wrapping Label measured before its container gives it a width reports thousands of pixels of height.
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
 
+## Latest (2026-09-25, third session, v0.4.1)
+
+- **Even cards:** every Market tab (stock, vessels, materials, boosts, work slots) gives all its cards the size of
+  the largest, so a locked card is as big as an open one (`UI.even_sizes`, measured one frame after the flow
+  enters the tree, once the theme applies and nested chip rows have wrapped). Use it for any other grid of cards.
+- Fixed a Nexus error (a delayed scroll ran after its list was freed; now `set_deferred`).
+- **Designer's request, not started: sharp text and icons at every resolution.** The game lays out at
+  1600x900 and `canvas_items` stretches it (1.2x at 1920x1080, times the Interface scale). MSAA won't help
+  (it only smooths drawn shapes). Try, comparing 1920x1080 screenshots: font hinting none instead of light
+  (`theme_factory.gd`), turning off `2d/snap/snap_2d_transforms_to_pixel`, checking font oversampling at
+  non-integer scales, and 512 px icons instead of 256 (`icon_runner.py finish --size`, sources in D:\AI).
+  The designer also dislikes icons that look different sizes anywhere.
+
 ## Start here (2026-09-25, second session: merged into godot-rebuild)
 
 This session's branch (`claude/vigilant-meitner-d7539t`) started from before last night's work, then merged
