@@ -555,10 +555,12 @@ class Benchmark:
         z = next((z for z in self.p["expedition"]["zones"] if z["id"] == zone_id), None)
         if not z:
             return False
-        if ctx.click(z["name"], quiet=True):
+        # exact: with the island list folded, a loose match on the name hits the Explore button's tooltip
+        # ("Explore Whisperleaf Hollow") and starts the run instead of selecting the island
+        if ctx.click(z["name"], quiet=True, exact=True):
             return True
         ctx.click("Show the island list", quiet=True)
-        if ctx.click(z["name"]):
+        if ctx.click(z["name"], exact=True):
             return True
         ctx.stuck("no island card for %s" % z["name"])
         return False
