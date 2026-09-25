@@ -34,7 +34,7 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
 4. **Art:** rarity is shown by frames, tints and shader effects, shinies by a runtime hue shift. Never make
    per-rarity or per-shiny art. Any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
    in `tools/make_icons.py`. **While the designer paints locally, don't edit those two files from the cloud:**
-   put new entries in `tools/art/artnew_merge_me_on_pull.md`. Never commit a regenerated `docs/art-prompts-*.md`
+   put new entries in `tools/art/artnew_merge_me_on_pull.md`. Never commit a regenerated `docs/archive/art/art-prompts-*.md`
    from a machine without the designer's `D:\AI` art folders (it wipes the "approved" marks).
 5. **Don't add systems that aren't in the design** without asking. Keep names as written in the docs.
 6. **Tests pass and stay at zero warnings** before any push. Keep the test count in `docs/DECISIONS.md` current,

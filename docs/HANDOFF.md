@@ -79,7 +79,7 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - **Art (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py`. **While the designer paints locally, don't edit those two files from the cloud:** put
   new prompts and placeholders in `tools/art/artnew_merge_me_on_pull.md` (say where each block goes). **Never
-  commit a regenerated `docs/art-prompts-*.md` from a machine without the designer's `D:\AI` art folders**: the
+  commit a regenerated `docs/archive/art/art-prompts-*.md` from a machine without the designer's `D:\AI` art folders**: the
   "approved" marks come from there and would be wiped.
 
 ## Running things

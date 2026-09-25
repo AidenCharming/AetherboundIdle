@@ -95,9 +95,9 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   script.
 - **Standing rule (designer's request):** whenever the game needs a new icon, it gets a prompt in
   `tools/art/build_icon_prompts.py` (and a placeholder in `tools/make_icons.py`) in the same change, and
-  `docs/art-prompts-icons.md` is regenerated. The designer's script lists whatever still needs painting
+  `docs/archive/art/art-prompts-icons.md` is regenerated. The designer's script lists whatever still needs painting
   after a pull.
-- **Painted icons are optional and drop-in:** `docs/art-prompts-icons.md` has a FLUX.2 prompt for every icon
+- **Painted icons are optional and drop-in:** `docs/archive/art/art-prompts-icons.md` has a FLUX.2 prompt for every icon
   (150 now; the top bar's vessel and meal reuse item icons), built by `tools/art/build_icon_prompts.py` with
   the creature pipeline's rules (magenta key, green for pink and purple things, no glow words, everything opaque).
   `tools/art/icon_runner.py` generates, picks and cuts them out with the existing `batch_runner.py` and
@@ -145,9 +145,9 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   with portraits (shinies first).
 - **Owned badge** (designer's request): a species you already own shows a green paw badge on the bottom-right
   of its portrait in an island's "Aetherlings seen here" list (it replaced the "· owned" text), and beside a
-  wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/art-prompts-icons.md`; until the
+  wild fighter's name tag in battle. Its icon is `ui/owned` in `docs/archive/art/art-prompts-icons.md`; until the
   painted PNG exists, `tools/make_icons.py` draws a placeholder. Behind them is a painted backdrop per island, `assets/zones/<id>.jpg`, with prompts in
-  `docs/art-prompts-zones.md` (10 islands; `icon_runner.py --group zone`). Until one exists the game draws a
+  `docs/archive/art/art-prompts-zones.md` (10 islands; `icon_runner.py --group zone`). Until one exists the game draws a
   landscape in the island's type colour: haze, two ranges of hills, open ground.
 - **Fonts:** Fredoka (headings; rounded, fits "cute stays cute") and Nunito (body). Both SIL Open Font
   License; licence files are next to them in `assets/fonts/`. They cover Latin only, so interface text
@@ -513,7 +513,7 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
   - **Prices:** every crafted item sells for at least 1.25× its inputs (`test_market_prices`). Thread prices
     also count the Aether they cost.
   - **Icons:** placeholder icons come from `tools/make_icons.py`. The FLUX prompts are in
-    `docs/art-prompts-icons.md`.
+    `docs/archive/art/art-prompts-icons.md`.
 - **Creature max level 100, forms at 20 and 40** (reference 99, 30 and 60), so evolutions (with their
   reveal) happen in the first sessions. **Working creatures earn half the skill XP they produce**; the
   reference only gave combat XP, so a creature that never fought never evolved.

@@ -3,6 +3,14 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## Cleanup (2026-09-25): art production wrapped up
+
+- Every sprite and icon is in the game, so the art docs (`art-pipeline.md`, `art-window-start.md`,
+  `art-prompts.md`, `art-prompts-icons.md`, `art-prompts-zones.md`) moved to `docs/archive/art/`. Both prompt
+  builders now write there. Outside the repo, `D:\AI` dropped its tool backups (`*.bak`), contact sheets,
+  cut-outs, line-ups, roster sheets and all ComfyUI output and input (about 2.4 GB). The `approved/` masters,
+  logs, workflows and tools were kept.
+
 ## 0.6.3j (2026-09-25): the last two Form 3 sprites
 
 - Form 3 of Gravelnip (from-scratch candidate 25: the prompt now names exactly two claws, a boulder claw and a

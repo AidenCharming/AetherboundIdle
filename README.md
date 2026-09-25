@@ -81,7 +81,7 @@ placeholder. The ids are in `data/species.json`, and `docs/DECISIONS.md` lists t
 
 ## Painted icons (FLUX.2 in ComfyUI)
 
-Every item and interface icon has a ready-to-paste prompt in [`docs/art-prompts-icons.md`](docs/art-prompts-icons.md),
+Every item and interface icon has a ready-to-paste prompt in [`docs/archive/art/art-prompts-icons.md`](docs/archive/art/art-prompts-icons.md),
 built by `tools/art/build_icon_prompts.py` (edit its table and rerun). `tools/art/icon_runner.py` runs them through
 ComfyUI with the same graphs as the creature pipeline and uses its `batch_runner.py` and `sprite_tools.py` from
 `D:\AI\tools`:
@@ -97,7 +97,7 @@ A `<id>.png` in `assets/icons/items/` or `assets/icons/ui/` replaces that icon's
 
 ## Island backdrops
 
-Each expedition island has a painted battle backdrop prompt in [`docs/art-prompts-zones.md`](docs/art-prompts-zones.md)
+Each expedition island has a painted battle backdrop prompt in [`docs/archive/art/art-prompts-zones.md`](docs/archive/art/art-prompts-zones.md)
 (same builder and runner, `--group zone`). `finish --group zone` square-crops the approved picture to 1024 px and copies
 it to `assets/zones/<zone id>.jpg`. Until a file exists, the battle view draws a simple landscape in the island's
 colour. Creatures stand at 84% of the height (back row 77%), so the bottom third of a backdrop must be flat ground.
