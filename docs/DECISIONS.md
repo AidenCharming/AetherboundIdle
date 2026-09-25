@@ -1,7 +1,7 @@
 # Aetherbound (Godot rebuild): decisions
 
 What the Godot rebuild changed, added or dropped compared with the reference material (`CLAUDE.md`,
-`docs/design.md`, `docs/content-data.md`, `docs/PROGRESS.md`, `src/data/*.json`, `src/sim/`), and why. The
+`docs/design.md`, `docs/content-data.md`, `docs/archive/web-build/PROGRESS.md`, `src/data/*.json`, `src/sim/`), and why. The
 web build on `main` is untouched; everything here lives under `/godot` on the `godot-rebuild` branch.
 
 Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprite files](#sprite-files) ·
@@ -733,7 +733,7 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 
 ## Open questions for the designer
 
-1. **Chunk 1 recipes:** `docs/naming/chunk1-claude.md` says its pair assignments are a reconstruction you
+1. **Chunk 1 recipes:** `docs/archive/done/naming/chunk1-claude.md` says its pair assignments are a reconstruction you
    hadn't reviewed. They are in the game as written; changing a pair is an edit to `data/recipes.json`.
 2. **Hybrid art:** 45 hybrids × 3 forms, listed above.
 3. **Gear:** leave it out, or design a gear list for a later pass?

@@ -6,8 +6,8 @@ decided and why) and `README.md` (how to run things).
 ## Ground rules
 
 - The Godot project is at the repo root (`project.godot`); `CLAUDE.md` is the short version of these rules. The
-  old web build is archived on the `web-archive` branch and is never touched. `docs/PROGRESS.md` and
-  `docs/plan.md` describe that web build and are history only.
+  old web build is archived on the `web-archive` branch and is never touched. Its docs are in
+  `docs/archive/web-build/` (history only).
 - Work on the branch you were given, **but first check it contains `origin/godot-rebuild`**
   (`git log --oneline HEAD..origin/godot-rebuild` should print nothing). The 2026-09-25 session started from an
   older base, missed a night of fixes and redid some of them; if that command lists commits, merge
@@ -116,6 +116,10 @@ in the cloud). A new `class_name` needs `godot --headless --path . --import` bef
 passes); watch for `SCRIPT ERROR` in its output. Fixing that in `tests/test_runner.gd` would be worth it.
 
 ## Recently done (this session)
+
+**Repo housekeeping:** `.gitattributes` forces LF (the ~390 "changed" `.import` files were CRLF/LF noise, not
+edits). Finished and web-era docs moved to `docs/archive/` (see its README); the `art-*` docs stay where the art
+window expects them.
 
 **Bulk release switches (0.3.1):** "Release shinies too" and "Release working ones too" were plain
 CheckButtons, whose icon the theme blanks, so they showed as bare text. They are `ToggleSwitch`es now, and the

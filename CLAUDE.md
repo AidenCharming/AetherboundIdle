@@ -3,7 +3,7 @@
 A creature-collecting idle game in the style of Melvor Idle: collect **Aetherlings**, put them to work in
 skills, breed rarer and hybrid forms, and send a party on idle-combat expeditions to bind wild ones. Built in
 **Godot 4.7** (GDScript, GL Compatibility, 1600×900, UI built in code). The old web version is archived on the
-`web-archive` branch; `docs/PROGRESS.md` and `docs/plan.md` describe that web build and are history only.
+`web-archive` branch; its docs are in `docs/archive/web-build/` (history only).
 
 ## Read these first
 
