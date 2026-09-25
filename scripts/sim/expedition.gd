@@ -114,15 +114,16 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 		for i in count:
 			var w := roll_wild(s, z, rng)
 			var mult := {"health": z.enemyMult, "power": z.enemyMult, "guard": z.enemyMult}
-			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult)
+			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult, "", "", int(w.form))
 			b.enemies.append(f)
 			if w.shiny:
 				events.append({"type": "shiny_spotted", "species": w.species})
 	events.append({"type": "wave", "wave": b.wave, "waves": b.waves})
 
 
-## A random wild encounter for a zone: {species, level, rarity, shiny}. Counts toward shiny pity and marks
-## the species as seen in the Aether-Log.
+## A random wild encounter for a zone: {species, level, rarity, shiny, form}. Counts toward shiny pity and
+## marks the species as seen in the Aether-Log. Now and then one is met a form (or two) above what its level
+## has reached (`combat.wildFormUp`), so the islands show a mix of forms.
 static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var sp_id: String = Rng.weighted_key(rng, z.species)
 	# a Glimmer Lure makes every rarity above Dim more common
@@ -141,7 +142,18 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
 	s.collection.seen[sp_id] = true
-	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny}
+	var form := F.form_for_level(level)
+	var up: Array = Data.tuning.combat.get("wildFormUp", [])
+	var roll := rng.randf()
+	for i in range(up.size() - 1, -1, -1):
+		var p_up := 0.0
+		for j in range(i, up.size()):
+			p_up += float(up[j])
+		if roll < p_up:
+			form += i + 1
+			break
+	form = mini(form, Data.species[sp_id].forms.size())
+	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": form}
 
 
 # ---------------------------------------------------------------- stepping
@@ -230,7 +242,7 @@ static func _on_enemy_down(s: Dictionary, f: Dictionary, rng: RandomNumberGenera
 	b.kills = int(b.kills) + 1
 	if f.get("boss", false):
 		return  # boss rewards land when the wave clears
-	defeated_wild(s, Data.zones[b.zone], {"species": f.species, "level": int(f.level), "rarity": int(f.rarity), "shiny": bool(f.shiny)},
+	defeated_wild(s, Data.zones[b.zone], {"species": f.species, "level": int(f.level), "rarity": int(f.rarity), "shiny": bool(f.shiny), "form": int(f.form)},
 		_alive_party(s), rng, events, b)
 
 
@@ -240,7 +252,7 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 	s.counters.kills = int(s.counters.kills) + 1
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + 1
-	_give_party_xp(s, party, kill_xp(int(w.level), int(w.rarity)), events)
+	_party_xp(s, party, kill_xp(int(w.level), int(w.rarity)), events, b)
 	var gold := rng.randi_range(int(z.gold[0]), int(z.gold[1]))
 	GameState.add_item(s, "gold", gold)
 	var loot := {"gold": gold}
@@ -251,6 +263,22 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 			loot[l.item] = loot.get(l.item, 0) + q
 	events.append({"type": "loot", "items": loot})
 	try_capture(s, w, party, rng, events, b)
+
+
+## Combat XP for each party member. One who levels or evolves mid-run fights at the new level at once: its
+## fighter in the live battle `b` is refreshed, so XP from every kill shows, not only after the boss.
+static func _party_xp(s: Dictionary, party: Array, xp: float, events: Array, b: Dictionary) -> void:
+	for c in party:
+		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
+		if cev.is_empty():
+			continue
+		for e in cev:
+			if e.type == "evolved":
+				Collection.on_evolved(s, c)
+		events.append_array(cev)
+		for f in b.get("allies", []):
+			if f.get("cid", "") == c.id:
+				Combat.refresh_ally(f, c)
 
 
 ## Picks the vessel the auto-bind settings allow for this encounter, or "" to let it go.
@@ -313,10 +341,11 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 		return
 	if int(b.get("freeBinds", 0)) > 0:
 		b.freeBinds = int(b.freeBinds) - 1
-		if Rng.chance(rng, bind_chance(s, "resonant-vessel", int(w.rarity), party)):
-			_bind(s, w, rng, events, "free")
+		var pf := bind_chance(s, "resonant-vessel", int(w.rarity), party)
+		if Rng.chance(rng, pf):
+			_bind(s, w, rng, events, "free", pf)
 		else:
-			events.append({"type": "escaped", "species": w.species, "rarity": w.rarity})
+			events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "chance": pf})
 		return
 	var vessel := choose_vessel(s, w)
 	if vessel == "":
@@ -325,22 +354,29 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 			events.append({"type": "pending", "species": w.species})
 		return
 	GameState.add_item(s, vessel, -1)
-	if Rng.chance(rng, bind_chance(s, vessel, int(w.rarity), party)):
-		_bind(s, w, rng, events, vessel)
+	var p := bind_chance(s, vessel, int(w.rarity), party)
+	if Rng.chance(rng, p):
+		_bind(s, w, rng, events, vessel, p)
 	elif w.get("shiny", false):
 		# a shiny never flees: it waits in the pending queue for another try
 		s.expedition.pending.append(w)
 		events.append({"type": "pending", "species": w.species})
 	else:
-		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel})
+		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel, "chance": p})
 
 
-static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String) -> Dictionary:
+## `chance` is the bind chance that was rolled (-1 for a guaranteed bind), shown in the expedition log.
+static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String, chance := -1.0) -> Dictionary:
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
 	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild")
+	if int(w.get("form", 1)) > Creatures.form_of(c):
+		c.form = int(w.form)   # bound in a higher form than its level: it keeps it
 	s.creatures[c.id] = c
 	s.counters.captures = int(s.counters.captures) + 1
-	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
+	var ev := {"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how}
+	if chance >= 0.0:
+		ev.chance = chance
+	events.append(ev)
 	if c.shiny:
 		events.append_array(GameState.give_pearls(s, int(Data.tuning.pearls.shinyFound), "a shiny was bound"))
 	events.append_array(Collection.on_owned(s, c))
@@ -354,11 +390,12 @@ static func retry_pending(s: Dictionary, index: int, vessel_id: String, rng: Ran
 		return events
 	var w: Dictionary = s.expedition.pending[index]
 	GameState.add_item(s, vessel_id, -1)
-	if Rng.chance(rng, bind_chance(s, vessel_id, int(w.rarity), GameState.party(s))):
+	var p := bind_chance(s, vessel_id, int(w.rarity), GameState.party(s))
+	if Rng.chance(rng, p):
 		s.expedition.pending.remove_at(index)
-		_bind(s, w, rng, events, vessel_id)
+		_bind(s, w, rng, events, vessel_id, p)
 	else:
-		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel_id, "pending": true})
+		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel_id, "pending": true, "chance": p})
 	return events
 
 
@@ -385,7 +422,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	zs.cleared = true
 	s.counters.bossKills = int(s.counters.bossKills) + 1
 	var boss: Dictionary = z.boss
-	_give_party_xp(s, _alive_party(s), kill_xp(int(boss.level), 3, true), events)
+	_party_xp(s, _alive_party(s), kill_xp(int(boss.level), 3, true), events, s.expedition.battle)
 	var bl: Dictionary = z.bossLoot
 	GameState.add_item(s, "gold", float(bl.gold))
 	for id in bl.items:
@@ -469,7 +506,7 @@ static func offline(s: Dictionary, ms: float, rng: RandomNumberGenerator) -> Arr
 		for e in ev:
 			if e.type in ["run_complete", "wiped"]:
 				runs += 1
-			if e.type in ["captured", "evolved", "boss_defeated", "zone_unlocked", "discovered", "pending", "wiped", "escaped", "loot"]:
+			if e.type in ["captured", "evolved", "boss_defeated", "zone_unlocked", "discovered", "pending", "wiped", "escaped", "loot", "pearl"]:
 				events.append(e)
 	var remaining := ms - simulated
 	if remaining <= 0.0 or not is_running(s) or simulated <= 0.0:

@@ -156,7 +156,11 @@ func _handle(r: Dictionary) -> Dictionary:
 			await get_tree().process_frame
 			return {"ok": true, "screen": Main.instance.current}
 		"new", "load":
-			return await _start(int(r.get("slot", SLOT)), String(r.cmd) == "new")
+			var slot := int(r.get("slot", SLOT))
+			var fresh := String(r.cmd) == "new"
+			if fresh and slot != SLOT and not bool(r.get("force", false)):
+				return _fail("\"new\" wipes the slot, so it only starts slot %d unless the request has \"force\": true" % SLOT)
+			return await _start(slot, fresh)
 		"title":
 			Game.leave()
 			get_tree().change_scene_to_file("res://scenes/title.tscn")
@@ -279,7 +283,7 @@ func _top_modal() -> Node:
 		return null
 	for i in range(Modal.layer.get_child_count() - 1, -1, -1):
 		var m := Modal.layer.get_child(i)
-		if m is Modal and not m.is_queued_for_deletion():
+		if m is Modal and m.is_open():
 			return m
 	return null
 
@@ -487,13 +491,14 @@ func _screenshot(path: String) -> Dictionary:
 	return {"ok": true, "path": ProjectSettings.globalize_path(path), "size": [img.get_width(), img.get_height()]}
 
 
-## Starts a slot fresh ("new") or from its save ("load") and opens the game screen. The slot is named
-## "Autoplay Slot" so it's easy to tell apart on the title screen.
+## Starts a slot fresh ("new") or from its save ("load") and opens the game screen. The bridge's own slot is
+## named "Autoplay Slot" so it's easy to tell apart on the title screen; any other slot keeps its name.
 func _start(slot: int, fresh: bool) -> Dictionary:
 	if Game.running:
 		Game.leave()
 	Game.start_slot(slot, fresh)
-	Game.rename_slot(slot, SLOT_NAME)
+	if slot == SLOT:
+		Game.rename_slot(slot, SLOT_NAME)
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
 	await get_tree().create_timer(0.6).timeout
 	return {"ok": true, "slot": slot, "fresh": fresh}
@@ -619,7 +624,7 @@ func modals_info() -> Array:
 	var now := Time.get_ticks_msec()
 	var live := {}
 	for m in Modal.layer.get_children():
-		if not (m is Modal) or m.is_queued_for_deletion():
+		if not (m is Modal) or not m.is_open():
 			continue
 		var key := m.get_instance_id()
 		live[key] = true

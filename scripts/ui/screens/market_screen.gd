@@ -16,6 +16,7 @@ var _body: VBoxContainer
 var _gold: Label
 var _clocks: Array = []   # [{label, fmt}] countdowns to the next stock
 var _boost_bars: Array = []   # [{id, bar, label}]
+var _window := -1   # the stock window on screen; buys pass it so a changed stock never buys the wrong offer
 
 
 func _ready() -> void:
@@ -45,6 +46,7 @@ func refresh() -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
+	_window = Market.window(Game.now_sec())
 	UI.clear(_tabs)
 	for t in TABS:
 		var b := UI.button(t[1], "ChipOn" if tab == t[0] else "Chip", func():
@@ -90,8 +92,9 @@ func _tick() -> void:
 	for c in _clocks:
 		if is_instance_valid(c.label):
 			c.label.text = c.fmt % F.format_seconds(left)
-	if left <= 0.5:
-		refresh.call_deferred()
+	if Market.window(Game.now_sec()) != _window:
+		_window = Market.window(Game.now_sec())
+		refresh.call_deferred()   # the stock changed: show the new offers before anything can be bought
 	for bb in _boost_bars:
 		var secs := Market.boost_left(s, bb.id)
 		bb.bar.value = secs / (float(Market.cfg().boosts.maxHours) * 3600.0) * 100.0
@@ -161,12 +164,12 @@ func _offer_card(o: Dictionary, i: int) -> Control:
 	cv.add_child(h)
 	var row := UI.hbox(8)
 	row.add_child(UI.amount("gold", float(o.gold), float(o.gold), 20))
-	if float(o.get("discount", 0.0)) > 0.0:
+	if roundi(float(o.get("discount", 0.0)) * 100.0) > 0:
 		row.add_child(UI.chip("-%d%%" % roundi(float(o.discount) * 100.0), Palette.GOOD, 12))
 	row.add_child(UI.spacer())
 	row.add_child(UI.chip("%d left" % int(o.left), Palette.GOLD if int(o.left) > 0 else Palette.DANGER, 12))
 	cv.add_child(row)
-	var b := UI.button("Buy" if int(o.left) > 0 else "Sold out", "Gold", func(): Game.buy_offer(i))
+	var b := UI.button("Buy" if int(o.left) > 0 else "Sold out", "Gold", func(): Game.buy_offer(i, _window))
 	b.disabled = int(o.left) <= 0 or float(Game.state.gold) < float(o.gold)
 	cv.add_child(b)
 	if int(o.left) <= 0:
@@ -205,7 +208,7 @@ func _limited_card(o: Dictionary, i: int) -> Control:
 	var bv := UI.vbox(8)
 	bv.alignment = BoxContainer.ALIGNMENT_CENTER
 	bv.add_child(UI.amount("gold", float(o.gold), float(o.gold), 24))
-	var b := UI.button("Buy now" if int(o.left) > 0 else "Snapped up", "Gold", func(): Game.buy_offer(i))
+	var b := UI.button("Buy now" if int(o.left) > 0 else "Snapped up", "Gold", func(): Game.buy_offer(i, _window))
 	b.custom_minimum_size.x = 160
 	b.disabled = int(o.left) <= 0 or float(Game.state.gold) < float(o.gold)
 	bv.add_child(b)

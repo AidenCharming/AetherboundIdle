@@ -2,7 +2,7 @@
 """Drive the running game through the test bridge (scripts/autoload/test_bridge.gd). Standard library only.
 
   python tools/bridge.py launch [--godot PATH]      start the game with the bridge on and wait for it
-  python tools/bridge.py new [slot]                 start a fresh game (slot 2, "Autoplay Slot", by default)
+  python tools/bridge.py new [slot] [--force]       start a fresh game in slot 2 ("Autoplay Slot"); another slot needs --force
   python tools/bridge.py state                      screen, gold, skills, expedition, fps, memory, error count
   python tools/bridge.py buttons                    every clickable button on screen right now
   python tools/bridge.py click "Buy egg" [index]    a real mouse click on the button with that text (scrolls to it)
@@ -256,7 +256,11 @@ def main(argv):
     elif cmd == "go":
         args = {"screen": rest[0], "arg": rest[1] if len(rest) > 1 else ""}
     elif cmd in ("new", "load"):
+        force = "--force" in rest
+        rest = [a for a in rest if a != "--force"]
         args = {"slot": int(rest[0]) if rest else 2}
+        if force:
+            args["force"] = True
     elif cmd == "skip":
         args = {"hours": float(rest[0]) if rest else 1.0}
     elif cmd == "wait":

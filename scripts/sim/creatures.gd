@@ -30,8 +30,10 @@ static func types_of(c: Dictionary) -> Array:
 	return Data.species[c.species].types
 
 
+## The form its level has reached, or the form it was bound in if higher (a wild one can be met a form or
+## two above its level: see Expedition.roll_wild).
 static func form_of(c: Dictionary) -> int:
-	return F.form_for_level(int(c.level))
+	return maxi(F.form_for_level(int(c.level)), int(c.get("form", 1)))
 
 
 static func display_name(c: Dictionary) -> String:

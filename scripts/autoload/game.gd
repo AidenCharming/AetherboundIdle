@@ -39,6 +39,16 @@ func backup_path(n: int) -> String:
 	return "user://slot_%d.bak.json" % n
 
 
+func tmp_path(n: int) -> String:
+	return "user://slot_%d.tmp.json" % n
+
+
+## Where a slot's save can be, in the order to try them. A .tmp only survives when a crash hit between
+## removing the main file and renaming .tmp into place, and then it is the newest good save.
+func _slot_paths(n: int) -> Array:
+	return [slot_path(n), tmp_path(n), backup_path(n)]
+
+
 ## Starts playing a save slot: loads it, or begins a new game there when it is empty or `fresh` is set.
 ## Applies offline progress and starts the clock.
 func start_slot(n: int, fresh := false) -> void:
@@ -113,11 +123,11 @@ func _log_battle(e: Dictionary) -> void:
 	var icon: Texture2D = null
 	match e.type:
 		"captured":
-			line = "Bound a %s %s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
-				" · first of its type, free" if e.how == "guaranteed" else ""]
+			line = "Bound a %s %s%s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
+				" · first of its type, free" if e.how == "guaranteed" else "", _chance_note(e)]
 			col = Palette.GOLD if e.shiny else Data.rarity_color(e.rarity)
 		"escaped":
-			line = "A %s %s broke free%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else ""]
+			line = "A %s %s broke free%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else "", _chance_note(e)]
 			col = Palette.TEXT_FAINT
 			icon = Data.item_icon(e.vessel) if e.has("vessel") else Data.ui_icon("vessel")
 		"boss_defeated":
@@ -156,6 +166,11 @@ func _log_battle(e: Dictionary) -> void:
 		battle_log.push_front(entry)
 		if battle_log.size() > 60:
 			battle_log.resize(60)
+
+
+## " · 41% chance" for a bind or an escape that was rolled, so the log shows the odds it had.
+static func _chance_note(e: Dictionary) -> String:
+	return " · %s chance" % F.pct(float(e.chance)) if e.has("chance") else ""
 
 
 func _handle(events: Array) -> void:
@@ -238,20 +253,45 @@ func save_game() -> void:
 	var text := JSON.stringify(state)
 	if slot <= 0:
 		return
-	var path := slot_path(slot)
-	if FileAccess.file_exists(path):
-		DirAccess.copy_absolute(ProjectSettings.globalize_path(path), ProjectSettings.globalize_path(backup_path(slot)))
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f:
-		f.store_string(text)
-		f.close()
+	_write_slot(slot, text)
+
+
+## Writes a save without ever leaving a half-written main file: the text goes to .tmp first, the old main
+## file becomes the backup only if it is a readable save, then .tmp is renamed into place.
+func _write_slot(n: int, text: String) -> bool:
+	var main := ProjectSettings.globalize_path(slot_path(n))
+	var tmp := ProjectSettings.globalize_path(tmp_path(n))
+	var f := FileAccess.open(tmp_path(n), FileAccess.WRITE)
+	if f == null:
+		push_error("Could not write %s (%s)" % [tmp_path(n), error_string(FileAccess.get_open_error())])
+		return false
+	f.store_string(text)
+	f.close()
+	if FileAccess.file_exists(slot_path(n)) and _readable(slot_path(n)):
+		DirAccess.copy_absolute(main, ProjectSettings.globalize_path(backup_path(n)))
+	if FileAccess.file_exists(slot_path(n)):
+		DirAccess.remove_absolute(main)   # Windows can't rename over an existing file
+	return DirAccess.rename_absolute(tmp, main) == OK
+
+
+func _readable(path: String) -> bool:
+	var parsed: Variant = _parse_file(path)
+	return parsed is Dictionary and parsed.has("version")
+
+
+## The parsed contents of a save file, or null when it is missing or not valid JSON.
+func _parse_file(path: String) -> Variant:
+	if not FileAccess.file_exists(path):
+		return null
+	var json := JSON.new()
+	if json.parse(FileAccess.get_file_as_string(path)) != OK:
+		return null
+	return json.data
 
 
 func load_game() -> bool:
-	for path in [slot_path(slot), backup_path(slot)]:
-		if not FileAccess.file_exists(path):
-			continue
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	for path in _slot_paths(slot):
+		var parsed: Variant = _parse_file(path)
 		if parsed is Dictionary and parsed.has("version"):
 			_adopt(parsed)
 			return true
@@ -296,10 +336,8 @@ func leave() -> void:
 
 ## A short description of a slot for the title screen, or {} when it is empty.
 func slot_info(n: int) -> Dictionary:
-	for path in [slot_path(n), backup_path(n)]:
-		if not FileAccess.file_exists(path):
-			continue
-		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+	for path in _slot_paths(n):
+		var parsed: Variant = _parse_file(path)
 		if not (parsed is Dictionary) or not parsed.has("creatures"):
 			continue
 		var best := ""
@@ -327,21 +365,19 @@ func rename_slot(n: int, save_name: String) -> void:
 		state.saveName = save_name
 		save_game()
 		return
-	var path := slot_path(n)
-	if not FileAccess.file_exists(path):
-		return
-	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
-	if not (parsed is Dictionary):
+	var parsed: Variant = null
+	for path in _slot_paths(n):
+		parsed = _parse_file(path)
+		if parsed is Dictionary and parsed.has("version"):
+			break
+	if not (parsed is Dictionary and parsed.has("version")):
 		return
 	parsed.saveName = save_name
-	var f := FileAccess.open(path, FileAccess.WRITE)
-	if f:
-		f.store_string(JSON.stringify(parsed))
-		f.close()
+	_write_slot(n, JSON.stringify(parsed))
 
 
 func delete_slot(n: int) -> void:
-	for path in [slot_path(n), backup_path(n)]:
+	for path in _slot_paths(n):
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
@@ -400,6 +436,16 @@ func assign(cid: String, skill_id: String) -> bool:
 	Sfx.play("click")
 	changed.emit()
 	return true
+
+
+## "Fill empty slots" on a skill page: the best resting Aetherlings go to work there.
+func fill_slots(skill_id: String) -> int:
+	var n := Skills.fill_slots(state, skill_id)
+	if n > 0:
+		Sfx.play("click")
+		info("%d Aetherling%s went to work in %s" % [n, "" if n == 1 else "s", Data.skills[skill_id].name], Data.ui_icon(skill_id))
+	changed.emit()
+	return n
 
 
 func bench(cid: String) -> void:
@@ -564,9 +610,10 @@ func toggle_item_lock(item_id: String) -> void:
 	changed.emit()
 
 
-func buy_offer(index: int) -> bool:
+## `expect_window` is the stock window the screen showed (see Market.buy_offer).
+func buy_offer(index: int, expect_window := -1) -> bool:
 	var o: Dictionary = Market.stock(state, now_sec()).offers[index] if index < Market.stock(state, now_sec()).offers.size() else {}
-	var ok := _market_result(Market.buy_offer(state, index, now_sec(), rng), "", null)
+	var ok := _market_result(Market.buy_offer(state, index, now_sec(), rng, expect_window), "", null)
 	if ok and o.get("limited", false):
 		Sfx.play("shiny_appear")
 		_notify("Snapped up: %s" % o.name, Data.ui_icon("market"), Palette.GOLD)
@@ -581,8 +628,8 @@ func buy_egg(type_id: String, grade: int) -> bool:
 	return _market_result(Market.buy_egg(state, type_id, grade, rng, now_sec()), "The egg is in a Genesis Pod", Data.ui_icon("pods"))
 
 
-func buy_featured_egg() -> bool:
-	return _market_result(Market.buy_featured(state, now_sec(), rng), "The featured egg is in a Genesis Pod", Data.ui_icon("pods"))
+func buy_featured_egg(expect_window := -1) -> bool:
+	return _market_result(Market.buy_featured(state, now_sec(), rng, expect_window), "The featured egg is in a Genesis Pod", Data.ui_icon("pods"))
 
 
 func release(cid: String) -> void:
@@ -602,10 +649,13 @@ func release(cid: String) -> void:
 	changed.emit()
 
 
-func bulk_release(max_rarity: int) -> void:
-	var res := Economy.bulk_release(state, max_rarity)
+func bulk_release(max_rarity: int, under_level := 0) -> void:
+	var pearls0 := GameState.count(state, "aether-pearl")
+	var res := Economy.bulk_release(state, max_rarity, under_level)
+	var pearls := int(GameState.count(state, "aether-pearl") - pearls0)
 	if res.count > 0:
-		info("Released %d Aetherlings. +%s Aether" % [res.count, F.format_num(res.aether)], Data.ui_icon("aether"))
+		info("Released %d Aetherlings. +%s Aether%s" % [res.count, F.format_num(res.aether),
+			" and %d Aether Pearl%s" % [pearls, "" if pearls == 1 else "s"] if pearls > 0 else ""], Data.ui_icon("aether"))
 	save_game()
 	changed.emit()
 

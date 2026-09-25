@@ -5,6 +5,7 @@ extends Control
 static var parent_a := ""
 static var parent_b := ""
 static var tier := 1
+static var _for_save := ""   # the save the picks above belong to: ids like "c3" exist in every slot
 
 var _bench: VBoxContainer
 var _pods: HFlowContainer
@@ -32,6 +33,12 @@ func _ready() -> void:
 func refresh() -> void:
 	if Game.state.is_empty():
 		return
+	var save_key := "%d:%d" % [Game.slot, int(Game.state.created)]
+	if save_key != _for_save:
+		parent_a = ""
+		parent_b = ""
+		tier = 1
+		_for_save = save_key
 	if GameState.creature(Game.state, parent_a).is_empty():
 		parent_a = ""
 	if GameState.creature(Game.state, parent_b).is_empty():

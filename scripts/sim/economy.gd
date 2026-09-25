@@ -55,6 +55,35 @@ static func shatter(s: Dictionary, id: String, qty: int) -> float:
 	return gain
 
 
+## Everything an item is good for besides selling: [{kind, name, ...}] with kind "recipe" (a skill task that uses
+## it, with skill and level), "upgrade" (a Sanctum Works build), "breeding" (a Genesis Pods material), "vessel",
+## "meal" or "shatter". Empty means it is only worth its gold.
+static func uses(id: String) -> Array:
+	var out := []
+	var it: Dictionary = Data.items.get(id, {})
+	if it.is_empty():
+		return out
+	match str(it.category):
+		"vessel":
+			out.append({"kind": "vessel", "name": "Binding wild Aetherlings on expeditions"})
+		"meal":
+			out.append({"kind": "meal", "name": "Healing the party between waves"})
+	if it.has("aether"):
+		out.append({"kind": "shatter", "name": "Shatter into %s Aether" % F.format_num(float(it.aether))})
+	for sk in Data.skill_list:
+		for a in sk.actions:
+			if a.has("inputs") and a.inputs.has(id):
+				out.append({"kind": "recipe", "name": a.name, "skill": sk.id, "level": int(a.level), "qty": int(a.inputs[id])})
+	for u in Data.upgrade_list:
+		for lv in u.levels:
+			if lv.cost.has(id):
+				out.append({"kind": "upgrade", "name": u.name, "id": u.id})
+				break
+	if it.has("element") and it.category != "rare" and Breeding.material(str(it.element), int(it.tier)) == id:
+		out.append({"kind": "breeding", "name": "Tier %d eggs in Genesis Pods (%s parents)" % [int(it.tier), Data.types[it.element].name]})
+	return out
+
+
 static func next_upgrade(s: Dictionary, id: String) -> Dictionary:
 	var u: Dictionary = Data.upgrades[id]
 	var lv := GameState.upgrade_level(s, id)
@@ -89,9 +118,10 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	return value
 
 
-## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, and never the
-## best (highest rarity, then level) of each species, so a species is never lost from the Nexus.
-static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
+## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, under level
+## `under_level` (0: any level), and never the best (highest rarity, then level) of each species, so a
+## species is never lost from the Nexus.
+static func bulk_release_candidates(s: Dictionary, max_rarity: int, under_level := 0) -> Array:
 	var best := {}
 	for c in s.creatures.values():
 		var b: Dictionary = best.get(c.species, {})
@@ -101,14 +131,16 @@ static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
 	for c in s.creatures.values():
 		if not Creatures.is_benched(c) or c.get("locked", false) or c.shiny or int(c.rarity) > max_rarity:
 			continue
+		if under_level > 0 and int(c.level) >= under_level:
+			continue
 		if best[c.species].id == c.id:
 			continue
 		out.append(c)
 	return out
 
 
-static func bulk_release(s: Dictionary, max_rarity: int) -> Dictionary:
-	var list := bulk_release_candidates(s, max_rarity)
+static func bulk_release(s: Dictionary, max_rarity: int, under_level := 0) -> Dictionary:
+	var list := bulk_release_candidates(s, max_rarity, under_level)
 	var total := 0
 	for c in list:
 		var v := release(s, c)

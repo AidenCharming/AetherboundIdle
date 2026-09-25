@@ -122,6 +122,11 @@ static func upgrade_value(s: Dictionary, id: String) -> float:
 	return float(u.base) if lv <= 0 else float(u.levels[lv - 1].value)
 
 
+## How many hours away count as offline progress: the Dream Anchor's hours plus the Pearl Hourglass's.
+static func offline_cap_hours(s: Dictionary) -> float:
+	return upgrade_value(s, "offline-cap") + float(Data.tuning.pearls.offlineHoursPerLevel) * pearl(s, "pearl-hourglass")
+
+
 static func pod_count(s: Dictionary) -> int:
 	return int(upgrade_value(s, "genesis-pods"))
 

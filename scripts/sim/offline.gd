@@ -6,7 +6,7 @@ extends RefCounted
 
 
 static func apply(s: Dictionary, elapsed_sec: float, rng: RandomNumberGenerator) -> Dictionary:
-	var cap := (GameState.upgrade_value(s, "offline-cap") + float(Data.tuning.pearls.offlineHoursPerLevel) * GameState.pearl(s, "pearl-hourglass")) * 3600.0
+	var cap := GameState.offline_cap_hours(s) * 3600.0
 	var used := clampf(elapsed_sec, 0.0, cap)
 	var before := snapshot(s)
 	var events := []
@@ -55,7 +55,7 @@ static func diff(s: Dictionary, before: Dictionary, events: Array) -> Dictionary
 	for id in s.skills:
 		if int(s.skills[id].level) > int(before.levels.get(id, 1)):
 			levels[id] = [int(before.levels.get(id, 1)), int(s.skills[id].level)]
-	var notable := events.filter(func(e): return e.type in ["evolved", "captured", "boss_defeated", "zone_unlocked", "slot_unlocked", "discovered", "shiny"])
+	var notable := events.filter(func(e): return e.type in ["evolved", "captured", "boss_defeated", "zone_unlocked", "slot_unlocked", "discovered", "shiny", "pearl"])
 	var actions := 0
 	for e in events:
 		if e.type == "produced":

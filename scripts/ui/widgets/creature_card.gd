@@ -67,11 +67,18 @@ func build(c: Dictionary, selected: bool, note: String, compact: bool) -> void:
 	r.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	v.add_child(r)
 	if not compact:
-		var st := UI.label(note if note != "" else status_text(c), "Faint", Palette.TEXT_DIM if note != "" else status_color(c))
-		st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		st.clip_text = true
-		st.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
-		v.add_child(st)
+		# a picker's note (what a pair would make, how fast it would work) comes first, and what the
+		# Aetherling is doing now stays under it, so a busy one is never picked by surprise
+		var lines := [[status_text(c), status_color(c)]]
+		if note != "":
+			lines.push_front([note, Palette.TEXT_DIM])
+			custom_minimum_size.y += 18.0
+		for pair in lines:
+			var st := UI.label(pair[0], "Faint", pair[1])
+			st.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			st.clip_text = true
+			st.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+			v.add_child(st)
 	tooltip_text = "%s · %s %s" % [Creatures.display_name(c), Data.rarity(int(c.rarity)).name, Data.species[c.species].name]
 
 

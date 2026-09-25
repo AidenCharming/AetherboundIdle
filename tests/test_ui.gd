@@ -246,7 +246,7 @@ func test_boss_fight_switches_to_boss_music_and_back() -> void:
 	_teardown()
 
 
-func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
+func test_worker_picker_sorts_by_output_and_secondary() -> void:
 	_setup()
 	var main := _main()
 	_teardown()
@@ -266,8 +266,7 @@ func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
 	t.eq(picker._sort, "output", "opens on Best output")
 	var o: Array = order.call()
 	t.ok(o.find(ids.bountiful) < o.find(ids.plain) and o.find(ids.bountiful) < o.find(ids.lucky), "bountiful out-produces plain and lucky")
-	_find_button(m, "Best time").pressed.emit()
-	t.eq(order.call()[0], ids.swift, "the fastest first")
+	t.ok(_find_button(m, "Best time") == null, "Best time is gone (play-test feedback)")
 	_find_button(m, "Best secondary").pressed.emit()
 	t.eq(order.call()[0], ids.lucky, "the luckiest first")
 	var first: CreatureCard = picker._grid.get_children().filter(func(n): return n is CreatureCard)[0]
@@ -411,22 +410,6 @@ func test_damage_numbers_spread_out() -> void:
 	arena.free()
 
 
-## A save slot can be named ("Dev Save") and the title screen's slot info reports the name.
-func test_save_slots_can_be_renamed() -> void:
-	var n := 3
-	var had := FileAccess.file_exists(Game.slot_path(n))
-	var backup := FileAccess.get_file_as_string(Game.slot_path(n)) if had else ""
-	FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(JSON.stringify(GameState.new_game()))
-	Game.rename_slot(n, "  Dev Save  ")
-	t.eq(Game.slot_info(n).get("name"), "Dev Save", "named and trimmed")
-	Game.rename_slot(n, "")
-	t.eq(Game.slot_info(n).get("name"), "", "cleared")
-	if had:
-		FileAccess.open(Game.slot_path(n), FileAccess.WRITE).store_string(backup)
-	else:
-		DirAccess.remove_absolute(Game.slot_path(n))
-
-
 ## Party members on a running expedition are not offered as workers (they can't be moved mid-run).
 func test_worker_picker_hides_the_locked_party() -> void:
 	_setup()
@@ -566,3 +549,448 @@ func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
 	t.ok(is_instance_valid(claim) and not claim.is_queued_for_deletion(), "an unrelated change doesn't rebuild the card mid-click")
 	main.free()
 	_teardown()
+
+
+## Play-test feedback: XP seemed to come only from the boss. A party member's nameplate has an XP bar that
+## moves with every kill, and its level chip follows a mid-run level-up.
+func test_arena_shows_party_xp_from_each_kill() -> void:
+	_setup()
+	var s := Game.state
+	var c := Creatures.make(s, "sproutlet", 1, 3, false, [], "test")
+	s.creatures[c.id] = c
+	Expedition.set_party_member(s, 0, c)
+	var rng := RandomNumberGenerator.new()
+	Expedition.start(s, "whisperleaf-hollow", rng)
+	var b: Dictionary = s.expedition.battle
+	for i in 200:
+		if not b.enemies.is_empty():
+			break
+		Expedition.step(s, 250.0, rng)
+		b = s.expedition.battle
+	var arena := Arena.new()
+	_layer.add_child(arena)
+	arena.size = Vector2(510, 585)
+	arena._build(b)
+	var v: Dictionary = arena._allies[0]
+	t.ok(v.xp != null, "the party member has an XP bar")
+	t.ok(arena._enemies.all(func(e): return e.get("xp") == null), "wild Aetherlings don't")
+	arena._update(b)
+	var before: float = v.xp.value
+	var ev := []
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 2, "rarity": 1, "shiny": false}, [c], rng, ev, b)
+	arena._update(b)
+	t.ok(v.xp.value > before or int(c.level) > 3, "the bar moved after one kill (%.3f -> %.3f)" % [before, v.xp.value])
+	c.xp = F.xp_for_level(F.creature_curve(), 7, Data.tuning.creature.maxLevel) - 0.5
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 2, "rarity": 1, "shiny": false}, [c], rng, ev, b)
+	arena._update(b)
+	t.eq(v.lv.text, "Lv %d" % int(c.level), "the level chip follows")
+	t.eq(int(b.allies[0].level), int(c.level), "and so does the fighter")
+	_teardown()
+
+
+## Bridge bug: after a picker closed, the next rail click did nothing. The fading dialog (0.1 s) still took
+## every click and still counted as open, so the bridge clicked its Close again, which landed on the page
+## (opening another picker). A closing dialog now lets clicks through and isn't open.
+func test_a_closing_dialog_lets_clicks_through() -> void:
+	_setup()
+	var m := Modal.open(UI.label("Pick one"), "Choose parent B")
+	t.ok(Modal.any_open() and m.is_open(), "open")
+	t.eq(m.mouse_filter, Control.MOUSE_FILTER_STOP, "an open dialog covers the page")
+	m.close()
+	t.ok(not Modal.any_open(), "a closing dialog no longer counts as open")
+	t.ok(not m.is_open())
+	t.eq(m.mouse_filter, Control.MOUSE_FILTER_IGNORE, "clicks pass it while it fades")
+	t.eq(m.mouse_behavior_recursive, Control.MOUSE_BEHAVIOR_DISABLED, "and pass its buttons and dim too")
+	var closes := {"n": 0}
+	m.closed.connect(func(): closes.n += 1)
+	m.close()
+	t.eq(closes.n, 0, "a second close does nothing")
+	_teardown()
+
+
+## A dialog belongs to its page: changing page closes it, so a picker can't outlive the Pods screen and
+## call back into it (every pick then errored and the picker stayed open for good).
+func test_changing_page_closes_its_dialogs() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("pods")
+	PodsScreen.parent_a = ""
+	main._screen._pick(1)
+	t.ok(Modal.any_open(), "the parent picker is open")
+	main.show_screen("sanctum")
+	t.ok(not Modal.any_open(), "going to the Sanctum closed it")
+
+
+## During the fade back to the title the state is empty; a worker bubble on the open skill page must not read it.
+func test_worker_bubble_waits_out_an_empty_state() -> void:
+	_setup()
+	var keep := Game.state
+	var c: Dictionary = keep.creatures.values()[0]
+	var bubble := WorkerBubble.make(c, "woodcutting", 58)
+	_layer.add_child(bubble)
+	Game.state = {}
+	bubble._process(0.016)
+	t.ok(true, "no error with an empty state")
+	Game.state = keep
+	_teardown()
+
+
+## The parents picked in Genesis Pods belong to one save: another save opens the page with nothing picked.
+func test_pods_forget_the_parents_of_another_save() -> void:
+	_setup()
+	var scr: Node = preload("res://scripts/ui/screens/pods_screen.gd").new()
+	_layer.add_child(scr)
+	var starter: String = Game.state.creatures.keys()[0]
+	PodsScreen.parent_a = starter
+	PodsScreen.parent_b = starter
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, starter, "kept within the same save")
+	var other := GameState.new_game()
+	other.created = int(Game.state.created) + 1
+	Game.state = other
+	scr.refresh()
+	t.eq(PodsScreen.parent_a, "", "parent A cleared")
+	t.eq(PodsScreen.parent_b, "", "parent B cleared")
+	_teardown()
+
+
+## Dragging a slider changes an option every frame; options.cfg is written once, after the changes stop.
+func test_option_changes_are_saved_once_after_they_stop() -> void:
+	var key := "music"
+	var was: float = Options.get_value(key)
+	var writes := Options.save_count
+	for i in 20:
+		Options.set_value(key, was)   # the same value, so the player's options.cfg ends up unchanged
+	t.eq(Options.save_count, writes, "nothing written while the changes keep coming")
+	t.ok(Options.save_pending(), "a write is waiting")
+	Options.flush()   # what the timer does when it runs (the runner can't wait for it)
+	t.eq(Options.save_count, writes + 1, "written once")
+	t.ok(not Options.save_pending(), "nothing left waiting")
+	Options.flush()
+	t.eq(Options.save_count, writes + 1, "and not again")
+
+
+## A capture or level-up while the mouse button is down must not rebuild the screen under the click (the button
+## would be freed between press and release and the click lost). The rebuild waits for the release.
+func test_screen_waits_for_the_mouse_before_rebuilding() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var screens := ["skill", "pods", "works", "market"]
+	for scr_id in screens:
+		main.show_screen(scr_id, "woodcutting" if scr_id == "skill" else "")
+		var btn := _first_button(main._screen)
+		t.ok(btn != null, "%s has a button" % scr_id)
+		if btn == null:
+			continue
+		var down := InputEventMouseButton.new()
+		down.button_index = MOUSE_BUTTON_LEFT
+		down.pressed = true
+		main._input(down)
+		Game.changed.emit()
+		t.ok(btn.is_inside_tree() and not btn.is_queued_for_deletion(), "%s: the button survives a change mid-click" % scr_id)
+		var up := InputEventMouseButton.new()
+		up.button_index = MOUSE_BUTTON_LEFT
+		up.pressed = false
+		main._input(up)
+		t.ok(main._refresh_waiting, "%s: the rebuild is still owed until after the release" % scr_id)
+		main._refresh_screen()
+		t.ok(not main._refresh_waiting, "%s: and then done" % scr_id)
+		Game.changed.emit()
+		if scr_id in ["pods", "market"]:   # Works and the skill page's header keep their buttons on purpose
+			t.ok(not btn.is_inside_tree(), "%s: with the button up, a change rebuilds at once" % scr_id)
+	main.free()
+	_teardown()
+
+
+## Bridge bugs: a Build click in Sanctum Works did nothing (the page rebuilt on a capture between mouse down
+## and up), and Build stayed disabled after the gold arrived (gold from work doesn't emit Game.changed).
+func test_works_build_buttons_stay_put_and_follow_the_gold() -> void:
+	_setup()
+	var s := Game.state
+	var works: Control = load("res://scripts/ui/screens/works_screen.gd").new()
+	_layer.add_child(works)
+	var b: Button = works._builds["genesis-pods"]
+	s.items.clear()
+	s.gold = 0.0
+	works._update_builds()
+	t.ok(b.disabled, "can't build with nothing")
+	works.refresh()   # what Main does on Game.changed (a capture, a level-up)
+	t.ok(works._builds["genesis-pods"] == b, "a capture or level-up doesn't replace the Build button")
+	var nxt := Economy.next_upgrade(s, "genesis-pods")
+	for id in nxt.cost:
+		GameState.add_item(s, id, float(nxt.cost[id]))
+	works._process(1.0)
+	t.ok(not b.disabled, "Build enables once the cost is there, with no Game.changed")
+	var before := GameState.upgrade_level(s, "genesis-pods")
+	Game.buy_upgrade("genesis-pods")
+	t.eq(GameState.upgrade_level(s, "genesis-pods"), before + 1, "built")
+	works.refresh()
+	t.ok(works._builds.get("genesis-pods") != b, "a new level rebuilds the card")
+	works.free()
+	_teardown()
+
+
+## Play-test feedback: 6-9 were out of the sidebar's order, and every page should have a key you can change,
+## shown on its tab. Defaults follow the rail (1-9), the skills take F1 onwards.
+func test_page_keys_follow_the_rail_and_can_be_changed() -> void:
+	_setup()
+	var saved: Dictionary = Options.values.keybinds.duplicate()
+	Options.reset_keybinds()
+	var order := ["sanctum", "nexus", "pods", "expeditions", "aetherlog", "inventory", "market", "eggmarket", "works"]
+	for i in order.size():
+		t.eq(Options.keybind(order[i]), KEY_1 + i, "%s is %d" % [order[i], i + 1])
+	t.eq(Options.keybind("skill:" + Data.skill_list[0].id), KEY_F1, "the first skill is F1")
+	t.eq(Options.tab_for_key(KEY_F2), "skill:" + Data.skill_list[1].id)
+	var main := _main()
+	_teardown()
+	var press := func(code: int):
+		var e := InputEventKey.new()
+		e.keycode = code as Key
+		e.pressed = true
+		main._unhandled_input(e)
+	press.call(KEY_7)
+	t.eq(main.current, "market", "7 opens the Market")
+	press.call(KEY_F1)
+	t.eq([main.current, main.current_arg], ["skill", Data.skill_list[0].id], "F1 opens the first skill")
+	var cap: Control = main._nav_buttons["market:"].keycap
+	t.ok(cap.visible and (cap.get_child(0) as Label).text == "7", "the Market's tab shows its key")
+	Options.set_keybind("market", KEY_M)
+	t.eq((cap.get_child(0) as Label).text, "M", "the keycap follows a change")
+	Options.set_keybind("works", KEY_M)
+	t.eq(Options.keybind("market"), 0, "a key moves: the Market lost M")
+	t.ok(not cap.visible, "and its keycap hides")
+	press.call(KEY_M)
+	t.eq(main.current, "works", "M opens Sanctum Works now")
+	main.free()
+	Options.values.keybinds = saved
+	Options.save_options()
+	_teardown()
+
+
+## Options > Controls: click a key, press a new one; Esc cancels without closing the dialog.
+func test_controls_page_captures_a_key() -> void:
+	_setup()
+	var saved: Dictionary = Options.values.keybinds.duplicate()
+	Options.reset_keybinds()
+	var p := OptionsPanel.new()
+	_layer.add_child(p)
+	p._current = "controls"
+	p._rebuild()
+	var b := _find_button(p, "7")
+	t.ok(b != null, "the Market's row shows 7")
+	b.pressed.emit()
+	t.eq(p._capturing, "market")
+	var key := func(code: int):
+		var e := InputEventKey.new()
+		e.keycode = code as Key
+		e.pressed = true
+		p._input(e)
+	key.call(KEY_SHIFT)
+	t.eq(p._capturing, "market", "a modifier alone waits for the real key")
+	key.call(KEY_Q)
+	t.eq(Options.keybind("market"), KEY_Q, "Q is the Market's key")
+	t.eq(p._capturing, "")
+	_find_button(p, "Q").pressed.emit()
+	key.call(KEY_ESCAPE)
+	t.eq(Options.keybind("market"), KEY_Q, "Esc cancels")
+	_find_button(p, "Q").pressed.emit()
+	key.call(KEY_BACKSPACE)
+	t.eq(Options.keybind("market"), 0, "Backspace clears it")
+	p.free()
+	Options.values.keybinds = saved
+	Options.save_options()
+	_teardown()
+
+
+## Play-test feedback: the breeding picker's cards said what a pair would make but not what each Aetherling
+## was doing. A card with a note shows its status too.
+func test_picker_cards_show_status_under_the_note() -> void:
+	_setup()
+	var c: Dictionary = Game.state.creatures.values()[0]
+	Skills.assign(Game.state, c, "woodcutting")
+	var card := CreatureCard.make(c, false, "Makes Sproutlet")
+	var texts := card.find_children("*", "Label", true, false).map(func(l): return l.text)
+	t.ok("Makes Sproutlet" in texts, "the note")
+	t.ok(("Working: " + Data.skills.woodcutting.name) in texts, "and what it's doing: %s" % [texts])
+	card.free()
+	_teardown()
+
+
+## Play-test feedback: one button fills a skill's empty slots with the best resting Aetherlings.
+func test_fill_empty_slots() -> void:
+	_setup()
+	var s := Game.state
+	s.skills.woodcutting.level = 10   # two slots
+	var starter: Dictionary = s.creatures.values()[0]
+	var plain := Creatures.make(s, "sproutlet", 1, 1, false, [], "test")
+	var bountiful := Creatures.make(s, "sproutlet", 1, 1, false, [{"id": "bountiful", "s": "major"}], "test")
+	var busy := Creatures.make(s, "sproutlet", 1, 30, false, [], "test")
+	var pyric := Creatures.make(s, "emberfang", 1, 30, false, [], "test")
+	for c in [plain, bountiful, busy, pyric]:
+		s.creatures[c.id] = c
+	Skills.assign(s, busy, "herbalism")
+	Skills.assign(s, starter, "woodcutting")
+	var main := _main()
+	_teardown()
+	main.show_screen("skill", "woodcutting")
+	var fb: Button = main._screen._fill_btn
+	t.ok(fb.visible and not fb.disabled, "a slot is free and someone can fill it")
+	fb.pressed.emit()
+	t.eq(GameState.workers(s, "woodcutting").size(), 2, "the free slot is filled")
+	t.eq(bountiful.job.get("id", ""), "woodcutting", "by the best producer")
+	t.ok(Creatures.is_benched(plain), "the weaker one keeps resting")
+	t.eq(busy.job.id, "herbalism", "a worker elsewhere isn't moved")
+	main._on_changed()
+	t.ok(not main._screen._fill_btn.visible, "no empty slot, no button")
+
+
+func _first_button(root: Node) -> Button:
+	if root is Button and root.visible:
+		return root
+	for c in root.get_children():
+		var b := _first_button(c)
+		if b:
+			return b
+	return null
+
+
+## Alt+Enter / F11 flip between a window and the fullscreen kind used last, and back.
+func test_fullscreen_toggle_goes_back_and_forth() -> void:
+	var was: int = Options.get_value("window_mode")
+	Options.values.window_mode = 2
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 0, "to a window")
+	Options.toggle_fullscreen()
+	t.eq(int(Options.get_value("window_mode")), 2, "back to the same fullscreen")
+	var key := InputEventKey.new()
+	key.keycode = KEY_F11
+	key.pressed = true
+	Options._input(key)
+	t.eq(int(Options.get_value("window_mode")), 0, "F11 does it too")
+	Options.values.window_mode = was
+	Options.flush()
+
+
+## The mouse's back and forward buttons walk the pages visited, like a browser.
+func test_mouse_back_and_forward_walk_the_pages() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("expeditions")
+	main.show_screen("skill", "woodcutting")
+	var back := InputEventMouseButton.new()
+	back.button_index = MOUSE_BUTTON_XBUTTON1
+	back.pressed = true
+	main._input(back)
+	t.eq(main.current, "expeditions", "back")
+	var fwd := InputEventMouseButton.new()
+	fwd.button_index = MOUSE_BUTTON_XBUTTON2
+	fwd.pressed = true
+	main._input(fwd)
+	t.eq([main.current, main.current_arg], ["skill", "woodcutting"], "forward")
+	main.history_step(-1)
+	main.show_screen("nexus")
+	main.history_step(1)
+	t.eq(main.current, "nexus", "a new page drops the forward history")
+	t.eq((main._nav_buttons["nexus:"].keycap.get_child(0) as Label).text, "2", "the rail shows the shortcut")
+	main.free()
+	_teardown()
+
+
+## Play-test feedback: the Nexus filters took three rows of chips, and the Put-to-work menu showed each skill's
+## icon at its painted size. Filters are one row of dropdowns; the menu's icons are text-sized, and a full
+## skill can't be chosen.
+func test_nexus_filters_and_put_to_work_menu() -> void:
+	_setup()
+	var s := Game.state
+	var starter: Dictionary = s.creatures.values()[0]
+	var ember := Creatures.make(s, "emberfang", 1, 5, false, [], "test")
+	s.creatures[ember.id] = ember
+	var main := _main()
+	_teardown()
+	main.show_screen("nexus", starter.id)
+	var nexus: Node = main._screen
+	var drops: Array = nexus._filter_bar.get_children().filter(func(n): return n is OptionButton)
+	t.eq(drops.size(), 3, "type, show and sort dropdowns on one row")
+	var type_drop: OptionButton = drops[0]
+	var pyric := -1
+	for i in type_drop.item_count:
+		if type_drop.get_item_text(i) == Data.types.pyric.name:
+			pyric = i
+	type_drop.select(pyric)
+	type_drop.item_selected.emit(pyric)
+	var shown: Array = nexus._grid.get_children().filter(func(n): return n is CreatureCard).map(func(n): return n.cid)
+	t.eq(shown, [ember.id], "the Pyric filter shows only the Pyric one")
+	var mb: MenuButton = nexus._detail.find_children("*", "MenuButton", true, false)[0]
+	var pm := mb.get_popup()
+	t.ok(pm.item_count > 0)
+	for i in pm.item_count:
+		t.eq(pm.get_item_icon_max_width(i), 22, "%s's icon is text-sized" % pm.get_item_text(i))
+	Skills.assign(s, starter, "woodcutting")   # woodcutting's one slot is now taken, by this one
+	nexus._fill_detail()
+	pm = (nexus._detail.find_children("*", "MenuButton", true, false)[0] as MenuButton).get_popup()
+	for i in pm.item_count:
+		if pm.get_item_text(i).begins_with(Data.skills.woodcutting.name):
+			t.ok(pm.is_item_disabled(i), "can't pick the skill it already works in")
+	main.free()
+	_teardown()
+
+
+## Designer's request: idle motion on the creature sprites. They breathe and sway from the feet, and hop now
+## and then; on the arena's ground (no plate) the feet stay planted between hops.
+func test_idle_motion_breathes_from_the_feet() -> void:
+	var lifts := []
+	var stretch := []
+	var sways := []
+	for i in 60:
+		var m := CreaturePortrait.idle_motion(i * 0.1, 1.3, false)
+		lifts.append(m.x)
+		stretch.append(m.y)
+		sways.append(m.z)
+	t.ok(lifts.all(func(v): return v == 0.0), "on the ground the feet stay put")
+	t.ok(stretch.max() > 1.01 and stretch.min() < 0.99, "it breathes")
+	t.ok(absf(sways.max()) > 0.01 and absf(sways.max()) < 0.05, "a slight sway")
+	t.ok(CreaturePortrait.idle_motion(0.7, 1.3, true).x != 0.0, "on a plate it floats a little")
+	var peak := 0.0
+	for i in 56:
+		peak = maxf(peak, CreaturePortrait.hop_motion(i * 0.01).x)
+	t.ok(peak > 0.03, "a hop leaves the ground")
+	t.eq(CreaturePortrait.hop_motion(CreaturePortrait.HOP_TIME).x, 0.0, "and lands")
+	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 120)
+	p.size = Vector2(120, 120)
+	p._layout()
+	t.eq(p._art.pivot_offset.y, p._art.size.y, "the art pivots on its feet")
+	p.free()
+
+
+## An item's tooltip is a card saying what the item is for, or that it only sells.
+func test_item_tooltips_say_what_an_item_is_for() -> void:
+	_setup()
+	var row := UI.amount("oak-log", 3)
+	t.ok(row is ItemTip, "cost chips carry a rich tooltip")
+	var card: Control = row._make_custom_tooltip("")
+	var texts := _texts(card)
+	t.ok(texts.any(func(x): return x.begins_with("• ")), "oak logs list their uses: %s" % [texts])
+	var only_gold := ""
+	for it in Data.item_list:
+		if Economy.uses(it.id).is_empty():
+			only_gold = it.id
+			break
+	if only_gold != "":
+		var tip := UI.item_tooltip(only_gold)
+		t.ok(_texts(tip).any(func(x): return x.begins_with("Only worth its gold")), "%s says it only sells" % only_gold)
+		tip.free()
+	card.free()
+	row.free()
+	_teardown()
+
+
+func _texts(root: Node) -> Array:
+	var out := []
+	if root is Label:
+		out.append(root.text)
+	for c in root.get_children():
+		out.append_array(_texts(c))
+	return out

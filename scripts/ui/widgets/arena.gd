@@ -14,8 +14,8 @@ var _ground: Control
 var _backdrop: TextureRect
 var _zone_type := "verdant"
 var _zone_seed := 0.0
-var _boss_music := false
-var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced   # the boss track is playing because of this arena
+var _boss_music := false   # the boss track is playing because of this arena
+var _announced := ""   # the wave whose shinies and rare Aetherlings have been announced
 
 ## Where feet touch the ground, as a fraction of the arena's height: front row, and how much higher the back
 ## row stands (a slight stagger, so each side reads as one line). Painted backdrops (assets/zones/<id>.png) are drawn with their ground across this band.
@@ -118,7 +118,10 @@ func _process(_d: float) -> void:
 			_status.text = ""
 		_set_boss_music(false)
 		return
-	var key := "%s|%d|%d|%d" % [b.zone, int(b.wave), b.allies.size(), b.enemies.size()]
+	var forms := ""
+	for f in b.allies:
+		forms += str(int(f.form))
+	var key := "%s|%d|%d|%d|%s" % [b.zone, int(b.wave), b.allies.size(), b.enemies.size(), forms]
 	if key != _key:
 		_key = key
 		_build(b)
@@ -221,6 +224,11 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	var sh := UI.bar(Color(0.6, 0.9, 1.0, 0.9), 3)
 	sh.modulate.a = 0.0
 	bars.add_child(sh)
+	# party members show their progress to the next level, so XP from every kill is seen
+	var xpb: ProgressBar = null
+	if side == 0:
+		xpb = UI.bar(Palette.AETHER, 3)
+		bars.add_child(xpb)
 	bars_row.add_child(bars)
 	v.add_child(bars_row)
 	panel.custom_minimum_size.x = width
@@ -229,7 +237,7 @@ func _nameplate(f: Dictionary, side: int, boss: bool, width: float) -> Dictionar
 	pips.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var tier := int(f.rarity)
 	pips.draw.connect(func(): UI.draw_pips(pips, Vector2.ZERO, tier, 3.2, Data.rarity_color_live(tier)))
-	return {"panel": panel, "hp": hp, "shield": sh, "pips": pips, "sb": sb, "tier": tier, "boss": boss}
+	return {"panel": panel, "hp": hp, "shield": sh, "pips": pips, "sb": sb, "tier": tier, "boss": boss, "xp": xpb, "lv": ll}
 
 
 ## A shiny or a rare wild Aetherling entering the fight gets a sound, a burst of light and a word over its
@@ -389,8 +397,8 @@ func _build(b: Dictionary) -> void:
 			root.add_child(np.pips)
 			np.pips.position = np.panel.position + Vector2(plate_w / 2.0, 0)
 			var rec := {"root": root, "portrait": por, "hp": np.hp, "shield": np.shield, "home": root.position, "down": false,
-				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss,
-				"cid": String(f.get("cid", ""))}
+				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss, "xp": np.xp, "lv": np.lv,
+				"cid": f.get("cid", "")}
 			(_allies if side == 0 else _enemies).append(rec)
 	_announce(b)
 	var z: Dictionary = Data.zones[b.zone]
@@ -424,6 +432,8 @@ func _update(b: Dictionary) -> void:
 					v.sb.border_color = Color(Data.rarity_color_live(int(v.tier)), 0.9)
 			v.shield.value = clampf(float(f.shield) / maxf(1.0, float(f.maxHp)), 0.0, 1.0)
 			v.shield.modulate.a = 1.0 if float(f.shield) > 0.5 else 0.0   # keeps its space, so the plate never jumps
+			if side == 0:
+				_update_xp(v)
 			if not f.alive and not v.down:
 				v.down = true
 				var tw := create_tween()
@@ -438,6 +448,24 @@ func _update(b: Dictionary) -> void:
 			_status.text = "Moving on…" if int(b.wave) > 0 else "Setting out…"
 		_:
 			_status.text = "Meals left this run: %d" % int(b.meals)
+
+
+## A party member's level chip and XP bar, read from the creature itself.
+func _update_xp(v: Dictionary) -> void:
+	var c: Dictionary = Game.state.creatures.get(v.get("cid", ""), {})
+	if c.is_empty():
+		return
+	v.lv.text = "Lv %d" % int(c.level)
+	if v.xp == null:
+		return
+	var max_lv: int = Data.tuning.creature.maxLevel
+	var lv := int(c.level)
+	if lv >= max_lv:
+		v.xp.value = 1.0
+		return
+	var lo := F.xp_for_level(F.creature_curve(), lv, max_lv)
+	var hi := F.xp_for_level(F.creature_curve(), lv + 1, max_lv)
+	v.xp.value = clampf((float(c.xp) - lo) / maxf(1.0, hi - lo), 0.0, 1.0)
 
 
 ## Where the next number over a fighter starts. Numbers that land close together take the next lane
@@ -535,6 +563,11 @@ func _on_event(e: Dictionary) -> void:
 			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 22, 60.0)
 		"escaped":
 			FloatText.spawn(_fx, Vector2(size.x * 0.73, size.y * 0.35), "Broke free", Palette.TEXT_FAINT, null, 16, 40.0)
+		"creature_level":
+			for v in _allies:
+				if v.get("cid", "") == e.creature:
+					FloatText.spawn(_fx, v.root.position + Vector2(v.root.size.x * 0.5, float(v.tag_top) - 10.0),
+						"Level %d!" % int(e.level), Palette.AETHER, Data.ui_icon("xp"), 16, 30.0, true)
 		"boss_defeated":
 			_show_banner("Victory!", Palette.GOLD)
 		"wiped":

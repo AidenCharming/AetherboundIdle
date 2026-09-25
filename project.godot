@@ -38,6 +38,7 @@ window/subwindows/embed_subwindows=true
 
 common/snap_controls_to_pixels=true
 theme/default_font_antialiasing=1
+timers/tooltip_delay_sec=0.35
 
 [importer_defaults]
 
