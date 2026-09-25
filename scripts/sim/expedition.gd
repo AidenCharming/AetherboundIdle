@@ -114,14 +114,14 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 		for i in count:
 			var w := roll_wild(s, z, rng)
 			var mult := {"health": z.enemyMult, "power": z.enemyMult, "guard": z.enemyMult}
-			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult)
+			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult, "", "", int(w.form))
 			b.enemies.append(f)
 			if w.shiny:
 				events.append({"type": "shiny_spotted", "species": w.species})
 	events.append({"type": "wave", "wave": b.wave, "waves": b.waves})
 
 
-## A random wild encounter for a zone: {species, level, rarity, shiny}. Counts toward shiny pity and marks
+## A random wild encounter for a zone: {species, level, rarity, shiny, form}. Counts toward shiny pity and marks
 ## the species as seen in the Aether-Log.
 static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var sp_id: String = Rng.weighted_key(rng, z.species)
@@ -141,7 +141,15 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
 	s.collection.seen[sp_id] = true
-	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny}
+	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": roll_form(rng, level)}
+
+
+## A wild creature's form: Form 1 anywhere, each higher form a roll (F.wild_form_chance) once its level allows it.
+static func roll_form(rng: RandomNumberGenerator, level: int) -> int:
+	var form := 1
+	while form < F.form_for_level(level) and Rng.chance(rng, F.wild_form_chance(form + 1, level)):
+		form += 1
+	return form
 
 
 # ---------------------------------------------------------------- stepping
@@ -325,7 +333,7 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 
 static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String) -> Dictionary:
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
-	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild")
+	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild", int(w.get("form", 0)))
 	s.creatures[c.id] = c
 	s.counters.captures = int(s.counters.captures) + 1
 	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
@@ -396,7 +404,8 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 			var fc: Dictionary = z.firstClearCreature
 			var pool := Data.species_list.filter(func(x): return x.kind == "base" and x.types[0] in fc.types)
 			var sp: Dictionary = Rng.pick(rng, pool)
-			_bind(s, {"species": sp.id, "level": int(boss.level) - 10, "rarity": int(fc.rarity), "shiny": false}, rng, events, "boss")
+			var lv := int(boss.level) - 10
+			_bind(s, {"species": sp.id, "level": lv, "rarity": int(fc.rarity), "shiny": false, "form": roll_form(rng, lv)}, rng, events, "boss")
 
 
 static func _eat_if_needed(s: Dictionary, events: Array) -> void:

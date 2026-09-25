@@ -504,7 +504,7 @@ func _pending_panel() -> PanelContainer:
 	for i in s.expedition.pending.size():
 		var w: Dictionary = s.expedition.pending[i]
 		var cell := UI.vbox(2)
-		var por := CreaturePortrait.make(w.species, F.form_for_level(int(w.level)), int(w.rarity), bool(w.shiny), 52)
+		var por := CreaturePortrait.make(w.species, int(w.get("form", F.form_for_level(int(w.level)))), int(w.rarity), bool(w.shiny), 52)
 		por.bob = false
 		por.tooltip_text = "%s%s %s" % ["Shiny " if w.shiny else "", Data.rarity(int(w.rarity)).name, Data.species[w.species].name]
 		cell.add_child(por)

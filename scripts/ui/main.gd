@@ -488,14 +488,14 @@ func _dev_modal() -> void:
 	lvl.value = 1
 	var shiny := CheckButton.new()
 	shiny.text = "Shiny"
-	# form comes from level: picking a form sets the level to where that form starts, and typing a level
-	# shows the form it gives
+	# a form can't be above what its level gives (like a wild one): picking a form raises the level to where
+	# that form starts if needed, and lowering the level lowers the form with it
 	var form_levels: Array = Data.tuning.creature.formLevels
 	var form := OptionButton.new()
 	for i in form_levels.size():
 		form.add_item("Form %d" % (i + 1), i)
-	form.item_selected.connect(func(i): lvl.value = int(form_levels[i]))
-	lvl.value_changed.connect(func(new_level): form.selected = F.form_for_level(int(new_level)) - 1)
+	form.item_selected.connect(func(i): lvl.value = maxi(int(lvl.value), int(form_levels[i])))
+	lvl.value_changed.connect(func(new_level): form.selected = mini(form.selected, F.form_for_level(int(new_level)) - 1))
 	row.add_child(sp)
 	row.add_child(rar)
 	row.add_child(form)
@@ -503,7 +503,7 @@ func _dev_modal() -> void:
 	row.add_child(lvl)
 	row.add_child(shiny)
 	row.add_child(UI.button("Grant", "Primary", func():
-		Game.dev_grant(Data.species_list[sp.selected].id, rar.selected + 1, int(lvl.value), shiny.button_pressed)
+		Game.dev_grant(Data.species_list[sp.selected].id, rar.selected + 1, int(lvl.value), shiny.button_pressed, form.selected + 1)
 		Game.info("Granted %s" % Data.species_list[sp.selected].name)))
 	v.add_child(UI.label("Grant an Aetherling", "H3"))
 	v.add_child(row)

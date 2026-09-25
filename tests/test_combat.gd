@@ -239,3 +239,56 @@ func test_one_run_is_a_fraction_of_a_level() -> void:
 		ms += 250.0
 	t.ok(int(lead.level) <= 13, "level %d after one run from 12" % int(lead.level))
 	t.ok(float(lead.xp) > F.xp_for_level(F.creature_curve(), 12, Data.tuning.creature.maxLevel), "but it did earn XP")
+
+
+func test_wild_forms_are_rolled_below_what_the_level_allows() -> void:
+	var levels: Array = Data.tuning.creature.formLevels
+	var rng := _rng()
+	var seen := {}
+	for lv in [1, int(levels[1]) - 1, int(levels[1]) + 5, int(levels[2]) + 5, int(Data.tuning.creature.maxLevel) - 5]:
+		seen[lv] = {}
+		for i in 400:
+			seen[lv][Expedition.roll_form(rng, lv)] = true
+	t.eq(seen[1].keys(), [1], "only Form 1 below the Form 2 level")
+	t.eq(seen[int(levels[1]) - 1].keys(), [1])
+	var mid: Dictionary = seen[int(levels[1]) + 5]
+	t.ok(mid.has(1) and mid.has(2) and not mid.has(3), "Forms 1 and 2 between the form levels")
+	for lv in [int(levels[2]) + 5, int(Data.tuning.creature.maxLevel) - 5]:
+		t.ok(seen[lv].has(1) and seen[lv].has(2) and seen[lv].has(3), "all three forms at Lv %d" % lv)
+	# higher forms get likelier as the level climbs through a band
+	t.ok(F.wild_form_chance(3, int(Data.tuning.creature.maxLevel)) > F.wild_form_chance(3, int(levels[2])))
+	t.eq(F.wild_form_chance(2, int(levels[1]) - 1), 0.0)
+
+
+func test_a_wild_encounter_fights_and_binds_in_its_rolled_form() -> void:
+	var s := _party_game([["tuskcub", 3, 60]])
+	var z: Dictionary = Data.zone_list.filter(func(x): return int(x.levels[0]) >= int(Data.tuning.creature.formLevels[2]))[0]
+	var rng := _rng()
+	var w := Expedition.roll_wild(s, z, rng)
+	w.level = int(z.levels[1])
+	w.form = 1
+	var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, {}, "", "", int(w.form))
+	t.eq(int(f.form), 1, "the fighter shows the rolled form")
+	var c: Dictionary = Expedition._bind(s, w, rng, [], "test")
+	t.eq(Creatures.form_of(c), 1, "a Form 1 caught at a high level stays Form 1")
+	t.ok(Collection.is_owned(s, w.species))
+
+
+func test_a_creature_behind_its_level_evolves_one_form_per_level_up() -> void:
+	var s := GameState.new_game()
+	var levels: Array = Data.tuning.creature.formLevels
+	var c := Creatures.make(s, "tuskcub", 1, int(levels[2]) + 5, false, [], "test", 1)
+	t.eq(Creatures.form_of(c), 1)
+	var next := func(): return F.xp_for_level(F.creature_curve(), int(c.level) + 1, Data.tuning.creature.maxLevel) - float(c.xp) + 0.01
+	var ev: Array = Creatures.add_xp(c, next.call())
+	t.eq(Creatures.form_of(c), 2)
+	t.ok(ev.any(func(e): return e.type == "evolved" and int(e.from) == 1 and int(e.form) == 2))
+	Creatures.add_xp(c, next.call())
+	t.eq(Creatures.form_of(c), 3)
+	# a creature in step with its level still evolves at the form levels, even across two in one gain
+	var d := Creatures.make(s, "tuskcub", 1, 1, false, [], "test")
+	Creatures.add_xp(d, F.xp_for_level(F.creature_curve(), int(levels[2]), Data.tuning.creature.maxLevel))
+	t.eq(Creatures.form_of(d), 3)
+	# saves from before forms were stored take the form their level gives
+	var old := {"species": "tuskcub", "level": int(levels[1])}
+	t.eq(Creatures.form_of(old), 2)

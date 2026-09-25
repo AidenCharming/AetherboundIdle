@@ -177,7 +177,7 @@
 			2,
 			3
 		],
-		"enemyMult": 0.78,
+		"enemyMult": 0.83,
 		"rarityWeights": [
 			60,
 			26,
@@ -262,7 +262,7 @@
 			2,
 			3
 		],
-		"enemyMult": 0.82,
+		"enemyMult": 0.89,
 		"rarityWeights": [
 			52,
 			28,
@@ -346,7 +346,7 @@
 			2,
 			3
 		],
-		"enemyMult": 0.86,
+		"enemyMult": 0.99,
 		"rarityWeights": [
 			45,
 			30,
@@ -431,7 +431,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.03,
+		"enemyMult": 1.21,
 		"rarityWeights": [
 			40,
 			30,
@@ -536,7 +536,7 @@
 			2,
 			3
 		],
-		"enemyMult": 1.07,
+		"enemyMult": 1.24,
 		"rarityWeights": [
 			36,
 			30,
@@ -639,7 +639,7 @@
 			3,
 			3
 		],
-		"enemyMult": 1.43,
+		"enemyMult": 1.65,
 		"rarityWeights": [
 			32,
 			30,
@@ -743,7 +743,7 @@
 			3,
 			3
 		],
-		"enemyMult": 1.61,
+		"enemyMult": 1.85,
 		"rarityWeights": [
 			28,
 			30,
@@ -848,7 +848,7 @@
 			3,
 			3
 		],
-		"enemyMult": 2.18,
+		"enemyMult": 2.48,
 		"rarityWeights": [
 			24,
 			28,

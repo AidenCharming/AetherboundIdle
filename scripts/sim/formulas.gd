@@ -76,6 +76,19 @@ static func form_for_level(level: int) -> int:
 	return form
 
 
+## The chance a wild creature at `level` has reached `form` (2 or 3), given it reached the form before.
+## Zero below that form's level; from there it climbs from wildForm.startChance to endChance by the next
+## form's level (or max level for the last form), so Form 1 stays possible everywhere.
+static func wild_form_chance(form: int, level: int) -> float:
+	var levels: Array = Data.tuning.creature.formLevels
+	if form < 2 or form > levels.size() or level < int(levels[form - 1]):
+		return 0.0
+	var from := int(levels[form - 1])
+	var to: int = int(levels[form]) if form < levels.size() else int(Data.tuning.creature.maxLevel)
+	var wf: Dictionary = Data.tuning.creature.wildForm
+	return lerpf(float(wf.startChance), float(wf.endChance), clampf(float(level - from) / float(maxi(1, to - from)), 0.0, 1.0))
+
+
 ## One stat for a creature. `trait_bonus` is the capped bonus_<stat> total.
 static func stat_value(stat: String, lean: String, level: int, rarity_tier: int, form: int, trait_bonus: float, shiny: bool) -> float:
 	var c: Dictionary = Data.tuning.creature

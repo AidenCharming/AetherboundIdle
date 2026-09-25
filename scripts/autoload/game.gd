@@ -658,8 +658,8 @@ func claim_milestone(track_id: String, index: int) -> void:
 
 # ---------------------------------------------------------------- dev tools (Settings > Developer)
 
-func dev_grant(species_id: String, rarity: int, level: int, shiny: bool) -> void:
-	var c := Creatures.make(state, species_id, rarity, level, shiny, Traits.roll_fresh(rng, Data.species[species_id].types), "dev")
+func dev_grant(species_id: String, rarity: int, level: int, shiny: bool, form := 0) -> void:
+	var c := Creatures.make(state, species_id, rarity, level, shiny, Traits.roll_fresh(rng, Data.species[species_id].types), "dev", form)
 	state.creatures[c.id] = c
 	_handle(Collection.on_owned(state, c))
 	changed.emit()

@@ -11,6 +11,10 @@
 			1.2,
 			1.4
 		],
+		"wildForm": {
+			"startChance": 0.3,
+			"endChance": 0.7
+		},
 		"baseStats": {
 			"health": 60,
 			"power": 12,

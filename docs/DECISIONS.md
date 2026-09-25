@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 108 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 111 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -365,6 +365,23 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Wild Aetherlings roll their form (designer's request)
+- **The problem:** form came only from level (Form 2 at 20, Form 3 at 40), so every wild Aetherling from
+  Thunderhum Steppe on was a Form 3, and a Form 1 could only come from breeding.
+- **Now a wild one rolls its form**, capped by what its level allows: Form 1 is possible everywhere, level-20+
+  islands mix Forms 1 and 2, level-40+ islands mix all three, and you bind whatever form you met. Each higher
+  form is a roll that climbs through its band, from `creature.wildForm.startChance` (30%) at that form's level
+  to `endChance` (70%) at the next form's level (max level for Form 3). At Lv 45 that is about 30% / 47% / 23%;
+  at Lv 95 about 30% / 23% / 47%. First-clear reward creatures roll the same way; bosses stay Form 3.
+- **Creatures store their form** (`form` on the record; saves without it take the form their level gives). A
+  creature caught below its level's form **evolves one form on each level-up** until it catches up, with the
+  usual evolution reveal; the Nexus says "Evolves at its next level". Dev tools can grant any form up to what
+  the level allows.
+- **Island strength rebalanced for it:** lower forms have lower stats, which moved the Zenith Spire clear from
+  day 22 to day 17. Each island's `enemyMult` from Smoldering Caldera on was raised by its average form-stat
+  loss (x1.07 to x1.17). Month probe after: islands cleared on days 1, 1, 1, 2, 3, 4, 5, 8, 12, 24 (was 1, 1,
+  1, 2, 3, 5, 6, 10, 15, 22); skills unchanged (every skill 99 by day 33).
 
 ### No faint grey numbers (designer's request)
 - **Numbers are chips or coloured**, the way the Aether-Log's dex numbers are: `UI.chip` / `UI.count_chip`

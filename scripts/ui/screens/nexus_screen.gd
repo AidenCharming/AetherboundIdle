@@ -199,7 +199,9 @@ func _fill_detail() -> void:
 	_xp_bar.value = F.level_progress(F.creature_curve(), float(c.xp), Data.tuning.creature.maxLevel)
 	lv.add_child(_xp_bar)
 	var levels: Array = Data.tuning.creature.formLevels
-	if form < 3:
+	if form < F.form_for_level(int(c.level)) and int(c.level) < int(Data.tuning.creature.maxLevel):
+		lv.add_child(UI.chip("Evolves at its next level", Palette.GOLD, 11))
+	elif form < levels.size():
 		lv.add_child(UI.chip("Evolves at Lv %d" % int(levels[form]), Palette.GOLD, 11))
 	_detail.add_child(lv)
 	# stats
