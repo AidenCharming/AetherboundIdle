@@ -649,13 +649,14 @@ func release(cid: String) -> void:
 	changed.emit()
 
 
-func bulk_release(max_rarity: int, under_level := 0) -> void:
-	var pearls0 := GameState.count(state, "aether-pearl")
-	var res := Economy.bulk_release(state, max_rarity, under_level)
-	var pearls := int(GameState.count(state, "aether-pearl") - pearls0)
+## `opts`: see Economy.BULK_DEFAULTS (or the older form: the highest rarity, and a level to stay under).
+func bulk_release(opts: Variant, under_level := 0) -> void:
+	var res := Economy.bulk_release(state, opts, under_level)
 	if res.count > 0:
 		info("Released %d Aetherlings. +%s Aether%s" % [res.count, F.format_num(res.aether),
-			" and %d Aether Pearl%s" % [pearls, "" if pearls == 1 else "s"] if pearls > 0 else ""], Data.ui_icon("aether"))
+			"  +%d Aether Pearl%s" % [res.pearls, "" if res.pearls == 1 else "s"] if res.pearls > 0 else ""], Data.ui_icon("aether"))
+	else:
+		warn("Nobody matched, so nobody was released.")
 	save_game()
 	changed.emit()
 
@@ -708,11 +709,30 @@ func claim_milestone(track_id: String, index: int) -> void:
 
 # ---------------------------------------------------------------- dev tools (Settings > Developer)
 
-func dev_grant(species_id: String, rarity: int, level: int, shiny: bool) -> void:
-	var c := Creatures.make(state, species_id, rarity, level, shiny, Traits.roll_fresh(rng, Data.species[species_id].types), "dev")
+func dev_grant(species_id: String, rarity: int, level: int, shiny: bool, form := 0) -> void:
+	var c := Creatures.make(state, species_id, rarity, level, shiny, Traits.roll_fresh(rng, Data.species[species_id].types), "dev", form)
 	state.creatures[c.id] = c
 	_handle(Collection.on_owned(state, c))
 	changed.emit()
+
+
+## For sprite and effect tests: every form x every rarity x plain and shiny, of one species or (empty id) of
+## every species. Each is logged in the Aether-Log like a normal catch, without a toast per creature.
+## Returns how many were granted.
+func dev_grant_all(species_id := "") -> int:
+	var ids: Array = [species_id] if species_id != "" else Data.species_list.map(func(sp): return sp.id)
+	var form_levels: Array = Data.tuning.creature.formLevels
+	var n := 0
+	for id in ids:
+		for form in form_levels.size():
+			for rarity in range(1, Data.max_rarity() + 1):
+				for shiny in [false, true]:
+					var c := Creatures.make(state, id, rarity, int(form_levels[form]), shiny, [], "dev", form + 1)
+					state.creatures[c.id] = c
+					Collection.on_owned(state, c)
+					n += 1
+	changed.emit()
+	return n
 
 
 func dev_add(id: String, qty: float) -> void:

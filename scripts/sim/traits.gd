@@ -191,4 +191,5 @@ static func attune(s: Dictionary, c: Dictionary, locked: Array, rng: RandomNumbe
 	var keep: Array = c.traits.filter(func(t): return t.id in locked)
 	var target := maxi(keep.size(), Rng.weighted_index(rng, at.get("countWeights", Data.tuning.poolTraits.attunementCountWeights)))
 	c.traits = roll_into(rng, Data.species[c.species].types, keep, target - keep.size())
+	GameState.roster_changed()   # its Aether rate, so the perch order
 	return ""

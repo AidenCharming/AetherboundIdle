@@ -582,14 +582,14 @@ func _dev_modal() -> void:
 	lvl.value = 1
 	var shiny := ToggleSwitch.new()
 	shiny.text = "Shiny"
-	# form comes from level: picking a form sets the level to where that form starts, and typing a level
-	# shows the form it gives
+	# a form can't be above what its level gives (like a wild one): picking a form raises the level to where
+	# that form starts if needed, and lowering the level lowers the form with it
 	var form_levels: Array = Data.tuning.creature.formLevels
 	var form := OptionButton.new()
 	for i in form_levels.size():
 		form.add_item("Form %d" % (i + 1), i)
-	form.item_selected.connect(func(i): lvl.value = int(form_levels[i]))
-	lvl.value_changed.connect(func(new_level): form.selected = F.form_for_level(int(new_level)) - 1)
+	form.item_selected.connect(func(i): lvl.value = maxi(int(lvl.value), int(form_levels[i])))
+	lvl.value_changed.connect(func(new_level): form.selected = mini(form.selected, F.form_for_level(int(new_level)) - 1))
 	row.add_child(sp)
 	row.add_child(rar)
 	row.add_child(form)
@@ -597,10 +597,21 @@ func _dev_modal() -> void:
 	row.add_child(lvl)
 	row.add_child(shiny)
 	row.add_child(UI.button("Grant", "Primary", func():
-		Game.dev_grant(Data.species_list[sp.selected].id, rar.selected + 1, int(lvl.value), shiny.button_pressed)
+		Game.dev_grant(Data.species_list[sp.selected].id, rar.selected + 1, int(lvl.value), shiny.button_pressed, form.selected + 1)
 		Game.info("Granted %s" % Data.species_list[sp.selected].name)))
 	v.add_child(UI.label("Grant an Aetherling", "H3"))
 	v.add_child(row)
+	# sprite tests: every form, rarity and shiny of the picked species, or of all of them
+	var per_species: int = Data.tuning.creature.formLevels.size() * Data.max_rarity() * 2
+	var all_row := UI.flow(8, 8)
+	all_row.add_child(UI.button("This species: every form, rarity and shiny (%d)" % per_species, "", func():
+		var n := Game.dev_grant_all(Data.species_list[sp.selected].id)
+		Game.info("Granted %d %s" % [n, Data.species_list[sp.selected].name])))
+	var total := per_species * Data.species_list.size()
+	all_row.add_child(UI.button("Every Aetherling, every form, rarity and shiny (%s)" % F.format_num(total), "", func():
+		Modal.confirm("Grant every Aetherling?", "Adds %s Aetherlings to this save (every species in Forms 1 to 3, Dim to Zenith, plain and shiny) and fills the Aether-Log. The Nexus gets slow with this many." % F.format_num(total), "Grant them all", func():
+			Game.info("Granted %s Aetherlings" % F.format_num(Game.dev_grant_all())))))
+	v.add_child(all_row)
 	v.add_child(UI.label("Resources", "H3"))
 	var res := UI.flow(8, 8)
 	for pair in [["aether", 1000], ["aether", 100000], ["gold", 1000], ["gold", 100000]]:

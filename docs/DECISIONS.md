@@ -61,7 +61,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 143 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
+- **Tests:** `tests/test_*.gd`, 149 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
@@ -365,6 +365,57 @@ Onboarding is a chain of 26 goals from "Overseer Vance" on the Sanctum screen, e
   (the reference's "guaranteed first capture from the final zone's boss").
 
 ## Changed
+
+### Expeditions: bosses a match for their waves (play-test feedback, 2026-09-25)
+- **The problem:** a friend got stuck on later islands' waves until he levelled, then beat their bosses easily.
+  `month_probe --split` measures, for each island's calibration party, the strength factor at which the waves
+  alone (boss made trivial) and the boss alone (waves made trivial) beat it. Bosses from Thunderhum Steppe on
+  broke at x2.1-2.4 while the waves broke at x1.24-2.15, unevenly.
+- **Now** islands 2-10 have their waves at about x1.45 and their boss at about x1.3 (a little tougher than the
+  waves; Stormsea x1.49), by scaling each island's `enemyMult` and boss `mult`. Old Thicketroll stays the wall
+  the designer asked for. Stormsea (x0.87), Magmaglass (x0.97) and Zenith (x0.92) were then eased to spread the
+  clears: days 1, 1, 1, 2, 3, 6, 7, 10, 14, 22 (was 1, 1, 1, 2, 3, 4, 6, 8, 12, 24). Zenith Spire waits on
+  breeding a Zenith party, so easing it further doesn't move it.
+
+### Big rosters stay smooth (2026-09-25)
+- With the 3,726 Aetherlings of the new dev tool the game ran at ~1 fps: the perches sorted the whole roster
+  every tick (working out each rate once per comparison, 469 ms), and workers per skill and auras scanned
+  every creature every frame. `GameState` now keeps a roster index (workers per skill, perch holders) outside
+  the save, rebuilt only when a creature is added or removed, changes job, or rerolls traits
+  (`GameState.roster_changed()`), or when another save is loaded. Perch holders are picked in one pass.
+- The Nexus and the creature picker build 120 cards at a time with a "Show more" button (`UI.fill_paged`) and
+  sort on keys worked out once (`UI.sort_by_key`; the same orders as before). Opening the Nexus with 3,726:
+  32 s and 737 MB before, 2 s and 104 MB after.
+
+### Bulk release, fuller (play-test feedback, 2026-09-25)
+- A friend found it wouldn't release shinies and sometimes released nobody: it silently kept shinies and
+  working ones and only went up to Gleaming. It now takes a rarity range over all tiers, a type, a species, a
+  level cap, how many of each species to keep (default 1, by rarity, then level, then shiny), and opt-ins for
+  shinies and working ones (they leave their jobs). Locked ones, the party and your last Aetherling always stay.
+  The preview lists who goes, the Aether and Pearls, and how many stay for each reason; releasing nobody says so.
+
+### Merging the two 2026-09-25 sessions
+- This session started from before `godot-rebuild`'s night of fixes. Where both fixed the same thing, the
+  better version stayed: `godot-rebuild`'s closing-dialog fix (it also disables focus), Works Build buttons,
+  benchmark island pick and hold-the-rebuild; its Nexus dropdowns, sorting and Put to work menu (with this
+  session's paging on top). This session's wild-form rule replaced `combat.wildFormUp` (designer's choice).
+
+### Wild Aetherlings roll their form (designer's request)
+- **The problem:** form came only from level (Form 2 at 20, Form 3 at 40), so every wild Aetherling from
+  Thunderhum Steppe on was a Form 3, and a Form 1 could only come from breeding.
+- **Now a wild one rolls its form**, capped by what its level allows: Form 1 is possible everywhere, level-20+
+  islands mix Forms 1 and 2, level-40+ islands mix all three, and you bind whatever form you met. Each higher
+  form is a roll that climbs through its band, from `creature.wildForm.startChance` (30%) at that form's level
+  to `endChance` (70%) at the next form's level (max level for Form 3). At Lv 45 that is about 30% / 47% / 23%;
+  at Lv 95 about 30% / 23% / 47%. First-clear reward creatures roll the same way; bosses stay Form 3.
+- **Creatures store their form** (`form` on the record; saves without it take the form their level gives). A
+  creature caught below its level's form **evolves one form on each level-up** until it catches up, with the
+  usual evolution reveal; the Nexus says "Evolves at its next level". Dev tools can grant any form up to what
+  the level allows.
+- **Island strength rebalanced for it:** lower forms have lower stats, which moved the Zenith Spire clear from
+  day 22 to day 17. Each island's `enemyMult` from Smoldering Caldera on was raised by its average form-stat
+  loss (x1.07 to x1.17). Month probe after: islands cleared on days 1, 1, 1, 2, 3, 4, 5, 8, 12, 24 (was 1, 1,
+  1, 2, 3, 5, 6, 10, 15, 22); skills unchanged (every skill 99 by day 33).
 
 ### Play-test feedback, first round (2026-09-25)
 A friend's first hours of play, reported with screenshots. Each change is its own commit.

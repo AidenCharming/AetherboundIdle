@@ -52,6 +52,7 @@ static func set_party_member(s: Dictionary, slot: int, c: Dictionary) -> String:
 	if old != "" and s.creatures.has(old) and (c.is_empty() or old != c.id):
 		s.creatures[old].job = {}
 	party[slot] = c.id if not c.is_empty() else ""
+	GameState.roster_changed()
 	_compact_party(s)
 	if GameState.party(s).is_empty():
 		stop(s)
@@ -61,6 +62,7 @@ static func set_party_member(s: Dictionary, slot: int, c: Dictionary) -> String:
 static func remove_from_party(s: Dictionary, c: Dictionary) -> void:
 	s.expedition.party.erase(c.id)
 	c.job = {}
+	GameState.roster_changed()
 	_compact_party(s)
 	if GameState.party(s).is_empty():
 		stop(s)
@@ -121,9 +123,8 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 	events.append({"type": "wave", "wave": b.wave, "waves": b.waves})
 
 
-## A random wild encounter for a zone: {species, level, rarity, shiny, form}. Counts toward shiny pity and
-## marks the species as seen in the Aether-Log. Now and then one is met a form (or two) above what its level
-## has reached (`combat.wildFormUp`), so the islands show a mix of forms.
+## A random wild encounter for a zone: {species, level, rarity, shiny, form}. Counts toward shiny pity and marks
+## the species as seen in the Aether-Log.
 static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	var sp_id: String = Rng.weighted_key(rng, z.species)
 	# a Glimmer Lure makes every rarity above Dim more common
@@ -142,18 +143,15 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
 	s.collection.seen[sp_id] = true
-	var form := F.form_for_level(level)
-	var up: Array = Data.tuning.combat.get("wildFormUp", [])
-	var roll := rng.randf()
-	for i in range(up.size() - 1, -1, -1):
-		var p_up := 0.0
-		for j in range(i, up.size()):
-			p_up += float(up[j])
-		if roll < p_up:
-			form += i + 1
-			break
-	form = mini(form, Data.species[sp_id].forms.size())
-	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": form}
+	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": roll_form(rng, level)}
+
+
+## A wild creature's form: Form 1 anywhere, each higher form a roll (F.wild_form_chance) once its level allows it.
+static func roll_form(rng: RandomNumberGenerator, level: int) -> int:
+	var form := 1
+	while form < F.form_for_level(level) and Rng.chance(rng, F.wild_form_chance(form + 1, level)):
+		form += 1
+	return form
 
 
 # ---------------------------------------------------------------- stepping
@@ -368,10 +366,9 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 ## `chance` is the bind chance that was rolled (-1 for a guaranteed bind), shown in the expedition log.
 static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String, chance := -1.0) -> Dictionary:
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
-	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild")
-	if int(w.get("form", 1)) > Creatures.form_of(c):
-		c.form = int(w.form)   # bound in a higher form than its level: it keeps it
+	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild", int(w.get("form", 0)))
 	s.creatures[c.id] = c
+	GameState.roster_changed()
 	s.counters.captures = int(s.counters.captures) + 1
 	var ev := {"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how}
 	if chance >= 0.0:
@@ -439,7 +436,8 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 			var fc: Dictionary = z.firstClearCreature
 			var pool := Data.species_list.filter(func(x): return x.kind == "base" and x.types[0] in fc.types)
 			var sp: Dictionary = Rng.pick(rng, pool)
-			_bind(s, {"species": sp.id, "level": int(boss.level) - 10, "rarity": int(fc.rarity), "shiny": false}, rng, events, "boss")
+			var lv := int(boss.level) - 10
+			_bind(s, {"species": sp.id, "level": lv, "rarity": int(fc.rarity), "shiny": false, "form": roll_form(rng, lv)}, rng, events, "boss")
 
 
 static func _eat_if_needed(s: Dictionary, events: Array) -> void:

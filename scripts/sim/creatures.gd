@@ -1,18 +1,21 @@
 class_name Creatures
 extends RefCounted
 ## Creature records and the rules about them. A creature is a Dictionary:
-## {id, species, rarity, level, xp, shiny, traits: [{id, s}], nick, locked, born, origin, job: {}, progress, overclock}
+## {id, species, rarity, level, form, xp, shiny, traits: [{id, s}], nick, locked, born, origin, job: {}, progress, overclock}
 ## `job` is {} when benched, {"kind": "skill", "id": skill_id} when working, {"kind": "party"} on an expedition.
 
 
-static func make(state: Dictionary, species_id: String, rarity: int, level: int, shiny: bool, traits: Array, origin: String) -> Dictionary:
+## `form` 0 means the form its level gives; a wild one keeps the form it was met in (never above that).
+static func make(state: Dictionary, species_id: String, rarity: int, level: int, shiny: bool, traits: Array, origin: String, form := 0) -> Dictionary:
 	state.nextCreatureId = int(state.nextCreatureId) + 1
 	var lv := clampi(level, 1, int(Data.tuning.creature.maxLevel))
+	var top := F.form_for_level(lv)
 	return {
 		"id": "c%d" % int(state.nextCreatureId),
 		"species": species_id,
 		"rarity": clampi(rarity, 1, Data.max_rarity()),
 		"level": lv,
+		"form": top if form <= 0 else clampi(form, 1, top),
 		"xp": F.xp_for_level(F.creature_curve(), lv, Data.tuning.creature.maxLevel),
 		"shiny": shiny,
 		"traits": traits,
@@ -30,10 +33,9 @@ static func types_of(c: Dictionary) -> Array:
 	return Data.species[c.species].types
 
 
-## The form its level has reached, or the form it was bound in if higher (a wild one can be met a form or
-## two above its level: see Expedition.roll_wild).
+## The stored form. Saves from before forms were stored have none: theirs is the form their level gives.
 static func form_of(c: Dictionary) -> int:
-	return maxi(F.form_for_level(int(c.level)), int(c.get("form", 1)))
+	return int(c.form) if c.has("form") else F.form_for_level(int(c.level))
 
 
 static func display_name(c: Dictionary) -> String:
@@ -92,7 +94,8 @@ static func power_rating(c: Dictionary) -> float:
 	return s.health * 0.2 + s.power * 1.0 + s.guard * 0.8
 
 
-## Adds creature XP. Returns events: level_up and evolved.
+## Adds creature XP. Returns events: level_up and evolved. A creature crossing a form's level evolves to it;
+## one caught in a lower form than its level allows evolves one form on each level-up until it catches up.
 static func add_xp(c: Dictionary, amount: float) -> Array:
 	var events := []
 	var max_lv: int = Data.tuning.creature.maxLevel
@@ -104,7 +107,10 @@ static func add_xp(c: Dictionary, amount: float) -> Array:
 	c.level = F.level_for_xp(F.creature_curve(), c.xp, max_lv)
 	if int(c.level) > before_level:
 		events.append({"type": "creature_level", "creature": c.id, "level": c.level})
-		var after_form := form_of(c)
+		var top := F.form_for_level(int(c.level))
+		var behind := before_form < F.form_for_level(before_level)
+		var after_form := mini(top, before_form + 1) if behind else maxi(before_form, top)
+		c.form = after_form
 		if after_form > before_form:
 			events.append({"type": "evolved", "creature": c.id, "species": c.species, "form": after_form, "from": before_form})
 	return events

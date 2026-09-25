@@ -5,14 +5,34 @@ extends RefCounted
 
 
 ## Benched creatures that sit on a perch, rarest (highest emission) first.
+## The resting Aetherlings on the perches (kept by GameState's roster index).
 static func perched(s: Dictionary) -> Array:
-	var benched: Array = s.creatures.values().filter(func(c): return Creatures.is_benched(c))
-	benched.sort_custom(func(a, b):
-		var ra := Creatures.bench_rate_per_min(a)
-		var rb := Creatures.bench_rate_per_min(b)
-		return ra > rb if ra != rb else a.id < b.id)
+	return GameState.perched(s)
+
+
+## Works out the perch holders: the best emitters, highest rate first (ties by id).
+static func find_perched(s: Dictionary) -> Array:
+	# one pass keeping the best n (n is the perch count, small): a full sort of thousands resting was most
+	# of a frame, and so was working out each one's rate once per comparison
 	var n := int(GameState.upgrade_value(s, "perches"))
-	return benched.slice(0, n)
+	var best := []   # [rate, id, creature], best first
+	for c in s.creatures.values():
+		if not Creatures.is_benched(c):
+			continue
+		var r := Creatures.bench_rate_per_min(c)
+		if best.size() >= n and not _ahead(r, c.id, best[-1]):
+			continue
+		var i := best.size()
+		while i > 0 and _ahead(r, c.id, best[i - 1]):
+			i -= 1
+		best.insert(i, [r, c.id, c])
+		if best.size() > n:
+			best.pop_back()
+	return best.map(func(e): return e[2])
+
+
+static func _ahead(rate: float, id: String, e: Array) -> bool:
+	return rate > float(e[0]) or (rate == float(e[0]) and id < String(e[1]))
 
 
 static func bench_aether_per_min(s: Dictionary) -> float:
@@ -97,6 +117,7 @@ static func buy_upgrade(s: Dictionary, id: String) -> String:
 	if not GameState.pay(s, nxt.cost):
 		return "Not enough materials."
 	s.upgrades[id] = GameState.upgrade_level(s, id) + 1
+	GameState.roster_changed()   # more perches
 	GameState.sync_pods(s)
 	return ""
 
@@ -109,6 +130,7 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	var value := Creatures.release_value(c)
 	Skills.unassign(s, c)
 	s.creatures.erase(c.id)
+	GameState.roster_changed()
 	GameState.add_item(s, "aether", value)
 	# the rarest (and shinies) leave Aether Pearls behind
 	var pearls := int(Data.rarity(int(c.rarity)).get("releasePearls", 0)) + (int(Data.tuning.pearls.shinyRelease) if c.get("shiny", false) else 0)
@@ -118,32 +140,79 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	return value
 
 
-## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, under level
-## `under_level` (0: any level), and never the best (highest rarity, then level) of each species, so a
-## species is never lost from the Nexus.
-static func bulk_release_candidates(s: Dictionary, max_rarity: int, under_level := 0) -> Array:
-	var best := {}
+## Bulk release options, all optional: minRarity/maxRarity (tiers, inclusive), type and species ("" for any),
+## maxLevel (0 for any), keepPerSpecies (the best N of each species by rarity, then level, then shiny always stay,
+## counting every one you own), shinies and working (let those go too). Locked Aetherlings and the expedition
+## party always stay, and so does your last Aetherling.
+const BULK_DEFAULTS := {"minRarity": 1, "maxRarity": 1, "type": "", "species": "", "maxLevel": 0, "keepPerSpecies": 1,
+	"shinies": false, "working": false}
+
+
+## Who a bulk release would let go, and why each other Aetherling stays: {list, kept: {reason: count}}.
+static func bulk_release_plan(s: Dictionary, opts: Dictionary) -> Dictionary:
+	var o := BULK_DEFAULTS.duplicate()
+	o.merge(opts, true)
+	var keep_n := maxi(0, int(o.keepPerSpecies))
+	var by_species := {}
 	for c in s.creatures.values():
-		var b: Dictionary = best.get(c.species, {})
-		if b.is_empty() or [int(c.rarity), int(c.level)] > [int(b.rarity), int(b.level)]:
-			best[c.species] = c
+		if not by_species.has(c.species):
+			by_species[c.species] = []
+		by_species[c.species].append(c)
+	var best := {}
+	for sp in by_species:
+		var ranked: Array = by_species[sp].map(func(c): return [[int(c.rarity), int(c.level), int(bool(c.shiny))], c.id])
+		ranked.sort_custom(func(a, b): return a[0] > b[0])
+		for i in mini(keep_n, ranked.size()):
+			best[ranked[i][1]] = true
+	var kept := {}
 	var out := []
 	for c in s.creatures.values():
-		if not Creatures.is_benched(c) or c.get("locked", false) or c.shiny or int(c.rarity) > max_rarity:
-			continue
-		if under_level > 0 and int(c.level) >= under_level:
-			continue
-		if best[c.species].id == c.id:
-			continue
-		out.append(c)
-	return out
+		var why := ""
+		var kind := Creatures.job_kind(c)
+		if c.get("locked", false):
+			why = "locked"
+		elif kind == "party":
+			why = "in the party"
+		elif kind == "skill" and not o.working:
+			why = "working"
+		elif c.shiny and not o.shinies:
+			why = "shiny"
+		elif int(c.rarity) < int(o.minRarity) or int(c.rarity) > int(o.maxRarity):
+			why = "other rarity"
+		elif o.type != "" and not (o.type in Creatures.types_of(c)):
+			why = "other type"
+		elif o.species != "" and c.species != o.species:
+			why = "other species"
+		elif int(o.maxLevel) > 0 and int(c.level) > int(o.maxLevel):
+			why = "above the level"
+		elif best.has(c.id):
+			why = "best of its species"
+		if why == "":
+			out.append(c)
+		else:
+			kept[why] = int(kept.get(why, 0)) + 1
+	if not out.is_empty() and out.size() >= s.creatures.size():
+		out.pop_back()
+		kept["your last one"] = 1
+	return {"list": out, "kept": kept}
 
 
-static func bulk_release(s: Dictionary, max_rarity: int, under_level := 0) -> Dictionary:
-	var list := bulk_release_candidates(s, max_rarity, under_level)
+## `opts` is the options Dictionary, or (the older form) the highest rarity with `under_level` (0: any) the
+## level they must be under.
+static func bulk_release_candidates(s: Dictionary, opts: Variant, under_level := 0) -> Array:
+	if not opts is Dictionary:
+		opts = {"maxRarity": int(opts), "maxLevel": under_level - 1 if under_level > 0 else 0}
+	return bulk_release_plan(s, opts).list
+
+
+static func bulk_release(s: Dictionary, opts: Variant, under_level := 0) -> Dictionary:
+	var list := bulk_release_candidates(s, opts, under_level)
 	var total := 0
+	var count := 0
+	var pearls_before := GameState.count(s, "aether-pearl")
 	for c in list:
 		var v := release(s, c)
 		if v > 0:
 			total += v
-	return {"count": list.size(), "aether": total}
+			count += 1
+	return {"count": count, "aether": total, "pearls": int(GameState.count(s, "aether-pearl") - pearls_before)}

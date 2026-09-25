@@ -16,6 +16,7 @@ func test_bridge_invariants_catch_a_broken_save() -> void:
 	Game.state.gold = -5.0
 	var c: Dictionary = Game.state.creatures.values()[0]
 	c.job = {"kind": "party"}
+	GameState.roster_changed()
 	var breaks := TestBridge.invariants()
 	t.ok(breaks.any(func(b): return b.begins_with("gold")), "negative gold is caught: %s" % [breaks])
 	t.ok(breaks.any(func(b): return "party job" in b), "a party job outside the party is caught: %s" % [breaks])

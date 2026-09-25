@@ -33,6 +33,10 @@ func _ready() -> void:
 		if a.begins_with("--days="):
 			days = int(a.substr(7))
 	var t0 := Time.get_ticks_msec()
+	if "--split" in OS.get_cmdline_user_args():
+		split()
+		get_tree().quit()
+		return
 	if "--calibrate" in OS.get_cmdline_user_args():
 		calibrate()
 		get_tree().quit()
@@ -296,6 +300,36 @@ func calibrate() -> void:
 		print("%-20s target %-11s lv %2d  breaks at x%.2f  suggest x%.2f (enemyMult %.2f)  one rarity weaker wins %d/3, 8 levels lower wins %d/3" % [
 			zid, Data.rarity(tgt[0]).name, tgt[1], lo, pick, em0 * pick, weaker, lower])
 		_scale_zone(z, em0, bm0, 1.0)
+
+
+## Waves against boss, per island: for the calibration party, how much stronger the waves alone (boss made
+## trivial) and the boss alone (waves made trivial) can get before that party stops winning. A boss that
+## breaks far above its waves is a pushover once the waves are cleared; an island whose waves break well
+## below its neighbours' is a wall.
+func split() -> void:
+	print("island               target         waves break at  boss breaks at  boss/waves")
+	for zid in CAL_TARGETS:
+		var z: Dictionary = Data.zones[zid]
+		var em0: float = z.enemyMult
+		var bm0: Dictionary = z.boss.mult.duplicate()
+		var tgt: Array = CAL_TARGETS[zid]
+		var out := []
+		for part in ["waves", "boss"]:
+			var lo := 0.05
+			var hi := 40.0
+			for i in 12:
+				var mid := sqrt(lo * hi)
+				z.enemyMult = em0 * (mid if part == "waves" else 0.01)
+				for k in bm0:
+					z.boss.mult[k] = float(bm0[k]) * (0.01 if part == "waves" else mid)
+				_combat_cache.clear()
+				if _combat(zid, tgt[0], tgt[1], 3).wins >= 2:
+					lo = mid
+				else:
+					hi = mid
+			out.append(lo)
+		_scale_zone(z, em0, bm0, 1.0)
+		print("%-20s %-10s lv %2d  x%-14.2f x%-14.2f %.2f" % [zid, Data.rarity(tgt[0]).name, tgt[1], out[0], out[1], out[1] / out[0]])
 
 
 func _scale_zone(z: Dictionary, em0: float, bm0: Dictionary, f: float) -> void:

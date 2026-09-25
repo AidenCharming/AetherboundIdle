@@ -8,9 +8,15 @@ decided and why) and `README.md` (how to run things).
 - The Godot project is at the repo root (`project.godot`); `CLAUDE.md` is the short version of these rules. The
   old web build is archived on the `web-archive` branch and is never touched. `docs/PROGRESS.md` and
   `docs/plan.md` describe that web build and are history only.
-- Work on the branch you were given (this session: `claude/new-session-18lsuu`); don't switch to the old
-  `godot-rebuild` branch. Fetch and **merge** before pushing, never rebase or force-push: the designer pushes art
-  to the same branch.
+- Work on the branch you were given, **but first check it contains `origin/godot-rebuild`**
+  (`git log --oneline HEAD..origin/godot-rebuild` should print nothing). The 2026-09-25 session started from an
+  older base, missed a night of fixes and redid some of them; if that command lists commits, merge
+  `origin/godot-rebuild` before anything else. Push to your branch and to `godot-rebuild` at the end. Fetch and
+  **merge** before pushing, never rebase or force-push: the designer pushes art to the same branches.
+- **Session task list (designer's request):** at the start, make a task list (the task tools) with each task's
+  percent done and estimated share of the 5-hour usage in its title, e.g. `[40%] Fix X (est. +3%)`. Keep one
+  task in progress, update the percent as you go, and after each finished task post a one-line progress note
+  (tasks done, overall %, ETA). The designer reports their usage %; use it to re-estimate what's left.
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
   Game, TestBridge. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and
   balance are JSON in `data/`. Never hardcode balance numbers.
@@ -37,7 +43,11 @@ All commands run from the repo root.
 - Screenshots: `godot --path . res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display;
   overwrites save slot 3).
 - Pacing probe (about 40 s): `godot --headless --path . res://tests/month_probe.tscn -- --days=35
-  [--skills|--rates|--calibrate]`. Its `_combat` rounds party levels down to multiples of 3.
+  [--skills|--rates|--calibrate|--split]`. Its `_combat` rounds party levels down to multiples of 3. `--split`
+  (8 s) prints, per island, how much stronger its waves alone and its boss alone can get before the calibration
+  party stops winning: keep waves near x1.45 everywhere and each boss a little tougher (about x1.3).
+- Big rosters: Developer tools > "Every Aetherling" grants 3,726 (every species, form, rarity, shiny). Use it
+  to check a change doesn't slow the game with thousands of Aetherlings.
 
 ## GDScript traps that bit this project
 
@@ -47,7 +57,35 @@ All commands run from the repo root.
 - A wrapping Label measured before its container gives it a width reports thousands of pixels of height.
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
 
-## Start here (2026-09-25, after merging claude/new-session-18lsuu into godot-rebuild)
+## Start here (2026-09-25, second session: merged into godot-rebuild)
+
+This session's branch (`claude/vigilant-meitner-d7539t`) started from before last night's work, then merged
+`godot-rebuild` in; both branches now hold everything. Done (details in the commits and `DECISIONS.md`):
+- **Wild forms (designer's request):** a wild Aetherling rolls its form, capped by its level: Form 1 anywhere,
+  Forms 1-2 from Lv 20, 1-3 from Lv 40 (`creature.wildForm`). Creatures store `form`; one caught below its
+  level's form evolves one form per level-up. Replaces last night's `combat.wildFormUp`.
+- **Expedition curve:** bosses were pushovers from island 5 on (they broke at x2.1-2.4 against waves at
+  x1.24-2.15). Islands 2-10 now have one wave margin (x1.45) and bosses slightly tougher than their waves;
+  first clears days 1,1,1,2,3,6,7,10,14,22; skills 99 by day 33. The last gap (Stormsea to Zenith) is gated by
+  breeding to Zenith rarity, not by stats.
+- **Big rosters:** a roster index in `GameState` (workers per skill, perch holders; outside the save, rebuilt
+  when a creature is added, removed, changes job or rerolls traits: call `GameState.roster_changed()` if you
+  add another such place). The Nexus and creature picker build 120 cards at a time. 3,726 Aetherlings went
+  from ~1 fps to normal.
+- **Bulk release:** rarity range over all tiers, type, species, level cap, keep the best N of each species,
+  opt-ins for shinies and working ones, a live preview with why each other one stays.
+- Dev tool: grant one species or all of them in every form, rarity and shiny.
+- Kept from last night where both fixed the same thing: the closing-dialog fix, Works Build buttons, the
+  benchmark's exact island pick, the hold-the-rebuild-while-the-mouse-is-down, the Nexus dropdowns, sorting
+  and Put to work menu.
+
+**Next session: rarity balancing (designer's pick).** Read this file, then work on the early-game balance
+item below; the designer runs the bug-test benchmark locally.
+
+**Still open:** the early-game balance item below (a Luminous party at Lv 1-3 beating Old Thicketroll; breeding
+two Steadys into Gleaming) was not touched; `month_probe --split` can measure it.
+
+## Earlier: after merging claude/new-session-18lsuu into godot-rebuild
 
 Done this round (details in the commits): XP from every kill shows at once (fighters refresh on level-up, ally
 XP bars); fish drop on islands 1-3 so Cooking works before Aqueous; closing dialogs no longer eat clicks (the

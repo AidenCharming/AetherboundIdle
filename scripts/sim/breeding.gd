@@ -232,6 +232,7 @@ static func hatch(s: Dictionary, pod: int, now: float) -> Dictionary:
 		return {}
 	var c := Creatures.make(s, egg.species, int(egg.rarity), 1, bool(egg.shiny), egg.traits, "bred")
 	s.creatures[c.id] = c
+	GameState.roster_changed()
 	s.pods[pod] = {}
 	s.counters.hatches = int(s.counters.hatches) + 1
 	var events := Collection.on_owned(s, c)

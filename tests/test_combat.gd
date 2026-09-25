@@ -290,6 +290,96 @@ func test_one_run_is_a_fraction_of_a_level() -> void:
 	t.ok(float(lead.xp) > F.xp_for_level(F.creature_curve(), 12, Data.tuning.creature.maxLevel), "but it did earn XP")
 
 
+func test_wild_forms_are_rolled_below_what_the_level_allows() -> void:
+	var levels: Array = Data.tuning.creature.formLevels
+	var rng := _rng()
+	var seen := {}
+	for lv in [1, int(levels[1]) - 1, int(levels[1]) + 5, int(levels[2]) + 5, int(Data.tuning.creature.maxLevel) - 5]:
+		seen[lv] = {}
+		for i in 400:
+			seen[lv][Expedition.roll_form(rng, lv)] = true
+	t.eq(seen[1].keys(), [1], "only Form 1 below the Form 2 level")
+	t.eq(seen[int(levels[1]) - 1].keys(), [1])
+	var mid: Dictionary = seen[int(levels[1]) + 5]
+	t.ok(mid.has(1) and mid.has(2) and not mid.has(3), "Forms 1 and 2 between the form levels")
+	for lv in [int(levels[2]) + 5, int(Data.tuning.creature.maxLevel) - 5]:
+		t.ok(seen[lv].has(1) and seen[lv].has(2) and seen[lv].has(3), "all three forms at Lv %d" % lv)
+	# higher forms get likelier as the level climbs through a band
+	t.ok(F.wild_form_chance(3, int(Data.tuning.creature.maxLevel)) > F.wild_form_chance(3, int(levels[2])))
+	t.eq(F.wild_form_chance(2, int(levels[1]) - 1), 0.0)
+
+
+func test_a_wild_encounter_fights_and_binds_in_its_rolled_form() -> void:
+	var s := _party_game([["tuskcub", 3, 60]])
+	var z: Dictionary = Data.zone_list.filter(func(x): return int(x.levels[0]) >= int(Data.tuning.creature.formLevels[2]))[0]
+	var rng := _rng()
+	var w := Expedition.roll_wild(s, z, rng)
+	w.level = int(z.levels[1])
+	w.form = 1
+	var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, {}, "", "", int(w.form))
+	t.eq(int(f.form), 1, "the fighter shows the rolled form")
+	var c: Dictionary = Expedition._bind(s, w, rng, [], "test")
+	t.eq(Creatures.form_of(c), 1, "a Form 1 caught at a high level stays Form 1")
+	t.ok(Collection.is_owned(s, w.species))
+
+
+func test_a_creature_behind_its_level_evolves_one_form_per_level_up() -> void:
+	var s := GameState.new_game()
+	var levels: Array = Data.tuning.creature.formLevels
+	var c := Creatures.make(s, "tuskcub", 1, int(levels[2]) + 5, false, [], "test", 1)
+	t.eq(Creatures.form_of(c), 1)
+	var next := func(): return F.xp_for_level(F.creature_curve(), int(c.level) + 1, Data.tuning.creature.maxLevel) - float(c.xp) + 0.01
+	var ev: Array = Creatures.add_xp(c, next.call())
+	t.eq(Creatures.form_of(c), 2)
+	t.ok(ev.any(func(e): return e.type == "evolved" and int(e.from) == 1 and int(e.form) == 2))
+	Creatures.add_xp(c, next.call())
+	t.eq(Creatures.form_of(c), 3)
+	# a creature in step with its level still evolves at the form levels, even across two in one gain
+	var d := Creatures.make(s, "tuskcub", 1, 1, false, [], "test")
+	Creatures.add_xp(d, F.xp_for_level(F.creature_curve(), int(levels[2]), Data.tuning.creature.maxLevel))
+	t.eq(Creatures.form_of(d), 3)
+	# saves from before forms were stored take the form their level gives
+	var old := {"species": "tuskcub", "level": int(levels[1])}
+	t.eq(Creatures.form_of(old), 2)
+
+
+func test_bulk_release_options_and_reasons() -> void:
+	var s := GameState.new_game()
+	var add := func(sp: String, rarity: int, level: int, shiny := false) -> Dictionary:
+		var c := Creatures.make(s, sp, rarity, level, shiny, [], "test")
+		s.creatures[c.id] = c
+		GameState.roster_changed()
+		return c
+	for i in 4:
+		add.call("tuskcub", 1, 5)
+	var sh: Dictionary = add.call("tuskcub", 1, 5, true)
+	var worker: Dictionary = add.call("tuskcub", 3, 30)
+	Skills.assign(s, worker, "mining")
+	var hi: Dictionary = add.call("emberfang", 6, 40)
+	add.call("emberfang", 6, 20)
+	# default: Dim only, keep 1 of each, no shinies, no workers
+	var plan := Economy.bulk_release_plan(s, {"maxRarity": 1})
+	t.eq(plan.list.size(), 4, "four plain Dim Tuskcubs (the best one is the Steady worker)")
+	t.eq(int(plan.kept.get("shiny", 0)), 1)
+	t.eq(int(plan.kept.get("working", 0)), 1)
+	# shinies and higher rarities when asked
+	plan = Economy.bulk_release_plan(s, {"maxRarity": 9, "shinies": true, "species": "tuskcub"})
+	t.ok(plan.list.has(sh), "a shiny goes when shinies are allowed")
+	t.ok(not plan.list.has(worker), "the worker stays (and is the best)")
+	plan = Economy.bulk_release_plan(s, {"minRarity": 6, "maxRarity": 6, "keepPerSpecies": 0, "working": true})
+	t.eq(plan.list.size(), 2, "keep 0 lets every matching one go")
+	plan = Economy.bulk_release_plan(s, {"minRarity": 6, "maxRarity": 6, "maxLevel": 25, "keepPerSpecies": 0})
+	t.eq(plan.list.size(), 1, "level cap")
+	t.ok(not plan.list.has(hi))
+	plan = Economy.bulk_release_plan(s, {"maxRarity": 9, "type": "pyric", "keepPerSpecies": 0})
+	t.ok(plan.list.all(func(c): return c.species == "emberfang"), "type filter")
+	# working ones leave their job when released
+	var res := Economy.bulk_release(s, {"maxRarity": 9, "working": true, "shinies": true, "keepPerSpecies": 0})
+	t.ok(res.count > 0)
+	t.ok(GameState.workers(s, "mining").is_empty(), "the worker was released and left Mining")
+	t.ok(s.creatures.size() >= 1, "never the last one")
+
+
 ## Play-test feedback: XP seemed to arrive only with the boss, because a party member's fighter kept the level
 ## it started the run at. A level-up from an ordinary kill now shows (and fights) at once.
 func test_a_kill_levels_the_fighter_mid_run() -> void:
@@ -314,29 +404,6 @@ func test_a_kill_levels_the_fighter_mid_run() -> void:
 	t.ok(float(f.maxHp) > max_before, "and its higher Health")
 	t.ok(float(f.hp) > hp_before, "gaining the extra Health")
 	t.ok(float(f.power) >= float(Combat.ally(c).power) - 0.001, "and its new power")
-
-
-## Designer's request: the islands show a mix of forms. A wild one is sometimes met a form or two above its
-## level's form (combat.wildFormUp), fights in that form, and keeps it when bound.
-func test_wild_aetherlings_come_in_a_mix_of_forms() -> void:
-	var s := GameState.new_game()
-	var z: Dictionary = Data.zones["whisperleaf-hollow"]   # levels 1-5: form 1 by level
-	var rng := _rng(11)
-	var counts := [0, 0, 0]
-	for i in 3000:
-		var w := Expedition.roll_wild(s, z, rng)
-		counts[int(w.form) - 1] += 1
-	var up: Array = Data.tuning.combat.wildFormUp
-	t.near(counts[1] / 3000.0, float(up[0]), 0.03, "form 2 about %s of the time (%d)" % [up[0], counts[1]])
-	t.near(counts[2] / 3000.0, float(up[1]), 0.015, "form 3 about %s (%d)" % [up[1], counts[2]])
-	t.ok(counts[0] > counts[1] and counts[1] > counts[2], "most are form 1")
-	var ev := []
-	Expedition.try_capture(s, {"species": "tuskcub", "level": 4, "rarity": 1, "shiny": false, "form": 3}, [], rng, ev, {"freeBinds": 0})
-	var bound: Dictionary = s.creatures[ev.filter(func(e): return e.type == "captured")[0].creature]
-	t.eq(Creatures.form_of(bound), 3, "bound in form 3 at level 4, it stays form 3")
-	t.eq(Combat.ally(bound).form, 3, "and fights as form 3")
-	bound.level = 45
-	t.eq(Creatures.form_of(bound), 3, "levelling past never lowers it")
 
 
 ## Thorns that knock out an attacker mid-way through a multi-target ability stop it: nothing more is hit.

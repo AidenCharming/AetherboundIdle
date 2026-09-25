@@ -142,13 +142,46 @@ static func creature(s: Dictionary, id: String) -> Dictionary:
 	return s.creatures.get(id, {})
 
 
-static func workers(s: Dictionary, skill_id: String) -> Array:
-	var out := []
+# ---------------------------------------------------------------- roster index
+# Who works where, and who sits on the perches, found with one pass over the roster and kept until the roster
+# changes, so a big collection doesn't cost a scan per skill per frame. It lives here, not in the save. Every
+# change to who exists or what they do calls roster_changed(): adding or removing a creature, a job change
+# (skills.gd, expedition.gd) and a trait reroll (it changes the perch order).
+static var _idx_state: Dictionary = {}
+static var _idx_count := -1
+static var _idx_workers := {}   # skill id -> [creature], by slot
+static var _idx_perched := []
+
+
+static func roster_changed(_s: Dictionary = {}) -> void:
+	_idx_count = -1
+
+
+static func _index(s: Dictionary) -> void:
+	if is_same(_idx_state, s) and _idx_count == s.creatures.size():
+		return
+	_idx_state = s
+	_idx_count = s.creatures.size()
+	_idx_workers = {}
 	for c in s.creatures.values():
-		if c.job.get("kind", "") == "skill" and c.job.id == skill_id:
-			out.append(c)
-	out.sort_custom(func(a, b): return int(a.job.get("slot", 0)) < int(b.job.get("slot", 0)))
-	return out
+		if c.job.get("kind", "") == "skill":
+			if not _idx_workers.has(c.job.id):
+				_idx_workers[c.job.id] = []
+			_idx_workers[c.job.id].append(c)
+	for list in _idx_workers.values():
+		list.sort_custom(func(a, b): return int(a.job.get("slot", 0)) < int(b.job.get("slot", 0)))
+	_idx_perched = Economy.find_perched(s)
+
+
+static func workers(s: Dictionary, skill_id: String) -> Array:
+	_index(s)
+	return _idx_workers.get(skill_id, []).duplicate()
+
+
+## The resting Aetherlings on the perches (see Economy.find_perched).
+static func perched(s: Dictionary) -> Array:
+	_index(s)
+	return _idx_perched.duplicate()
 
 
 static func party(s: Dictionary) -> Array:
@@ -190,6 +223,7 @@ static func migrate(s: Dictionary) -> Dictionary:
 		var c: Dictionary = s.creatures[id]
 		if not Data.species.has(c.get("species", "")):
 			s.creatures.erase(id)
+			roster_changed()
 			continue
 		for k in ["job", "progress", "overclock", "nick", "locked", "traits", "shiny"]:
 			if not c.has(k):

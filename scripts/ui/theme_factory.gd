@@ -137,6 +137,8 @@ static func get_theme() -> Theme:
 	t.set_color("font_color", "PopupMenu", Palette.TEXT_DIM)
 	t.set_color("font_hover_color", "PopupMenu", Palette.TEXT)
 	t.set_constant("v_separation", "PopupMenu", 10)
+	# menu icons (the skill list under Put to work) are painted at 512 px: draw them at text size
+	t.set_constant("icon_max_width", "PopupMenu", 28)
 	t.set_color("font_color", "CheckButton", Palette.TEXT)
 	t.set_color("font_hover_color", "CheckButton", Palette.TEXT)
 	t.set_color("font_pressed_color", "CheckButton", Palette.TEXT)

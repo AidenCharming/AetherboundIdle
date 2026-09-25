@@ -551,6 +551,17 @@ func test_sanctum_goal_card_shows_claim_when_an_item_goal_finishes() -> void:
 	_teardown()
 
 
+## The Put to work menu drew its skill icons at their painted 512 px, filling the screen.
+func test_menu_icons_are_drawn_small() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var w: int = main.get_theme_constant("icon_max_width", "PopupMenu")
+	t.ok(w > 0 and w <= 32, "PopupMenu icons capped at %d px" % w)
+	main.free()
+	_teardown()
+
+
 ## Play-test feedback: XP seemed to come only from the boss. A party member's nameplate has an XP bar that
 ## moves with every kill, and its level chip follows a mid-run level-up.
 func test_arena_shows_party_xp_from_each_kill() -> void:
