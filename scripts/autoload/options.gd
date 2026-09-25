@@ -162,6 +162,9 @@ func flush() -> void:
 func load_options() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(PATH) != OK:
+		# First run on a small screen: the 1920x1080 layout shrinks to 67% at 1280x720, so start the text larger.
+		if DisplayServer.get_name() != "headless" and DisplayServer.screen_get_size().x <= 1440:
+			values.ui_scale = 2
 		return
 	for k in values:
 		if cfg.has_section_key("options", k):

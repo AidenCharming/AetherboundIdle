@@ -207,6 +207,11 @@ What its first runs found and fixed:
   it runs just after the release (deferred, so the click lands on the button first). Rebuilding only the parts
   that changed would still be nicer for performance, but clicks are no longer lost.
 
+- **0.5.2:** code-filled polygons (rarity pips, portrait and frame sparkles) had hard edges, since Godot fills
+  polygons without anti-aliasing; `UI.fill_polygon` adds a thin anti-aliased outline in the same colour. First run
+  on a screen 1440 px wide or less starts the Interface scale at 115%. Textures were checked: all build mipmaps.
+  Still open: font hinting none vs light, 512 px icons.
+
 ## Not yet seen or heard in the real game (check these first)
 
 - The shiny and rare entrance burst and its two sounds (`shiny_appear`, `rare_appear`), and the type attack sounds.

@@ -63,9 +63,18 @@ static func draw_pips(ci: CanvasItem, at: Vector2, n: int, r: float, col: Color,
 	for i in n:
 		var p := at + dir * (float(i) - float(n - 1) / 2.0) * step
 		var o := r + maxf(1.0, r * 0.35)
-		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -o), p + Vector2(o, 0), p + Vector2(0, o), p + Vector2(-o, 0)]), Palette.INK)
-		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0)]), col)
+		fill_polygon(ci, PackedVector2Array([p + Vector2(0, -o), p + Vector2(o, 0), p + Vector2(0, o), p + Vector2(-o, 0)]), Palette.INK)
+		fill_polygon(ci, PackedVector2Array([p + Vector2(0, -r), p + Vector2(r, 0), p + Vector2(0, r), p + Vector2(-r, 0)]), col)
 		ci.draw_colored_polygon(PackedVector2Array([p + Vector2(0, -r), p + Vector2(r * 0.45, -r * 0.1), p + Vector2(0, -r * 0.2)]), Color(1, 1, 1, 0.55))
+
+
+## Fills a polygon with smooth edges: Godot fills polygons without anti-aliasing, so a thin anti-aliased
+## outline in the same colour feathers the stair-stepped edge.
+static func fill_polygon(ci: CanvasItem, pts: PackedVector2Array, col: Color) -> void:
+	ci.draw_colored_polygon(pts, col)
+	var ring := pts.duplicate()
+	ring.append(pts[0])
+	ci.draw_polyline(ring, col, 1.0, true)
 
 
 ## A small number chip in the nameplates' style: a rounded pill tinted with `color` (level, dex number).

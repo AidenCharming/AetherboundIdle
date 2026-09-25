@@ -57,7 +57,7 @@ func _draw() -> void:
 		var p := Vector2(sp.pos.x * size.x, sp.pos.y * size.y)
 		var s: float = sp.size * k
 		var c := Color(1.0, 0.97, 0.8, k)
-		draw_colored_polygon(PackedVector2Array([p + Vector2(0, -s * 1.6), p + Vector2(s * 0.35, -s * 0.35), p + Vector2(s * 1.6, 0),
+		UI.fill_polygon(self, PackedVector2Array([p + Vector2(0, -s * 1.6), p + Vector2(s * 0.35, -s * 0.35), p + Vector2(s * 1.6, 0),
 			p + Vector2(s * 0.35, s * 0.35), p + Vector2(0, s * 1.6), p + Vector2(-s * 0.35, s * 0.35), p + Vector2(-s * 1.6, 0),
 			p + Vector2(-s * 0.35, -s * 0.35)]), c)
 

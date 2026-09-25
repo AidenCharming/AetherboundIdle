@@ -244,8 +244,8 @@ func _draw_twinkles(on: Control) -> void:
 		var pos := Vector2(0.18 + 0.64 * fposmod(sin(sd * 12.9) * 43.7, 1.0), 0.12 + 0.6 * fposmod(sin(sd * 78.2) * 17.3, 1.0)) * s
 		var r := s * 0.05 * a
 		var c := Color(col, a)
-		on.draw_polygon(PackedVector2Array([pos + Vector2(0, -r), pos + Vector2(r * 0.22, -r * 0.22), pos + Vector2(r, 0), pos + Vector2(r * 0.22, r * 0.22),
-			pos + Vector2(0, r), pos + Vector2(-r * 0.22, r * 0.22), pos + Vector2(-r, 0), pos + Vector2(-r * 0.22, -r * 0.22)]), PackedColorArray([c]))
+		UI.fill_polygon(on, PackedVector2Array([pos + Vector2(0, -r), pos + Vector2(r * 0.22, -r * 0.22), pos + Vector2(r, 0), pos + Vector2(r * 0.22, r * 0.22),
+			pos + Vector2(0, r), pos + Vector2(-r * 0.22, r * 0.22), pos + Vector2(-r, 0), pos + Vector2(-r * 0.22, -r * 0.22)]), c)
 
 
 func _draw_plate() -> void:
