@@ -43,10 +43,21 @@ func tmp_path(n: int) -> String:
 	return "user://slot_%d.tmp.json" % n
 
 
+## The save as it was when this session started. Autosaves never touch it, so a bad restore or a bug that
+## corrupts the state can still be undone after the rolling .bak has been overwritten.
+func session_path(n: int) -> String:
+	return "user://slot_%d.session.json" % n
+
+
+## The game as it was just before an import replaced it.
+func pre_import_path(n: int) -> String:
+	return "user://slot_%d.pre-import.json" % n
+
+
 ## Where a slot's save can be, in the order to try them. A .tmp only survives when a crash hit between
 ## removing the main file and renaming .tmp into place, and then it is the newest good save.
 func _slot_paths(n: int) -> Array:
-	return [slot_path(n), tmp_path(n), backup_path(n)]
+	return [slot_path(n), tmp_path(n), backup_path(n), session_path(n)]
 
 
 ## Starts playing a save slot: loads it, or begins a new game there when it is empty or `fresh` is set.
@@ -57,8 +68,11 @@ func start_slot(n: int, fresh := false) -> void:
 	battle_log.clear()
 	notifications.clear()
 	unread = 0
+	_main_ok.erase(n)
 	if fresh or not load_game():
 		new_game()
+	elif _readable(slot_path(n)):
+		DirAccess.copy_absolute(ProjectSettings.globalize_path(slot_path(n)), ProjectSettings.globalize_path(session_path(n)))
 	var now := now_sec()
 	var away := now - float(state.lastSeen)
 	_last_tick = now
@@ -267,11 +281,23 @@ func _write_slot(n: int, text: String) -> bool:
 		return false
 	f.store_string(text)
 	f.close()
-	if FileAccess.file_exists(slot_path(n)) and _readable(slot_path(n)):
+	if FileAccess.file_exists(slot_path(n)) and (_main_ok.get(n, -1) == _file_size(slot_path(n)) or _readable(slot_path(n))):
 		DirAccess.copy_absolute(main, ProjectSettings.globalize_path(backup_path(n)))
 	if FileAccess.file_exists(slot_path(n)):
 		DirAccess.remove_absolute(main)   # Windows can't rename over an existing file
-	return DirAccess.rename_absolute(tmp, main) == OK
+	var done := DirAccess.rename_absolute(tmp, main) == OK
+	# we just wrote it, so the next save can trust it without parsing it again, as long as its size is unchanged
+	_main_ok[n] = text.to_utf8_buffer().size() if done else -1
+	return done
+
+
+func _file_size(path: String) -> int:
+	var f := FileAccess.open(path, FileAccess.READ)
+	return f.get_length() if f else -2
+
+
+## The byte size of each slot's main file as this session last wrote it, so it is known to be a readable save.
+var _main_ok := {}
 
 
 func _readable(path: String) -> bool:
@@ -377,7 +403,8 @@ func rename_slot(n: int, save_name: String) -> void:
 
 
 func delete_slot(n: int) -> void:
-	for path in _slot_paths(n):
+	_main_ok.erase(n)
+	for path in _slot_paths(n) + [pre_import_path(n)]:
 		if FileAccess.file_exists(path):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
 
@@ -395,6 +422,19 @@ func import_text(text: String) -> String:
 	var parsed: Variant = JSON.parse_string(json)
 	if not (parsed is Dictionary) or not parsed.has("version") or not parsed.has("creatures"):
 		return "That does not look like an Aetherbound save."
+	# migrate a copy first, and only adopt it when the result has the shape a game needs
+	var trial: Dictionary = GameState.migrate(_fix_numbers(parsed.duplicate(true)))
+	for key in ["creatures", "items", "skills", "expedition", "collection"]:
+		if not (trial.get(key) is Dictionary):
+			return "That save is damaged (%s), so it was not loaded." % key
+	if not (trial.get("rng") is Dictionary):
+		return "That save is damaged (rng), so it was not loaded."
+	if slot > 0 and not state.is_empty():
+		_store_rng()
+		var keep := FileAccess.open(pre_import_path(slot), FileAccess.WRITE)
+		if keep:
+			keep.store_string(JSON.stringify(state))
+			keep.close()
 	_adopt(parsed)
 	_last_tick = now_sec()
 	save_game()

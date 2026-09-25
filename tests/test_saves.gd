@@ -104,3 +104,37 @@ func test_delete_slot_removes_every_file() -> void:
 		t.ok(not FileAccess.file_exists(path), "%s removed" % path)
 	t.eq(Game.slot_info(N), {}, "the slot reads as empty")
 	_end(keep)
+
+
+## The session-start copy is the last fallback: it still loads when the main file, .tmp and .bak are all gone.
+func test_session_copy_is_the_last_fallback() -> void:
+	var keep := _begin()
+	Game.state.aether = 4321
+	Game.save_game()
+	DirAccess.copy_absolute(ProjectSettings.globalize_path(Game.slot_path(N)), ProjectSettings.globalize_path(Game.session_path(N)))
+	for path in [Game.slot_path(N), Game.backup_path(N), Game.tmp_path(N)]:
+		if FileAccess.file_exists(path):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+	Game.state = GameState.new_game()
+	t.ok(Game.load_game(), "loads from the session copy")
+	t.eq(int(Game.state.aether), 4321, "the session copy's Aether")
+	_end(keep)
+
+
+## An import keeps the game it replaced, and a save that migrates into the wrong shape is refused untouched.
+func test_import_keeps_the_old_game_and_refuses_damage() -> void:
+	var keep := _begin()
+	Game.state.aether = 111
+	var damaged: Dictionary = GameState.new_game()
+	damaged.expedition = "broken"
+	t.ok(Game.import_text(JSON.stringify(damaged)) != "", "a damaged save is refused")
+	t.eq(int(Game.state.aether), 111, "the game in play is untouched")
+	var other: Dictionary = GameState.new_game()
+	other.aether = 999
+	t.eq(Game.import_text(JSON.stringify(other)), "", "a good save imports")
+	t.eq(int(Game.state.aether), 999, "and is in play")
+	var json := JSON.new()
+	t.ok(json.parse(FileAccess.get_file_as_string(Game.pre_import_path(N))) == OK and int(json.data.aether) == 111, "the old game was kept")
+	Game.delete_slot(N)
+	t.ok(not FileAccess.file_exists(Game.pre_import_path(N)), "deleting the slot removes the pre-import copy")
+	_end(keep)
