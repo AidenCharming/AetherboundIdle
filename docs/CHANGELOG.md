@@ -3,6 +3,19 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3b (2026-09-25): 13 more Form 3 sprites
+
+- Form 3 of Burrbolt, Cliffscorch, Duskbloom, Duskflare, Eddyelver, Flintlamb, Mudskulker, Murkmire, Nettlemesa,
+  Riftshale, Sproutfault, Wraithcoal and Yarrowflare (the second Form 3 run, approved by the designer). 26 of the
+  45 hybrids and specials now have all three forms; the other 19 are in a last dual-reference run.
+- **Mudskulker Form 3 cut-out:** its pale lavender-pink belly and chin read as the magenta key and were punched out
+  (about 16,800 px, even with `--keep`, because those pixels match the key colour almost exactly). The sprite has no
+  real see-through gaps, so it was cut with every enclosed hole filled back from the source image. Watch for this
+  on any creature with a pale pink or lavender belly on a magenta key (a green key would avoid it).
+- `D:\AI\tools\batch_runner.py --dual-ref` (Form 3 with Form 2 and Form 1 as references) now rewrites the prompt's
+  "the reference image" to name both references and ask for a pose unlike either: single-reference Form 3 edits
+  kept copying Form 2's pose.
+
 ## 0.6.3a (2026-09-25): third code review, Nexus speed, first-run window, version letters
 
 - **Version letters (designer's request):** the numbers climb slowly. Minor only for a new system, patch for a
