@@ -639,3 +639,31 @@ func test_changing_page_closes_its_dialogs() -> void:
 	t.ok(not Modal.any_open(), "going to the Sanctum closed it")
 	main.free()
 	_teardown()
+
+
+## Bridge bugs: a Build click in Sanctum Works did nothing (the page rebuilt on a capture between mouse down
+## and up), and Build stayed disabled after the gold arrived (gold from work doesn't emit Game.changed).
+func test_works_build_buttons_stay_put_and_follow_the_gold() -> void:
+	_setup()
+	var s := Game.state
+	var works: Control = load("res://scripts/ui/screens/works_screen.gd").new()
+	_layer.add_child(works)
+	var b: Button = works._builds["genesis-pods"]
+	s.items.clear()
+	s.gold = 0.0
+	works._update_builds()
+	t.ok(b.disabled, "can't build with nothing")
+	works.refresh()   # what Main does on Game.changed (a capture, a level-up)
+	t.ok(works._builds["genesis-pods"] == b, "a capture or level-up doesn't replace the Build button")
+	var nxt := Economy.next_upgrade(s, "genesis-pods")
+	for id in nxt.cost:
+		GameState.add_item(s, id, float(nxt.cost[id]))
+	works._process(1.0)
+	t.ok(not b.disabled, "Build enables once the cost is there, with no Game.changed")
+	var before := GameState.upgrade_level(s, "genesis-pods")
+	Game.buy_upgrade("genesis-pods")
+	t.eq(GameState.upgrade_level(s, "genesis-pods"), before + 1, "built")
+	works.refresh()
+	t.ok(works._builds.get("genesis-pods") != b, "a new level rebuilds the card")
+	works.free()
+	_teardown()
