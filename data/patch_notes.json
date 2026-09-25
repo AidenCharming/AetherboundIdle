@@ -61,27 +61,19 @@
 				["Market", "Every Market tab gives all its cards one size, so a locked card is as big as an open one."]
 			],
 			"Bugfixes": [
-				["Nexus", "Fixed an error when a delayed scroll ran after its list had closed."]
+				["Nexus", "Fixed an error when leaving the Nexus while its list was scrolling."]
 			]
 		}
 	},
 	{
 		"version": "0.4.0",
 		"date": "2026-09-25",
-		"title": "Second code review",
+		"title": "Safer saves",
 		"notes": {
-			"New": [
-				["Dev tools", "Force the next wave: a boss, a shiny or the rarest rarity."],
-				["Dev tools", "Rarity preview: every rarity plain and shiny, for any species and form, with its sounds."]
-			],
 			"Bugfixes": [
 				["Saves", "A copy is kept from the start of each session and before every import; imports are checked first."],
 				["Expeditions", "Thorns that knock out an attacker are handled correctly."],
-				["Nexus", "Keeps your page and a stable order when the list changes."],
-				["Game", "Bad tiers and indices are refused instead of breaking a save."]
-			],
-			"Balancing": [
-				["Game", "Eight numbers that were written in the code moved to the data files."]
+				["Nexus", "Keeps your page and a stable order when the list changes."]
 			]
 		}
 	},
@@ -101,7 +93,7 @@
 	{
 		"version": "0.3.0",
 		"date": "2026-09-25",
-		"title": "Play-test round one",
+		"title": "Wild forms and bulk release",
 		"notes": {
 			"New": [
 				["Expeditions", "Wild Aetherlings roll their form: Form 2 from level 20, Form 3 from level 40. One caught below its level's form evolves as it levels."],
@@ -125,7 +117,7 @@
 			],
 			"Bugfixes": [
 				["UI", "A closing dialog no longer eats the next click; changing page closes a page's dialogs."],
-				["UI", "Clicks were lost when a screen rebuilt while the mouse button was down."],
+				["UI", "Clicks could be lost while a screen was updating."],
 				["Sanctum", "Works Build buttons follow your gold live and their clicks aren't lost."],
 				["Sanctum", "The goal card now shows Claim for item and counter goals."],
 				["Options", "The window no longer unmaximizes on its own."],
@@ -141,10 +133,10 @@
 	{
 		"version": "0.2.0",
 		"date": "2026-09-24",
-		"title": "The Godot rebuild",
+		"title": "A fresh start",
 		"notes": {
 			"New": [
-				["Game", "Aetherbound rebuilt in Godot: title screen with three save slots, options, offline progress."],
+				["Game", "A new title screen with three save slots, a full Options menu and progress while you're away."],
 				["Market", "A full Market: stock, rotating offers, boosts, extra work slots, bulk selling and the Egg Market."],
 				["Sanctum", "Aether Pearls: an endgame currency with six Pearl upgrades in Sanctum Works."],
 				["Sanctum", "Overseer Vance has 112 goals paced over the month (was 26)."],
@@ -175,7 +167,7 @@
 				["Breeding", "Inherited traits never come out weaker than the parent's; shiny parents raise an egg's shiny chance a little."],
 				["Breeding", "Breeding odds follow the parents' rarity."],
 				["Expeditions", "Levels matter in a fight; the first boss and Fractured Quarry are tougher."],
-				["Game", "Skill and creature curves fitted to a one-month pace; creature level cap 100."],
+				["Game", "Skill and Aetherling levelling paced so every skill reaches 99 in about a month; Aetherlings level up to 100."],
 				["Market", "Sell prices sit below shop prices; crafted goods are worth more than their inputs."]
 			]
 		}

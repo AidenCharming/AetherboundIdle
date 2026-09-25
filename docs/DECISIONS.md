@@ -784,6 +784,8 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
   Expeditions, ...), grouped as New / QOL / Bugfixes / Balancing, with filter chips (`PatchNotes` widget, right
   side of the title). **Add an entry with every version bump**: a test checks the newest entry matches
   `config/version`, the order, the kinds and that each area has a colour (`PatchNotes.AREA_COLORS`).
+  **The notes are for players:** no developer tools, code, data files, engine or tooling. The version shows only
+  on the patch notes (the title's bottom line just says progress saves automatically).
 - **A switch per kind of sound** (Options > Audio): rare finds, notifications, battle, interface (`Sfx.GROUPS`,
   options `sfx_rare`, `sfx_notify`, `sfx_battle`, `sfx_ui`). Sounds are grouped by name (`Sfx.GROUP_OF`; `hit_*`
   and `cast_*` are battle, anything unlisted is interface). Switching a kind on plays one of its sounds.

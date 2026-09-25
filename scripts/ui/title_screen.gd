@@ -83,7 +83,7 @@ func _build_menu() -> void:
 	if OS.get_name() != "Web":
 		col.add_child(_menu_button("Quit", "Ghost", func(): get_tree().quit()))
 	col.add_child(UI.spacer(true))
-	col.add_child(UI.label("Version %s · Godot rebuild · progress saves automatically" % ProjectSettings.get_setting("application/config/version"), "Faint"))
+	col.add_child(UI.label("Progress saves automatically", "Faint"))   # the version is on the patch notes
 	var notes := PatchNotes.new()
 	notes.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
 	notes.offset_left = -660
