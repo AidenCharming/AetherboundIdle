@@ -658,3 +658,29 @@ func test_fullscreen_toggle_goes_back_and_forth() -> void:
 	t.eq(int(Options.get_value("window_mode")), 0, "F11 does it too")
 	Options.values.window_mode = was
 	Options.flush()
+
+
+## The mouse's back and forward buttons walk the pages visited, like a browser.
+func test_mouse_back_and_forward_walk_the_pages() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	main.show_screen("expeditions")
+	main.show_screen("skill", "woodcutting")
+	var back := InputEventMouseButton.new()
+	back.button_index = MOUSE_BUTTON_XBUTTON1
+	back.pressed = true
+	main._input(back)
+	t.eq(main.current, "expeditions", "back")
+	var fwd := InputEventMouseButton.new()
+	fwd.button_index = MOUSE_BUTTON_XBUTTON2
+	fwd.pressed = true
+	main._input(fwd)
+	t.eq([main.current, main.current_arg], ["skill", "woodcutting"], "forward")
+	main.history_step(-1)
+	main.show_screen("nexus")
+	main.history_step(1)
+	t.eq(main.current, "nexus", "a new page drops the forward history")
+	t.ok(main._nav_buttons["nexus:"].button.tooltip_text.contains("key 2"), "the rail shows the shortcut")
+	main.free()
+	_teardown()

@@ -33,6 +33,8 @@ var _rail_refresh := 0.0
 var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
 var _limited_flash := false   # a rare limited offer is in the Market: its badge pulses
 var _boosts_box: HBoxContainer
+var _history: Array = []   # [[screen, arg]] pages visited, for the mouse's back and forward buttons
+var _history_at := -1
 var _mouse_held := false        # the left button is down: rebuilding now could free the button being clicked
 var _refresh_waiting := false   # a Game.changed came while it was down; the screen rebuilds on release
 
@@ -121,9 +123,16 @@ static func go(screen: String, arg := "") -> void:
 		instance.show_screen(screen, arg)
 
 
-func show_screen(screen: String, arg := "") -> void:
+func show_screen(screen: String, arg := "", from_history := false) -> void:
 	if screen == current and arg == current_arg and _screen:
 		return
+	if not from_history:
+		# a new page drops anything "forward" of where the player was, like a browser
+		_history.resize(_history_at + 1)
+		_history.append([screen, arg])
+		if _history.size() > HISTORY_MAX:
+			_history.pop_front()
+		_history_at = _history.size() - 1
 	current = screen
 	current_arg = arg
 	if _screen:
@@ -160,7 +169,21 @@ func _refresh_screen() -> void:
 		_screen.refresh()
 
 
+## The mouse's back (or forward) button: the page visited before (or after) this one.
+func history_step(dir: int) -> void:
+	var to := _history_at + dir
+	if to < 0 or to >= _history.size():
+		return
+	_history_at = to
+	show_screen(_history[to][0], _history[to][1], true)
+
+
 func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
+		if not Modal.any_open() and not _reveal.active:
+			get_viewport().set_input_as_handled()
+			history_step(-1 if event.button_index == MOUSE_BUTTON_XBUTTON1 else 1)
+		return
 	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
 		_mouse_held = event.pressed
 		if not event.pressed and _refresh_waiting:
@@ -173,7 +196,7 @@ func _build_rail() -> Control:
 	var v := UI.vbox(6)
 	rail.add_child(v)
 	var logo := UI.hbox(8)
-	logo.add_child(UI.icon(Data.ui_icon("aether"), 30))
+	logo.add_child(UI.icon(APP_ICON, 32))
 	var title_lbl := UI.label("Aetherbound", "H2")
 	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
 	title_lbl.add_theme_constant_override("shadow_outline_size", 10)
@@ -230,6 +253,10 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	l.add_theme_font_size_override("font_size", 15)
 	h.add_child(l)
 	h.add_child(UI.spacer())
+	var key := _shortcut_for(screen) if arg == "" else ""
+	if key != "":
+		h.add_child(_keycap(key))
+		b.tooltip_text = "%s  (key %s)" % [text, key]
 	var extra := UI.chip("", Palette.AETHER, 11)
 	extra.custom_minimum_size.x = 26
 	(extra.get_child(0) as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -239,6 +266,35 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	b.pressed.connect(func(): show_screen(screen, arg))
 	_rail_list.add_child(b)
 	_nav_buttons[screen + ":" + arg] = {"button": b, "extra": extra, "label": l, "icon": h.get_child(0)}
+
+
+## The number key that opens a screen ("" when it has none).
+func _shortcut_for(screen: String) -> String:
+	for k in SHORTCUTS:
+		if SHORTCUTS[k] == screen:
+			return OS.get_keycode_string(k)
+	return ""
+
+
+## A small keyboard key showing a shortcut, drawn like a keycap (a thicker bottom edge).
+func _keycap(key: String) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	p.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	var sb := ThemeFactory.box(Color(1, 1, 1, 0.04), 5, 1, Palette.LINE_STRONG, 0)
+	sb.border_width_bottom = 2
+	sb.content_margin_left = 5
+	sb.content_margin_right = 5
+	sb.content_margin_top = 0
+	sb.content_margin_bottom = 1
+	p.add_theme_stylebox_override("panel", sb)
+	var l := UI.label(key, "", Palette.TEXT_FAINT)
+	l.add_theme_font_size_override("font_size", 11)
+	l.add_theme_font_override("font", ThemeFactory.bold_font())
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.custom_minimum_size.x = 8
+	p.add_child(l)
+	return p
 
 
 ## A nav entry's badge: a chip, hidden when there's nothing to say.
@@ -411,6 +467,9 @@ func _process(delta: float) -> void:
 		UI.set_chip(_top.working, "%d working" % working, Palette.GOOD)
 		UI.set_chip(_top.perched, "%d perched" % Economy.perched(s).size(), Palette.AETHER)
 
+
+const APP_ICON := preload("res://assets/app-icon.png")
+const HISTORY_MAX := 50
 
 const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works",
 	KEY_8: "market", KEY_9: "eggmarket"}
