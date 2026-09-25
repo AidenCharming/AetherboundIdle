@@ -75,7 +75,7 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 32 | Cinderbasin | Pyric/Aqueous | Cinderbasin > Steamrill > Kettlebrine | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 33 | Embersurge | Pyric/Voltaic | Embersurge > Blazearc > Infernodynamo | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 34 | Brinecore | Aqueous/Voltaic | Brinecore > Rillarc > Tidebolt | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 35 | Eclipseed | Void/Verdant | Eclipseed > Starsap > Nightbloom | hybrid | green | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 35 | Eclipseed | Void/Verdant | Eclipseed > Starsap > Nightbloom | hybrid | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 36 | Nullshale | Void/Telluric | Nullshale > Riftrock > Abysscrag | hybrid | green | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 37 | Gloamforge | Void/Pyric | Gloamforge > Muteember > Hushkiln | hybrid | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 38 | Hushflow | Void/Aqueous | Hushflow > Nullstream > Riftcurrent | hybrid | green | structure | F1 [x]  F2 [x]  F3 [ ] |
@@ -84,7 +84,7 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 41 | Ripplesnap | Telluric/Aqueous | Ripplesnap > Slatesnout > Ridgehide | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 42 | Cairnflit | Telluric/Voltaic | Cairnflit > Pumiceglide > Fluxwing | special | magenta | structure | F1 [x]  F2 [x]  F3 [ ] |
 | 43 | Flintlamb | Telluric/Voltaic | Flintlamb > Ampcurl > Mesahorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 44 | Coralpeep | Pyric/Aqueous | Coralpeep > Flarewade > Pyreplume | special | green | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 44 | Coralpeep | Pyric/Aqueous | Coralpeep > Flarewade > Pyreplume | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 45 | Drizzlenub | Pyric/Aqueous | Drizzlenub > Brooksoak > Lavabask | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 46 | Coalgrub | Pyric/Voltaic | Coalgrub > Arcflicker > Blazefly | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 47 | Boltkit | Pyric/Voltaic | Boltkit > Brandtail > Scorchfox | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
@@ -92,7 +92,7 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 49 | Sprayfledge | Aqueous/Voltaic | Sprayfledge > Pulsedart > Voltfisher | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 50 | Sorrelcliff | Verdant/Telluric | Sorrelcliff > Fernscarp > Highhorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 51 | Hazelslate | Verdant/Telluric | Hazelslate > Mossflint > Grovepeak | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 52 | Brackensear | Verdant/Pyric | Brackensear > Thornkiln > Scaldhearth | special | magenta | cute | F1 [x]  F2 [x]  F3 [ ] |
+| 52 | Brackensear | Verdant/Pyric | Brackensear > Thornkiln > Scaldhearth | special | magenta | cute | F1 [x]  F2 [x]  F3 [x] |
 | 53 | Yarrowflare | Verdant/Pyric | Yarrowflare > Bloomember > Petalblaze | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 54 | Sedgestilt | Verdant/Aqueous | Sedgestilt > Reedcurrent > Willowmire | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
 | 55 | Rowanboulder | Verdant/Aqueous | Rowanboulder > Fernbrook > Alderfalls | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
@@ -1087,7 +1087,7 @@ Redraw the same character as the reference image as its second form, a flat thor
 ```
 **Form 3, Spinehearth** (edit, reference = `nettlemesa-f2.png`, 8 steps, CFG 1.0, file `nettlemesa-f3.png`)
 ```
-Redraw the same character as the reference image as its final form, a broad hearth-spined lizard. Keep the same face, the same eyes and the same colouring, the same dark-brown outlines and the same art style. Change the body proportions dramatically: a large, powerful, broad-chested body about four times the size of the head, thick strong limbs, noticeably larger and more massive overall, and a head much smaller in proportion to the body. A broad, heavy horned lizard with a big crown of horns, rows of thick spines down its back and sides whose tips are orange and red like banked coals drawn as crisp flat shapes, and thick strong legs. Three-quarter view facing left, standing upright on its hind legs, broad and heavy, full body, centred, on a solid bright saturated pure magenta background (#FF00FF), evenly lit and completely flat, no shadow, no glow effect, no halo.
+Redraw the same character as the reference image as its final form, a broad hearth-spined lizard. Keep the same face, the same eyes and the same colouring, the same stone horns and the same forehead crystal, the same dark-brown outlines and the same art style. A real final evolution: a new pose and a clearly different, fully grown body about twice the size of the second form, the head smaller in proportion to the body; correct anatomy, no extra limbs. A huge, broad, heavy horned lizard with a wide flat body, a big crown of stone horns, a small stone hearth set into the middle of its back with an orange fire inside, rows of thick spines down its back and sides whose tips are orange and red like banked coals drawn as crisp flat shapes, a thick spiked tail, and thick clawed legs. Three-quarter view facing left, standing on all four legs, low, wide and heavy, head raised, full body, centred, on a solid bright saturated pure magenta background (#FF00FF), evenly lit and completely flat, no shadow, no glow effect, no halo.
 ```
 
 ### 60. Murkroot > Palevine > Loamgrove (Void/Verdant)

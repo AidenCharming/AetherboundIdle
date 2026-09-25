@@ -3,6 +3,18 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.2 (2026-09-25): sprites for the 45 hybrids and specials
+
+- 103 creature sprites into `assets/creatures/`: Forms 1 and 2 of all 15 hybrids and 30 specials, and Form 3 of
+  the 13 approved so far (Ashwood, Mosscoil, Cinderbasin, Gloamforge, Quakeforge, Embersurge, Brinecore,
+  Hazelslate, Coalgrub, Nethershale, Brackensear, Coralpeep, Eclipseed). Cut out from `D:\AI\sprites\approved\`
+  with `sprite_tools.py cutout --size 512` (default settings, checked on the dark plate). No code change: the game
+  loads `<id>-f<form>.png` by name, and a form without a file keeps the placeholder blob (the designer is fine with
+  that until the other 32 Form 3s are approved).
+- `docs/art-prompts.md` rebuilt from `D:\AI\tools\build_prompts.py`: a Form 3 redo table (EVO3) for the 32
+  weak Form 3s: a new pose, a size stated relative to Form 2, and lost signature parts back in the keep list.
+  Designer's rule: a weak Form 3 is regenerated, never approved as a compromise.
+
 ## 0.6.1 (2026-09-25): painted icons, benchmark fixes
 
 - The designer's paint pass: 111 item icons and 40 interface icons, plus `docs/art-prompts.md` from their art

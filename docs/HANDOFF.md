@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.1)
+## Where things stand (2026-09-25, v0.6.2)
 
-- Current version **0.6.1**. All 160 tests pass, zero warnings.
+- Current version **0.6.2**. All 160 tests pass, zero warnings.
 - The designer is painting in `D:\AI`: every prompt is written, and Form 3 and hybrid sprites are being generated
   and reviewed there. Leave the art files alone (see the art rules below).
 - The last benchmark run (`bridge_runs/bugtest_benchmark-20260925-131537`) found two bridge-side bugs, fixed in
@@ -30,6 +30,21 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 3. **Windowed mode:** small text in 1280×720 windows (scaled to 67%); consider a bigger default Interface scale.
 4. **Benchmark `--movie`:** a clip was recorded but its frame stats file was missing; check on a full run.
 5. Performance, nice to have: screens that rebuild on every `Game.changed` could rebuild only what changed.
+6. **Aether-Log species page (designer asked for a plan, 2026-09-25).** Today (`aetherlog_screen.gd`): the grid
+   card shows the highest form discovered; the detail modal shows three 204 px portraits in a row, each form's
+   description squeezed into a 204 px column under its portrait (only for discovered forms), so a long description
+   runs to five narrow lines under Form 1 while Forms 2 and 3 have none, and the three columns end up uneven.
+   The plan, to agree with the designer before building:
+   - **One selected form, not three columns:** a large portrait of the chosen form on the left, with the three
+     forms as small clickable thumbnails (undiscovered ones as silhouettes, "Form 2: not discovered yet").
+     Default to the highest form discovered, as the grid card does.
+   - **Text on the right at full width:** the form's name and description in one readable paragraph, then the
+     species facts (types, Specialist/Knack/Lean, signature trait and ability), then rarities owned, shiny swatch
+     and the recipe/where-to-find line. Nothing wraps into a narrow column.
+   - **Per-form facts** where the data has them (what changes at that form, the level it evolves at).
+   - Keep the page one screen high at 1920×1080 and check it at the smallest Interface scale.
+   - Tests: the modal opens for an unseen, seen and owned species; the selected form defaults to the highest
+     discovered; a click on a thumbnail swaps the portrait and text.
 
 ## Open: for the designer
 
