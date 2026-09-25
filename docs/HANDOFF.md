@@ -34,9 +34,11 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
    (~25 ms), Market (~18 ms).
 ## Open: for the designer
 
-- **Not yet seen or heard in the real game:** the shiny and rare entrance sounds (`shiny_appear`, `rare_appear`),
-  the type attack sounds, and the sprite effects' motion. Developer tools > "Next wave: a shiny" / "the rarest
-  rarity", and "Rarity preview" plays every sound.
+- **Sound and music (designer's playtest, 2026-09-25):** `rare_appear` works but feels "meh"; the type attack
+  sounds and the sounds and music in general may need real recordings from an open-source (CC0) library instead
+  of the ones synthesized in `scripts/autoload/sfx.gd`. Plan the source and licences with the designer first.
+- **Close button is too purple** (designer, 2026-09-25): tone down `face_sat` / `face_value` in
+  `assets/shaders/flat_icon.gdshader` (or set them per button in `modal.gd`'s `close_x`).
 - **Confirm on Windows:** the Options window-mode fix (the bug was on Windows fullscreen; guarded three ways).
 - **Balance only play can judge:** Overseer Vance's 112 goals (order, texts, rewards in `data/goals.json`),
   Market prices (`data/market.json`, and whether buying materials makes gathering pointless), Aether Pearl drop
@@ -46,8 +48,6 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - Check one hatch reveal's rarity pips.
 - **Kill XP is now split across the party** (0.6.3d) with the per-kill base tripled so a trio keeps its
   pace: judge in play whether solo/duo parties now level too fast.
-- Close button (0.6.3f): flattened in code by `flat_icon.gdshader`; tune `flatness`/`face_value` there if needed.
-- Look over the new Aether-Log species page and the Creaturedex Show bar (0.6.3).
 
 ## Ground rules
 

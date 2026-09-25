@@ -3,13 +3,21 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## Designer playtest (2026-09-25)
+
+- Confirmed in the real game: the shiny entrance sound (`shiny_appear`), the sprite effects' motion ("amazing"),
+  the Aether-Log and its species page. `rare_appear` works but is "meh", and the Close button is too purple:
+  both are open in `HANDOFF.md`, with sourcing sounds and music from an open-source library.
+- The Chunk 1 recipes are final as they are in the game (closed by the designer).
+
 ## Bridge benchmark fixes (2026-09-25)
 
 - The 2026-09-25 `--movie` run failed only on "fps fell below 20" (median 10). Movie Maker writes a 1080p PNG
   every frame, so under `--movie` the frame rate measures the disk, not the game: fps is no longer judged on
   movie runs (the report says "Movie Maker run: not judged"). Run without `--movie` for a real fps check.
 - The movie clip step crashed on the third clip and never rewrote the report: the frame list was written with
-  Windows line endings, Godot kept the `` on each path, and the first "jump" flag hit a `None` frame number.
+  Windows line endings, Godot kept the `
+` on each path, and the first "jump" flag hit a `None` frame number.
   The list is now `
 `-only and both sides strip the paths. The step prints progress per clip, rewrites the
   report even if it's interrupted, and runs `frame_stats.gd` outside the project (no asset scan, 120 s timeout).
