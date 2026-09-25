@@ -122,6 +122,15 @@ func _run() -> void:
 			Main.instance._screen._fill_bottom()
 			await _wait(0.4)
 			await _shot("bottom_" + tab)
+	if _want("folded"):
+		Main.go("expeditions")
+		await _wait(0.3)
+		Main.instance._screen._set_open("exp_log_open", false)
+		Main.instance._screen._set_open("exp_zones_open", false)
+		await _wait(0.6)
+		await _shot("folded")
+		Main.instance._screen._set_open("exp_log_open", true)
+		Main.instance._screen._set_open("exp_zones_open", true)
 	if _want("attune"):
 		Main.go("nexus")
 		await _wait(0.4)
