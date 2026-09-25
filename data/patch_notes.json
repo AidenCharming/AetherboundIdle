@@ -1,5 +1,16 @@
 [
 	{
+		"version": "0.6.1",
+		"date": "2026-09-25",
+		"title": "Freshly painted icons",
+		"notes": {
+			"New": [
+				["Inventory", "111 item icons are newly painted: ores, bars, logs, herbs, fish, meals, threads, parts and vessels."],
+				["UI", "40 interface icons are newly painted."]
+			]
+		}
+	},
+	{
 		"version": "0.6.0",
 		"date": "2026-09-25",
 		"title": "Patch notes and sound switches",

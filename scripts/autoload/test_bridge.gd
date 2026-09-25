@@ -424,7 +424,7 @@ func _real_click(pos: Vector2, canvas_coords: bool) -> void:
 
 
 ## A button that exists but sits scrolled out of view: wheel its scroll area (as a player would) until it shows.
-func _reveal(pred: Callable) -> bool:
+func _reveal(pred: Callable, tries: int = 3) -> bool:
 	var target: BaseButton = null
 	var root: Node = get_tree().root
 	if _top_modal() != null:
@@ -445,11 +445,16 @@ func _reveal(pred: Callable) -> bool:
 		return false
 	var at := sc.get_global_rect().get_center()
 	for i in 40:
+		# a screen that rebuilds while it scrolls (a claimed milestone) frees the button: find its replacement
+		if not is_instance_valid(target) or not is_instance_valid(sc):
+			if tries <= 0:
+				return false
+			return await _reveal(pred, tries - 1)
 		if _clickable(target):
 			return true
 		var down := target.get_global_rect().get_center().y > sc.get_global_rect().get_center().y
 		await _wheel(at, 1 if down else -1)
-	return _clickable(target)
+	return is_instance_valid(target) and _clickable(target)
 
 
 func _all_buttons(n: Node, out: Array = []) -> Array:

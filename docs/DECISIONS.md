@@ -795,3 +795,22 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 - **Ready to claim:** the Sanctum rail tab shows a gold "claim!" chip when Overseer Vance's goal is done, with the
   goal in its tooltip; the Pods and Expeditions chips got tooltips too. The Aether-Log already had its claim chip.
   160 tests.
+
+## Painted icons, bridge fixes (0.6.1, 2026-09-25)
+
+- The designer's paint pass: 111 item icons and 40 interface icons, plus `docs/art-prompts.md` from their art
+  run (every species has prompts; Form 3 sprites are being made).
+- **Bridge:** `_reveal` (scrolling a button into view) now checks the button still exists on every wheel turn.
+  A screen that rebuilds while it scrolls (the Aether-Log after a milestone Claim) freed it, which raised a script
+  error and made the benchmark report "2 milestone rewards still claimable". It now finds the new button (up to
+  3 tries).
+- **Benchmark:** after picking an island it waits 0.3 s before clicking Explore/Move here. The click came in the
+  same instant as the panel redraw and was lost ("clicked 'Move here' but the expedition is at ..."). The game's
+  own start/move code was fine.
+- **Font hinting:** tried none instead of light at 1920x1080 (1:1). No visible difference, so light stays. The
+  sharpness item left is 512 px icons, which waits on the art pipeline.
+- The test runner already fails on a test file that doesn't compile (checked with a broken file: `FAIL ...
+  (does not compile)`, exit 1); the old HANDOFF note saying otherwise was stale.
+- The designer confirmed the Sanctum "claim!" chip is what they meant by "a tooltip on the nexus for missions
+  ready to collect". 160 tests.
+
