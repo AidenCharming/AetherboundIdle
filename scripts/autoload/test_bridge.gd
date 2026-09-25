@@ -76,7 +76,7 @@ func _process(_delta: float) -> void:
 	while _server.is_connection_available():
 		var p := _server.take_connection()
 		p.set_no_delay(true)
-		_peers.append({"peer": p, "buf": ""})
+		_peers.append({"peer": p, "buf": "", "first": true})
 	for entry in _peers.duplicate():
 		var p: StreamPeerTCP = entry.peer
 		p.poll()
@@ -89,8 +89,19 @@ func _process(_delta: float) -> void:
 		while "\n" in entry.buf:
 			var line: String = entry.buf.get_slice("\n", 0)
 			entry.buf = entry.buf.substr(line.length() + 1)
+			if entry.first and _looks_like_http(line):
+				# a web page can POST to localhost; its body would arrive as a line of its own. Hang up first.
+				p.disconnect_from_host()
+				_peers.erase(entry)
+				break
+			entry.first = false
 			if line.strip_edges() != "":
 				_run(p, line)
+
+
+func _looks_like_http(line: String) -> bool:
+	var head := line.strip_edges().get_slice(" ", 0)
+	return head in ["GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS", "PATCH", "CONNECT", "TRACE"] or " HTTP/" in line
 
 
 func _run(p: StreamPeerTCP, line: String) -> void:

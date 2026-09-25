@@ -454,6 +454,8 @@ static func _lay(s: Dictionary, egg: Dictionary) -> int:
 
 
 static func egg_check(s: Dictionary, type_id: String, grade: int) -> String:
+	if grade < 0 or grade >= grades().size() or not Data.types.has(type_id):
+		return "No such egg."
 	if grade > best_grade(s):
 		return "Not on sale yet."
 	if not (type_id in egg_types(s)):

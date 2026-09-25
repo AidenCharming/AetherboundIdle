@@ -136,6 +136,8 @@ static func claimable(s: Dictionary) -> Array:
 
 static func claim(s: Dictionary, track_id: String, index: int, rng: RandomNumberGenerator) -> Dictionary:
 	var t := track(track_id)
+	if t.is_empty() or index < 0 or index >= t.milestones.size():
+		return {}
 	var m: Dictionary = t.milestones[index]
 	if is_claimed(s, track_id, index) or progress(s, track_id) < milestone_target(track_id, m):
 		return {}

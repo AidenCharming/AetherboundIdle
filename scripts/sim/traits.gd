@@ -182,6 +182,8 @@ static func lock_mult(strength: String) -> float:
 
 ## Rerolls every pool trait not in `locked` (at most two locks). Returns "" or an error.
 static func attune(s: Dictionary, c: Dictionary, locked: Array, rng: RandomNumberGenerator) -> String:
+	if c.is_empty():
+		return "No such Aetherling."
 	var at: Dictionary = Data.tuning.attunement
 	if locked.size() > int(at.maxLocks):
 		return "You can lock at most %d traits." % int(at.maxLocks)

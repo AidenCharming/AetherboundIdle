@@ -44,3 +44,10 @@ func test_bridge_new_refuses_other_slots() -> void:
 	t.eq(res.get("ok"), false, "refused: %s" % res)
 	t.eq(FileAccess.get_file_as_string(Game.slot_path(1)) if FileAccess.file_exists(Game.slot_path(1)) else "", before, "slot 1 untouched")
 	t.eq(Game.slot, 0, "no game started")
+
+
+## A browser's request to the bridge port is refused before its body can be read as a command.
+func test_bridge_hangs_up_on_http() -> void:
+	t.ok(TestBridge._looks_like_http("POST / HTTP/1.1"), "a browser POST")
+	t.ok(TestBridge._looks_like_http("GET /x HTTP/1.1\r"), "a GET")
+	t.ok(not TestBridge._looks_like_http("{\"cmd\": \"ping\"}"), "a bridge command")

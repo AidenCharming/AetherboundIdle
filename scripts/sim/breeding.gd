@@ -128,6 +128,8 @@ static func check(s: Dictionary, a: Dictionary, b: Dictionary, tier: int) -> Str
 		return "Choose two parents."
 	if a.id == b.id:
 		return "Choose two different Aetherlings."
+	if tier < 1 or tier > Data.tuning.breeding.aetherCost.size():
+		return "No such breeding tier."
 	if free_pod(s) < 0:
 		return "Every Genesis Pod is busy."
 	var c := cost(a, b, tier)
