@@ -509,7 +509,7 @@ func _dev_modal() -> void:
 	lvl.min_value = 1
 	lvl.max_value = Data.tuning.creature.maxLevel
 	lvl.value = 1
-	var shiny := CheckButton.new()
+	var shiny := ToggleSwitch.new()
 	shiny.text = "Shiny"
 	# form comes from level: picking a form sets the level to where that form starts, and typing a level
 	# shows the form it gives
