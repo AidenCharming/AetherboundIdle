@@ -424,3 +424,25 @@ func test_thorns_stop_a_multi_target_ability() -> void:
 	var hits := events.filter(func(e): return e.type == "hit" and e.side == 0 and e.from == 0)
 	t.eq(hits.size(), 1, "only the thorned target was hit")
 	t.ok(not att.alive, "the attacker went down")
+
+
+## Developer tools: the next wave can be forced to the boss, a shiny or the island's rarest rarity.
+func test_dev_next_wave() -> void:
+	var s := GameState.new_game()
+	var rng := _rng()
+	t.ok(Expedition.dev_next_wave(s, "boss") != "", "refused with no expedition")
+	Expedition.set_party_member(s, 0, s.creatures.values()[0])
+	Expedition.start(s, "whisperleaf-hollow", rng)
+	var z: Dictionary = Data.zones["whisperleaf-hollow"]
+	for kind in ["shiny", "rare", "boss"]:
+		t.eq(Expedition.dev_next_wave(s, kind), "", kind)
+		Expedition.step(s, 1.0, rng)
+		var first: Dictionary = s.expedition.battle.enemies[0]
+		match kind:
+			"shiny":
+				t.ok(first.shiny, "a shiny leads the wave")
+			"rare":
+				t.eq(int(first.rarity), (z.rarityWeights as Array).size(), "the rarest rarity leads the wave")
+			"boss":
+				t.ok(first.get("boss", false), "the boss wave")
+	t.ok(Expedition.dev_next_wave(s, "nope") != "", "an unknown kind is refused")

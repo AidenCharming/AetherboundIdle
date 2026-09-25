@@ -775,6 +775,15 @@ func dev_grant_all(species_id := "") -> int:
 	return n
 
 
+func dev_next_wave(kind: String) -> void:
+	var err := Expedition.dev_next_wave(state, kind)
+	if err != "":
+		warn(err)
+		return
+	info("Next wave: %s" % kind, Data.ui_icon("shiny"))
+	changed.emit()
+
+
 func dev_add(id: String, qty: float) -> void:
 	GameState.add_item(state, id, qty)
 	changed.emit()

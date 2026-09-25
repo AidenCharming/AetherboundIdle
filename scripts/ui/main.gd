@@ -625,6 +625,12 @@ func _dev_modal() -> void:
 		for it in Data.item_list:
 			Game.dev_add(it.id, 50)))
 	v.add_child(res)
+	v.add_child(UI.label("Expedition", "H3"))
+	var ex := UI.flow(8, 8)
+	for pair in [["boss", "Next wave: boss"], ["shiny", "Next wave: a shiny"], ["rare", "Next wave: the rarest rarity"]]:
+		ex.add_child(UI.button(pair[1], "", func(): Game.dev_next_wave(pair[0])))
+	ex.add_child(UI.button("Rarity preview", "", func(): RarityPreview.open()))
+	v.add_child(ex)
 	v.add_child(UI.label("Time", "H3"))
 	var ff := UI.flow(8, 8)
 	for h in [1, 4, 12]:

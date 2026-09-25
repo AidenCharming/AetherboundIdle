@@ -90,6 +90,20 @@ static func stop(s: Dictionary) -> void:
 	s.expedition.battle = {}
 
 
+## Developer tools: end the current wave at once and make the next one a boss, a shiny or the island's rarest
+## rarity. Returns an error, or "".
+static func dev_next_wave(s: Dictionary, kind: String) -> String:
+	if not is_running(s) or s.expedition.battle.is_empty():
+		return "Start an expedition first."
+	if not kind in ["boss", "shiny", "rare"]:
+		return "No such wave."
+	var b: Dictionary = s.expedition.battle
+	b.devNext = kind
+	b.phase = "gap"
+	b.timer = 0.0
+	return ""
+
+
 static func _new_run(s: Dictionary, _rng: RandomNumberGenerator) -> void:
 	var z: Dictionary = Data.zones[s.expedition.zone]
 	var party := GameState.party(s)
@@ -105,6 +119,12 @@ static func _new_run(s: Dictionary, _rng: RandomNumberGenerator) -> void:
 static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array) -> void:
 	var b: Dictionary = s.expedition.battle
 	var z: Dictionary = Data.zones[b.zone]
+	var dev: String = b.get("devNext", "")   # developer tools: force the next wave (see dev_next_wave)
+	b.erase("devNext")
+	if dev == "boss":
+		b.wave = int(b.waves) - 1
+	elif dev != "" and int(b.wave) + 1 >= int(b.waves):
+		b.wave = 0
 	b.wave = int(b.wave) + 1
 	b.enemies = []
 	if int(b.wave) >= int(b.waves):
@@ -115,6 +135,10 @@ static func _spawn_wave(s: Dictionary, rng: RandomNumberGenerator, events: Array
 		var count: int = Rng.pick(rng, z.enemiesPerWave)
 		for i in count:
 			var w := roll_wild(s, z, rng)
+			if i == 0 and dev == "shiny":
+				w.shiny = true
+			elif i == 0 and dev == "rare":
+				w.rarity = (z.rarityWeights as Array).size()
 			var mult := {"health": z.enemyMult, "power": z.enemyMult, "guard": z.enemyMult}
 			var f := Combat.wild(w.species, w.level, w.rarity, w.shiny, mult, "", "", int(w.form))
 			b.enemies.append(f)
