@@ -164,12 +164,14 @@ func _layout() -> void:
 
 
 func _process(delta: float) -> void:
-	if plate and not silhouette and Data.rarity_animated(rarity) and is_visible_in_tree():
+	# a portrait scrolled out of view is still "visible in tree": a late Creaturedex has dozens of animated ones
+	var on_screen := is_visible_in_tree() and get_global_rect().intersects(get_viewport_rect())
+	if plate and not silhouette and Data.rarity_animated(rarity) and on_screen:
 		queue_redraw()
-	if shiny and not silhouette and is_visible_in_tree() and _glints:
+	if shiny and not silhouette and on_screen and _glints:
 		_twinkle_t += delta
 		_glints.queue_redraw()
-	if not bob or not _art or not is_visible_in_tree():
+	if not bob or not _art or not on_screen:
 		return
 	if Options.get_value("reduce_motion"):
 		return

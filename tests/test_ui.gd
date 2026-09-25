@@ -1055,13 +1055,14 @@ func test_aetherlog_species_page_shows_one_form_at_a_time() -> void:
 	s.collection.species.erase(sp.id)
 	var m: Modal = AetherlogScreen._detail(sp)
 	t.eq(big_form.call(m), 1, "an unseen species opens on Form 1")
-	t.eq(thumbs.call(m).size(), 3, "three form thumbnails")
+	t.eq(thumbs.call(m).size(), 0, "no thumbnails: its later forms stay hidden")
 	t.ok(_find_label(m, sp.forms[0].name) == null, "an unseen species keeps its name hidden")
 	_teardown()
 	# seen, not owned
 	s.collection.seen[sp.id] = true
 	m = AetherlogScreen._detail(sp)
 	t.eq(big_form.call(m), 1, "a seen species opens on Form 1")
+	t.eq(thumbs.call(m).size(), 3, "three form thumbnails")
 	t.ok(_find_label(m, "Form 1") != null, "a form not found yet is named by its number")
 	_teardown()
 	# owned up to Form 2: opens there, its description is shown, and a click on Form 3 swaps
@@ -1110,6 +1111,8 @@ func test_aetherlog_cards_show_chosen_form_rarity_and_shiny() -> void:
 	_find_button(screen, "Form 3").pressed.emit()
 	p = card.call()
 	t.eq([p.form, p.silhouette, p.shiny], [3, true, false], "a form not found is a plain silhouette")
+	var unseen: Array = screen.find_children("*", "CreaturePortrait", true, false).filter(func(x): return x.has_meta("card_portrait") and not x.is_queued_for_deletion() and not s.collection.seen.has(x.species))
+	t.ok(not unseen.is_empty() and unseen.all(func(x): return x.form == 1), "a species never seen keeps its Form 1 shape")
 	_find_button(screen, "Form 1").pressed.emit()
 	_find_button(screen, "Highest rarity").pressed.emit()
 	_find_button(screen, "Shiny").pressed.emit()

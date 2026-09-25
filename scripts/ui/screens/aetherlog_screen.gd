@@ -130,7 +130,8 @@ func _entry(sp: Dictionary) -> Control:
 	var best_form := 1
 	for f in entry.get("forms", []):
 		best_form = maxi(best_form, int(f))
-	var form := show_form if show_form > 0 else best_form
+	# a species never seen shows only its Form 1 shape, whichever form the bar asks for
+	var form := show_form if show_form > 0 and seen else best_form
 	var have: bool = form in entry.get("forms", [])
 	var top_rarity := 1
 	if show_rarity and have:
@@ -188,7 +189,8 @@ static func _detail(sp: Dictionary) -> Modal:
 	for f in entry.get("forms", []):
 		best_form = maxi(best_form, int(f))
 	var parts := {"big": big_box, "text": form_box, "thumbs": thumbs}
-	for f in [1, 2, 3]:
+	# a species never seen keeps its later forms hidden: no thumbnails, just the Form 1 shape
+	for f in ([1, 2, 3] if seen else []):
 		var b := UI.button("", "Tile")
 		b.custom_minimum_size = Vector2(88, 88)
 		b.set_meta("form", f)
