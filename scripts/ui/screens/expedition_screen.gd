@@ -477,7 +477,7 @@ func _bottom_into(tab: String, parent: VBoxContainer) -> void:
 	en.toggled.connect(func(on): Game.state.expedition.autobind.enabled = on)
 	bv.add_child(en)
 	var ns := ToggleSwitch.new()
-	ns.text = "Always try new species"
+	ns.text = "Always try new forms"
 	ns.button_pressed = bool(ab.get("newSpecies", true))
 	ns.toggled.connect(func(on): Game.state.expedition.autobind.newSpecies = on)
 	bv.add_child(ns)

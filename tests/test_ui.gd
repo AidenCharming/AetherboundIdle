@@ -1070,6 +1070,7 @@ func test_aetherlog_species_page_shows_one_form_at_a_time() -> void:
 	var c := Creatures.make(s, sp.id, 1, 25, false, [], "test")
 	s.creatures[c.id] = c
 	Collection.on_owned(s, c)
+	Collection.on_owned(s, Creatures.make(s, sp.id, 1, 1, false, [], "test"))   # Form 1 had too (it caught up from there)
 	m = AetherlogScreen._detail(sp)
 	t.eq(big_form.call(m), 2, "opens on the highest form found")
 	t.ok(_find_label(m, sp.forms[0].name) != null and _find_label(m, "Form 3") != null, "found forms show their names under the thumbnails")
@@ -1098,6 +1099,7 @@ func test_aetherlog_cards_show_chosen_form_rarity_and_shiny() -> void:
 	var c := Creatures.make(s, "emberfang", 3, 25, true, [], "test")
 	s.creatures[c.id] = c
 	Collection.on_owned(s, c)
+	Collection.on_owned(s, Creatures.make(s, "emberfang", 1, 1, false, [], "test"))
 	AetherlogScreen.tab = "dex"
 	var main := _main()
 	_teardown()

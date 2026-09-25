@@ -137,8 +137,8 @@ func test_kill_xp_is_shared_by_the_party() -> void:
 	t.near(float(first.xp) - before, 7.5, 0.001, "two share it in halves")
 
 
-## Playtest question: catching a Form 2 must not mark its Form 1 as owned (the island list and wild name tags
-## show the mark per form). Evolving into a form, or an old save's roster, counts.
+## Designer's rule: catching a Form 2 doesn't count its Form 1 as found (the log, the owned mark on the island
+## list and wild name tags, auto-bind's "new forms"). Evolving into a form, or an old save's roster, counts.
 func test_owned_mark_is_per_form() -> void:
 	var s := GameState.new_game()
 	var c := Creatures.make(s, "emberfang", 1, 30, false, [], "test")
@@ -148,10 +148,15 @@ func test_owned_mark_is_per_form() -> void:
 	Collection.on_owned(s, c)
 	t.ok(Collection.is_form_owned(s, "emberfang", form), "the caught form is marked")
 	t.ok(not Collection.is_form_owned(s, "emberfang", 1), "its Form 1 isn't")
-	t.ok(1 in s.collection.species.emberfang.forms, "though the log still shows Form 1 as found")
-	s.collection.species.emberfang.erase("ownedForms")
+	t.eq(s.collection.species.emberfang.forms, [form], "and the log doesn't count Form 1 as found")
+	t.ok(Expedition.wants_bind(s, {"species": "emberfang", "rarity": 1, "shiny": false, "form": 1}), "auto-bind tries a form never had")
+	t.ok(not Expedition.wants_bind(s, {"species": "emberfang", "rarity": 1, "shiny": false, "form": form}), "but not a Dim of one already had")
+	# an old save logged every lower form: it keeps the highest and the roster's
+	s.collection.species.emberfang.forms = [1, 2, 3]
+	s.version = 3
+	c.form = 1
 	Collection.migrate(s)
-	t.eq(s.collection.species.emberfang.ownedForms, [form], "an old save starts from the roster's forms")
+	t.eq(s.collection.species.emberfang.forms, [3, 1], "an old save keeps its highest form and the roster's")
 
 
 func test_first_of_a_type_binds_free() -> void:

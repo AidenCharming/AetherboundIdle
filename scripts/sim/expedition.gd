@@ -320,33 +320,35 @@ static func bind_chance(s: Dictionary, vessel_id: String, rarity: int, party: Ar
 	return clampf(float(v.base) * pow(float(v.falloff), rarity - 1) * (1.0 + bonus), 0.0, 0.98)
 
 
-## How many of a species the player owns and the best rarity among them: [count, best rarity].
-static func owned_copies(s: Dictionary, species_id: String, cache: Dictionary = {}) -> Array:
-	if cache.has(species_id):
-		return cache[species_id]
+## How many of a species' form the player owns and the best rarity among them: [count, best rarity].
+static func owned_copies(s: Dictionary, species_id: String, form: int, cache: Dictionary = {}) -> Array:
+	var key := "%s/%d" % [species_id, form]
+	if cache.has(key):
+		return cache[key]
 	var n := 0
 	var best := 0
 	for c in s.creatures.values():
-		if c.species == species_id:
+		if c.species == species_id and Creatures.form_of(c) == form:
 			n += 1
 			best = maxi(best, int(c.rarity))
-	cache[species_id] = [n, best]
-	return cache[species_id]
+	cache[key] = [n, best]
+	return cache[key]
 
 
-## The auto-bind rules: shinies always; new species if that box is ticked; otherwise the minimum rarity,
-## and no more than `maxCopies` of a species unless the new one is rarer than the best one owned.
+## The auto-bind rules, all per form: shinies always; forms never had if that box is ticked; otherwise the
+## minimum rarity, and no more than `maxCopies` of a form unless the new one is rarer than the best one owned.
 static func wants_bind(s: Dictionary, w: Dictionary, cache: Dictionary = {}) -> bool:
 	var ab: Dictionary = s.expedition.autobind
 	if w.get("shiny", false):
 		return true
 	if not ab.get("enabled", true):
 		return false
-	if ab.get("newSpecies", true) and not Collection.is_owned(s, w.species):
+	var form := int(w.get("form", 1))
+	if ab.get("newSpecies", true) and not Collection.is_form_owned(s, w.species, form):
 		return true
 	if int(w.rarity) < int(ab.get("minRarity", 1)):
 		return false
-	var owned := owned_copies(s, w.species, cache)
+	var owned := owned_copies(s, w.species, form, cache)
 	return owned[0] < int(ab.get("maxCopies", 5)) or int(w.rarity) > int(owned[1])
 
 
@@ -558,7 +560,7 @@ static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int
 			var before: int = s.creatures.size()
 			try_capture(s, w, party, rng, events, fake_battle)
 			if s.creatures.size() != before:
-				cache.erase(w.species)
+				cache.erase("%s/%d" % [w.species, int(w.form)])
 	s.counters.kills = int(s.counters.kills) + n
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + n

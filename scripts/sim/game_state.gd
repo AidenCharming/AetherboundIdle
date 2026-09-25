@@ -3,7 +3,8 @@ extends RefCounted
 ## The shape of a save, new-game setup, inventory helpers and save migration.
 ## The whole game is one Dictionary so it serialises straight to JSON.
 
-const SAVE_VERSION := 3  # 2: creature XP curve changed; 3: skill and creature curves retuned (levels kept, see migrate)
+const SAVE_VERSION := 4  # 2: creature XP curve changed; 3: skill and creature curves retuned (levels kept, see migrate);
+                         # 4: the Aether-Log keeps only forms actually had (Collection.migrate)
 
 
 static func new_game(seed_value: int = 0) -> Dictionary:
