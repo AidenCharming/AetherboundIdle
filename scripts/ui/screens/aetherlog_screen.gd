@@ -275,18 +275,18 @@ func _milestones() -> void:
 			var m: Dictionary = t.milestones[i]
 			var target := Collection.milestone_target(t.id, m)
 			var claimed := Collection.is_claimed(s, t.id, i)
-			var ready := not claimed and p >= target
+			var claimable := not claimed and p >= target
 			# one card per milestone: the goal on top, each reward on its own line, the state at the bottom
 			var mc := PanelContainer.new()
-			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not ready else Color(Palette.GOLD, 0.10), 14, 1,
-				Color(Palette.GOLD, 0.7) if ready else Palette.LINE, 14)
+			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not claimable else Color(Palette.GOLD, 0.10), 14, 1,
+				Color(Palette.GOLD, 0.7) if claimable else Palette.LINE, 14)
 			sb.content_margin_top = 12
 			sb.content_margin_bottom = 12
 			mc.add_theme_stylebox_override("panel", sb)
 			mc.custom_minimum_size.x = 150
 			var mv := UI.vbox(8)
 			mc.add_child(mv)
-			var title := UI.label("All %d" % target if str(m.at) == "all" else "At %d" % target, "H3", Palette.GOLD if ready else Palette.TEXT)
+			var title := UI.label("All %d" % target if str(m.at) == "all" else "At %d" % target, "H3", Palette.GOLD if claimable else Palette.TEXT)
 			mv.add_child(title)
 			var mbar := UI.bar(Palette.GOOD if claimed else Palette.AETHER, 4)
 			mbar.value = clampf(float(p) / maxf(1.0, float(target)), 0.0, 1.0)
@@ -311,7 +311,7 @@ func _milestones() -> void:
 			if claimed:
 				mv.add_child(UI.label("✓ Claimed", "Small", Palette.GOOD))
 				mc.modulate.a = 0.6
-			elif ready:
+			elif claimable:
 				mv.add_child(UI.button("Claim", "Gold", func(): Game.claim_milestone(t.id, i)))
 			else:
 				mv.add_child(UI.chip("%d to go" % (target - p), Palette.AETHER, 11))
