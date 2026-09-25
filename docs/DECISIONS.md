@@ -15,9 +15,10 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   in the standard (non-.NET) editor.
 - **Renderer: GL Compatibility.** It is a 2D UI game; Compatibility runs on older laptops and integrated
   GPUs and starts faster than Forward+.
-- **Base resolution 1600×900**, `canvas_items` stretch with `expand`, so it reflows from 1280×720 to 4K.
+- **Base resolution 1920×1080** (was 1600×900 until 0.5.0; every UI size was raised ×1.2 then, so the most common
+  screen draws 1:1 instead of stretched 1.2×), `canvas_items` stretch with `expand`, so it reflows from 1280×720 to 4K.
   Options has window mode, window size, VSync, a frame-rate cap and an interface scale.
-  - **2D transforms snap to whole pixels.** At 1920×1080 the UI is scaled 1.2×, and without snapping some
+  - **2D transforms snap to whole pixels.** At 1920×1080 the old 1600 layout was scaled 1.2×, and without snapping some
     glyphs land on pixel edges (sharp) and others between them (soft), so text looked unevenly blurry.
     Movement now steps in whole screen pixels.
   - **Wrapping labels are measured again when the window changes size.** A wrapping label measured
@@ -28,7 +29,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
     screen's own size.
   - **Nothing may widen a screen.** Screen header subtitles wrap instead of forcing a width (the Nexus
     header once pushed the detail panel off the right edge), and zone card lines end in "…". A test
-    checks every screen's minimum width fits beside the sidebar at 1600.
+    checks every screen's minimum width fits beside the sidebar at 1920.
 - **Content is JSON under `godot/data/`**, loaded once by the `Data` autoload; balance numbers are in
   `data/tuning.json`. Adding a species, item, action, zone, upgrade or goal is a data change.
 - **Speed:** a busy mid-game save (13 workers across every skill plus an expedition) resolves a full
@@ -768,3 +769,7 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 - Open question for the designer (ask before the sharpness work): move the base layout from 1600x900 to 1920x1080,
   most players' resolution, so it draws 1:1 there instead of stretched 1.2x. It would make everything ~17% smaller
   unless sizes are raised to match.
+- **1920×1080 base (0.5.0).** The designer chose "same size, sharper" over a smaller UI with more room. Every size
+  literal in `scripts/ui/` (theme fonts and boxes, helper arguments and defaults, overrides, minimum sizes, offsets,
+  drawn pixels, tween distances) was raised ×1.2 and rounded to whole pixels; `project.godot` is 1920×1080. The
+  default window stays 1600×900 (a 1920 window doesn't fit a 1080p desktop with a taskbar). 155 tests.
