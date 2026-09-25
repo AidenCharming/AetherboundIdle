@@ -81,7 +81,7 @@ func _fill_grid() -> void:
 			continue
 		any = true
 		var b := UI.button("", "TileOn" if it.id == selected else "Tile")
-		b.custom_minimum_size = Vector2(112, 124)
+		b.custom_minimum_size = Vector2(112, 128)
 		b.tooltip_text = it.name
 		b.pressed.connect(func():
 			selected = it.id
@@ -89,8 +89,9 @@ func _fill_grid() -> void:
 		var v := UI.vbox(2)
 		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		v.offset_top = 10
-		v.offset_bottom = -8
+		v.offset_top = 16
+		v.offset_bottom = -6
+		v.add_theme_constant_override("separation", 4)
 		var ic := UI.icon(Data.item_icon(it.id), 58)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(ic)
@@ -99,15 +100,24 @@ func _fill_grid() -> void:
 			lk.position = Vector2(86, 6)
 			lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			b.add_child(lk)
-		var nl := UI.label(F.format_num(n), "Num")
-		nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		v.add_child(nl)
-		var name_lbl := UI.label(it.name, "Faint")
+		# the name: bright, bold and allowed two lines, so "Verdant Seedcache" isn't cut to "Verdant Seedcac…"
+		var name_lbl := UI.label(it.name, "", Palette.TEXT if it.id == selected else Palette.TEXT_DIM.lightened(0.15))
+		name_lbl.add_theme_font_override("font", ThemeFactory.bold_font())
+		name_lbl.add_theme_font_size_override("font_size", 13)
+		name_lbl.add_theme_constant_override("line_spacing", -2)
 		name_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		name_lbl.clip_text = true
+		name_lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		name_lbl.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		name_lbl.max_lines_visible = 2
 		name_lbl.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+		name_lbl.custom_minimum_size = Vector2(100, 40)
 		v.add_child(name_lbl)
 		b.add_child(v)
+		# how many, as a pill on the top-left corner of the tile
+		var count := UI.chip(F.format_num(n), Palette.GOLD if it.category in ["rare", "treasure"] else Palette.AETHER, 12)
+		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		count.position = Vector2(6, 6)
+		b.add_child(count)
 		_grid.add_child(b)
 	if not any:
 		_grid.add_child(UI.label("Nothing here yet.", "Dim"))
