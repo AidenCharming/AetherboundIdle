@@ -16,6 +16,10 @@ var _hover := false
 func _ready() -> void:
 	_t = 1.0 if button_pressed else 0.0
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	# the switch must never cover the text: room for both, whatever the theme's icon allowance is
+	if text != "":
+		var fs := get_theme_font_size("font_size")
+		custom_minimum_size.x = maxf(custom_minimum_size.x, get_theme_font("font").get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x + W + 12.0)
 	toggled.connect(_slide)
 	mouse_entered.connect(func():
 		_hover = true
