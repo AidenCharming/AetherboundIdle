@@ -38,6 +38,13 @@ func _shot(name: String) -> void:
 	print("shot ", name)
 
 
+func _tip_label(text: String) -> Label:
+	var l := Label.new()
+	l.theme_type_variation = "TooltipLabel"
+	l.text = text
+	return l
+
+
 func _wait(sec: float) -> void:
 	await get_tree().create_timer(sec).timeout
 
@@ -131,6 +138,20 @@ func _run() -> void:
 		await _shot("folded")
 		Main.instance._screen._set_open("exp_log_open", true)
 		Main.instance._screen._set_open("exp_zones_open", true)
+	if _want("tooltip"):
+		# tooltips can't be hovered here: draw the two kinds in their themed panel instead
+		var row := UI.hbox(24)
+		row.position = Vector2(420, 200)
+		for content in [UI.item_tooltip("oak-log"), UI.item_tooltip("timber-frame"), _tip_label("A Faint Brambletrundle broke free of a Tinker's Vessel · 41% chance")]:
+			var p := PanelContainer.new()
+			p.theme_type_variation = "TooltipPanel"
+			p.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+			p.add_child(content)
+			row.add_child(p)
+		Main.instance.add_child(row)
+		await _wait(0.4)
+		await _shot("tooltip")
+		row.queue_free()
 	if _want("attune"):
 		Main.go("nexus")
 		await _wait(0.4)
