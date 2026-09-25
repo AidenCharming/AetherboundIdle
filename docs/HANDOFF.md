@@ -57,7 +57,7 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
   estimated share of the 5-hour usage in its title, e.g. `[40%] Fix X (est. +3%)`. Keep one task in progress,
   and after each finished task post a one-line progress note (tasks done, overall %, ETA). The designer reports
   their usage %; use it to re-estimate.
-- Godot 4.7 GDScript, GL Compatibility, base size 1920×1080 (default window 1600×900), UI built in code.
+- Godot 4.7 GDScript, GL Compatibility, base size 1920×1080 (first-run window: the largest that fits the screen, up to 1920×1080, with larger text below that), UI built in code.
   Autoloads: Options, Data, Sfx, Music, Game, TestBridge. The sim is pure static functions in `scripts/sim/`, the
   UI is in `scripts/ui/`, content and balance are JSON in `data/`. Never hardcode balance numbers.
 - Commit as you go. Keep the test count in `docs/DECISIONS.md` current, and add a `docs/CHANGELOG.md` entry for

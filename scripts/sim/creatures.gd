@@ -91,7 +91,8 @@ static func stats(c: Dictionary) -> Dictionary:
 ## A single number for sorting and party suggestions.
 static func power_rating(c: Dictionary) -> float:
 	var s := stats(c)
-	return s.health * 0.2 + s.power * 1.0 + s.guard * 0.8
+	var w: Dictionary = Data.tuning.creature.powerRating
+	return s.health * float(w.health) + s.power * float(w.power) + s.guard * float(w.guard)
 
 
 ## Adds creature XP. Returns events: level_up and evolved. A creature crossing a form's level evolves to it;

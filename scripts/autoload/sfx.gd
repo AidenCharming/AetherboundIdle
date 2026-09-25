@@ -71,8 +71,14 @@ func _ready() -> void:
 	_streams.whoosh = _render([[400, 0.0, 0.25, "noise", 0.12]])
 
 
-func play(sound: String, pitch := 1.0) -> void:
-	if not enabled(sound):
+## Every sound's name (the Rarity preview lists them).
+func sound_names() -> Array:
+	return _streams.keys()
+
+
+## Plays a sound unless its group is switched off; `always` plays it anyway (a preview the player asked for).
+func play(sound: String, pitch := 1.0, always := false) -> void:
+	if not always and not enabled(sound):
 		return
 	last_played = sound
 	# headless runs (tests, exports) have no audio output, and sounds left playing at exit show up as leaks

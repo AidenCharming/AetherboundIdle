@@ -1,6 +1,11 @@
 {
 	"creature": {
 		"maxLevel": 100,
+		"powerRating": {
+			"health": 0.2,
+			"power": 1.0,
+			"guard": 0.8
+		},
 		"formLevels": [
 			1,
 			20,

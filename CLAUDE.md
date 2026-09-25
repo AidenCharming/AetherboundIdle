@@ -2,7 +2,7 @@
 
 A creature-collecting idle game in the style of Melvor Idle: collect **Aetherlings**, put them to work in
 skills, breed rarer and hybrid forms, and send a party on idle-combat expeditions to bind wild ones. Built in
-**Godot 4.7** (GDScript, GL Compatibility, 1600×900, UI built in code). The old web version is archived on the
+**Godot 4.7** (GDScript, GL Compatibility, 1920×1080 layout, UI built in code). The old web version is archived on the
 `web-archive` branch; its docs are in `docs/archive/web-build/` (history only).
 
 ## Read these first
@@ -65,7 +65,7 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
 | Screenshot tour | `godot --path . res://tests/tour.tscn -- --out=DIR [--only=market,nexus,...]` (overwrites save slot 3) |
 | Pacing probe (~40 s) | `godot --headless --path . res://tests/month_probe.tscn -- --days=35 [--calibrate]` |
 | Test bridge | `python tools/bridge.py launch` then `new`, `buttons`, `click "…"`, `errors`, `screenshot`, `monkey` (plays in slot 2, "Autoplay Slot") |
-| Bug-test benchmark (~10 min) | `python tools/bridge.py run bugtest_benchmark [--minutes N] [--movie]` (report in `bridge_runs/`; cloud: start the game under `xvfb-run -a -s "-screen 0 1600x900x24"` first) |
+| Bug-test benchmark (~10 min) | `python tools/bridge.py run bugtest_benchmark [--minutes N] [--movie]` (report in `bridge_runs/`; cloud: start the game under `xvfb-run -a -s "-screen 0 1920x1080x24"` first) |
 | Icon placeholders | `python3 tools/make_icons.py` |
 | Windows exe | Editor: Project > Export > Windows Desktop (see README), or `build-exe.bat` |
 

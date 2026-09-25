@@ -163,12 +163,24 @@ func flush() -> void:
 		save_options()
 
 
+## First run: the largest window that fits the screen with room to spare (1920x1080 at most, the layout's own
+## size), and larger text when that window is smaller, since the 1920x1080 layout shrinks with it (to 83% at
+## 1600x900, the usual pick on a 1080p screen, and 67% at 1280x720).
+func first_run_defaults(screen: Vector2i) -> Dictionary:
+	var res := 0
+	for i in RESOLUTIONS.size():
+		var r: Vector2i = RESOLUTIONS[i]
+		if r.x <= 1920 and r.x <= screen.x * 0.9 and r.y <= screen.y * 0.9:
+			res = i
+	return {"resolution": res, "ui_scale": 2 if RESOLUTIONS[res].y < 1080 else 1}
+
+
 func load_options() -> void:
 	var cfg := ConfigFile.new()
 	if cfg.load(PATH) != OK:
-		# First run on a small screen: the 1920x1080 layout shrinks to 67% at 1280x720, so start the text larger.
-		if DisplayServer.get_name() != "headless" and DisplayServer.screen_get_size().x <= 1440:
-			values.ui_scale = 2
+		if DisplayServer.get_name() != "headless":
+			var screen := DisplayServer.screen_get_usable_rect(DisplayServer.window_get_current_screen()).size
+			values.merge(first_run_defaults(screen), true)
 		return
 	for k in values:
 		if cfg.has_section_key("options", k):

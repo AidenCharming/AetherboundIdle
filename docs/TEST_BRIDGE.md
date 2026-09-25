@@ -37,7 +37,7 @@ Or start the game yourself: `Godot.exe --path . -- --bridge`.
 | `invariants` | Broken rules in the save: gold/Aether/items finite and ≥ 0, workers ≤ slots, nobody in two jobs, party consistent, pods, levels |
 | `breed_check` | `raw '{"cmd":"breed_check","pairs":[["c1","c2"]],"tier":1}'`: whether each pair can lay an egg, the cost and what could hatch (new to the log?) |
 | `focus` | Act as if the window had focus (lifts the background frame-rate cap), as a player looking at it |
-| `click_at <x> <y>` | A real click at a point in the game's 1600×900 layout (the `x,y` that `buttons` reports) |
+| `click_at <x> <y>` | A real click at a point in the game's 1920×1080 layout (the `x,y` that `buttons` reports) |
 | `scroll <x> <y> [steps]` | Mouse-wheel at a point; positive steps scroll down |
 | `key <name>` | A key press: `Escape`, `Enter`, `1` … `9` and `F1` … `F11` (page shortcuts by default: 1-9 the pages in sidebar order, F-keys the skills; players can change them in Options > Controls) |
 | `go <screen> [arg]` | Jump to a page without clicking: `sanctum`, `skill woodcutting`, `nexus`, `pods`, `expeditions`, `aetherlog`, `inventory`, `market`, `eggmarket`, `works` |

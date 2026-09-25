@@ -1123,3 +1123,15 @@ func test_aetherlog_cards_show_chosen_form_rarity_and_shiny() -> void:
 	AetherlogScreen.show_shiny = true
 	main.free()
 	_teardown()
+
+
+## First run picks the largest window that fits the screen (1920x1080 at most) and larger text when that window
+## is smaller than the 1920x1080 layout (review 3 #8, HANDOFF: small text in small windows).
+func test_first_run_window_and_text_size_follow_the_screen() -> void:
+	var at := func(w: int, h: int) -> Array:
+		var d := Options.first_run_defaults(Vector2i(w, h))
+		return [Options.RESOLUTIONS[d.resolution], Options.UI_SCALES[d.ui_scale]]
+	t.eq(at.call(1920, 1040), [Vector2i(1600, 900), 1.15], "a 1080p screen: 1600x900 with larger text")
+	t.eq(at.call(2560, 1400), [Vector2i(1920, 1080), 1.0], "a 1440p screen: the full layout at normal text")
+	t.eq(at.call(3840, 2100), [Vector2i(1920, 1080), 1.0], "a 4K screen: no bigger than the layout")
+	t.eq(at.call(1366, 728), [Vector2i(1280, 720), 1.15], "a small laptop: the smallest window, larger text")

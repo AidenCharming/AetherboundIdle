@@ -41,9 +41,9 @@ static func open() -> void:
 	fill.call()
 	v.add_child(UI.label("Sounds", "H3"))
 	var sounds := UI.flow(7, 7)
-	var names: Array = Sfx._streams.keys()
+	var names: Array = Sfx.sound_names()
 	names.sort()
 	for sound in names:
-		sounds.add_child(UI.button(sound, "Chip", func(): Sfx.play(sound)))
+		sounds.add_child(UI.button(sound, "Chip", func(): Sfx.play(sound, 1.0, true)))
 	v.add_child(sounds)
 	Modal.open(v, "Rarity preview", 1392)
