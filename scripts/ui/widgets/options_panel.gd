@@ -1,11 +1,13 @@
 class_name OptionsPanel
 extends VBoxContainer
-## The Options screen: Audio, Display and Gameplay tabs. Every change applies at once and is saved to
+## The Options screen: Audio, Display, Gameplay and Controls tabs. Every change applies at once and is saved to
 ## user://options.cfg by the Options autoload.
 
 var _tabs: HBoxContainer
 var _page: VBoxContainer
 var _current := "audio"
+var _capturing := ""   # the tab waiting for a new key in Controls, or ""
+const PAGES := [["audio", "Audio"], ["display", "Display"], ["gameplay", "Gameplay"], ["controls", "Controls"]]
 
 
 static func open_modal() -> Modal:
@@ -18,7 +20,7 @@ func _ready() -> void:
 	custom_minimum_size = Vector2(660, 460)
 	_tabs = UI.hbox(8)
 	add_child(_tabs)
-	for pair in [["audio", "Audio"], ["display", "Display"], ["gameplay", "Gameplay"]]:
+	for pair in PAGES:
 		var b := UI.button(pair[1], "ChipOn" if pair[0] == _current else "Chip")
 		b.pressed.connect(func():
 			_current = pair[0]
@@ -31,7 +33,7 @@ func _ready() -> void:
 
 func _rebuild() -> void:
 	for i in _tabs.get_child_count():
-		_tabs.get_child(i).theme_type_variation = "ChipOn" if ["audio", "display", "gameplay"][i] == _current else "Chip"
+		_tabs.get_child(i).theme_type_variation = "ChipOn" if PAGES[i][0] == _current else "Chip"
 	UI.clear(_page)
 	match _current:
 		"audio":
@@ -63,7 +65,60 @@ func _rebuild() -> void:
 			_toggle("Screen shake on big moments", "screen_shake")
 			_toggle("Toast notifications", "toasts")
 			_toggle("Developer tools in the pause menu (for testing)", "dev_tools")
-			_page.add_child(UI.label("Shortcuts: 1 Sanctum · 2 Nexus · 3 Genesis Pods · 4 Expeditions · 5 Aether-Log · 6 Inventory · 7 Sanctum Works · Esc menu", "Faint"))
+		"controls":
+			_controls_page()
+
+
+## Controls: one row per page of the sidebar with the key that opens it. Click a key, then press the new
+## one (Esc cancels, Backspace clears). A key already used moves to this page.
+func _controls_page() -> void:
+	_page.add_child(_note("Each page of the sidebar opens with a key, shown on its tab. Click a key and press a new one: Esc cancels, Backspace or Delete leaves the page without a key. Esc always opens the menu."))
+	var list := UI.vbox(4)
+	for pair in Options.tab_list():
+		var h := UI.hbox(12)
+		var l := UI.label(pair[1])
+		l.custom_minimum_size.x = 250
+		h.add_child(l)
+		var code := Options.keybind(pair[0])
+		var text := "Press a key…" if _capturing == pair[0] else (Options.key_name(code) if code != 0 else "None")
+		var b := UI.button(text, "ChipOn" if _capturing == pair[0] else "Chip")
+		b.custom_minimum_size.x = 150
+		b.focus_mode = Control.FOCUS_NONE
+		b.tooltip_text = "Click, then press the key for %s" % pair[1]
+		var tab: String = pair[0]
+		b.pressed.connect(func():
+			_capturing = "" if _capturing == tab else tab
+			_rebuild())
+		h.add_child(b)
+		list.add_child(h)
+	var sc := UI.scroll(list)
+	sc.custom_minimum_size.y = 300
+	_page.add_child(sc)
+	var row := UI.hbox(10)
+	row.add_child(UI.spacer())
+	row.add_child(UI.button("Reset to defaults", "", func():
+		_capturing = ""
+		Options.reset_keybinds()
+		_rebuild()))
+	_page.add_child(row)
+
+
+## While a key is being chosen, the next key press is the new key and goes nowhere else (not even Esc to
+## the dialog, which would close it).
+func _input(event: InputEvent) -> void:
+	if _capturing == "" or not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	get_viewport().set_input_as_handled()
+	var code: int = event.keycode
+	if code in [KEY_BACKSPACE, KEY_DELETE]:
+		Options.set_keybind(_capturing, 0)
+	elif code in Options.RESERVED_KEYS or code == KEY_NONE:
+		if code != KEY_ESCAPE:
+			return   # a modifier on its own: wait for the real key
+	else:
+		Options.set_keybind(_capturing, code)
+	_capturing = ""
+	_rebuild()
 
 
 ## A wrapped note with a fixed width. A wrapping label that is measured before its container has given
@@ -102,7 +157,7 @@ func _slider(title: String, key: String) -> void:
 
 
 func _toggle(title: String, key: String) -> void:
-	var c := CheckButton.new()
+	var c := ToggleSwitch.new()
 	c.text = title
 	c.button_pressed = bool(Options.get_value(key))
 	c.focus_mode = Control.FOCUS_NONE

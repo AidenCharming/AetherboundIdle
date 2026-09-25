@@ -62,6 +62,14 @@
 					1,
 					2
 				]
+			},
+			{
+				"item": "minnow",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
 			}
 		],
 		"gold": [
@@ -146,6 +154,14 @@
 					1,
 					2
 				]
+			},
+			{
+				"item": "minnow",
+				"chance": 0.3,
+				"qty": [
+					1,
+					2
+				]
 			}
 		],
 		"gold": [
@@ -226,6 +242,22 @@
 			},
 			{
 				"item": "glass-lens",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "minnow",
+				"chance": 0.25,
+				"qty": [
+					1,
+					2
+				]
+			},
+			{
+				"item": "sunfish",
 				"chance": 0.25,
 				"qty": [
 					1,

@@ -75,6 +75,35 @@ static func shatter(s: Dictionary, id: String, qty: int) -> float:
 	return gain
 
 
+## Everything an item is good for besides selling: [{kind, name, ...}] with kind "recipe" (a skill task that uses
+## it, with skill and level), "upgrade" (a Sanctum Works build), "breeding" (a Genesis Pods material), "vessel",
+## "meal" or "shatter". Empty means it is only worth its gold.
+static func uses(id: String) -> Array:
+	var out := []
+	var it: Dictionary = Data.items.get(id, {})
+	if it.is_empty():
+		return out
+	match str(it.category):
+		"vessel":
+			out.append({"kind": "vessel", "name": "Binding wild Aetherlings on expeditions"})
+		"meal":
+			out.append({"kind": "meal", "name": "Healing the party between waves"})
+	if it.has("aether"):
+		out.append({"kind": "shatter", "name": "Shatter into %s Aether" % F.format_num(float(it.aether))})
+	for sk in Data.skill_list:
+		for a in sk.actions:
+			if a.has("inputs") and a.inputs.has(id):
+				out.append({"kind": "recipe", "name": a.name, "skill": sk.id, "level": int(a.level), "qty": int(a.inputs[id])})
+	for u in Data.upgrade_list:
+		for lv in u.levels:
+			if lv.cost.has(id):
+				out.append({"kind": "upgrade", "name": u.name, "id": u.id})
+				break
+	if it.has("element") and it.category != "rare" and Breeding.material(str(it.element), int(it.tier)) == id:
+		out.append({"kind": "breeding", "name": "Tier %d eggs in Genesis Pods (%s parents)" % [int(it.tier), Data.types[it.element].name]})
+	return out
+
+
 static func next_upgrade(s: Dictionary, id: String) -> Dictionary:
 	var u: Dictionary = Data.upgrades[id]
 	var lv := GameState.upgrade_level(s, id)
@@ -168,13 +197,16 @@ static func bulk_release_plan(s: Dictionary, opts: Dictionary) -> Dictionary:
 	return {"list": out, "kept": kept}
 
 
-## A bare number is the highest rarity to release (the old one-choice window).
-static func bulk_release_candidates(s: Dictionary, opts: Variant) -> Array:
-	return bulk_release_plan(s, opts if opts is Dictionary else {"maxRarity": int(opts)}).list
+## `opts` is the options Dictionary, or (the older form) the highest rarity with `under_level` (0: any) the
+## level they must be under.
+static func bulk_release_candidates(s: Dictionary, opts: Variant, under_level := 0) -> Array:
+	if not opts is Dictionary:
+		opts = {"maxRarity": int(opts), "maxLevel": under_level - 1 if under_level > 0 else 0}
+	return bulk_release_plan(s, opts).list
 
 
-static func bulk_release(s: Dictionary, opts: Variant) -> Dictionary:
-	var list := bulk_release_candidates(s, opts)
+static func bulk_release(s: Dictionary, opts: Variant, under_level := 0) -> Dictionary:
+	var list := bulk_release_candidates(s, opts, under_level)
 	var total := 0
 	var count := 0
 	var pearls_before := GameState.count(s, "aether-pearl")

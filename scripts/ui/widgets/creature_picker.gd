@@ -107,7 +107,8 @@ func _fill() -> void:
 		if _perks.is_valid():
 			card.add_perks(_perks.call(c))
 		card.picked.connect(func(id):
-			_on_pick.call(id)
+			if _on_pick.is_valid():   # the screen that opened the picker may be gone
+				_on_pick.call(id)
 			_modal.close())
 		return card)
 

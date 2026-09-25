@@ -74,3 +74,13 @@ static func pick(rng: RandomNumberGenerator, list: Array) -> Variant:
 	if list.is_empty():
 		return null
 	return list[rng.randi_range(0, list.size() - 1)]
+
+
+## Shuffles `arr` in place (Fisher–Yates) with the game's generator. Array.shuffle() uses Godot's global one,
+## which would make the result impossible to reproduce from a seed.
+static func shuffle(rng: RandomNumberGenerator, arr: Array) -> void:
+	for i in range(arr.size() - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var tmp: Variant = arr[i]
+		arr[i] = arr[j]
+		arr[j] = tmp

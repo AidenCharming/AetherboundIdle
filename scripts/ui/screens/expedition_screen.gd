@@ -14,6 +14,8 @@ var _tabs_box: HBoxContainer
 var _controls: HBoxContainer
 var _sky: SkyBackdrop
 var _log_count := -1
+var _log_whens: Array = []   # [{label, tile, time}] the log's "how long ago" texts, refreshed once a second
+var _whens_left := 0.0
 var _party_locked := false
 var _pending_count := -1
 var _bottom_tab := "party"
@@ -276,7 +278,7 @@ func _fill_controls() -> void:
 		lk.tooltip_text = "Defeat %s to open this island." % Data.zones[z.unlockAfter].boss.name
 		lk.mouse_filter = Control.MOUSE_FILTER_PASS
 		_controls.add_child(UI.hbox(6, [UI.icon(Data.ui_icon("lock"), 16), lk]))
-	var rep := CheckButton.new()
+	var rep := ToggleSwitch.new()
 	rep.text = "Repeat"
 	rep.tooltip_text = "Start the next run by itself when one ends."
 	rep.button_pressed = bool(s.expedition.autoRepeat)
@@ -303,14 +305,30 @@ func _fill_right() -> void:
 func _strip(arrow: String, tip: String, tex: Texture2D, on_open: Callable) -> VBoxContainer:
 	var v := UI.vbox(10)
 	v.custom_minimum_size.x = 44
-	var b := _fold_button(arrow, on_open)
+	# one button: the panel's icon with a small arrow on its corner, pointing the way the panel opens
+	var b := _fold_button("", on_open)
+	b.custom_minimum_size = Vector2(42, 46)
 	b.tooltip_text = tip
-	v.add_child(b)
+	var center := CenterContainer.new()
+	center.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	b.add_child(center)
 	var ic := UI.icon(tex, 26)
-	ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
-	ic.tooltip_text = tip
-	ic.mouse_filter = Control.MOUSE_FILTER_PASS
-	v.add_child(ic)
+	ic.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	center.add_child(ic)
+	var arr := UI.label(arrow, "", Palette.AETHER)
+	arr.add_theme_font_size_override("font_size", 18)
+	arr.add_theme_constant_override("outline_size", 6)
+	arr.add_theme_color_override("font_outline_color", Palette.BG_DEEP)
+	arr.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	arr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	arr.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT if arrow == "‹" else HORIZONTAL_ALIGNMENT_RIGHT
+	arr.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
+	arr.offset_left = 2
+	arr.offset_right = -2
+	arr.offset_bottom = 2
+	b.add_child(arr)
+	v.add_child(b)
 	var badge := UI.label("", "Small", Palette.GOLD)
 	badge.name = "Badge"
 	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -385,7 +403,6 @@ func _party_tab() -> VBoxContainer:
 
 ## The panel under the battle: Party, Auto-bind and Supplies, as tabs.
 func _fill_bottom() -> void:
-	var s := Game.state
 	UI.clear(_bind)
 	UI.clear(_tabs_box)
 	var tabs := _tabs_box
@@ -394,10 +411,31 @@ func _fill_bottom() -> void:
 			_bottom_tab = pair[0]
 			_fill_bottom(), Data.ui_icon(pair[2]))
 		tabs.add_child(b)
-	if _bottom_tab == "party":
-		_bind.add_child(_party_tab())
+	# every tab is built and the panel keeps the tallest one's height, so switching tabs doesn't resize it
+	for tab in ["party", "autobind", "supplies"]:
+		var box := UI.vbox(8)
+		box.visible = tab == _bottom_tab
+		_bind.add_child(box)
+		_bottom_into(tab, box)
+	_fit_bottom.call_deferred()
+
+
+func _fit_bottom() -> void:
+	if not is_instance_valid(_bind):
 		return
-	if _bottom_tab == "supplies":
+	var h := 0.0
+	for c in _bind.get_children():
+		h = maxf(h, (c as Control).get_combined_minimum_size().y)
+	_bind.custom_minimum_size.y = h
+
+
+## One tab's content under the battle.
+func _bottom_into(tab: String, parent: VBoxContainer) -> void:
+	var s := Game.state
+	if tab == "party":
+		parent.add_child(_party_tab())
+		return
+	if tab == "supplies":
 		var sv := UI.vbox(8)
 		sv.add_child(UI.wrap_label("Between waves the party eats a meal when anyone drops below %d%% Health. Carries %d meals per run (Supply Crates raise it)." % [roundi(float(Data.tuning.combat.eatBelow) * 100), int(GameState.upgrade_value(s, "supply-crates"))], "Faint", 560))
 		var ob := OptionButton.new()
@@ -410,24 +448,26 @@ func _fill_bottom() -> void:
 		ob.item_selected.connect(func(i): Game.state.expedition.meal = "" if i == 0 else meals[i - 1].id)
 		sv.add_child(ob)
 		if GameState.count(s, Expedition.pick_meal(s)) < 1:
-			sv.add_child(UI.label("No meals: cook some (Cooking needs a Pyric Aetherling)", "Small", Palette.DANGER))
-		_bind.add_child(sv)
+			var nm := UI.wrap_label("No meals. Cook some in Cooking (a Pyric Aetherling): the first islands' wild Aetherlings drop Minnows and Sunfish, and the Market sells fish and meals.", "Small", 560)
+			nm.add_theme_color_override("font_color", Palette.DANGER)
+			sv.add_child(nm)
+		parent.add_child(sv)
 		return
 	var ab: Dictionary = s.expedition.autobind
 	var cols := UI.hbox(16)
-	_bind.add_child(cols)
+	parent.add_child(cols)
 	var bv := UI.vbox(4)
 	bv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	cols.add_child(bv)
 	var bv2 := UI.vbox(6)
 	cols.add_child(bv2)
-	var en := CheckButton.new()
+	var en := ToggleSwitch.new()
 	en.text = "Throw vessels"
 	en.tooltip_text = "After a win the party can throw a vessel. The first of each type you've never owned binds free; shinies are always tried."
 	en.button_pressed = bool(ab.get("enabled", true))
 	en.toggled.connect(func(on): Game.state.expedition.autobind.enabled = on)
 	bv.add_child(en)
-	var ns := CheckButton.new()
+	var ns := ToggleSwitch.new()
 	ns.text = "Always try new species"
 	ns.button_pressed = bool(ab.get("newSpecies", true))
 	ns.toggled.connect(func(on): Game.state.expedition.autobind.newSpecies = on)
@@ -536,7 +576,7 @@ func _pick_party(slot: int) -> void:
 		"best")
 
 
-func _process(_d: float) -> void:
+func _process(d: float) -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
@@ -553,6 +593,24 @@ func _process(_d: float) -> void:
 		_log_count = Game.battle_log.size()
 		_log_top = top
 		_render_log()
+	_whens_left -= d
+	if _whens_left <= 0.0:
+		_whens_left = 1.0
+		_update_whens()
+
+
+## Brings the log's "now" / "3m" texts up to date without rebuilding the cards.
+func _update_whens() -> void:
+	var now := Game.now_sec()
+	for w in _log_whens:
+		if w.label != null and is_instance_valid(w.label):
+			w.label.text = _when(now, w.time)
+		if w.tile != null and is_instance_valid(w.tile):
+			w.tile.tooltip_text = "%s  (%s)" % [w.text, _when(now, w.time) + ("" if now - w.time < 60 else " ago")]
+
+
+static func _when(now: float, time: float) -> String:
+	return "now" if now - time < 60 else F.format_seconds(now - time)
 
 
 ## The expedition log: each line a small card with an icon (a portrait for a capture), its text, and how long
@@ -560,14 +618,14 @@ func _process(_d: float) -> void:
 func _render_log() -> void:
 	UI.clear(_log)
 	UI.clear(_log_mini)
+	_log_whens.clear()
+	_whens_left = 1.0
 	if Game.battle_log.is_empty():
 		_log.add_child(UI.wrap_label("The expedition log fills up as your party explores.", "Faint", 300))
 		return
 	var now := Game.now_sec()
 	for e in Game.battle_log.slice(0, 40):
 		var col: Color = e.color
-		var ago := now - float(e.time)
-		var when := "now" if ago < 60 else F.format_seconds(ago)
 		var card := _log_card(col, 8)
 		var h := UI.hbox(8)
 		h.add_child(_log_icon(e, 30, 22))
@@ -578,12 +636,15 @@ func _render_log() -> void:
 		l.tooltip_text = e.text
 		l.mouse_filter = Control.MOUSE_FILTER_PASS
 		h.add_child(l)
-		h.add_child(UI.label(when, "Faint"))
+		var when := UI.label(_when(now, float(e.time)), "Faint")
+		_log_whens.append({"label": when, "tile": null, "time": float(e.time), "text": e.text})
+		h.add_child(when)
 		card.add_child(h)
 		_log.add_child(card)
 	for e in Game.battle_log.slice(0, 16):
 		var tile := _log_card(e.color, 3)
-		tile.tooltip_text = "%s  (%s)" % [e.text, "now" if now - float(e.time) < 60 else F.format_seconds(now - float(e.time)) + " ago"]
+		tile.tooltip_text = "%s  (%s)" % [e.text, _when(now, float(e.time)) + ("" if now - float(e.time) < 60 else " ago")]
+		_log_whens.append({"label": null, "tile": tile, "time": float(e.time), "text": e.text})
 		tile.mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
 		tile.gui_input.connect(func(ev: InputEvent):
 			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:

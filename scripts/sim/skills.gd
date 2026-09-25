@@ -197,7 +197,6 @@ static func complete(s: Dictionary, c: Dictionary, skill_id: String, action: Dic
 	return n
 
 
-## The item of an element type at a tier (partner-element drops), or the nearest lower tier.
 ## A worker's trait bonuses on this action, as the numbers complete() actually uses (capped), for the UI:
 ## [{key, value}] plus {key: "partner_element_drop_chance", value, type} per partner drop. Speed is left
 ## out (it shows as the cooldown), and so is anything that does nothing on this action.
@@ -238,6 +237,7 @@ static func partner_drops_for(c: Dictionary, skill_id: String, action: Dictionar
 	return out
 
 
+## The item of an element type at a tier (partner-element drops), or the nearest lower tier.
 static func element_item(type_id: String, tier: int) -> String:
 	var best := ""
 	var best_tier := 0
@@ -293,6 +293,31 @@ static func assign(s: Dictionary, c: Dictionary, skill_id: String) -> String:
 	return ""
 
 
+## Resting Aetherlings who could fill this skill's empty slots, best first (most product per hour on the
+## current task), no more than there are empty slots. Workers elsewhere and the party are left alone.
+static func fill_candidates(s: Dictionary, skill_id: String) -> Array:
+	var free := GameState.slot_count(s, skill_id) - GameState.workers(s, skill_id).size()
+	if free <= 0:
+		return []
+	var action := current_action(s, skill_id)
+	var auras := active_auras(s)
+	var keyed := []
+	for c in s.creatures.values():
+		if Creatures.is_benched(c) and Creatures.can_work(c, skill_id):
+			keyed.append([float(work_rates(c, skill_id, action, auras).output), int(c.level), c])
+	keyed.sort_custom(func(a, b): return [a[0], a[1]] > [b[0], b[1]])
+	return keyed.slice(0, free).map(func(k): return k[2])
+
+
+## Puts the best resting Aetherlings into every empty slot of a skill. Returns how many went to work.
+static func fill_slots(s: Dictionary, skill_id: String) -> int:
+	var n := 0
+	for c in fill_candidates(s, skill_id):
+		if assign(s, c, skill_id) == "":
+			n += 1
+	return n
+
+
 static func unassign(s: Dictionary, c: Dictionary) -> void:
 	if c.job.get("kind", "") == "party":
 		s.expedition.party.erase(c.id)
@@ -303,7 +328,6 @@ static func unassign(s: Dictionary, c: Dictionary) -> void:
 	c.erase("stalled")
 
 
-## Expected output per hour for one worker (for the UI).
 ## What a worker would make per hour on an action, reckoned as complete() rolls it: its cooldown, the product
 ## (with extra-output rolls, online) and secondary finds (rare drop, treasure and partner-element drops).
 ## The worker picker sorts by these.
@@ -323,6 +347,7 @@ static func work_rates(c: Dictionary, skill_id: String, action: Dictionary, aura
 	return {"cooldown": cd, "output": per * qty * (1.0 + Traits.capped_self(c, "extra_output_chance", skill_id)), "secondary": per * finds}
 
 
+## Expected output per hour for one worker (for the UI).
 static func per_hour(s: Dictionary, c: Dictionary, skill_id: String) -> Dictionary:
 	var action := current_action(s, skill_id)
 	var cd := worker_cooldown(c, skill_id, action, active_auras(s), speed(s))

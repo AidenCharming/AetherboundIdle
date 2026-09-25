@@ -161,12 +161,23 @@ static func clamp_strength(trait_id: String, s: String) -> String:
 
 # ---------------------------------------------------------------- attunement (rerolling pool traits)
 
-static func attune_cost(c: Dictionary, locks: int, s: Dictionary = {}) -> int:
+## The Aether cost of an attunement keeping the traits in `locked` (ids). Each lock multiplies the cost by its
+## trait's strength (attunement.lockMultByStrength): keeping a Minor trait costs less than keeping a Major one.
+static func attune_cost(c: Dictionary, locked: Array, s: Dictionary = {}) -> int:
 	var at: Dictionary = Data.tuning.attunement
 	var base: float = float(at.baseCost) * pow(float(at.rarityGrowth), int(c.rarity) - 1)
 	var red := capped_self(c, "attunement_cost_reduction")
 	var pearl := 1.0 - float(Data.tuning.pearls.attuneCostPerLevel) * GameState.pearl(s, "pearl-crucible")
-	return int(ceil(base * float(at.lockMult[clampi(locks, 0, 2)]) * (1.0 - red) * pearl))
+	var mult := 1.0
+	for t in c.traits:
+		if t.id in locked:
+			mult *= lock_mult(t.s)
+	return int(ceil(base * mult * (1.0 - red) * pearl))
+
+
+## What locking a trait of this strength multiplies the attunement cost by.
+static func lock_mult(strength: String) -> float:
+	return float(Data.tuning.attunement.lockMultByStrength.get(strength, 1.0))
 
 
 ## Rerolls every pool trait not in `locked` (at most two locks). Returns "" or an error.
@@ -174,7 +185,7 @@ static func attune(s: Dictionary, c: Dictionary, locked: Array, rng: RandomNumbe
 	var at: Dictionary = Data.tuning.attunement
 	if locked.size() > int(at.maxLocks):
 		return "You can lock at most %d traits." % int(at.maxLocks)
-	var cost := attune_cost(c, locked.size(), s)
+	var cost := attune_cost(c, locked, s)
 	if not GameState.pay(s, {"aether": cost}):
 		return "Not enough Aether."
 	var keep: Array = c.traits.filter(func(t): return t.id in locked)

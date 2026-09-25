@@ -2,9 +2,9 @@ extends Control
 ## Sanctum Works: permanent upgrades built with gold and crafted parts.
 
 var _list: HFlowContainer
-var _levels := []        ## upgrade levels the cards were built for: they're rebuilt only when these change
-var _builds := {}        ## upgrade id -> its Build button, whose enabled state is kept current in place
-var _poll := 0.0
+var _builds: Dictionary = {}   # upgrade id -> its Build button, kept up to date in _process
+var _levels_key := ""         # the upgrade levels the cards were built for
+var _tick := 0.0
 
 
 func _ready() -> void:
@@ -19,18 +19,17 @@ func _ready() -> void:
 	refresh()
 
 
-## Rebuilding on every Game.changed (a capture mid-expedition) freed a Build button between mouse down and up,
-## losing the click; and gold earned by work never re-enabled one. So the cards are rebuilt only when an
-## upgrade level changes, and the Build buttons follow what you can afford a few times a second.
+## Rebuilds the cards only when an upgrade level changed. Game.changed fires on captures and level-ups too,
+## and rebuilding then could free a Build button between mouse down and up, losing the click.
 func refresh() -> void:
 	var s := Game.state
 	if s.is_empty():
 		return
-	var levels := Data.upgrade_list.map(func(u): return GameState.upgrade_level(s, u.id))
-	if levels == _levels and _list.get_child_count() > 0:
+	var key := ",".join(Data.upgrade_list.map(func(u): return str(GameState.upgrade_level(s, u.id))))
+	if key == _levels_key and not _builds.is_empty():
 		_update_builds()
 		return
-	_levels = levels
+	_levels_key = key
 	_builds.clear()
 	UI.clear(_list)
 	for u in Data.upgrade_list:
@@ -65,23 +64,28 @@ func refresh() -> void:
 			cv.add_child(UI.hbox(8, [UI.label(_fmt(u.id, now), "H3"), UI.label("next", "Faint"), UI.label(_fmt(u.id, float(nxt.value)), "H3", Palette.AETHER)]))
 			cv.add_child(UI.cost_row(nxt.cost, 22))
 			var b := UI.button("Build", "Primary", func(): Game.buy_upgrade(u.id))
-			b.disabled = not GameState.can_afford(s, nxt.cost)
-			_builds[u.id] = b
 			cv.add_child(b)
+			_builds[u.id] = b
 		_list.add_child(card)
+	_update_builds()
+
+
+## Gold and materials arrive without Game.changed (workers, the extractor), so whether each Build can be
+## afforded is checked a few times a second rather than only when the page was built.
+func _update_builds() -> void:
+	var s := Game.state
+	for id in _builds:
+		var nxt := Economy.next_upgrade(s, id)
+		var b: Button = _builds[id]
+		b.disabled = nxt.is_empty() or not GameState.can_afford(s, nxt.cost)
+		b.tooltip_text = "" if not b.disabled else "Not enough gold or materials yet."
 
 
 func _process(delta: float) -> void:
-	_poll -= delta
-	if _poll <= 0.0:
-		_poll = 0.25
-		refresh()
-
-
-func _update_builds() -> void:
-	for id in _builds:
-		var nxt := Economy.next_upgrade(Game.state, id)
-		_builds[id].disabled = nxt.is_empty() or not GameState.can_afford(Game.state, nxt.cost)
+	_tick -= delta
+	if _tick <= 0.0 and not Game.state.is_empty():
+		_tick = 0.25
+		_update_builds()
 
 
 func _icon(id: String) -> String:

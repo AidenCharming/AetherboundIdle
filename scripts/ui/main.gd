@@ -33,6 +33,10 @@ var _rail_refresh := 0.0
 var _pending_flash := false   # shinies are waiting for a vessel: the Expeditions badge pulses
 var _limited_flash := false   # a rare limited offer is in the Market: its badge pulses
 var _boosts_box: HBoxContainer
+var _history: Array = []   # [[screen, arg]] pages visited, for the mouse's back and forward buttons
+var _history_at := -1
+var _mouse_held := false        # the left button is down: rebuilding now could free the button being clicked
+var _refresh_waiting := false   # a Game.changed came while it was down; the screen rebuilds on release
 
 
 func _ready() -> void:
@@ -96,6 +100,7 @@ func _ready() -> void:
 	Game.offline_summary.connect(_show_summary)
 	Game.reveal_requested.connect(func(kind, data): _reveal.enqueue(kind, data))
 	Game.notifications_changed.connect(_update_bell)
+	Options.options_changed.connect(_update_keycaps)
 	show_screen("sanctum")
 	Music.play("sanctum")
 	if DisplayServer.get_name() != "headless":
@@ -119,11 +124,20 @@ static func go(screen: String, arg := "") -> void:
 		instance.show_screen(screen, arg)
 
 
-func show_screen(screen: String, arg := "") -> void:
+func show_screen(screen: String, arg := "", from_history := false) -> void:
 	if screen == current and arg == current_arg and _screen:
 		return
+	if not from_history:
+		# a new page drops anything "forward" of where the player was, like a browser
+		_history.resize(_history_at + 1)
+		_history.append([screen, arg])
+		if _history.size() > HISTORY_MAX:
+			_history.pop_front()
+		_history_at = _history.size() - 1
 	current = screen
 	current_arg = arg
+	# a dialog belongs to the page that opened it: one left open would call back into a freed page
+	Modal.close_all()
 	if _screen:
 		_screen.queue_free()
 	var s: Control = SCREENS[screen].new()
@@ -143,18 +157,49 @@ func show_screen(screen: String, arg := "") -> void:
 
 
 func _on_changed() -> void:
+	# A capture or level-up mid-click used to rebuild the screen between mouse down and up, freeing the button
+	# and losing the click. While the button is held, the rebuild waits for the release.
+	if _mouse_held:
+		_refresh_waiting = true
+	else:
+		_refresh_screen()
+	_refresh_rail()
+
+
+func _refresh_screen() -> void:
+	_refresh_waiting = false
 	if _screen and _screen.has_method("refresh"):
 		_screen.refresh()
-	_refresh_rail()
+
+
+## The mouse's back (or forward) button: the page visited before (or after) this one.
+func history_step(dir: int) -> void:
+	var to := _history_at + dir
+	if to < 0 or to >= _history.size():
+		return
+	_history_at = to
+	show_screen(_history[to][0], _history[to][1], true)
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.pressed and event.button_index in [MOUSE_BUTTON_XBUTTON1, MOUSE_BUTTON_XBUTTON2]:
+		if not Modal.any_open() and not _reveal.active:
+			get_viewport().set_input_as_handled()
+			history_step(-1 if event.button_index == MOUSE_BUTTON_XBUTTON1 else 1)
+		return
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
+		_mouse_held = event.pressed
+		if not event.pressed and _refresh_waiting:
+			_refresh_screen.call_deferred()   # after the release has reached (and clicked) the button
 
 
 func _build_rail() -> Control:
 	var rail := UI.panel("Rail")
-	rail.custom_minimum_size.x = 236
+	rail.custom_minimum_size.x = 276
 	var v := UI.vbox(6)
 	rail.add_child(v)
 	var logo := UI.hbox(8)
-	logo.add_child(UI.icon(Data.ui_icon("aether"), 30))
+	logo.add_child(UI.icon(APP_ICON, 32))
 	var title_lbl := UI.label("Aetherbound", "H2")
 	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
 	title_lbl.add_theme_constant_override("shadow_outline_size", 10)
@@ -188,6 +233,7 @@ func _fill_rail() -> void:
 	_nav_item("market", "", "Market", "market")
 	_nav_item("eggmarket", "", "Egg Market", "egg-market")
 	_nav_item("works", "", "Sanctum Works", "works")
+	_update_keycaps()
 	_refresh_rail()
 
 
@@ -200,7 +246,7 @@ func _section(text: String) -> void:
 func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> void:
 	var b := UI.button("", "Nav")
 	b.custom_minimum_size.y = 38
-	var h := UI.hbox(10)
+	var h := UI.hbox(7)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	h.offset_left = 10
@@ -209,8 +255,13 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	var l := UI.label(text)
 	l.add_theme_font_override("font", ThemeFactory.bold_font())
 	l.add_theme_font_size_override("font_size", 15)
+	l.clip_text = true
+	l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	l.custom_minimum_size.x = 40
 	h.add_child(l)
-	h.add_child(UI.spacer())
+	var cap := _keycap()
+	h.add_child(cap)
 	var extra := UI.chip("", Palette.AETHER, 11)
 	extra.custom_minimum_size.x = 26
 	(extra.get_child(0) as Label).horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -219,7 +270,37 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	b.add_child(h)
 	b.pressed.connect(func(): show_screen(screen, arg))
 	_rail_list.add_child(b)
-	_nav_buttons[screen + ":" + arg] = {"button": b, "extra": extra, "label": l, "icon": h.get_child(0)}
+	_nav_buttons[screen + ":" + arg] = {"button": b, "extra": extra, "label": l, "icon": h.get_child(0), "keycap": cap,
+		"tab": screen + (":" + arg if arg != "" else "")}
+
+
+## A small key drawn in code (a rounded cap with a deeper bottom edge) showing a tab's shortcut.
+func _keycap() -> PanelContainer:
+	var cap := PanelContainer.new()
+	var sb := ThemeFactory.box(Color(0.12, 0.13, 0.25, 0.9), 4, 1, Color(Palette.TEXT_DIM, 0.55), 0)
+	sb.border_width_bottom = 3
+	sb.content_margin_left = 4
+	sb.content_margin_right = 4
+	sb.content_margin_top = 0
+	sb.content_margin_bottom = 0
+	cap.add_theme_stylebox_override("panel", sb)
+	cap.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	cap.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var kl := UI.label("", "Small", Palette.TEXT_DIM)
+	kl.add_theme_font_size_override("font_size", 10)
+	kl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	kl.custom_minimum_size.x = 11
+	cap.add_child(kl)
+	return cap
+
+
+## Every rail tab's keycap shows its current key (hidden when it has none).
+func _update_keycaps() -> void:
+	for key in _nav_buttons:
+		var nb: Dictionary = _nav_buttons[key]
+		var code := Options.keybind(nb.tab)
+		nb.keycap.visible = code != 0
+		(nb.keycap.get_child(0) as Label).text = Options.key_name(code)
 
 
 ## A nav entry's badge: a chip, hidden when there's nothing to say.
@@ -360,6 +441,10 @@ func _update_bell() -> void:
 func _process(delta: float) -> void:
 	if Game.state.is_empty():
 		return
+	if _mouse_held and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+		_mouse_held = false   # released where this window never saw it (focus lost mid-click)
+		if _refresh_waiting:
+			_refresh_screen()
 	var s := Game.state
 	_top.aether.value.text = F.format_num(float(s.aether))
 	_top.aether.sub.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
@@ -389,8 +474,8 @@ func _process(delta: float) -> void:
 		UI.set_chip(_top.perched, "%d perched" % Economy.perched(s).size(), Palette.AETHER)
 
 
-const SHORTCUTS := {KEY_1: "sanctum", KEY_2: "nexus", KEY_3: "pods", KEY_4: "expeditions", KEY_5: "aetherlog", KEY_6: "inventory", KEY_7: "works",
-	KEY_8: "market", KEY_9: "eggmarket"}
+const APP_ICON := preload("res://assets/app-icon.png")
+const HISTORY_MAX := 50
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -398,17 +483,26 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		open_pause_menu()
 	elif event is InputEventKey and event.pressed and not event.echo and not Modal.any_open() and not _reveal.active:
-		var screen: String = SHORTCUTS.get(event.keycode, "")
-		if screen != "" and not (get_viewport().gui_get_focus_owner() is LineEdit):
+		# page shortcuts: 1-9 and F1-F11 by default, changed in Options > Controls
+		var tab := Options.tab_for_key(event.keycode)
+		if tab != "" and not (get_viewport().gui_get_focus_owner() is LineEdit):
 			get_viewport().set_input_as_handled()
-			show_screen(screen)
+			go_tab(tab)
+
+
+## Opens a tab as Options names it: "market", or "skill:mining".
+func go_tab(tab: String) -> void:
+	if tab.begins_with("skill:"):
+		show_screen("skill", tab.trim_prefix("skill:"))
+	else:
+		show_screen(tab)
 
 
 # ---------------------------------------------------------------- menus and summaries
 
 func open_pause_menu() -> void:
 	var v := UI.vbox(10)
-	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.upgrade_value(Game.state, "offline-cap")), "Faint", 380))
+	v.add_child(UI.wrap_label("Your Aetherlings keep working while this menu is open, and while the game is closed (up to %d hours)." % int(GameState.offline_cap_hours(Game.state)), "Faint", 380))
 	var box := {}  # holds the modal: lambdas capture locals by value, a Dictionary by reference
 	var add := func(text: String, variation: String, cb: Callable):
 		var b := UI.button(text, variation, cb)
@@ -486,7 +580,7 @@ func _dev_modal() -> void:
 	lvl.min_value = 1
 	lvl.max_value = Data.tuning.creature.maxLevel
 	lvl.value = 1
-	var shiny := CheckButton.new()
+	var shiny := ToggleSwitch.new()
 	shiny.text = "Shiny"
 	# a form can't be above what its level gives (like a wild one): picking a form raises the level to where
 	# that form starts if needed, and lowering the level lowers the form with it

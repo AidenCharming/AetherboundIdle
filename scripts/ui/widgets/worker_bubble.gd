@@ -29,8 +29,8 @@ static func make(c: Dictionary, skill: String, px: float) -> WorkerBubble:
 
 
 func _process(_d: float) -> void:
-	if cid == "" or not is_visible_in_tree():
-		return
+	if cid == "" or Game.state.is_empty() or not is_visible_in_tree():
+		return   # an empty state is the fade back to the title screen
 	var c := GameState.creature(Game.state, cid)
 	if c.is_empty():
 		return

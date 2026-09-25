@@ -3,20 +3,18 @@
 For the next session (local or cloud, any model). Read this, then `docs/DECISIONS.md` (the long record of what was
 decided and why) and `README.md` (how to run things).
 
-## Start here: open play-test feedback
-
-`docs/bridge_bugs.md` has 5 concrete bugs from the latest automated play-test run, with repro steps and
-screenshots. Fix those first, before anything else in this file.
-
 ## Ground rules
 
-- Work in `godot/` on branch `godot-rebuild`. The web build on `main` (`src/`, `electron/`, top-level files) is
-  never touched.
+- The Godot project is at the repo root (`project.godot`); `CLAUDE.md` is the short version of these rules. The
+  old web build is archived on the `web-archive` branch and is never touched. `docs/PROGRESS.md` and
+  `docs/plan.md` describe that web build and are history only.
+- Work on the branch you were given (this session: `claude/new-session-18lsuu`); don't switch to the old
+  `godot-rebuild` branch. Fetch and **merge** before pushing, never rebase or force-push: the designer pushes art
+  to the same branch.
 - Godot 4.7 GDScript, GL Compatibility, base size 1600×900, UI built in code. Autoloads: Options, Data, Sfx, Music,
-  Game. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and balance are JSON
-  in `data/`. Never hardcode balance numbers.
-- Commit as you go with clear messages, keep `docs/DECISIONS.md` current (it states the test count, now 108), and
-  push to `godot-rebuild`.
+  Game, TestBridge. The sim is pure static functions in `scripts/sim/`; the UI is in `scripts/ui/`; content and
+  balance are JSON in `data/`. Never hardcode balance numbers.
+- Commit as you go with clear messages, and keep `docs/DECISIONS.md` current (it states the test count).
 - **Art rule (designer's request):** any new icon gets a prompt in `tools/art/build_icon_prompts.py` and a placeholder
   in `tools/make_icons.py` in the same change; regenerate `docs/art-prompts-icons.md`. The designer's script lists
   what still needs painting. **Don't commit a regenerated `docs/art-prompts-*.md` from a machine without the
@@ -29,12 +27,17 @@ screenshots. Fix those first, before anything else in this file.
 
 ## Running things
 
-- Tests: `godot --headless --debug --path godot res://tests/test_runner.tscn < /dev/null` (close stdin: with
-  `--debug` a script error waits at a debugger prompt). Add `--verbose` to see warnings; keep it at zero warnings.
+All commands run from the repo root.
+
+- Import once after cloning: `godot --headless --path . --import`.
+- Tests: `godot --headless --debug --path . res://tests/test_runner.tscn < /dev/null` (close stdin: with
+  `--debug` a script error waits at a debugger prompt), or `tools/check.sh [godot]`. Add `--verbose` to see
+  warnings; keep it at zero warnings. Tests that touch save files use slot 99 only, never the player's slots 1–3.
 - Driving the running game (real clicks, errors, screenshots): `docs/TEST_BRIDGE.md`.
-- Screenshots: `godot --path godot res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display).
-- Pacing probe (about 40 s): `res://tests/month_probe.tscn -- --days=35 [--skills|--rates|--calibrate]`. Its
-  `_combat` rounds party levels down to multiples of 3.
+- Screenshots: `godot --path . res://tests/tour.tscn -- --out=DIR --only=nexus,expeditions,...` (needs a display;
+  overwrites save slot 3).
+- Pacing probe (about 40 s): `godot --headless --path . res://tests/month_probe.tscn -- --days=35
+  [--skills|--rates|--calibrate]`. Its `_combat` rounds party levels down to multiples of 3.
 
 ## GDScript traps that bit this project
 
@@ -44,7 +47,47 @@ screenshots. Fix those first, before anything else in this file.
 - A wrapping Label measured before its container gives it a width reports thousands of pixels of height.
 - Tweens that move a fighter are bound to that fighter's node so they die with it.
 
+## Start here (2026-09-25, after merging claude/new-session-18lsuu into godot-rebuild)
+
+Done this round (details in the commits): XP from every kill shows at once (fighters refresh on level-up, ally
+XP bars); fish drop on islands 1-3 so Cooking works before Aqueous; closing dialogs no longer eat clicks (the
+bridge bugs, benchmark re-run PASS); Sanctum Works Build buttons stay live; every sidebar tab has a rebindable
+key (Options > Controls; 1-9 in sidebar order, F1-F10 and F12 for skills, F11 stays fullscreen) shown as a
+keycap; egg speed-ups cost about the egg's Aether; bulk release by level; pickers show status under the note;
+Fill empty slots (Best time removed); Nexus filters as one row of dropdowns and a tidier detail panel; wild
+Aetherlings sometimes a form or two up (`combat.wildFormUp`); idle breathing/sway/hop on sprites; Sturdy
+Vessels only in Vessel Crafting (Fabrication's duplicate recipe removed).
+
+**Still open:**
+1. **Balance** (the friend's hour: Gleaming by breeding two Steadys, many Minor/Major traits, a Luminous
+   Mossgear party at Lv 1-3 beating Old Thicketroll). Not changed yet. Candidates: a gentler Dim → Faint →
+   Steady `statMultiplier` ramp in `data/rarities.json`, breeding `mutationPlusOne` / `ceilingByTier`, trait
+   strength odds, Mossgear's lean. Measure with `tests/balance_probe.tscn` and the month probe.
+2. Windowed mode small text (see DECISIONS); the parse-error-exits-0 test runner issue below.
+3. The sidebar is 276 px wide now (keycaps); Sanctum station cards are 288 px so they stay two across.
+
+Tools that helped: `tests/tour.tscn` now takes `--size=WxH` and `--ui-scale=N`, and has shots named
+`autobind`, `attune`, `folded`, `tooltip`, `milestones` (run under `xvfb-run -a -s "-screen 0 1920x1400x24"`
+in the cloud). A new `class_name` needs `godot --headless --path . --import` before the tests see it.
+**The test runner exits 0 even when a test file fails to parse** (the parse errors print, the suite still
+passes); watch for `SCRIPT ERROR` in its output. Fixing that in `tests/test_runner.gd` would be worth it.
+
 ## Recently done (this session)
+
+**Code review fixes (2026-09-24),** one commit each, see `DECISIONS.md` ("Code review fixes"):
+- Saves are written atomically (`.tmp`, then rename); the backup is only ever a readable save, and a leftover
+  `.tmp` is loaded before the backup. The slot-rename test no longer writes the player's slot 3 (slot 99 now).
+- The Market and Egg Market refuse a buy made from a stock window that has since changed, and refresh once when
+  the stock changes. `Market.buy()` refuses 0 or fewer.
+- Trait inheritance shuffles with the game's rng (reproducible from a seed). The pause menu's time-away cap counts
+  the Pearl Hourglass. Pearls found while away show in Welcome Back. Thorns that knock out an attacker stop its
+  multi-target ability. Bulk release reports Pearls.
+- Worker bubbles skip frames during the fade to the title; Genesis Pods forget picked parents when the save
+  changes; options.cfg is written once a change settles; a broken data file is reported with its line; the
+  test bridge's `new` only wipes slot 2 unless forced, and only slot 2 is renamed; the Expeditions log's "ago"
+  times tick; three misplaced comments moved; `tools/check.sh` runs the tests like `CLAUDE.md` does.
+
+**Earlier:**
 
 The fixes, all pushed: the Options panel going blank after going fullscreen, the Nexus panel pushed off screen,
 music dropping out, blurry text, the Sanctum expedition card not updating, fighters facing the wrong way. The
@@ -71,9 +114,10 @@ What its first runs found and fixed:
 - Bridge fixes: clicks pick an exact match that's scrolled out of view before a visible partial match; only the
   top dialog's buttons are listed; a button counts as visible only when its centre is in its scroll area.
 
-Still open (bigger than a quick fix): the same "rebuild everything on `Game.changed`" pattern is used by most
-screens (skill pages, pods, Works, Market), so a click there can be lost the same way during a busy expedition.
-Rebuilding only the parts that changed would fix it for good.
+- **Clicks lost on the other screens** (skill pages, pods, Works, Market, which rebuild on every `Game.changed`):
+  fixed in `Main`. While the left mouse button is held, a `Game.changed` only marks the screen as owed a rebuild;
+  it runs just after the release (deferred, so the click lands on the button first). Rebuilding only the parts
+  that changed would still be nicer for performance, but clicks are no longer lost.
 
 ## Not yet seen or heard in the real game (check these first)
 

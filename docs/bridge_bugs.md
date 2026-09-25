@@ -31,3 +31,22 @@ repro steps), find the cause, fix it, and add or extend a `test_ui.gd` test that
 
 Secondary, not blocking: fps dipped to a min of 22 (10th percentile 30, median 30) and memory grew 82 → 101 → 89
 MB (+9%) over the 10-minute run. Worth a look if there's time, not urgent.
+
+## Outcome (2026-09-25)
+
+All five fixed; `bugtest_benchmark` re-run in the cloud (xvfb, seed 1, 8 h compressed): **PASS**, 0 errors,
+0 invariant breaks, 0 stuck, 35 goals claimed, 45 screens.
+
+1. and 2. **Sanctum click landed on Pods; no Claim.** Reproduced with the bridge. A dialog fading out (0.1 s)
+   still took every click and still counted as open, so the scenario clicked the parent picker's Close a
+   second time; that click fell through to the Pods page and opened another picker, which swallowed the
+   rail click (and the Sanctum check then ran on the Pods page). Fixed in `modal.gd`: a closing dialog
+   ignores the mouse and isn't open. Changing page also closes a page's dialogs, and a picker whose page
+   is gone just closes. Tests: `test_a_closing_dialog_lets_clicks_through`, `test_changing_page_closes_its_dialogs`.
+3. and 5. **Works Build did nothing / stayed disabled.** The page rebuilt every card on each `Game.changed`
+   (a capture could free the button mid-click), and set `disabled` only when built (gold from work doesn't
+   emit `changed`). Cards now rebuild only when an upgrade level changes; affordability is checked four times
+   a second. Test: `test_works_build_buttons_stay_put_and_follow_the_gold`.
+4. **No Explore for Whisperleaf Hollow** was the scenario, not the game: with the island list folded, its
+   loose click on "Whisperleaf Hollow" matched the Explore button's tooltip and started the run. The
+   scenario now selects islands by exact name.

@@ -248,9 +248,11 @@ static func sort_by_key(items: Array, key: Callable) -> Array:
 
 ## Icon + amount, e.g. [log] 12. `need` > 0 turns it red when the player has less.
 static func amount(id: String, qty: float, need := -1.0, size := 22) -> HBoxContainer:
-	var h := hbox(4)
+	var h := ItemTip.new()
+	h.item = id
+	h.add_theme_constant_override("separation", 4)
+	h.mouse_filter = Control.MOUSE_FILTER_STOP
 	var ic := icon(Data.item_icon(id), size)
-	ic.tooltip_text = Data.item_name(id)
 	ic.mouse_filter = Control.MOUSE_FILTER_PASS
 	h.add_child(ic)
 	var l := label(F.format_num(qty), "Num")
@@ -260,6 +262,46 @@ static func amount(id: String, qty: float, need := -1.0, size := 22) -> HBoxCont
 	h.add_child(l)
 	h.tooltip_text = Data.item_name(id)
 	return h
+
+
+## The card an item's tooltip shows: picture, name, tier and kind, how many you have, the description, and
+## what the item is used for, or that it's only worth its gold.
+static func item_tooltip(id: String) -> Control:
+	var it: Dictionary = Data.items.get(id, {})
+	var v := vbox(6)
+	if it.is_empty():
+		v.add_child(label(Data.item_name(id)))
+		return v
+	var head := hbox(10)
+	head.add_child(icon(Data.item_icon(id), 40))
+	var names := vbox(0)
+	var n := label(it.name, "", Palette.TEXT)
+	n.add_theme_font_override("font", ThemeFactory.bold_font())
+	n.add_theme_font_size_override("font_size", 16)
+	names.add_child(n)
+	names.add_child(label("Tier %d · %s" % [int(it.tier), str(it.category).capitalize()], "Faint"))
+	head.add_child(names)
+	v.add_child(head)
+	if not Game.state.is_empty():
+		v.add_child(label("You have %s" % F.format_num(GameState.count(Game.state, id)), "Dim"))
+	if str(it.get("desc", "")) != "":
+		v.add_child(wrap_label(it.desc, "Faint", 280))
+	var used := Economy.uses(id)
+	if used.is_empty():
+		v.add_child(label("Only worth its gold: %d each" % int(it.sell), "", Palette.GOLD))
+	else:
+		v.add_child(label("Used for", "Small", Palette.AETHER))
+		for i in mini(used.size(), 5):
+			var u: Dictionary = used[i]
+			var line: String = u.name
+			if u.kind == "recipe":
+				line = "%s · %s Lv %d" % [u.name, Data.skills[u.skill].name, int(u.level)]
+			elif u.kind == "upgrade":
+				line = "%s (Sanctum Works)" % u.name
+			v.add_child(label("• " + line, "Small"))
+		if used.size() > 5:
+			v.add_child(label("and %d more" % (used.size() - 5), "Faint"))
+	return v
 
 
 ## A row of cost chips for {id: qty}.

@@ -1,7 +1,8 @@
 class_name CreaturePortrait
 extends Control
 ## A creature on a round art plate: type-coloured rim, rarity glow, the approved sprite (or the aether-blob
-## placeholder for species without art), shiny hue shift and sparkle, optional idle bob.
+## placeholder for species without art), shiny hue shift and sparkle, optional idle motion (breathing, a
+## slight sway, now and then a hop).
 ## Use setup() or set the fields and call refresh().
 
 const CREATURE_SHADER := preload("res://assets/shaders/creature.gdshader")
@@ -23,6 +24,8 @@ var _mat: ShaderMaterial
 var _t := 0.0
 var _phase := 0.0
 var _twinkle_t := 0.0
+var _hop_in := -1.0    # seconds to the next little hop (set on the first frame)
+var _hop_t := -1.0     # time into the current hop, or -1
 var _glints: Control
 
 
@@ -156,7 +159,7 @@ func _layout() -> void:
 	var k: float = FORM_SCALE[clampi(form, 1, 3) - 1] * (0.9 if plate else 1.0)
 	var art_size := Vector2(s, s) * k
 	_art.size = art_size
-	_art.pivot_offset = art_size / 2.0
+	_art.pivot_offset = Vector2(art_size.x / 2.0, art_size.y)   # breathing and sway pivot on the feet
 	_art.position = (Vector2(s, s) - art_size) / 2.0 + Vector2(0, s * 0.02)
 
 
@@ -172,12 +175,52 @@ func _process(delta: float) -> void:
 		return
 	_t += delta
 	var s := size.x
-	var y := sin(_t * 2.1 + _phase) * s * 0.018
-	var sq := 1.0 + sin(_t * 4.2 + _phase) * 0.012
+	var m := idle_motion(_t, _phase, plate)
+	# now and then a little hop: a crouch, a jump, a landing squash
+	if _hop_in < 0.0:
+		_hop_in = 4.0 + fposmod(_phase * 3.7, 7.0)
+	var hop := Vector3.ZERO   # (lift, squash, unused)
+	if _hop_t >= 0.0:
+		_hop_t += delta
+		hop = hop_motion(_hop_t)
+		if _hop_t >= HOP_TIME:
+			_hop_t = -1.0
+			_hop_in = randf_range(6.0, 14.0)
+	else:
+		_hop_in -= delta
+		if _hop_in <= 0.0:
+			_hop_t = 0.0
 	var k: float = FORM_SCALE[clampi(form, 1, 3) - 1] * (0.9 if plate else 1.0)
 	var art_size := Vector2(s, s) * k
-	_art.position = (Vector2(s, s) - art_size) / 2.0 + Vector2(0, s * 0.02 + y)
-	_art.scale = Vector2(1.0 / sq, sq)
+	_art.position = (Vector2(s, s) - art_size) / 2.0 + Vector2(0, s * 0.02 + (m.x - hop.x) * s)
+	var sq: float = m.y * (1.0 + hop.y)
+	_art.scale = Vector2(1.0 / sqrt(sq), sq)
+	_art.rotation = m.z
+
+
+const HOP_TIME := 0.55
+
+
+## The idle loop at time `t`: (lift as a share of the size, vertical stretch, sway in radians). Breathing is a
+## slow stretch from the feet with a slight lean; on a plate it also floats a little. On the ground (the
+## arena, plate off) the feet stay planted.
+static func idle_motion(t: float, phase: float, on_plate: bool) -> Vector3:
+	var breathe := 1.0 + sin(t * 2.4 + phase) * 0.022
+	var sway := sin(t * 1.1 + phase * 1.7) * 0.022
+	var lift := sin(t * 2.1 + phase) * 0.014 if on_plate else 0.0
+	return Vector3(lift, breathe, sway)
+
+
+## A hop at time `t` into it: (height as a share of the size, extra vertical stretch). A crouch first, a
+## stretched jump, then a squash on landing.
+static func hop_motion(t: float) -> Vector3:
+	var u := clampf(t / HOP_TIME, 0.0, 1.0)
+	if u < 0.18:   # crouch
+		return Vector3(0.0, -0.08 * sin(u / 0.18 * PI), 0.0)
+	if u < 0.8:    # in the air
+		var a := (u - 0.18) / 0.62
+		return Vector3(0.06 * sin(a * PI), 0.06 * cos(a * PI), 0.0)
+	return Vector3(0.0, -0.07 * sin((u - 0.8) / 0.2 * PI), 0.0)   # landing
 
 
 func _draw() -> void:

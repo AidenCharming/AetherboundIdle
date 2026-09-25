@@ -153,16 +153,16 @@
 			360
 		],
 		"speedUpAetherPerMinute": [
-			3,
-			4,
-			6,
-			9,
-			13,
-			18,
-			25,
-			35,
 			50,
-			70
+			40,
+			45,
+			50,
+			60,
+			70,
+			90,
+			110,
+			135,
+			180
 		],
 		"inheritChance": 0.4,
 		"traitStrengthUpChance": 0.15,
@@ -182,11 +182,11 @@
 	"attunement": {
 		"baseCost": 60,
 		"rarityGrowth": 1.8,
-		"lockMult": [
-			1,
-			3,
-			9
-		],
+		"lockMultByStrength": {
+			"minor": 1.5,
+			"moderate": 2.25,
+			"major": 3
+		},
 		"maxLocks": 2
 	},
 	"pearls": {

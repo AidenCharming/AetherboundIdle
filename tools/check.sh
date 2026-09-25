@@ -4,4 +4,4 @@ set -e
 cd "$(dirname "$0")/.."
 GODOT="${1:-${GODOT:-godot}}"
 "$GODOT" --headless --path . --import >/dev/null 2>&1 || true
-"$GODOT" --headless --path . res://tests/test_runner.tscn
+"$GODOT" --headless --debug --path . res://tests/test_runner.tscn < /dev/null

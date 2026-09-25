@@ -555,7 +555,8 @@ class Benchmark:
         z = next((z for z in self.p["expedition"]["zones"] if z["id"] == zone_id), None)
         if not z:
             return False
-        # exact: with the island list folded, a loose match hits the Explore button ("Explore <island>" tooltip)
+        # exact: with the island list folded, a loose match on the name hits the Explore button's tooltip
+        # ("Explore Whisperleaf Hollow") and starts the run instead of selecting the island
         if ctx.click(z["name"], quiet=True, exact=True):
             return True
         ctx.click("Show the island list", quiet=True)

@@ -174,7 +174,7 @@ static func inherit(rng: RandomNumberGenerator, a: Dictionary, b: Dictionary, ty
 	var pool := []
 	for t in a.traits + b.traits:
 		pool.append(t)
-	pool.shuffle()
+	Rng.shuffle(rng, pool)
 	var max_traits: int = Data.tuning.creature.maxPoolTraits
 	var eligible := Traits.eligible_pool(types).map(func(t): return t.id)
 	for t in pool:

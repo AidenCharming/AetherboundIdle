@@ -10,7 +10,7 @@ static var layer: Control   ## set by the title and game scenes
 var panel: PanelContainer
 var body: VBoxContainer
 var locked := false
-var closing := false
+var closing := false   ## fading out: it no longer counts as open and lets every click through
 var _dim: ColorRect
 
 
@@ -85,13 +85,15 @@ func _unhandled_input(event: InputEvent) -> void:
 		close()
 
 
-## Closing lets go of the mouse at once: during the fade a closing dialog doesn't swallow clicks meant for the
-## screen under it, doesn't count as open (Esc, the page shortcuts) and can't be closed a second time.
 func close() -> void:
 	if closing or is_queued_for_deletion():
 		return
 	closing = true
-	propagate_call("set_mouse_filter", [Control.MOUSE_FILTER_IGNORE])
+	# while it fades, clicks go to whatever is under it: a click on the rail or a button a moment after
+	# closing a dialog was being swallowed by the fading dim
+	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	mouse_behavior_recursive = Control.MOUSE_BEHAVIOR_DISABLED
+	focus_behavior_recursive = Control.FOCUS_BEHAVIOR_DISABLED
 	closed.emit()
 	var tw := create_tween()
 	tw.tween_property(self, "modulate:a", 0.0, 0.1)
@@ -116,10 +118,23 @@ static func confirm(title: String, text: String, yes_text: String, on_yes: Calla
 	return box.m
 
 
+## Open and taking input: not closing or freed.
+func is_open() -> bool:
+	return not closing and not is_queued_for_deletion()
+
+
+static func close_all() -> void:
+	if not layer or not is_instance_valid(layer):
+		return
+	for c in layer.get_children():
+		if c is Modal and c.is_open():
+			c.close()
+
+
 static func any_open() -> bool:
 	if not layer or not is_instance_valid(layer):
 		return false
 	for c in layer.get_children():
-		if c is Modal and not c.is_queued_for_deletion() and not c.closing:
+		if c is Modal and c.is_open():
 			return true
 	return false

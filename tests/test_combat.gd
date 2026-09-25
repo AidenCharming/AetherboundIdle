@@ -109,6 +109,12 @@ func test_capture_consumes_a_vessel() -> void:
 	Expedition.try_capture(s, {"species": "brambletrundle", "level": 3, "rarity": 1, "shiny": false}, [], _rng(), ev, {"freeBinds": 0})
 	t.eq(GameState.count(s, "tinkerers-vessel"), before - 1.0)
 	t.ok(ev.any(func(e): return e.type in ["captured", "escaped"]))
+	var rolled: Array = ev.filter(func(e): return e.type in ["captured", "escaped"])
+	t.near(float(rolled[0].get("chance", -1.0)) if not rolled.is_empty() else -1.0,
+		Expedition.bind_chance(s, "tinkerers-vessel", 1, []), 0.0001, "the event carries the chance it had, for the log")
+	Game._log_battle(rolled[0])
+	t.ok(Game.battle_log[0].text.ends_with("% chance"), "and the log line says it: %s" % Game.battle_log[0].text)
+	Game.battle_log.clear()
 
 
 func test_autobind_respects_min_rarity_for_owned_species() -> void:
@@ -187,6 +193,26 @@ func test_bulk_release_keeps_the_best_of_each_species() -> void:
 	t.ok(s.creatures.has(keep.id), "best kept")
 	t.ok(s.creatures.has(shiny.id), "shiny kept")
 	t.eq(s.creatures.size(), 3, "starter, best and shiny remain")
+
+
+## A friend's request: release only the ones under a chosen level.
+func test_bulk_release_under_a_level() -> void:
+	var s := GameState.new_game()
+	var keep := Creatures.make(s, "brambletrundle", 2, 40, false, [], "test")
+	s.creatures[keep.id] = keep
+	var low := []
+	for lv in [3, 8, 9]:
+		var c := Creatures.make(s, "brambletrundle", 1, lv, false, [], "test")
+		s.creatures[c.id] = c
+		low.append(c)
+	var mid := Creatures.make(s, "brambletrundle", 1, 25, false, [], "test")
+	s.creatures[mid.id] = mid
+	t.eq(Economy.bulk_release_candidates(s, 2, 10).size(), 3, "three under level 10")
+	t.eq(Economy.bulk_release_candidates(s, 2, 9).size(), 2, "under 9 means below it, not 9 itself")
+	t.eq(Economy.bulk_release_candidates(s, 2).size(), 4, "any level: everyone but the best")
+	var res := Economy.bulk_release(s, 2, 10)
+	t.eq(res.count, 3)
+	t.ok(s.creatures.has(mid.id) and s.creatures.has(keep.id), "level 25 and the best stay")
 
 
 func test_autobind_stops_at_max_copies_unless_rarer() -> void:
@@ -329,3 +355,49 @@ func test_bulk_release_options_and_reasons() -> void:
 	t.ok(res.count > 0)
 	t.ok(GameState.workers(s, "mining").is_empty(), "the worker was released and left Mining")
 	t.ok(s.creatures.size() >= 1, "never the last one")
+
+
+## Play-test feedback: XP seemed to arrive only with the boss, because a party member's fighter kept the level
+## it started the run at. A level-up from an ordinary kill now shows (and fights) at once.
+func test_a_kill_levels_the_fighter_mid_run() -> void:
+	var s := _party_game([["sproutlet", 1, 5]])
+	var c: Dictionary = s.creatures.values()[0]
+	var rng := _rng()
+	t.eq(Expedition.start(s, "whisperleaf-hollow", rng), "")
+	while s.expedition.battle.phase != "fight":
+		Expedition.step(s, 250.0, rng)
+	var f: Dictionary = s.expedition.battle.allies[0]
+	f.hp = float(f.maxHp) * 0.5
+	var hp_before := float(f.hp)
+	var max_before := float(f.maxHp)
+	# one XP short of level 6, then an ordinary wild falls
+	c.xp = F.xp_for_level(F.creature_curve(), 6, Data.tuning.creature.maxLevel) - 1.0
+	var ev := []
+	Expedition.defeated_wild(s, Data.zones["whisperleaf-hollow"], {"species": "sproutlet", "level": 3, "rarity": 1, "shiny": false},
+		[c], rng, ev, s.expedition.battle)
+	t.ok(ev.any(func(e): return e.type == "creature_level"), "a level-up event")
+	t.eq(int(c.level), 6)
+	t.eq(int(f.level), 6, "the fighter took the new level")
+	t.ok(float(f.maxHp) > max_before, "and its higher Health")
+	t.ok(float(f.hp) > hp_before, "gaining the extra Health")
+	t.ok(float(f.power) >= float(Combat.ally(c).power) - 0.001, "and its new power")
+
+
+## Thorns that knock out an attacker mid-way through a multi-target ability stop it: nothing more is hit.
+func test_thorns_stop_a_multi_target_ability() -> void:
+	var ab_id := ""
+	for id in Data.abilities:
+		if Data.abilities[id].effect == "multi-target-damage":
+			ab_id = id
+			break
+	var att := Combat.wild("sproutlet", 10, 1, false, {}, "", ab_id)
+	att.hp = 1.0
+	var foes := []
+	for i in 3:
+		foes.append(Combat.wild("sproutlet", 10, 1, false, {"health": 100.0}))
+	foes[0].thornsT = 5000.0
+	var events := []
+	Combat._use_ability([att], foes, 0, 0, _rng(), events)
+	var hits := events.filter(func(e): return e.type == "hit" and e.side == 0 and e.from == 0)
+	t.eq(hits.size(), 1, "only the thorned target was hit")
+	t.ok(not att.alive, "the attacker went down")
