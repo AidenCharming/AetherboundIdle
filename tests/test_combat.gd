@@ -109,6 +109,12 @@ func test_capture_consumes_a_vessel() -> void:
 	Expedition.try_capture(s, {"species": "brambletrundle", "level": 3, "rarity": 1, "shiny": false}, [], _rng(), ev, {"freeBinds": 0})
 	t.eq(GameState.count(s, "tinkerers-vessel"), before - 1.0)
 	t.ok(ev.any(func(e): return e.type in ["captured", "escaped"]))
+	var rolled: Array = ev.filter(func(e): return e.type in ["captured", "escaped"])
+	t.near(float(rolled[0].get("chance", -1.0)) if not rolled.is_empty() else -1.0,
+		Expedition.bind_chance(s, "tinkerers-vessel", 1, []), 0.0001, "the event carries the chance it had, for the log")
+	Game._log_battle(rolled[0])
+	t.ok(Game.battle_log[0].text.ends_with("% chance"), "and the log line says it: %s" % Game.battle_log[0].text)
+	Game.battle_log.clear()
 
 
 func test_autobind_respects_min_rarity_for_owned_species() -> void:

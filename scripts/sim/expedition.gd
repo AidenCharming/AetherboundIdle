@@ -301,10 +301,11 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 		return
 	if int(b.get("freeBinds", 0)) > 0:
 		b.freeBinds = int(b.freeBinds) - 1
-		if Rng.chance(rng, bind_chance(s, "resonant-vessel", int(w.rarity), party)):
-			_bind(s, w, rng, events, "free")
+		var pf := bind_chance(s, "resonant-vessel", int(w.rarity), party)
+		if Rng.chance(rng, pf):
+			_bind(s, w, rng, events, "free", pf)
 		else:
-			events.append({"type": "escaped", "species": w.species, "rarity": w.rarity})
+			events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "chance": pf})
 		return
 	var vessel := choose_vessel(s, w)
 	if vessel == "":
@@ -313,22 +314,27 @@ static func try_capture(s: Dictionary, w: Dictionary, party: Array, rng: RandomN
 			events.append({"type": "pending", "species": w.species})
 		return
 	GameState.add_item(s, vessel, -1)
-	if Rng.chance(rng, bind_chance(s, vessel, int(w.rarity), party)):
-		_bind(s, w, rng, events, vessel)
+	var p := bind_chance(s, vessel, int(w.rarity), party)
+	if Rng.chance(rng, p):
+		_bind(s, w, rng, events, vessel, p)
 	elif w.get("shiny", false):
 		# a shiny never flees: it waits in the pending queue for another try
 		s.expedition.pending.append(w)
 		events.append({"type": "pending", "species": w.species})
 	else:
-		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel})
+		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel, "chance": p})
 
 
-static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String) -> Dictionary:
+## `chance` is the bind chance that was rolled (-1 for a guaranteed bind), shown in the expedition log.
+static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, events: Array, how: String, chance := -1.0) -> Dictionary:
 	var traits := Traits.roll_fresh(rng, Data.species[w.species].types)
 	var c := Creatures.make(s, w.species, int(w.rarity), int(w.level), bool(w.shiny), traits, "wild")
 	s.creatures[c.id] = c
 	s.counters.captures = int(s.counters.captures) + 1
-	events.append({"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how})
+	var ev := {"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how}
+	if chance >= 0.0:
+		ev.chance = chance
+	events.append(ev)
 	if c.shiny:
 		events.append_array(GameState.give_pearls(s, int(Data.tuning.pearls.shinyFound), "a shiny was bound"))
 	events.append_array(Collection.on_owned(s, c))
@@ -342,11 +348,12 @@ static func retry_pending(s: Dictionary, index: int, vessel_id: String, rng: Ran
 		return events
 	var w: Dictionary = s.expedition.pending[index]
 	GameState.add_item(s, vessel_id, -1)
-	if Rng.chance(rng, bind_chance(s, vessel_id, int(w.rarity), GameState.party(s))):
+	var p := bind_chance(s, vessel_id, int(w.rarity), GameState.party(s))
+	if Rng.chance(rng, p):
 		s.expedition.pending.remove_at(index)
-		_bind(s, w, rng, events, vessel_id)
+		_bind(s, w, rng, events, vessel_id, p)
 	else:
-		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel_id, "pending": true})
+		events.append({"type": "escaped", "species": w.species, "rarity": w.rarity, "vessel": vessel_id, "pending": true, "chance": p})
 	return events
 
 

@@ -123,11 +123,11 @@ func _log_battle(e: Dictionary) -> void:
 	var icon: Texture2D = null
 	match e.type:
 		"captured":
-			line = "Bound a %s %s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
-				" · first of its type, free" if e.how == "guaranteed" else ""]
+			line = "Bound a %s %s%s%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " (shiny!)" if e.shiny else "",
+				" · first of its type, free" if e.how == "guaranteed" else "", _chance_note(e)]
 			col = Palette.GOLD if e.shiny else Data.rarity_color(e.rarity)
 		"escaped":
-			line = "A %s %s broke free%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else ""]
+			line = "A %s %s broke free%s%s" % [Data.rarity(e.rarity).name, Data.species[e.species].name, " of a " + Data.item_name(e.vessel) if e.has("vessel") else "", _chance_note(e)]
 			col = Palette.TEXT_FAINT
 			icon = Data.item_icon(e.vessel) if e.has("vessel") else Data.ui_icon("vessel")
 		"boss_defeated":
@@ -166,6 +166,11 @@ func _log_battle(e: Dictionary) -> void:
 		battle_log.push_front(entry)
 		if battle_log.size() > 60:
 			battle_log.resize(60)
+
+
+## " · 41% chance" for a bind or an escape that was rolled, so the log shows the odds it had.
+static func _chance_note(e: Dictionary) -> String:
+	return " · %s chance" % F.pct(float(e.chance)) if e.has("chance") else ""
 
 
 func _handle(events: Array) -> void:
