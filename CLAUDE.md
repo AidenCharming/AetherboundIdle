@@ -48,6 +48,9 @@ skills, breed rarer and hybrid forms, and send a party on idle-combat expedition
    See `docs/HANDOFF.md`.
 10. **Git:** commit as you go with clear messages; fetch and **merge** (never rebase or force-push: the designer
    pushes art to the same branch), then push.
+11. **Keep the context small** (every turn re-reads it): filter command output (`--porcelain`, `grep`, `tail`,
+   counts, `--stat`), read only the part of a file you need, take screenshots at half scale and only when the
+   visual matters, and send broad searches to a subagent. One task per session; `docs/HANDOFF.md` carries state.
 
 ## Commands
 
