@@ -71,32 +71,32 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 28 | Mosscoil | Verdant/Voltaic | Mosscoil > Mossfuse > Canopygrid | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 29 | Mudskulker | Telluric/Aqueous | Mudskulker > Shaleflow > Bedrocktide | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 30 | Quakeforge | Telluric/Pyric | Quakeforge > Slagfist > Craterhearth | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 31 | Geodegrid | Telluric/Voltaic | Geodegrid > Crystalwire > Prismvolt | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 31 | Geodegrid | Telluric/Voltaic | Geodegrid > Crystalwire > Prismvolt | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 32 | Cinderbasin | Pyric/Aqueous | Cinderbasin > Steamrill > Kettlebrine | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 33 | Embersurge | Pyric/Voltaic | Embersurge > Blazearc > Infernodynamo | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 34 | Brinecore | Aqueous/Voltaic | Brinecore > Rillarc > Tidebolt | hybrid | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 35 | Eclipseed | Void/Verdant | Eclipseed > Starsap > Nightbloom | hybrid | green | animal | F1 [x]  F2 [x]  F3 [x] |
-| 36 | Nullshale | Void/Telluric | Nullshale > Riftrock > Abysscrag | hybrid | green | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 36 | Nullshale | Void/Telluric | Nullshale > Riftrock > Abysscrag | hybrid | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 37 | Gloamforge | Void/Pyric | Gloamforge > Muteember > Hushkiln | hybrid | green | animal | F1 [x]  F2 [x]  F3 [x] |
-| 38 | Hushflow | Void/Aqueous | Hushflow > Nullstream > Riftcurrent | hybrid | green | structure | F1 [x]  F2 [x]  F3 [ ] |
-| 39 | Gridrift | Void/Voltaic | Gridrift > Corewire > Lodestar | hybrid | green | structure | F1 [x]  F2 [x]  F3 [ ] |
+| 38 | Hushflow | Void/Aqueous | Hushflow > Nullstream > Riftcurrent | hybrid | green | structure | F1 [x]  F2 [x]  F3 [x] |
+| 39 | Gridrift | Void/Voltaic | Gridrift > Corewire > Lodestar | hybrid | green | structure | F1 [x]  F2 [x]  F3 [x] |
 | 40 | Gravelnip | Telluric/Aqueous | Gravelnip > Reefpincer > Boulderclaw | special | magenta | structure | F1 [x]  F2 [x]  F3 [ ] |
-| 41 | Ripplesnap | Telluric/Aqueous | Ripplesnap > Slatesnout > Ridgehide | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 42 | Cairnflit | Telluric/Voltaic | Cairnflit > Pumiceglide > Fluxwing | special | magenta | structure | F1 [x]  F2 [x]  F3 [ ] |
+| 41 | Ripplesnap | Telluric/Aqueous | Ripplesnap > Slatesnout > Ridgehide | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
+| 42 | Cairnflit | Telluric/Voltaic | Cairnflit > Pumiceglide > Fluxwing | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 43 | Flintlamb | Telluric/Voltaic | Flintlamb > Ampcurl > Mesahorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 44 | Coralpeep | Pyric/Aqueous | Coralpeep > Flarewade > Pyreplume | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 45 | Drizzlenub | Pyric/Aqueous | Drizzlenub > Brooksoak > Lavabask | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 46 | Coalgrub | Pyric/Voltaic | Coalgrub > Arcflicker > Blazefly | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
-| 47 | Boltkit | Pyric/Voltaic | Boltkit > Brandtail > Scorchfox | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 47 | Boltkit | Pyric/Voltaic | Boltkit > Brandtail > Scorchfox | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 48 | Eddyelver | Aqueous/Voltaic | Eddyelver > Kelpeel > Dynamoeel | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
-| 49 | Sprayfledge | Aqueous/Voltaic | Sprayfledge > Pulsedart > Voltfisher | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 50 | Sorrelcliff | Verdant/Telluric | Sorrelcliff > Fernscarp > Highhorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 49 | Sprayfledge | Aqueous/Voltaic | Sprayfledge > Pulsedart > Voltfisher | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
+| 50 | Sorrelcliff | Verdant/Telluric | Sorrelcliff > Fernscarp > Highhorn | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 51 | Hazelslate | Verdant/Telluric | Hazelslate > Mossflint > Grovepeak | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
 | 52 | Brackensear | Verdant/Pyric | Brackensear > Thornkiln > Scaldhearth | special | magenta | cute | F1 [x]  F2 [x]  F3 [x] |
 | 53 | Yarrowflare | Verdant/Pyric | Yarrowflare > Bloomember > Petalblaze | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
-| 54 | Sedgestilt | Verdant/Aqueous | Sedgestilt > Reedcurrent > Willowmire | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 55 | Rowanboulder | Verdant/Aqueous | Rowanboulder > Fernbrook > Alderfalls | special | magenta | animal | F1 [x]  F2 [x]  F3 [ ] |
-| 56 | Ivyflux | Verdant/Voltaic | Ivyflux > Vinespark > Leafcharge | special | magenta | structure | F1 [x]  F2 [x]  F3 [ ] |
+| 54 | Sedgestilt | Verdant/Aqueous | Sedgestilt > Reedcurrent > Willowmire | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
+| 55 | Rowanboulder | Verdant/Aqueous | Rowanboulder > Fernbrook > Alderfalls | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
+| 56 | Ivyflux | Verdant/Voltaic | Ivyflux > Vinespark > Leafcharge | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 57 | Burrbolt | Verdant/Voltaic | Burrbolt > Quillspark > Stormbristle | special | magenta | cute | F1 [x]  F2 [x]  F3 [x] |
 | 58 | Cliffscorch | Telluric/Pyric | Cliffscorch > Kilnclaw > Pyrestinger | special | magenta | structure | F1 [x]  F2 [x]  F3 [x] |
 | 59 | Nettlemesa | Telluric/Pyric | Nettlemesa > Spurback > Spinehearth | special | magenta | animal | F1 [x]  F2 [x]  F3 [x] |
@@ -107,9 +107,9 @@ For a green-key creature add `--bg #00FF00`. Add `--halo-strict` only if a pink 
 | 64 | Wraithcoal | Void/Pyric | Wraithcoal > Ashgloam > Cinderwraith | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 65 | Duskflare | Void/Pyric | Duskflare > Wanescorch > Gloamfang | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 66 | Murkmire | Void/Aqueous | Murkmire > Murkveil > Abyssbloom | special | green | structure | F1 [x]  F2 [x]  F3 [x] |
-| 67 | Hollowstream | Void/Aqueous | Hollowstream > Stillgill > Palepool | special | green | animal | F1 [x]  F2 [x]  F3 [ ] |
+| 67 | Hollowstream | Void/Aqueous | Hollowstream > Stillgill > Palepool | special | green | animal | F1 [x]  F2 [x]  F3 [x] |
 | 68 | Wraithwire | Void/Voltaic | Wraithwire > Wanewire > Shadescythe | special | green | structure | F1 [x]  F2 [x]  F3 [ ] |
-| 69 | Duskvolt | Void/Voltaic | Duskvolt > Wanecoil > Gloomweaver | special | green | structure | F1 [x]  F2 [x]  F3 [ ] |
+| 69 | Duskvolt | Void/Voltaic | Duskvolt > Wanecoil > Gloomweaver | special | green | structure | F1 [x]  F2 [x]  F3 [x] |
 
 ## Base species
 
@@ -764,7 +764,7 @@ Redraw the same character as the reference image as its second form, a tall reef
 ```
 **Form 3, Boulderclaw** (edit, reference = `gravelnip-f2.png`, 8 steps, CFG 1.0, file `gravelnip-f3.png`)
 ```
-Redraw the same character as the reference image as its final form, a huge boulder-clawed crab. Keep the same face, the same eyes and the same colouring, the same eyes on short stalks and the wooden bucket on its shell, the same dark-brown outlines and the same art style. A real final evolution: about three times the size of the second form, grander, more intricate and clearly the most impressive form; correct anatomy, no extra limbs. A huge, towering crab raised high on six long armoured legs, with one enormous boulder claw of cracked grey rock bigger than its body, a tall craggy shale shell veined in teal like a small cliff, and the wooden bucket on its shell grown into a big wooden tub holding a tide pool with a tiny reed. Three-quarter view facing left, raised high on its legs, its boulder claw lifted over its head, full body, centred, on a solid bright saturated pure magenta background (#FF00FF), evenly lit and completely flat, no shadow, no glow effect, no halo.
+Redraw the same character as the reference image as its final form, a huge boulder-clawed crab. Keep the same face, the same eyes and the same colouring, the same eyes on short stalks and the wooden bucket on its shell, the same dark-brown outlines and the same art style. A real final evolution: about three times the size of the second form, grander, more intricate and clearly the most impressive form; correct anatomy, no extra limbs. A huge, towering crab raised high on six long armoured legs, with exactly two claws: one enormous boulder claw of grey rock bigger than its body, and one small claw held up in front of its face, both clearly visible; a craggy shale shell veined in teal like a small cliff, and the wooden bucket on its shell grown into a big wooden tub holding a tide pool with a tiny reed. Three-quarter view facing left, raised high on its legs, its boulder claw lifted over its head, full body, centred, on a solid bright saturated pure magenta background (#FF00FF), evenly lit and completely flat, no shadow, no glow effect, no halo.
 ```
 
 ### 41. Ripplesnap > Slatesnout > Ridgehide (Telluric/Aqueous)
@@ -1240,7 +1240,7 @@ Redraw the same character as the reference image as its second form, a sleek adu
 ```
 **Form 3, Shadescythe** (edit, reference = `wraithwire-f2.png`, 8 steps, CFG 1.0, file `wraithwire-f3.png`)
 ```
-Redraw the same character as the reference image as its final form, a tall shadow-scythe cat. Keep the same face, the same eyes and the same colouring, the same ears, the copper wire wraps and the stone portal ring on its tail, the same dark indigo outlines and the same art style. A real final evolution: a new pose and a clearly different, fully grown body about twice the size of the second form, the head smaller in proportion to the body; correct anatomy, no extra limbs. A tall, powerful panther-like cat with long slim legs, copper wire wound around its legs with small yellow zigzag marks, a long coiled copper tail carrying the big stone portal ring, and two long curved scythe blades that grow out of the backs of its front legs as part of its body, not weapons it holds, edged with bright yellow zigzag lines. Three-quarter view facing left, prowling on all four legs, low and stalking, head forward, full body, centred, on a solid bright saturated pure green background (#00FF00), evenly lit and completely flat, no shadow, no glow effect, no halo.
+Redraw the same character as the reference image as its final form, a tall shadow-scythe cat. Keep the same face, the same eyes and the same colouring, the same ears, the copper wire wraps and the stone portal ring on its tail, the same dark indigo outlines and the same art style. A real final evolution: a new pose and a clearly different, fully grown body about twice the size of the second form, the head smaller in proportion to the body; correct anatomy, no extra limbs. A tall, powerful panther-like cat with long slim legs, copper wire wound around its legs with small yellow zigzag marks, a long coiled copper tail carrying the big stone portal ring, and a long crescent-shaped fin of dark violet fur sweeping back from each front leg like a scythe blade, edged with bright yellow zigzag lines. Three-quarter view facing left, prowling on all four legs, low and stalking, head forward, full body, centred, on a solid bright saturated pure green background (#00FF00), evenly lit and completely flat, no shadow, no glow effect, no halo.
 ```
 
 ### 69. Duskvolt > Wanecoil > Gloomweaver (Void/Voltaic)

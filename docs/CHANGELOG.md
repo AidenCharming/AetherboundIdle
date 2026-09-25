@@ -3,6 +3,17 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3h (2026-09-25): 14 Form 3 sprites drawn from scratch
+
+- Form 3 of Boltkit, Cairnflit, Duskvolt, Geodegrid, Gridrift, Hollowstream, Hushflow, Ivyflux, Nullshale,
+  Ripplesnap, Rowanboulder, Sedgestilt, Sorrelcliff and Sprayfledge, from the `--scratch` run (text to image, no
+  reference). It fixed what three edit runs could not: new poses and real growth, with the likeness to Forms 1
+  and 2 kept by a full identity line per species (`SCRATCH3`). 43 of the 45 hybrids and specials now have all
+  three forms in the game; Gravelnip (candidates hid its small claw) and Wraithwire (the scythes kept coming out
+  as loose weapons, now forearm fur fins) are being redrawn.
+- Cut-outs checked over cyan; the see-through share on Gridrift (4.8%), Sprayfledge, Duskvolt and Cairnflit is
+  real gaps (rings, the coiled tail, legs, between wings and body), not holes.
+
 ## 0.6.3g (2026-09-25): the owned mark is per form
 
 - **Owned mark (playtest question):** the mark on an island's Aetherling list and on wild fighters' name tags
