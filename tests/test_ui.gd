@@ -612,3 +612,14 @@ func test_works_build_buttons_stay_put_and_follow_gold() -> void:
 	t.ok(works._builds[id] != b, "building rebuilt the cards")
 	main.free()
 	_teardown()
+
+
+## The Put to work menu drew its skill icons at their painted 512 px, filling the screen.
+func test_menu_icons_are_drawn_small() -> void:
+	_setup()
+	var main := _main()
+	_teardown()
+	var w: int = main.get_theme_constant("icon_max_width", "PopupMenu")
+	t.ok(w > 0 and w <= 32, "PopupMenu icons capped at %d px" % w)
+	main.free()
+	_teardown()
