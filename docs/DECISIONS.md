@@ -353,7 +353,7 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     egg (a grade above the best on sale) or a Crystal hoard.
   - **Boosts** start when bought and keep running offline (a boost that ends while away counts for its share
     of the time): Aether Incense +50% Aether, Battle Tonic +50% party XP, Glimmer Lure makes rarities above
-    Dim twice as common, Tinker's Brew +20% work speed. 30–60 minutes a purchase, stacking to 8 hours;
+    Dim 50% more common, Tinker's Brew +20% work speed. 30–60 minutes a purchase, stacking to 8 hours;
     prices grow ×1.55 per island cleared. They show in the top bar with their time left.
   - **Market eggs** hold a random base Aetherling of a type you own, in grades that open with islands
     cleared (Common Dim+ 600 gold, Fine Faint+ 6K, Choice Steady+ 40K, Prime Gleaming+ 200K, Royal

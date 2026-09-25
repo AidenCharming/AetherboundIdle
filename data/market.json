@@ -55,8 +55,8 @@
 				"desc": "+50% Aether from perches and the Resonance Extractor."},
 			{"id": "battle-tonic", "name": "Battle Tonic", "icon": "boost-tonic", "effect": "partyXp", "value": 0.5, "minutes": 60, "gold": 300,
 				"desc": "+50% XP for the expedition party."},
-			{"id": "glimmer-lure", "name": "Glimmer Lure", "icon": "boost-lure", "effect": "wildRarity", "value": 1.0, "minutes": 30, "gold": 500,
-				"desc": "Wild Aetherlings rarer than Dim turn up twice as often."},
+			{"id": "glimmer-lure", "name": "Glimmer Lure", "icon": "boost-lure", "effect": "wildRarity", "value": 0.5, "minutes": 30, "gold": 500,
+				"desc": "Wild Aetherlings rarer than Dim turn up 50% more often."},
 			{"id": "tinkers-brew", "name": "Tinker's Brew", "icon": "boost-brew", "effect": "workSpeed", "value": 0.2, "minutes": 60, "gold": 600,
 				"desc": "Every worker finishes its actions 20% faster."}
 		]

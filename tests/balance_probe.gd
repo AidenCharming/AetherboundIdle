@@ -8,6 +8,13 @@ func _ready() -> void:
 		["whisperleaf-hollow", [["sproutlet", 1, 4]]],
 		["whisperleaf-hollow", [["sproutlet", 1, 6], ["brambletrundle", 1, 4]]],
 		["whisperleaf-hollow", [["sproutlet", 1, 8], ["brambletrundle", 2, 6], ["buzzbud", 1, 6]]],
+		# early outliers (the designer's reports): a lucky high rarity at a low level against Old Thicketroll
+		["whisperleaf-hollow", [["mossgear", 5, 1]]],
+		["whisperleaf-hollow", [["mossgear", 5, 3]]],
+		["whisperleaf-hollow", [["mossgear", 5, 2], ["sproutlet", 1, 2], ["buzzbud", 1, 2]]],
+		["whisperleaf-hollow", [["mossgear", 4, 3], ["sproutlet", 3, 3], ["buzzbud", 3, 3]]],
+		["whisperleaf-hollow", [["mossgear", 3, 3], ["sproutlet", 3, 3], ["buzzbud", 3, 3]]],
+		["smoldering-caldera", [["tuskcub", 2, 10], ["quakemaw", 2, 10], ["sproutlet", 2, 10]]],
 		["fractured-quarry", [["sproutlet", 1, 10], ["brambletrundle", 2, 8], ["buzzbud", 1, 8]]],
 		["fractured-quarry", [["sproutlet", 2, 16], ["tuskcub", 2, 14], ["buzzbud", 2, 14]]],
 		["smoldering-caldera", [["tuskcub", 2, 22], ["quakemaw", 2, 22], ["sproutlet", 2, 24]]],

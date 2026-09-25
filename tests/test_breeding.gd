@@ -68,7 +68,7 @@ func test_one_rarer_parent_raises_the_odds() -> void:
 	var dd := Breeding.rarity_odds(dim, _c(s, "sproutlet", 1), 1)
 	var df := Breeding.rarity_odds(dim, faint, 1)
 	var ff := Breeding.rarity_odds(faint, _c(s, "mossgear", 2), 1)
-	t.near(dd[1], 0.25, 0.02, "two Dims make a Faint about a quarter of the time (%.3f)" % dd[1])
+	t.near(dd[1], 0.21, 0.02, "two Dims make a Faint about a fifth of the time (%.3f)" % dd[1])
 	t.ok(df[1] > dd[1] + 0.15, "a Faint parent lifts the Faint chance (%.3f vs %.3f)" % [df[1], dd[1]])
 	t.ok(df[0] < dd[0] and df[0] > 0.0, "and lowers Dim without ruling it out")
 	t.eq(ff[0], 0.0, "two Faints never make a Dim")

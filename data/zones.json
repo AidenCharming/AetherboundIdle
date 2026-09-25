@@ -16,9 +16,9 @@
 		],
 		"enemyMult": 0.62,
 		"rarityWeights": [
-			80,
-			17,
-			3
+			88,
+			11,
+			1
 		],
 		"species": {
 			"sproutlet": 3,
@@ -103,10 +103,10 @@
 		],
 		"enemyMult": 0.6,
 		"rarityWeights": [
-			70,
-			22,
-			7,
-			1
+			80,
+			16,
+			3.5,
+			0.5
 		],
 		"species": {
 			"quakemaw": 2,
@@ -195,11 +195,11 @@
 		],
 		"enemyMult": 1.01,
 		"rarityWeights": [
-			60,
-			26,
-			10,
-			3,
-			1
+			70,
+			22,
+			6,
+			1.5,
+			0.5
 		],
 		"species": {
 			"emberfang": 2,
@@ -296,11 +296,11 @@
 		],
 		"enemyMult": 0.96,
 		"rarityWeights": [
-			52,
-			28,
-			13,
-			5,
-			2
+			62,
+			26,
+			8.5,
+			2.5,
+			1
 		],
 		"species": {
 			"dewdrop": 3,
@@ -380,12 +380,12 @@
 		],
 		"enemyMult": 1.3,
 		"rarityWeights": [
-			45,
-			30,
-			15,
-			7,
-			2,
-			1
+			55,
+			28,
+			11,
+			4,
+			1.5,
+			0.5
 		],
 		"species": {
 			"voltfluff": 3,
@@ -465,12 +465,12 @@
 		],
 		"enemyMult": 1.44,
 		"rarityWeights": [
-			40,
-			30,
-			16,
-			8,
-			4,
-			2
+			50,
+			28,
+			13,
+			5,
+			2.5,
+			1.5
 		],
 		"species": {
 			"eclipsa": 1,
@@ -570,13 +570,13 @@
 		],
 		"enemyMult": 1.33,
 		"rarityWeights": [
-			36,
+			44,
 			30,
-			18,
-			9,
-			4,
-			2,
-			1
+			15,
+			6,
+			3,
+			1.5,
+			0.5
 		],
 		"species": {
 			"sproutlet": 3,
@@ -673,13 +673,13 @@
 		],
 		"enemyMult": 1.66,
 		"rarityWeights": [
-			32,
+			40,
 			30,
-			20,
-			10,
-			5,
-			2,
-			1
+			17,
+			8,
+			3,
+			1.5,
+			0.5
 		],
 		"species": {
 			"emberfang": 2,
@@ -777,11 +777,11 @@
 		],
 		"enemyMult": 1.61,
 		"rarityWeights": [
-			28,
+			35,
 			30,
-			21,
-			12,
-			6,
+			19,
+			9,
+			4,
 			2,
 			1
 		],
@@ -882,14 +882,14 @@
 		],
 		"enemyMult": 1.95,
 		"rarityWeights": [
-			24,
+			30,
 			28,
-			22,
-			14,
-			7,
-			3,
+			20,
+			12,
+			6,
+			2.5,
 			1,
-			1
+			0.5
 		],
 		"species": {
 			"eclipsa": 2,

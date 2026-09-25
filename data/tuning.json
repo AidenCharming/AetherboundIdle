@@ -96,15 +96,15 @@
 	},
 	"poolTraits": {
 		"countWeights": [
-			35,
-			40,
-			20,
-			5
+			55,
+			33,
+			10,
+			2
 		],
 		"strengthWeights": {
-			"minor": 65,
-			"moderate": 28,
-			"major": 7
+			"minor": 72,
+			"moderate": 24,
+			"major": 4
 		},
 		"typeAffinityMult": 3,
 		"attunementCountWeights": [
@@ -142,8 +142,8 @@
 		],
 		"stepWeight": 0.18,
 		"centreLiftPerTier": 0.05,
-		"mutationPlusOne": 0.15,
-		"mutationPlusTwo": 0.025,
+		"mutationPlusOne": 0.08,
+		"mutationPlusTwo": 0.01,
 		"topTierMutationMult": 0.5,
 		"hatchMinutes": [
 			2,

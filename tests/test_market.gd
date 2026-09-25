@@ -182,7 +182,7 @@ func test_glimmer_lure_brings_rarer_wilds() -> void:
 	var plain: int = count.call()
 	Market.add_boost(s, "glimmer-lure")
 	var lured: int = count.call()
-	t.ok(lured > plain * 1.4, "more non-Dim wilds (%d vs %d)" % [lured, plain])
+	t.ok(lured > plain * 1.25, "more non-Dim wilds (%d vs %d)" % [lured, plain])
 
 
 func test_market_eggs() -> void:
