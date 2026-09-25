@@ -246,7 +246,7 @@ func test_boss_fight_switches_to_boss_music_and_back() -> void:
 	_teardown()
 
 
-func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
+func test_worker_picker_sorts_by_output_and_secondary() -> void:
 	_setup()
 	var main := _main()
 	_teardown()
@@ -266,8 +266,7 @@ func test_worker_picker_sorts_by_time_output_and_secondary() -> void:
 	t.eq(picker._sort, "output", "opens on Best output")
 	var o: Array = order.call()
 	t.ok(o.find(ids.bountiful) < o.find(ids.plain) and o.find(ids.bountiful) < o.find(ids.lucky), "bountiful out-produces plain and lucky")
-	_find_button(m, "Best time").pressed.emit()
-	t.eq(order.call()[0], ids.swift, "the fastest first")
+	t.ok(_find_button(m, "Best time") == null, "Best time is gone (play-test feedback)")
 	_find_button(m, "Best secondary").pressed.emit()
 	t.eq(order.call()[0], ids.lucky, "the luckiest first")
 	var first: CreatureCard = picker._grid.get_children().filter(func(n): return n is CreatureCard)[0]
@@ -752,4 +751,34 @@ func test_picker_cards_show_status_under_the_note() -> void:
 	t.ok("Makes Sproutlet" in texts, "the note")
 	t.ok(("Working: " + Data.skills.woodcutting.name) in texts, "and what it's doing: %s" % [texts])
 	card.free()
+	_teardown()
+
+
+## Play-test feedback: one button fills a skill's empty slots with the best resting Aetherlings.
+func test_fill_empty_slots() -> void:
+	_setup()
+	var s := Game.state
+	s.skills.woodcutting.level = 10   # two slots
+	var starter: Dictionary = s.creatures.values()[0]
+	var plain := Creatures.make(s, "sproutlet", 1, 1, false, [], "test")
+	var bountiful := Creatures.make(s, "sproutlet", 1, 1, false, [{"id": "bountiful", "s": "major"}], "test")
+	var busy := Creatures.make(s, "sproutlet", 1, 30, false, [], "test")
+	var pyric := Creatures.make(s, "emberfang", 1, 30, false, [], "test")
+	for c in [plain, bountiful, busy, pyric]:
+		s.creatures[c.id] = c
+	Skills.assign(s, busy, "herbalism")
+	Skills.assign(s, starter, "woodcutting")
+	var main := _main()
+	_teardown()
+	main.show_screen("skill", "woodcutting")
+	var fb: Button = main._screen._fill_btn
+	t.ok(fb.visible and not fb.disabled, "a slot is free and someone can fill it")
+	fb.pressed.emit()
+	t.eq(GameState.workers(s, "woodcutting").size(), 2, "the free slot is filled")
+	t.eq(bountiful.job.get("id", ""), "woodcutting", "by the best producer")
+	t.ok(Creatures.is_benched(plain), "the weaker one keeps resting")
+	t.eq(busy.job.id, "herbalism", "a worker elsewhere isn't moved")
+	main._on_changed()
+	t.ok(not main._screen._fill_btn.visible, "no empty slot, no button")
+	main.free()
 	_teardown()

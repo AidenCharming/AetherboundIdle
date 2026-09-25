@@ -293,6 +293,31 @@ static func assign(s: Dictionary, c: Dictionary, skill_id: String) -> String:
 	return ""
 
 
+## Resting Aetherlings who could fill this skill's empty slots, best first (most product per hour on the
+## current task), no more than there are empty slots. Workers elsewhere and the party are left alone.
+static func fill_candidates(s: Dictionary, skill_id: String) -> Array:
+	var free := GameState.slot_count(s, skill_id) - GameState.workers(s, skill_id).size()
+	if free <= 0:
+		return []
+	var action := current_action(s, skill_id)
+	var auras := active_auras(s)
+	var keyed := []
+	for c in s.creatures.values():
+		if Creatures.is_benched(c) and Creatures.can_work(c, skill_id):
+			keyed.append([float(work_rates(c, skill_id, action, auras).output), int(c.level), c])
+	keyed.sort_custom(func(a, b): return [a[0], a[1]] > [b[0], b[1]])
+	return keyed.slice(0, free).map(func(k): return k[2])
+
+
+## Puts the best resting Aetherlings into every empty slot of a skill. Returns how many went to work.
+static func fill_slots(s: Dictionary, skill_id: String) -> int:
+	var n := 0
+	for c in fill_candidates(s, skill_id):
+		if assign(s, c, skill_id) == "":
+			n += 1
+	return n
+
+
 static func unassign(s: Dictionary, c: Dictionary) -> void:
 	if c.job.get("kind", "") == "party":
 		s.expedition.party.erase(c.id)

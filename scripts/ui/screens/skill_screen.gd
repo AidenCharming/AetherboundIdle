@@ -12,6 +12,7 @@ var _rate: VBoxContainer
 var _slot_bars: Array = []   # [{cid, bar, label}]
 var _have_labels: Array = []   # [{id, label, last}] item counts on the action cards, updated live
 var _fx: Control
+var _fill_btn: Button
 
 
 func setup(arg: String) -> void:
@@ -56,7 +57,11 @@ func _ready() -> void:
 	_rate.custom_minimum_size.x = 260
 	head.add_child(_rate)
 	# slots
-	v.add_child(UI.label("Work slots", "H2"))
+	var sh := UI.hbox(12, [UI.label("Work slots", "H2")])
+	_fill_btn = UI.button("Fill empty slots", "", func(): Game.fill_slots(skill_id), Data.ui_icon("nexus"))
+	_fill_btn.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	sh.add_child(_fill_btn)
+	v.add_child(sh)
 	_slots = UI.flow(14, 14)
 	v.add_child(_slots)
 	v.add_child(UI.label("What to work on", "H2"))
@@ -88,6 +93,11 @@ func _fill_slots() -> void:
 	var levels: Array = Data.tuning.skills.slotLevels
 	var action := Skills.current_action(s, skill_id)
 	var auras := Skills.active_auras(s)
+	var fill := Skills.fill_candidates(s, skill_id)
+	_fill_btn.visible = ws.size() < open
+	_fill_btn.disabled = fill.is_empty()
+	_fill_btn.tooltip_text = "Put the best resting Aetherlings (most %s per hour) in every empty slot" % Data.item_name(action.outputs.keys()[0]) \
+		if not fill.is_empty() else "No resting Aetherling can work here"
 	for i in maxi(levels.size(), open):
 		var card := UI.panel("Card")
 		card.custom_minimum_size = Vector2(250, 214)
@@ -184,7 +194,7 @@ func _pick(replace_id: String) -> void:
 		_worker_sorts(action, auras))
 
 
-## The worker picker's rankings for this task: fastest, most product, most secondary finds.
+## The worker picker's rankings for this task: most product, most secondary finds.
 func _worker_sorts(action: Dictionary, auras: Array) -> Array:
 	var rates := {}   # creature id -> Skills.work_rates, worked out once per creature
 	var r := func(c: Dictionary) -> Dictionary:
@@ -200,9 +210,6 @@ func _worker_sorts(action: Dictionary, auras: Array) -> Array:
 		{"id": "output", "label": "Best output", "tip": "Most %s per hour, counting speed and extra-output traits" % out_name,
 			"key": func(c): return r.call(c).output,
 			"note": func(c): return "%s %s/h" % [F.format_num(r.call(c).output), out_name]},
-		{"id": "time", "label": "Best time", "tip": "Shortest time per task",
-			"key": func(c): return -float(r.call(c).cooldown),
-			"note": func(c): return "Every %s here" % F.format_ms(r.call(c).cooldown)},
 		{"id": "secondary", "label": "Best secondary", "tip": "Most secondary finds per hour: %s" % ", ".join(finds + ["partner-element drops"]),
 			"key": func(c): return r.call(c).secondary,
 			"note": func(c): return "%s secondary finds/h" % F.format_num(r.call(c).secondary)},

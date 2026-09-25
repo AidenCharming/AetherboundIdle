@@ -402,6 +402,16 @@ func assign(cid: String, skill_id: String) -> bool:
 	return true
 
 
+## "Fill empty slots" on a skill page: the best resting Aetherlings go to work there.
+func fill_slots(skill_id: String) -> int:
+	var n := Skills.fill_slots(state, skill_id)
+	if n > 0:
+		Sfx.play("click")
+		info("%d Aetherling%s went to work in %s" % [n, "" if n == 1 else "s", Data.skills[skill_id].name], Data.ui_icon(skill_id))
+	changed.emit()
+	return n
+
+
 func bench(cid: String) -> void:
 	var c := creature(cid)
 	if c.is_empty():
