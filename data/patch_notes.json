@@ -1,5 +1,15 @@
 [
 	{
+		"version": "0.6.3j",
+		"date": "2026-09-25",
+		"title": "Every final form painted",
+		"notes": {
+			"New": [
+				["Nexus", "Gravelnip and Wraithwire are painted in their final form: every Aetherling now has art for all three forms."]
+			]
+		}
+	},
+	{
 		"version": "0.6.3i",
 		"date": "2026-09-25",
 		"title": "Every form counts",

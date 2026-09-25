@@ -3,6 +3,13 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.3j (2026-09-25): the last two Form 3 sprites
+
+- Form 3 of Gravelnip (from-scratch candidate 25: the prompt now names exactly two claws, a boulder claw and a
+  small one) and Wraithwire (candidate 23: the scythes became forearm fur fins, then dropped out of the pick; the
+  designer chose the plain wire-wrapped shadow cat with the ring tail). All 45 hybrids and specials, and all 69
+  species, now have all three forms in the game. Cut-outs checked over cyan: no holes.
+
 ## 0.6.3i (2026-09-25): forms are found one by one; auto-bind per form
 
 - **Designer's rule:** catching a Form 2 no longer logs its Form 1 as found. `forms` in each Aether-Log
