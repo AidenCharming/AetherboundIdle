@@ -739,3 +739,17 @@ func test_controls_page_captures_a_key() -> void:
 	Options.values.keybinds = saved
 	Options.save_options()
 	_teardown()
+
+
+## Play-test feedback: the breeding picker's cards said what a pair would make but not what each Aetherling
+## was doing. A card with a note shows its status too.
+func test_picker_cards_show_status_under_the_note() -> void:
+	_setup()
+	var c: Dictionary = Game.state.creatures.values()[0]
+	Skills.assign(Game.state, c, "woodcutting")
+	var card := CreatureCard.make(c, false, "Makes Sproutlet")
+	var texts := card.find_children("*", "Label", true, false).map(func(l): return l.text)
+	t.ok("Makes Sproutlet" in texts, "the note")
+	t.ok(("Working: " + Data.skills.woodcutting.name) in texts, "and what it's doing: %s" % [texts])
+	card.free()
+	_teardown()
