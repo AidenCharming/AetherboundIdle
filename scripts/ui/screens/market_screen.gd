@@ -151,7 +151,7 @@ func _offer_card(o: Dictionary, i: int) -> Control:
 	var cv := UI.vbox(10)
 	card.add_child(cv)
 	var h := UI.hbox(14)
-	h.add_child(_offer_icon(o, 52))
+	h.add_child(_offer_icon(o, 62))
 	var tv := UI.vbox(2)
 	var title := UI.label(_offer_title(o), "H3")
 	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -189,11 +189,11 @@ func _limited_card(o: Dictionary, i: int) -> Control:
 	card.add_theme_stylebox_override("panel", sb)
 	var h := UI.hbox(22)
 	card.add_child(h)
-	var ic := _offer_icon(o, 84)
+	var ic := _offer_icon(o, 101)
 	h.add_child(ic)
 	if int(o.left) > 0 and not Options.values.get("reduce_motion", false):
 		var tw := ic.create_tween().set_loops()
-		ic.pivot_offset = Vector2(42, 42)
+		ic.pivot_offset = Vector2(50.5, 50.5)
 		tw.tween_property(ic, "scale", Vector2(1.08, 1.08), 0.7).set_trans(Tween.TRANS_SINE)
 		tw.tween_property(ic, "scale", Vector2.ONE, 0.7).set_trans(Tween.TRANS_SINE)
 	var tv := UI.vbox(5)

@@ -74,10 +74,10 @@ func _station(skill: Dictionary) -> Control:
 	var v := UI.vbox(10)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	v.offset_left = 14
-	v.offset_right = -14
-	v.offset_top = 12
-	v.offset_bottom = -12
+	v.offset_left = 17
+	v.offset_right = -17
+	v.offset_top = 14
+	v.offset_bottom = -14
 	card.add_child(v)
 	var head := UI.hbox(12)
 	head.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -125,7 +125,7 @@ func refresh() -> void:
 		var n := GameState.slot_count(s, id)
 		var cols := mini(n, 5)
 		var room := 272 - (36 if ws.size() > 0 else 0)
-		var px := clampi(int((room - 6 * (cols - 1)) / float(cols)), 34, 58)
+		var px := clampi(int((room - 7 * (cols - 1)) / float(cols)), 41, 70)
 		var grid := UI.grid(maxi(1, cols), 7, 7)
 		grid.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		st.workers.add_child(grid)

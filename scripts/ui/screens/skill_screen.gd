@@ -231,10 +231,10 @@ func _fill_actions() -> void:
 		var cv := UI.vbox(7)
 		cv.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		cv.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		cv.offset_left = 14
-		cv.offset_right = -14
-		cv.offset_top = 12
-		cv.offset_bottom = -12
+		cv.offset_left = 17
+		cv.offset_right = -17
+		cv.offset_top = 14
+		cv.offset_bottom = -14
 		card.add_child(cv)
 		var out: String = a.outputs.keys()[0]
 		var top := UI.hbox(14)
@@ -315,7 +315,7 @@ func _fit_cards() -> void:
 	var h := 236.0
 	for card in _actions.get_children():
 		if card.get_child_count() > 0:
-			h = maxf(h, card.get_child(0).get_combined_minimum_size().y + 24.0)
+			h = maxf(h, card.get_child(0).get_combined_minimum_size().y + 29.0)
 	for card in _actions.get_children():
 		card.custom_minimum_size.y = h
 
@@ -396,7 +396,7 @@ func _on_event(e: Dictionary) -> void:
 			for i in _slot_bars.size():
 				if _slot_bars[i].cid == e.creature:
 					var bar: ProgressBar = _slot_bars[i].bar
-					var at := bar.global_position - _fx.global_position + Vector2(bar.size.x - 70.0, -96.0)
+					var at := bar.global_position - _fx.global_position + Vector2(bar.size.x - 84.0, -115.0)
 					var n := 0
 					for id in e.items:
 						if id.begins_with("_"):

@@ -140,10 +140,10 @@ func _fill_zones() -> void:
 		var v := UI.vbox(4)
 		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		v.offset_left = 14
-		v.offset_right = -12
-		v.offset_top = 10
-		v.offset_bottom = -10
+		v.offset_left = 17
+		v.offset_right = -14
+		v.offset_top = 12
+		v.offset_bottom = -12
 		card.add_child(v)
 		var h := UI.hbox(10)
 		h.add_child(_fit(UI.label(z.name, "H3")))
@@ -639,7 +639,7 @@ func _render_log() -> void:
 		var col: Color = e.color
 		var card := _log_card(col, 8)
 		var h := UI.hbox(10)
-		h.add_child(_log_icon(e, 30, 22))
+		h.add_child(_log_icon(e, 36, 26))
 		var l := UI.label(e.text, "", col)
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		l.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -660,7 +660,7 @@ func _render_log() -> void:
 		tile.gui_input.connect(func(ev: InputEvent):
 			if ev is InputEventMouseButton and ev.pressed and ev.button_index == MOUSE_BUTTON_LEFT:
 				_set_open("exp_log_open", true))
-		var ic := _log_icon(e, 26, 22)
+		var ic := _log_icon(e, 31, 26)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		tile.add_child(ic)
 		_log_mini.add_child(tile)

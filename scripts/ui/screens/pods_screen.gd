@@ -149,8 +149,8 @@ func _parent_slot(which: int) -> Control:
 	var v := UI.vbox(5)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	v.offset_top = 12
-	v.offset_bottom = -12
+	v.offset_top = 14
+	v.offset_bottom = -14
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(v)
 	if c.is_empty():
@@ -209,7 +209,7 @@ func _odds_bar(odds: Array) -> Control:
 			var seg: float = odds[i] * w
 			if seg <= 0.0:
 				continue
-			bar.draw_rect(Rect2(x, 0, maxf(seg, 2.0), bar.size.y), Data.rarity_color(i + 1))
+			bar.draw_rect(Rect2(x, 0, maxf(seg, 2.4), bar.size.y), Data.rarity_color(i + 1))
 			x += seg
 		bar.draw_rect(Rect2(Vector2.ZERO, bar.size), Color(1, 1, 1, 0.15), false, 1.0))
 	return bar

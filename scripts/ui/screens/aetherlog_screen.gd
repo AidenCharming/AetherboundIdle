@@ -87,10 +87,10 @@ func _entry(sp: Dictionary) -> Control:
 	var v := UI.vbox(5)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	v.offset_left = 8
-	v.offset_right = -8
-	v.offset_top = 8
-	v.offset_bottom = -8
+	v.offset_left = 10
+	v.offset_right = -10
+	v.offset_top = 10
+	v.offset_bottom = -10
 	card.add_child(v)
 	# the dex number as a chip: the species' type colour once owned, grey until then
 	var num_col := Data.type_color(sp.types[0]) if owned else (Palette.TEXT_DIM if seen else Palette.TEXT_FAINT)
@@ -117,9 +117,9 @@ func _entry(sp: Dictionary) -> Control:
 		var n := Data.max_rarity()
 		for i in n:
 			var c := Data.rarity_color(i + 1) if (i + 1) in rar else Color(1, 1, 1, 0.1)
-			dots.draw_circle(Vector2(8 + i * 12.5, 6), 4.2, c)
+			dots.draw_circle(Vector2(10 + i * 15.0, 7), 5.0, c)
 		if shiny:
-			dots.draw_circle(Vector2(8 + n * 12.5, 6), 4.6, Palette.GOLD))
+			dots.draw_circle(Vector2(10 + n * 15.0, 7), 5.5, Palette.GOLD))
 	v.add_child(dots)
 	card.tooltip_text = sp.name if seen else "Not found yet"
 	return card
@@ -278,8 +278,8 @@ func _milestones() -> void:
 			var claimable := not claimed and p >= target
 			# one card per milestone: the goal on top, each reward on its own line, the state at the bottom
 			var mc := PanelContainer.new()
-			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not claimable else Color(Palette.GOLD, 0.10), 14, 1,
-				Color(Palette.GOLD, 0.7) if claimable else Palette.LINE, 14)
+			var sb := ThemeFactory.box(Color(1, 1, 1, 0.035) if not claimable else Color(Palette.GOLD, 0.10), 17, 1,
+				Color(Palette.GOLD, 0.7) if claimable else Palette.LINE, 17)
 			sb.content_margin_top = 14
 			sb.content_margin_bottom = 14
 			mc.add_theme_stylebox_override("panel", sb)

@@ -79,10 +79,10 @@ func _ready() -> void:
 	toasts.anchor_right = 1.0
 	toasts.anchor_top = 1.0
 	toasts.anchor_bottom = 1.0
-	toasts.offset_left = -380
-	toasts.offset_right = -22
-	toasts.offset_top = -400
-	toasts.offset_bottom = -22
+	toasts.offset_left = -456
+	toasts.offset_right = -26
+	toasts.offset_top = -480
+	toasts.offset_bottom = -26
 	toasts.alignment = BoxContainer.ALIGNMENT_END
 	toasts.z_index = 120
 	add_child(toasts)
@@ -254,8 +254,8 @@ func _nav_item(screen: String, arg: String, text: String, icon_name: String) -> 
 	var h := UI.hbox(8)
 	h.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	h.offset_left = 10
-	h.offset_right = -6
+	h.offset_left = 12
+	h.offset_right = -7
 	h.add_child(UI.icon(Data.ui_icon(icon_name), 29))
 	var l := UI.label(text)
 	l.add_theme_font_override("font", ThemeFactory.bold_font())
@@ -805,8 +805,8 @@ func _show_summary(s: Dictionary) -> void:
 	root.add_child(act)
 	var sc := UI.scroll(root)
 	# tall enough for the longer column, up to what fits on screen (then it scrolls)
-	var left_h: int = ceili(s.gained.size() / 3.0) * 66 + (40 + ceili(s.used.size() / 3.0) * 66 if not s.used.is_empty() else 0)
-	var right_h: int = s.levels.size() * 54 + (40 + mini(moments.size(), 8) * 34 if not moments.is_empty() else 0) + (44 + ceili(mini(order.size(), 12) / 3.0) * 62 if not order.is_empty() else 0)
+	var left_h: int = ceili(s.gained.size() / 3.0) * 79 + (48 + ceili(s.used.size() / 3.0) * 79 if not s.used.is_empty() else 0)
+	var right_h: int = s.levels.size() * 65 + (48 + mini(moments.size(), 8) * 41 if not moments.is_empty() else 0) + (53 + ceili(mini(order.size(), 12) / 3.0) * 74 if not order.is_empty() else 0)
 	sc.custom_minimum_size = Vector2(1056, clampi(312 + maxi(left_h, right_h), 384, 792))
 	box.m = Modal.open(sc, "Welcome back", 1128)
 

@@ -223,7 +223,7 @@ func _spawn_drifters() -> void:
 		var p := CreaturePortrait.make(sp.id, rng.randi_range(1, 3), 1, rng.randf() < 0.15, 180.0 * depth)
 		p.plate = false
 		p.modulate = Color(0.75 + 0.25 * depth, 0.75 + 0.25 * depth, 0.9 + 0.1 * depth, 0.35 + 0.55 * depth)
-		p.set_meta("speed", rng.randf_range(10.0, 26.0) * depth)
+		p.set_meta("speed", rng.randf_range(12.0, 31.0) * depth)
 		p.set_meta("y", rng.randf_range(0.15, 0.85))
 		p.set_meta("phase", rng.randf() * TAU)
 		p.position.x = rng.randf_range(0.0, 1.0)
@@ -237,12 +237,12 @@ func _process(delta: float) -> void:
 	for p in _drifters:
 		var sp: float = p.get_meta("speed")
 		var x: float = p.position.x + sp * delta
-		if x > vs.x + 40:
-			x = -p.custom_minimum_size.x - 20
+		if x > vs.x + 48:
+			x = -p.custom_minimum_size.x - 24
 		if p.position.x <= 1.0 and p.position.x >= 0.0 and not p.has_meta("placed"):
 			x = p.position.x * vs.x
 			p.set_meta("placed", true)
-		p.position = Vector2(x, vs.y * p.get_meta("y") + sin(_t * 0.6 + p.get_meta("phase")) * 16.0)
+		p.position = Vector2(x, vs.y * p.get_meta("y") + sin(_t * 0.6 + p.get_meta("phase")) * 19.0)
 	if not Options.get_value("reduce_motion"):
 		_bg.scale = Vector2.ONE * (1.04 + 0.02 * sin(_t * 0.05))
 		_bg.pivot_offset = _bg.size / 2.0

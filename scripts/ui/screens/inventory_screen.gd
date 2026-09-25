@@ -89,15 +89,15 @@ func _fill_grid() -> void:
 		var v := UI.vbox(2)
 		v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		v.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		v.offset_top = 16
-		v.offset_bottom = -6
+		v.offset_top = 19
+		v.offset_bottom = -7
 		v.add_theme_constant_override("separation", 5)
 		var ic := UI.icon(Data.item_icon(it.id), 70)
 		ic.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		v.add_child(ic)
 		if Market.is_locked(s, it.id):
 			var lk := UI.icon(Data.ui_icon("lock"), 22)
-			lk.position = Vector2(86, 6)
+			lk.position = Vector2(103, 7)
 			lk.mouse_filter = Control.MOUSE_FILTER_IGNORE
 			b.add_child(lk)
 		# the name: bright, bold and allowed two lines, so "Verdant Seedcache" isn't cut to "Verdant Seedcac…"
@@ -116,7 +116,7 @@ func _fill_grid() -> void:
 		# how many, as a pill on the top-left corner of the tile
 		var count := UI.chip(F.format_num(n), Palette.GOLD if it.category in ["rare", "treasure"] else Palette.AETHER, 14)
 		count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		count.position = Vector2(6, 6)
+		count.position = Vector2(7, 7)
 		b.add_child(count)
 		_grid.add_child(b)
 	if not any:

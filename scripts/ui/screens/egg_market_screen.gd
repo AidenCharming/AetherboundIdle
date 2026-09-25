@@ -117,7 +117,7 @@ func _egg_card(type_id: String) -> Control:
 	var cv := UI.vbox(10)
 	card.add_child(cv)
 	var h := UI.hbox(17)
-	var egg := _egg(type_id, 72)
+	var egg := _egg(type_id, 86)
 	h.add_child(egg)
 	var tv := UI.vbox(5)
 	tv.add_child(UI.label("%s egg" % Data.types[type_id].name, "H2", Data.type_color(type_id).lightened(0.3)))
@@ -157,13 +157,13 @@ func _featured_card(f: Dictionary) -> Control:
 	var card := PanelContainer.new()
 	var sb := ThemeFactory.box(Color(0.12, 0.08, 0.2, 0.92), 17, 0, Palette.LINE, 0)
 	for side in ["left", "right"]:
-		sb.set("content_margin_" + side, 22)
+		sb.set("content_margin_" + side, 26)
 	sb.content_margin_top = 19
 	sb.content_margin_bottom = 19
 	card.add_theme_stylebox_override("panel", sb)
 	var h := UI.hbox(24)
 	card.add_child(h)
-	var egg := _egg(f.type, 96)
+	var egg := _egg(f.type, 115)
 	h.add_child(egg)
 	var sold := int(f.left) <= 0
 	if not sold and not Options.values.get("reduce_motion", false):
