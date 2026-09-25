@@ -276,7 +276,7 @@ static func _limited(s: Dictionary, rng: RandomNumberGenerator) -> Dictionary:
 	else:
 		o.kind = "item"
 		o.item = l.item
-		o.qty = int(l.qty) if l.has("qty") else ceili(int(l.qtyMult) * 15 * growth(s))
+		o.qty = int(l.qty) if l.has("qty") else ceili(int(l.qtyMult) * int(cfg().offerQtyBase) * growth(s))
 		o.gold = int(l.gold) if l.has("gold") else int(o.qty) * int(l.goldEach)
 	return o
 

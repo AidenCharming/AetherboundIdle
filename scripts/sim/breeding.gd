@@ -102,12 +102,12 @@ static func hatch_chance_shiny(s: Dictionary, a: Dictionary = {}, b: Dictionary 
 	var p := float(sh.hatchRate)
 	if since > int(sh.hatchPityStart):
 		var t := clampf(float(since - int(sh.hatchPityStart)) / float(int(sh.hatchPityFull) - int(sh.hatchPityStart)), 0.0, 1.0)
-		p = lerpf(float(sh.hatchRate), 0.2, t)
+		p = lerpf(float(sh.hatchRate), float(sh.hatchPityMax), t)
 	var shiny_parents := int(bool(a.get("shiny", false))) + int(bool(b.get("shiny", false)))
 	p *= 1.0 + float(sh.get("shinyParentBonus", 0.0)) * shiny_parents
 	# the Pearl Lens adds a flat share per level
 	p += float(Data.tuning.pearls.lensHatchPerLevel) * GameState.pearl(s, "pearl-lens")
-	return minf(0.25, p)
+	return minf(float(sh.hatchCap), p)
 
 
 static func hatch_seconds(a: Dictionary, b: Dictionary, tier: int, s: Dictionary = {}) -> float:

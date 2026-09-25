@@ -1,6 +1,7 @@
 {
 	"_note": "Market rules (designer's): a thing sells back for a little less than it costs (buy = sell x markup), so crafting stays the cheaper way and buy-and-resell never pays. Stock and wares open up as islands are cleared.",
 	"markup": 1.25,
+	"offerQtyBase": 15,
 	"buyCategories": ["log", "herb", "ore", "fish", "salvage", "bar", "meal", "component", "thread", "part", "vessel"],
 	"tierPerClear": 1,
 	"vesselClears": {

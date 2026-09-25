@@ -117,7 +117,10 @@ static func add_xp(c: Dictionary, amount: float) -> Array:
 
 
 static func release_value(c: Dictionary) -> int:
-	return int(round(Data.rarity(int(c.rarity)).releaseAether * (1.0 + (int(c.level) - 1) / 20.0) * (1.0 + (form_of(c) - 1) * 0.5)))
+	var t: Dictionary = Data.tuning.aether
+	var by_level := 1.0 + (int(c.level) - 1) / float(t.releaseLevelsPerStep)
+	var by_form := 1.0 + (form_of(c) - 1) * float(t.releasePerForm)
+	return int(round(Data.rarity(int(c.rarity)).releaseAether * by_level * by_form))
 
 
 static func bench_rate_per_min(c: Dictionary) -> float:

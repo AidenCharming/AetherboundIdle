@@ -408,7 +408,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	zs.cleared = true
 	s.counters.bossKills = int(s.counters.bossKills) + 1
 	var boss: Dictionary = z.boss
-	_party_xp(s, _alive_party(s), kill_xp(int(boss.level), 3, true), events, s.expedition.battle)
+	_party_xp(s, _alive_party(s), kill_xp(int(boss.level), int(Data.tuning.combat.bossXpRarity), true), events, s.expedition.battle)
 	var bl: Dictionary = z.bossLoot
 	GameState.add_item(s, "gold", float(bl.gold))
 	for id in bl.items:
@@ -425,7 +425,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 			var fc: Dictionary = z.firstClearCreature
 			var pool := Data.species_list.filter(func(x): return x.kind == "base" and x.types[0] in fc.types)
 			var sp: Dictionary = Rng.pick(rng, pool)
-			var lv := int(boss.level) - 10
+			var lv := int(boss.level) - int(Data.tuning.combat.firstClearLevelBelowBoss)
 			_bind(s, {"species": sp.id, "level": lv, "rarity": int(fc.rarity), "shiny": false, "form": roll_form(rng, lv)}, rng, events, "boss")
 
 

@@ -239,7 +239,7 @@ static func _use_ability(own: Array, foe: Array, side: int, i: int, rng: RandomN
 		"heal-instant", "heal-over-time":
 			var hurt := false
 			for a in own:
-				if a.alive and a.hp < a.maxHp * 0.85:
+				if a.alive and a.hp < a.maxHp * float(Data.tuning.combat.healBelow):
 					hurt = true
 			if not hurt:
 				return false

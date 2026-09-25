@@ -177,6 +177,8 @@
 		"hatchPityStart": 150,
 		"hatchPityFull": 300,
 		"shinyParentBonus": 0.5,
+		"hatchPityMax": 0.2,
+		"hatchCap": 0.25,
 		"statBonus": 0.02
 	},
 	"attunement": {
@@ -203,6 +205,9 @@
 	},
 	"combat": {
 		"spriteFacing": "left",
+		"healBelow": 0.85,
+		"bossXpRarity": 3,
+		"firstClearLevelBelowBoss": 10,
 		"rareAnnounceChance": 0.1,
 		"baseAttackMs": 2400,
 		"minAttackMs": 700,
@@ -252,7 +257,9 @@
 	},
 	"aether": {
 		"startingAether": 50,
-		"startingGold": 0
+		"startingGold": 0,
+		"releaseLevelsPerStep": 20,
+		"releasePerForm": 0.5
 	},
 	"offline": {
 		"awayThresholdSec": 60,
