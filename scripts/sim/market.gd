@@ -142,6 +142,16 @@ static func bulk_candidates(s: Dictionary, category: String, max_tier: int, keep
 	return out
 
 
+## Treasure: every unlocked item you hold that nothing uses (Economy.uses is empty), all of it, for "Sell treasure".
+static func treasure_candidates(s: Dictionary) -> Dictionary:
+	var out := {}
+	for it in Data.item_list:
+		var n := int(GameState.count(s, it.id))
+		if n > 0 and int(it.sell) > 0 and not is_locked(s, it.id) and Economy.uses(it.id).is_empty():
+			out[it.id] = n
+	return out
+
+
 static func bulk_value(cands: Dictionary) -> int:
 	var g := 0
 	for id in cands:

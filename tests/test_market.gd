@@ -278,3 +278,19 @@ func test_stock_discounts_are_real() -> void:
 	Market.stock(s, now)
 	t.eq(int(boost.gold), ceili(Market.boost_price(s, boost.boost) * (1.0 - float(boost.discount))), "priced from today's boost price")
 	t.ok(int(boost.gold) > before, "which went up with the clears")
+
+
+## "Sell treasure" takes every unlocked item nothing uses, and nothing a recipe, build or pod needs.
+func test_treasure_is_what_nothing_uses() -> void:
+	var s := _game()
+	GameState.add_item(s, "sunken-trinket", 3)
+	GameState.add_item(s, "seedcache", 2)
+	GameState.add_item(s, "oak-log", 50)
+	Market.toggle_item_lock(s, "seedcache")
+	var c := Market.treasure_candidates(s)
+	t.eq(int(c.get("sunken-trinket", 0)), 3, "treasure sells")
+	t.ok(not c.has("seedcache"), "a locked one stays")
+	t.ok(not c.has("oak-log"), "logs are used in recipes")
+	for id in c:
+		t.eq(Economy.uses(id), [], "%s has no use" % id)
+	t.ok(Economy.uses("oak-log").any(func(u): return u.kind == "recipe"), "oak logs list their recipes")
