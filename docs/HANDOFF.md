@@ -41,7 +41,6 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - **Balance only play can judge:** Overseer Vance's 112 goals (order, texts, rewards in `data/goals.json`),
   Market prices (`data/market.json`, and whether buying materials makes gathering pointless), Aether Pearl drop
   rates (3–7 a day at the end), work XP, early-island pacing (`combat.levelGap`, Fractured Quarry).
-- **Chunk 1 recipes:** their pair assignments were never reviewed (`docs/archive/done/naming/chunk1-claude.md`).
 - **Cosmetics:** pick from `docs/cosmetics.md`; nothing is built.
 - Gear stays out (it would upset the balance).
 - Check one hatch reveal's rarity pips.

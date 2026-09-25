@@ -660,7 +660,6 @@ island's boss and a weaker one reaches the boss but loses. It is a first pass an
 
 ## Open questions for the designer
 
-1. **Chunk 1 recipes:** `docs/archive/done/naming/chunk1-claude.md` says its pair assignments are a reconstruction you
-   hadn't reviewed. They are in the game as written; changing a pair is an edit to `data/recipes.json`.
-2. Answered: **hybrid art** is being painted (all prompts written); **gear** stays out (it would upset the
+1. Answered: **Chunk 1 recipes** are final as they are in the game (closed by the designer, 2026-09-25); **hybrid art**
+   is done; **gear** stays out (it would upset the
    balance); **pacing** targets one month to every skill at 99 and Zenith Spire cleared.
