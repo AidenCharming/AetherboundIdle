@@ -153,9 +153,23 @@ static func get_theme() -> Theme:
 		t.set_icon(icon_name, "CheckButton", blank)
 
 	# tooltips
-	t.set_stylebox("panel", "TooltipPanel", box(Palette.PANEL_SOLID, 10, 1, Palette.LINE_STRONG, 10, 8))
+	# tooltips: a small glass card with an aether edge on top and a soft drop shadow
+	var tip := box(Color(0.10, 0.11, 0.25, 0.97), 12, 1, Palette.LINE_STRONG, 14, 0)
+	tip.border_width_top = 3
+	tip.border_color = Color(Palette.AETHER, 0.55)
+	tip.shadow_color = Color(0, 0, 0.04, 0.6)
+	tip.shadow_size = 14
+	tip.shadow_offset = Vector2(0, 5)
+	tip.content_margin_top = 10
+	tip.content_margin_bottom = 10
+	tip.anti_aliasing = true
+	t.set_stylebox("panel", "TooltipPanel", tip)
 	t.set_color("font_color", "TooltipLabel", Palette.TEXT)
-	t.set_font_size("font_size", "TooltipLabel", 15)
+	t.set_color("font_shadow_color", "TooltipLabel", Color(0, 0, 0, 0.35))
+	t.set_constant("shadow_offset_y", "TooltipLabel", 1)
+	t.set_font("font", "TooltipLabel", font(F_BODY_BOLD))
+	t.set_font_size("font_size", "TooltipLabel", 14)
+	t.set_constant("line_spacing", "TooltipLabel", 2)
 
 	# scrollbars: thin and quiet
 	var sbar := box(Color(1, 1, 1, 0.03), 99, 0, Palette.LINE, 0)

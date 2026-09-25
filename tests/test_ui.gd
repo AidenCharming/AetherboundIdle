@@ -684,3 +684,34 @@ func test_mouse_back_and_forward_walk_the_pages() -> void:
 	t.ok(main._nav_buttons["nexus:"].button.tooltip_text.contains("key 2"), "the rail shows the shortcut")
 	main.free()
 	_teardown()
+
+
+## An item's tooltip is a card saying what the item is for, or that it only sells.
+func test_item_tooltips_say_what_an_item_is_for() -> void:
+	_setup()
+	var row := UI.amount("oak-log", 3)
+	t.ok(row is ItemTip, "cost chips carry a rich tooltip")
+	var card: Control = row._make_custom_tooltip("")
+	var texts := _texts(card)
+	t.ok(texts.any(func(x): return x.begins_with("• ")), "oak logs list their uses: %s" % [texts])
+	var only_gold := ""
+	for it in Data.item_list:
+		if Economy.uses(it.id).is_empty():
+			only_gold = it.id
+			break
+	if only_gold != "":
+		var tip := UI.item_tooltip(only_gold)
+		t.ok(_texts(tip).any(func(x): return x.begins_with("Only worth its gold")), "%s says it only sells" % only_gold)
+		tip.free()
+	card.free()
+	row.free()
+	_teardown()
+
+
+func _texts(root: Node) -> Array:
+	var out := []
+	if root is Label:
+		out.append(root.text)
+	for c in root.get_children():
+		out.append_array(_texts(c))
+	return out
