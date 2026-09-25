@@ -317,23 +317,31 @@ func _bulk_release() -> void:
 	for i in 4:
 		ob.add_item(Data.rarities[i].name, i)
 	row.add_child(ob)
+	# a friend's request: clear out the low-level ones only
+	row.add_child(UI.label("of", "Dim"))
+	var lv := OptionButton.new()
+	var levels := [0, 5, 10, 15, 20, 30, 40, 50, 75]
+	for i in levels.size():
+		lv.add_item("any level" if levels[i] == 0 else "under level %d" % levels[i], i)
+	row.add_child(lv)
 	v.add_child(row)
 	var preview := UI.label("", "H3")
 	v.add_child(preview)
 	var box := {}
 	var go := UI.button("Release", "Danger")
 	var upd := func(_i := 0):
-		var list := Economy.bulk_release_candidates(Game.state, ob.selected + 1)
+		var list := Economy.bulk_release_candidates(Game.state, ob.selected + 1, levels[lv.selected])
 		var total := 0
 		for c in list:
 			total += Creatures.release_value(c)
 		preview.text = "%d Aetherlings · +%s Aether" % [list.size(), F.format_num(total)]
 		go.disabled = list.is_empty()
 	ob.item_selected.connect(upd)
+	lv.item_selected.connect(upd)
 	upd.call()
 	go.pressed.connect(func():
 		box.m.close()
-		Game.bulk_release(ob.selected + 1))
+		Game.bulk_release(ob.selected + 1, levels[lv.selected]))
 	v.add_child(go)
 	box.m = Modal.open(v, "Bulk release", 580)
 

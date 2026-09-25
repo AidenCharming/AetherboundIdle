@@ -189,6 +189,26 @@ func test_bulk_release_keeps_the_best_of_each_species() -> void:
 	t.eq(s.creatures.size(), 3, "starter, best and shiny remain")
 
 
+## A friend's request: release only the ones under a chosen level.
+func test_bulk_release_under_a_level() -> void:
+	var s := GameState.new_game()
+	var keep := Creatures.make(s, "brambletrundle", 2, 40, false, [], "test")
+	s.creatures[keep.id] = keep
+	var low := []
+	for lv in [3, 8, 9]:
+		var c := Creatures.make(s, "brambletrundle", 1, lv, false, [], "test")
+		s.creatures[c.id] = c
+		low.append(c)
+	var mid := Creatures.make(s, "brambletrundle", 1, 25, false, [], "test")
+	s.creatures[mid.id] = mid
+	t.eq(Economy.bulk_release_candidates(s, 2, 10).size(), 3, "three under level 10")
+	t.eq(Economy.bulk_release_candidates(s, 2, 9).size(), 2, "under 9 means below it, not 9 itself")
+	t.eq(Economy.bulk_release_candidates(s, 2).size(), 4, "any level: everyone but the best")
+	var res := Economy.bulk_release(s, 2, 10)
+	t.eq(res.count, 3)
+	t.ok(s.creatures.has(mid.id) and s.creatures.has(keep.id), "level 25 and the best stay")
+
+
 func test_autobind_stops_at_max_copies_unless_rarer() -> void:
 	var s := GameState.new_game()
 	s.expedition.autobind.minRarity = 1

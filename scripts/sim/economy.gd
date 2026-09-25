@@ -89,9 +89,10 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	return value
 
 
-## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, and never the
-## best (highest rarity, then level) of each species, so a species is never lost from the Nexus.
-static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
+## Who a bulk release would let go: resting, unlocked, not shiny, at or below `max_rarity`, under level
+## `under_level` (0: any level), and never the best (highest rarity, then level) of each species, so a
+## species is never lost from the Nexus.
+static func bulk_release_candidates(s: Dictionary, max_rarity: int, under_level := 0) -> Array:
 	var best := {}
 	for c in s.creatures.values():
 		var b: Dictionary = best.get(c.species, {})
@@ -101,14 +102,16 @@ static func bulk_release_candidates(s: Dictionary, max_rarity: int) -> Array:
 	for c in s.creatures.values():
 		if not Creatures.is_benched(c) or c.get("locked", false) or c.shiny or int(c.rarity) > max_rarity:
 			continue
+		if under_level > 0 and int(c.level) >= under_level:
+			continue
 		if best[c.species].id == c.id:
 			continue
 		out.append(c)
 	return out
 
 
-static func bulk_release(s: Dictionary, max_rarity: int) -> Dictionary:
-	var list := bulk_release_candidates(s, max_rarity)
+static func bulk_release(s: Dictionary, max_rarity: int, under_level := 0) -> Dictionary:
+	var list := bulk_release_candidates(s, max_rarity, under_level)
 	var total := 0
 	for c in list:
 		var v := release(s, c)

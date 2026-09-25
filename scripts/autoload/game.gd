@@ -602,8 +602,8 @@ func release(cid: String) -> void:
 	changed.emit()
 
 
-func bulk_release(max_rarity: int) -> void:
-	var res := Economy.bulk_release(state, max_rarity)
+func bulk_release(max_rarity: int, under_level := 0) -> void:
+	var res := Economy.bulk_release(state, max_rarity, under_level)
 	if res.count > 0:
 		info("Released %d Aetherlings. +%s Aether" % [res.count, F.format_num(res.aether)], Data.ui_icon("aether"))
 	save_game()
