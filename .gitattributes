@@ -1,0 +1,4 @@
+# Line endings: LF everywhere (Godot writes LF). Without this, Windows' core.autocrlf checks files out as CRLF,
+# Godot rewrites them as LF, and git shows hundreds of files as changed with no real difference.
+* text=auto eol=lf
+*.bat text eol=crlf
