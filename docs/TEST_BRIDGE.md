@@ -38,7 +38,7 @@ Or start the game yourself: `Godot.exe --path . -- --bridge`.
 | `focus` | Act as if the window had focus (lifts the background frame-rate cap), as a player looking at it |
 | `click_at <x> <y>` | A real click at a point in the game's 1600×900 layout (the `x,y` that `buttons` reports) |
 | `scroll <x> <y> [steps]` | Mouse-wheel at a point; positive steps scroll down |
-| `key <name>` | A key press: `Escape`, `Enter`, `1` … `9` (page shortcuts), `F11` |
+| `key <name>` | A key press: `Escape`, `Enter`, `1` … `9` and `F1` … `F11` (page shortcuts by default: 1-9 the pages in sidebar order, F-keys the skills; players can change them in Options > Controls) |
 | `go <screen> [arg]` | Jump to a page without clicking: `sanctum`, `skill woodcutting`, `nexus`, `pods`, `expeditions`, `aetherlog`, `inventory`, `market`, `eggmarket`, `works` |
 | `new [slot]` / `load [slot]` | Start slot 2 fresh / load it, and open the game screen |
 | `title` | Leave to the title screen |

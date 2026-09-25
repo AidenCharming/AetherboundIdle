@@ -29,7 +29,14 @@ var values := {
 	"dev_tools": false,
 	"exp_zones_open": true,   # Expeditions page: the island list is shown (or folded to a strip)
 	"exp_log_open": true,     # Expeditions page: the log column is shown (or folded to a strip)
+	"keybinds": {},           # tab -> keycode, only where the player changed it (0 = no key); see keybind()
 }
+
+## The rail's tabs other than the skills, in rail order, with their names. Skills sit after the Sanctum.
+const TABS := [["nexus", "Nexus"], ["pods", "Genesis Pods"], ["expeditions", "Expeditions"], ["aetherlog", "Aether-Log"],
+	["inventory", "Inventory"], ["market", "Market"], ["eggmarket", "Egg Market"], ["works", "Sanctum Works"]]
+## Keys a tab can't take: Esc opens the menu, and modifiers alone aren't keys.
+const RESERVED_KEYS := [KEY_ESCAPE, KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK]
 
 var _focused := true
 
@@ -59,6 +66,71 @@ func set_value(key: String, v: Variant) -> void:
 	apply()
 	save_options()
 	options_changed.emit()
+
+
+# ---------------------------------------------------------------- page shortcuts
+
+## Every tab of the rail in order, as [tab, name]: "sanctum", "skill:<id>" for each skill, then the rest.
+## A tab is what Main.show_screen takes ("skill:mining" is show_screen("skill", "mining")).
+func tab_list() -> Array:
+	var out: Array = [["sanctum", "Sanctum"]]
+	for sk in Data.skill_list:
+		out.append(["skill:" + sk.id, sk.name])
+	out.append_array(TABS)
+	return out
+
+
+## The default keys: 1 to 9 for the Sanctum and the other pages in rail order, F1 onwards for the skills.
+func default_keybind(tab: String) -> int:
+	if tab == "sanctum":
+		return KEY_1
+	if tab.begins_with("skill:"):
+		var i := Data.skill_list.map(func(sk): return "skill:" + sk.id).find(tab)
+		return KEY_F1 + i if i >= 0 and i < 12 else 0
+	for i in TABS.size():
+		if TABS[i][0] == tab:
+			return KEY_2 + i if i < 8 else 0
+	return 0
+
+
+## The key that opens a tab now (0 if none).
+func keybind(tab: String) -> int:
+	var own: Dictionary = values.keybinds
+	return int(own[tab]) if own.has(tab) else default_keybind(tab)
+
+
+## Gives a tab a key (0 clears it). A key belongs to one tab: whichever tab had it loses it.
+func set_keybind(tab: String, code: int) -> void:
+	var own: Dictionary = values.keybinds.duplicate()
+	if code != 0:
+		for pair in tab_list():
+			if pair[0] != tab and keybind(pair[0]) == code:
+				own[pair[0]] = 0
+	own[tab] = code
+	values.keybinds = own
+	save_options()
+	options_changed.emit()
+
+
+func reset_keybinds() -> void:
+	values.keybinds = {}
+	save_options()
+	options_changed.emit()
+
+
+## The tab a key opens, or "".
+func tab_for_key(code: int) -> String:
+	if code == 0:
+		return ""
+	for pair in tab_list():
+		if keybind(pair[0]) == code:
+			return pair[0]
+	return ""
+
+
+## A key's name as printed on a keycap: "7", "F1", "Q".
+func key_name(code: int) -> String:
+	return OS.get_keycode_string(code) if code != 0 else ""
 
 
 func load_options() -> void:

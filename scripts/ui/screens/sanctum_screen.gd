@@ -69,7 +69,7 @@ func _ready() -> void:
 
 func _station(skill: Dictionary) -> Control:
 	var card := UI.button("", "Tile")
-	card.custom_minimum_size = Vector2(300, 176)
+	card.custom_minimum_size = Vector2(288, 176)
 	card.pressed.connect(func(): Main.go("skill", skill.id))
 	var v := UI.vbox(8)
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE

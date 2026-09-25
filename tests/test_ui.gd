@@ -667,3 +667,75 @@ func test_works_build_buttons_stay_put_and_follow_the_gold() -> void:
 	t.ok(works._builds.get("genesis-pods") != b, "a new level rebuilds the card")
 	works.free()
 	_teardown()
+
+
+## Play-test feedback: 6-9 were out of the sidebar's order, and every page should have a key you can change,
+## shown on its tab. Defaults follow the rail (1-9), the skills take F1 onwards.
+func test_page_keys_follow_the_rail_and_can_be_changed() -> void:
+	_setup()
+	var saved: Dictionary = Options.values.keybinds.duplicate()
+	Options.reset_keybinds()
+	var order := ["sanctum", "nexus", "pods", "expeditions", "aetherlog", "inventory", "market", "eggmarket", "works"]
+	for i in order.size():
+		t.eq(Options.keybind(order[i]), KEY_1 + i, "%s is %d" % [order[i], i + 1])
+	t.eq(Options.keybind("skill:" + Data.skill_list[0].id), KEY_F1, "the first skill is F1")
+	t.eq(Options.tab_for_key(KEY_F2), "skill:" + Data.skill_list[1].id)
+	var main := _main()
+	_teardown()
+	var press := func(code: int):
+		var e := InputEventKey.new()
+		e.keycode = code as Key
+		e.pressed = true
+		main._unhandled_input(e)
+	press.call(KEY_7)
+	t.eq(main.current, "market", "7 opens the Market")
+	press.call(KEY_F1)
+	t.eq([main.current, main.current_arg], ["skill", Data.skill_list[0].id], "F1 opens the first skill")
+	var cap: Control = main._nav_buttons["market:"].keycap
+	t.ok(cap.visible and (cap.get_child(0) as Label).text == "7", "the Market's tab shows its key")
+	Options.set_keybind("market", KEY_M)
+	t.eq((cap.get_child(0) as Label).text, "M", "the keycap follows a change")
+	Options.set_keybind("works", KEY_M)
+	t.eq(Options.keybind("market"), 0, "a key moves: the Market lost M")
+	t.ok(not cap.visible, "and its keycap hides")
+	press.call(KEY_M)
+	t.eq(main.current, "works", "M opens Sanctum Works now")
+	main.free()
+	Options.values.keybinds = saved
+	Options.save_options()
+	_teardown()
+
+
+## Options > Controls: click a key, press a new one; Esc cancels without closing the dialog.
+func test_controls_page_captures_a_key() -> void:
+	_setup()
+	var saved: Dictionary = Options.values.keybinds.duplicate()
+	Options.reset_keybinds()
+	var p := OptionsPanel.new()
+	_layer.add_child(p)
+	p._current = "controls"
+	p._rebuild()
+	var b := _find_button(p, "7")
+	t.ok(b != null, "the Market's row shows 7")
+	b.pressed.emit()
+	t.eq(p._capturing, "market")
+	var key := func(code: int):
+		var e := InputEventKey.new()
+		e.keycode = code as Key
+		e.pressed = true
+		p._input(e)
+	key.call(KEY_SHIFT)
+	t.eq(p._capturing, "market", "a modifier alone waits for the real key")
+	key.call(KEY_Q)
+	t.eq(Options.keybind("market"), KEY_Q, "Q is the Market's key")
+	t.eq(p._capturing, "")
+	_find_button(p, "Q").pressed.emit()
+	key.call(KEY_ESCAPE)
+	t.eq(Options.keybind("market"), KEY_Q, "Esc cancels")
+	_find_button(p, "Q").pressed.emit()
+	key.call(KEY_BACKSPACE)
+	t.eq(Options.keybind("market"), 0, "Backspace clears it")
+	p.free()
+	Options.values.keybinds = saved
+	Options.save_options()
+	_teardown()
