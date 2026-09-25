@@ -207,6 +207,24 @@ static func kill_xp(level: int, rarity: int, boss := false) -> float:
 	return xp
 
 
+## Combat XP for each party member, with their own bonuses. Reports a "party_xp" event ({cid: amount}) so the
+## arena can show what every kill gave, not only the level-ups.
+static func _give_party_xp(s: Dictionary, party: Array, xp: float, events: Array) -> void:
+	var gained := {}
+	for c in party:
+		var amount := xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp"))
+		var before := float(c.xp)
+		var cev := Creatures.add_xp(c, amount)
+		if float(c.xp) > before:
+			gained[c.id] = float(c.xp) - before
+		for e in cev:
+			if e.type == "evolved":
+				Collection.on_evolved(s, c)
+		events.append_array(cev)
+	if not gained.is_empty():
+		events.append({"type": "party_xp", "xp": gained})
+
+
 static func _on_enemy_down(s: Dictionary, f: Dictionary, rng: RandomNumberGenerator, events: Array) -> void:
 	var b: Dictionary = s.expedition.battle
 	b.kills = int(b.kills) + 1
@@ -222,13 +240,7 @@ static func defeated_wild(s: Dictionary, z: Dictionary, w: Dictionary, party: Ar
 	s.counters.kills = int(s.counters.kills) + 1
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + 1
-	var xp := kill_xp(int(w.level), int(w.rarity))
-	for c in party:
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
+	_give_party_xp(s, party, kill_xp(int(w.level), int(w.rarity)), events)
 	var gold := rng.randi_range(int(z.gold[0]), int(z.gold[1]))
 	GameState.add_item(s, "gold", gold)
 	var loot := {"gold": gold}
@@ -373,13 +385,7 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	zs.cleared = true
 	s.counters.bossKills = int(s.counters.bossKills) + 1
 	var boss: Dictionary = z.boss
-	var xp := kill_xp(int(boss.level), 3, true)
-	for c in _alive_party(s):
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
+	_give_party_xp(s, _alive_party(s), kill_xp(int(boss.level), 3, true), events)
 	var bl: Dictionary = z.bossLoot
 	GameState.add_item(s, "gold", float(bl.gold))
 	for id in bl.items:
@@ -501,12 +507,7 @@ static func extrapolate_kills(s: Dictionary, z: Dictionary, party: Array, n: int
 	s.counters.kills = int(s.counters.kills) + n
 	var zs := zone_state(s, z.id)
 	zs.kills = int(zs.kills) + n
-	for c in party:
-		var cev := Creatures.add_xp(c, xp * (1.0 + Traits.capped_self(c, "bonus_combat_xp") + Market.bonus(s, "partyXp")))
-		for e in cev:
-			if e.type == "evolved":
-				Collection.on_evolved(s, c)
-		events.append_array(cev)
+	_give_party_xp(s, party, xp, events)
 	GameState.add_item(s, "gold", roundi(n * (float(z.gold[0]) + float(z.gold[1])) / 2.0))
 	for l in z.loot:
 		var k := Rng.binomial(rng, n, float(l.chance))

@@ -20,6 +20,7 @@ var _bottom_tab := "party"
 var _folds := {}          # "zones"/"log" -> [full panel, folded strip]
 var _log_strip: VBoxContainer
 var _log_mini: VBoxContainer  # the folded log strip's column of recent entries, as small icon cards
+var _xp_rows: Array = []      # the party cards' live XP: [{cid, bar, lv (chip), tip (Control)}]
 
 
 func setup(arg: String) -> void:
@@ -352,6 +353,7 @@ func _party_tab() -> VBoxContainer:
 	else:
 		pv.add_child(UI.label("Up to three. Party members don't work or gather Aether while they explore.", "Faint"))
 	var row := UI.hbox(10)
+	_xp_rows.clear()
 	for i in party_size:
 		var card := UI.vbox(4)
 		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -367,11 +369,18 @@ func _party_tab() -> VBoxContainer:
 			nm.custom_minimum_size.x = 60
 			cv.add_child(nm)
 			var st := Creatures.stats(c)
-			cv.add_child(UI.hbox(8, [UI.chip("Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)), 11), _mini_stat("health", st.health)]))
+			var lv := UI.chip("Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)), 11)
+			cv.add_child(UI.hbox(8, [lv, _mini_stat("health", st.health)]))
 			cv.add_child(UI.hbox(10, [_mini_stat("power", st.power), _mini_stat("guard", st.guard)]))
 			cv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			h.add_child(cv)
 			card.add_child(h)
+			# XP toward the next level, filling with every kill
+			var xb := UI.bar(Palette.AETHER, 6)
+			xb.mouse_filter = Control.MOUSE_FILTER_STOP
+			card.add_child(xb)
+			_xp_rows.append({"cid": c.id, "bar": xb, "lv": lv, "level": -1})
+			_update_xp_row(_xp_rows[-1])
 			if not locked:
 				card.add_child(UI.hbox(4, [UI.button("Swap", "Ghost", func(): _pick_party(i)), UI.button("Remove", "Ghost", func(): Game.bench(c.id))]))
 		elif not locked:
@@ -548,6 +557,8 @@ func _process(_d: float) -> void:
 		_pending_count = s.expedition.pending.size()
 		_fill_right()  # a run ending on its own frees the party; a shiny may be waiting for a vessel
 	_arena.visible = running_here
+	for r in _xp_rows:
+		_update_xp_row(r)
 	var top: float = Game.battle_log[0].time if not Game.battle_log.is_empty() else -1.0
 	if Game.battle_log.size() != _log_count or top != _log_top:
 		_log_count = Game.battle_log.size()
@@ -624,6 +635,23 @@ func _log_icon(e: Dictionary, portrait: int, icon: int) -> Control:
 
 
 ## A small icon and number for the party cards (health, power, guard).
+func _update_xp_row(r: Dictionary) -> void:
+	var c: Dictionary = Game.state.creatures.get(r.cid, {})
+	if c.is_empty() or not is_instance_valid(r.bar):
+		return
+	var max_lv: int = Data.tuning.creature.maxLevel
+	r.bar.value = F.level_progress(F.creature_curve(), float(c.xp), max_lv)
+	if int(c.level) != int(r.level):
+		r.level = int(c.level)
+		UI.set_chip(r.lv, "Lv %d" % int(c.level), Data.rarity_color(int(c.rarity)))
+	var tip := "Max level" if int(c.level) >= max_lv else "%s / %s XP to level %d" % [
+		F.format_num(float(c.xp) - F.xp_for_level(F.creature_curve(), int(c.level), max_lv)),
+		F.format_num(F.xp_for_level(F.creature_curve(), int(c.level) + 1, max_lv) - F.xp_for_level(F.creature_curve(), int(c.level), max_lv)),
+		int(c.level) + 1]
+	if r.bar.tooltip_text != tip:
+		r.bar.tooltip_text = tip
+
+
 func _mini_stat(icon_name: String, value: float) -> HBoxContainer:
 	var l := UI.label(F.format_num(value), "Small", Palette.TEXT)
 	return UI.hbox(3, [UI.icon(Data.ui_icon(icon_name), 14), l])

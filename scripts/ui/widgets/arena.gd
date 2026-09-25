@@ -389,7 +389,8 @@ func _build(b: Dictionary) -> void:
 			root.add_child(np.pips)
 			np.pips.position = np.panel.position + Vector2(plate_w / 2.0, 0)
 			var rec := {"root": root, "portrait": por, "hp": np.hp, "shield": np.shield, "home": root.position, "down": false,
-				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss}
+				"tag_top": top - 6.0, "pips": np.pips, "sb": np.sb, "tier": np.tier, "boss": np.boss,
+				"cid": String(f.get("cid", ""))}
 			(_allies if side == 0 else _enemies).append(rec)
 	_announce(b)
 	var z: Dictionary = Data.zones[b.zone]
@@ -518,6 +519,17 @@ func _on_event(e: Dictionary) -> void:
 			var v := _view(e.side, e.to)
 			if not v.is_empty() and Options.get_value("damage_numbers"):
 				FloatText.spawn(_fx, _number_at(v), _num(e.dmg), Data.type_color("verdant"), null, 13, 30.0, true)
+		"party_xp":
+			# every kill's XP, over each party member it went to
+			for v in _allies:
+				if e.xp.has(v.cid) and not v.down:
+					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 22.0)
+					FloatText.spawn(_fx, at, "+%s XP" % _num(float(e.xp[v.cid])), Palette.AETHER, null, 13, 30.0, true)
+		"creature_level":
+			for v in _allies:
+				if v.cid == e.creature:
+					var at: Vector2 = v.root.position + Vector2(v.root.size.x * 0.5, float(v.get("tag_top", -8.0)) - 40.0)
+					FloatText.spawn(_fx, at, "Level %d!" % int(e.level), Palette.GOLD, null, 17, 44.0, true)
 		"captured":
 			var at := Vector2(size.x * 0.73, size.y * 0.35)
 			FloatText.spawn(_fx, at, "Bound!", Data.rarity_color(int(e.rarity)), Data.ui_icon("vessel"), 22, 60.0)

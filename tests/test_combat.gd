@@ -92,6 +92,29 @@ func test_clearing_a_boss_unlocks_the_next_island() -> void:
 	t.ok(Expedition.zone_unlocked(s, "fractured-quarry"))
 
 
+## Play-test report: "XP only comes from the boss". Every wild kill gives the party XP and says so, before
+## any boss shows up.
+func test_every_kill_gives_party_xp() -> void:
+	var s := _party_game([["emberfang", 1, 12], ["tuskcub", 1, 12]])
+	var rng := _rng()
+	Expedition.start(s, "whisperleaf-hollow", rng)
+	var c: Dictionary = s.creatures.values()[0]
+	var xp0 := float(c.xp)
+	var kills := 0
+	var xp_events := 0
+	for i in 4000:
+		for e in Expedition.step(s, 250.0, rng):
+			if e.type == "party_xp":
+				xp_events += 1
+				t.ok(float(e.xp.get(c.id, 0.0)) > 0.0, "the event names what each member got")
+		kills = int(s.counters.kills)
+		if kills >= 2:
+			break
+	t.eq(int(s.counters.bossKills), 0, "no boss yet")
+	t.ok(float(c.xp) > xp0, "XP from wild kills alone")
+	t.eq(xp_events, kills, "one XP event per kill")
+
+
 func test_first_of_a_type_binds_free() -> void:
 	var s := GameState.new_game()
 	s.items.clear()
