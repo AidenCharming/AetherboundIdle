@@ -1,5 +1,15 @@
 [
 	{
+		"version": "0.7.0b",
+		"date": "2026-09-25",
+		"title": "Hands-on battles",
+		"notes": {
+			"Bugfixes": [
+				["Expeditions", "Clicks on the Aetherlings in a battle were caught by an invisible panel. They reach the fighters now."]
+			]
+		}
+	},
+	{
 		"version": "0.7.0a",
 		"date": "2026-09-25",
 		"title": "Trophy frames",

@@ -68,7 +68,10 @@ func _ready() -> void:
 	_arena = Arena.new()
 	_arena_host.add_child(_arena)
 	_preview = UI.vbox(12)
-	_arena_host.add_child(UI.margin(_preview, 34, 26, 34, 26))
+	var preview_box := UI.margin(_preview, 34, 26, 34, 26)
+	# the margin stays over the arena while a battle hides the preview: let clicks through to the fighters
+	preview_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_arena_host.add_child(preview_box)
 	# under the battle: one panel with the tabs (Party, Auto-bind, Supplies) and the run controls on the same row
 	var bottom := UI.vbox(10)
 	var top := UI.hbox(10)

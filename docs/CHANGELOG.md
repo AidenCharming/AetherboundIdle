@@ -3,6 +3,12 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.0b (2026-09-25): battle clicks reach the fighters
+
+- The designer found the Stare Down secret never triggered. The Expeditions page hides the island preview during a
+  battle, but only its contents: the full-size margin around it stayed over the arena and caught every click
+  (a Container passes clicks to its parent, not to the arena beside it). The margin ignores the mouse now.
+
 ## 0.7.0a (2026-09-25): achievement frames and the art prompts reworked
 
 - **Designer:** cancel the achievement art run (stopped: ComfyUI's queue cleared, the runner closed; the tool
