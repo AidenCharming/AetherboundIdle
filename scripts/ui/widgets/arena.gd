@@ -361,6 +361,9 @@ func _build(b: Dictionary) -> void:
 			var por := CreaturePortrait.make(f.species, int(f.form), int(f.rarity), bool(f.shiny), px)
 			por.plate = false
 			por.flip = _needs_flip(f.species, int(f.form), side)
+			if side == 1:
+				por.pokeable = true
+				por.poke_mode = "stare"
 			por.size = Vector2(px, px)
 			por.refresh()
 			# stand the visible art on the ground line: its lowest opaque pixel touches the feet line

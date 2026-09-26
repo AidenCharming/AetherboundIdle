@@ -1757,13 +1757,13 @@
 		"id": "bell",
 		"category": "secret",
 		"name": "Is Anyone There?",
-		"text": "You rang the bell with nothing to hear.",
+		"text": "You rang the bell 10 times with nothing to hear.",
 		"tier": 0,
 		"art": "secret-bell",
 		"check": {
 			"kind": "secret",
 			"id": "bell",
-			"n": 1
+			"n": 10
 		},
 		"reward": {
 			"aether": 250,

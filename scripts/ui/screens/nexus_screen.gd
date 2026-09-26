@@ -197,6 +197,9 @@ func _fill_detail() -> void:
 	var form := Creatures.form_of(c)
 	var por := CreaturePortrait.of(c, 276)
 	por.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+	por.pokeable = true
+	por.pettable = true
+	por.poke_key = c.id
 	_detail.add_child(por)
 	var name_row := UI.hbox(10)
 	name_row.alignment = BoxContainer.ALIGNMENT_CENTER

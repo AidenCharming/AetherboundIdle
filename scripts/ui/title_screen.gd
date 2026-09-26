@@ -8,6 +8,11 @@ var _drifters: Array = []
 var _bg: TextureRect
 var _t := 0.0
 var _fade: ColorRect
+var _logo: Label
+## Secrets: an old code typed on the title screen turns the logo into a rainbow.
+const KONAMI := [KEY_UP, KEY_UP, KEY_DOWN, KEY_DOWN, KEY_LEFT, KEY_RIGHT, KEY_LEFT, KEY_RIGHT, KEY_B, KEY_A]
+var _konami_at := 0
+var _rainbow := false
 
 
 func _ready() -> void:
@@ -56,6 +61,7 @@ func _build_menu() -> void:
 	col.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	col.add_child(UI.spacer(true))
 	var logo := UI.label("Aetherbound", "Title")
+	_logo = logo
 	logo.add_theme_font_size_override("font_size", 110)
 	logo.add_theme_color_override("font_color", Color("f3f1ff"))
 	logo.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.55))
@@ -234,8 +240,35 @@ func _spawn_drifters() -> void:
 		p.set_meta("y", rng.randf_range(0.15, 0.85))
 		p.set_meta("phase", rng.randf() * TAU)
 		p.position.x = rng.randf_range(0.0, 1.0)
+		# a click makes a drifter hop (secrets: five hops, and catching a shiny one)
+		p.pokeable = true
+		p.poke_mode = "hop"
+		p.poked.connect(func(_n: int): _on_drifter_poked(p))
 		add_child(p)
 		_drifters.append(p)
+
+
+func _on_drifter_poked(p: CreaturePortrait) -> void:
+	Game.note_secret("hop_scotch")
+	if p.shiny:
+		Sfx.play("shiny_appear")
+		FloatText.spawn(p, Vector2(p.size.x / 2.0, p.size.y * 0.2), "✦ a wish! ✦", Palette.GOLD, null, 20, 50.0, true)
+		Game.note_secret("wish")
+
+
+func _input(event: InputEvent) -> void:
+	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+	var code: int = event.keycode
+	if code == KONAMI[_konami_at]:
+		_konami_at += 1
+		if _konami_at == KONAMI.size():
+			_konami_at = 0
+			_rainbow = true
+			Sfx.play("shiny_appear")
+			Game.note_secret("konami")
+	else:
+		_konami_at = 1 if code == KONAMI[0] else 0
 
 
 func _process(delta: float) -> void:
@@ -250,6 +283,8 @@ func _process(delta: float) -> void:
 			x = p.position.x * vs.x
 			p.set_meta("placed", true)
 		p.position = Vector2(x, vs.y * p.get_meta("y") + sin(_t * 0.6 + p.get_meta("phase")) * 19.0)
+	if _rainbow and _logo:
+		_logo.add_theme_color_override("font_color", Color.from_hsv(fmod(_t * 0.25, 1.0), 0.35, 1.0))
 	if not Options.get_value("reduce_motion"):
 		_bg.scale = Vector2.ONE * (1.04 + 0.02 * sin(_t * 0.05))
 		_bg.pivot_offset = _bg.size / 2.0

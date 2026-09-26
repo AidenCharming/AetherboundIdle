@@ -248,6 +248,7 @@ func _fill_pods() -> void:
 		else:
 			var ev := EggView.make(egg, 180)
 			ev.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
+			ev.knockable = true
 			v.add_child(ev)
 			var tl := UI.label("", "Dim")
 			tl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

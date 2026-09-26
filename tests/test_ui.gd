@@ -1224,3 +1224,42 @@ func test_achievements_page_filters_and_hides_secrets() -> void:
 	t.eq(Achievements.unseen(s), 0, "leaving the page marks it seen")
 	main.free()
 	_teardown()
+
+
+## Poking an Aetherling: a click hops, the third quick one sends it running off (the Leave Me Alone! secret);
+## a perched one sulks after five, and a knocked egg squeaks after three.
+func test_poking_aetherlings_and_eggs() -> void:
+	_setup()
+	var keep := Game.running
+	Game.running = true   # a secret noted with no game running would wait in options.cfg instead
+	var host := Control.new()
+	_layer.add_child(host)
+	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 160)
+	p.pokeable = true
+	p.poke_key = "test-runaway"
+	host.add_child(p)
+	p.poke()
+	t.ok(p._hop_t >= 0.0 and p._run_t < 0.0, "a poke makes it hop")
+	p.poke()
+	p.poke()
+	t.ok(p._run_t >= 0.0, "the third quick poke sends it running")
+	t.ok(Achievements.is_unlocked(Game.state, "runaway"), "Leave Me Alone! unlocked")
+	t.eq(Sfx.last_played, "achievement", "with the achievement chime")
+	var perch := CreaturePortrait.make("sproutlet", 1, 1, false, 72)
+	perch.pokeable = true
+	perch.poke_mode = "sulk"
+	perch.poke_key = "test-sulk"
+	host.add_child(perch)
+	for i in 5:
+		perch.poke()
+	t.ok(perch._sulk_t >= 0.0, "five pokes and a perched one turns its back")
+	t.ok(Achievements.is_unlocked(Game.state, "cold-shoulder"), "Cold Shoulder unlocked")
+	var egg := EggView.make({"species": "sproutlet", "rarity": 1, "laidAt": 1.0}, 120)
+	egg.knockable = true
+	host.add_child(egg)
+	for i in 3:
+		egg.knock()
+	t.ok(Achievements.is_unlocked(Game.state, "patience"), "three knocks on an egg: Patience!")
+	host.free()
+	Game.running = keep
+	_teardown()

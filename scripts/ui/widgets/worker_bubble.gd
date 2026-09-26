@@ -21,6 +21,8 @@ static func make(c: Dictionary, skill: String, px: float) -> WorkerBubble:
 		w._portrait = CreaturePortrait.of(c, px - 12)
 		w._portrait.position = Vector2(6, 6)
 		w._portrait.glow_scale = 0.5
+		w._portrait.pokeable = true
+		w._portrait.poke_key = c.id
 		w.add_child(w._portrait)
 		w.tooltip_text = "%s · Lv %d" % [Creatures.display_name(c), int(c.level)]
 		var t: Variant = Data.skills[skill].type

@@ -206,10 +206,25 @@ func _build_rail() -> Control:
 	rail.add_child(v)
 	var logo := UI.hbox(10)
 	logo.add_child(UI.icon(APP_ICON, 38))
-	var title_lbl := UI.label("Aetherbound", "H2")
-	title_lbl.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
-	title_lbl.add_theme_constant_override("shadow_outline_size", 12)
-	logo.add_child(title_lbl)
+	# one label per letter, so the letters can bounce (a secret: click the name LOGO_CLICKS times)
+	var title_box := UI.hbox(0)
+	title_box.mouse_filter = Control.MOUSE_FILTER_STOP
+	for ch in "Aetherbound":
+		var letter := UI.label(ch, "H2")
+		letter.add_theme_color_override("font_shadow_color", Color(0.45, 0.85, 1.0, 0.4))
+		letter.add_theme_constant_override("shadow_outline_size", 12)
+		title_box.add_child(letter)
+	var clicks := {"n": 0, "at": 0.0}
+	title_box.gui_input.connect(func(e: InputEvent):
+		if e is InputEventMouseButton and e.pressed and e.button_index == MOUSE_BUTTON_LEFT:
+			var now := Time.get_ticks_msec() / 1000.0
+			clicks.n = 1 if now - float(clicks.at) > 1.5 else int(clicks.n) + 1
+			clicks.at = now
+			if int(clicks.n) >= LOGO_CLICKS:
+				clicks.n = 0
+				_bounce_letters(title_box)
+				Game.note_secret("letter_bounce"))
+	logo.add_child(title_box)
 	v.add_child(UI.margin(logo, 7, 10, 0, 12))
 	_rail_list = UI.vbox(2)
 	v.add_child(UI.scroll(_rail_list))
@@ -242,6 +257,21 @@ func _fill_rail() -> void:
 	_nav_item("works", "", "Sanctum Works", "works")
 	_update_keycaps()
 	_refresh_rail()
+
+
+const LOGO_CLICKS := 7
+
+
+## The rail's name hops one letter after another, with a boing for each.
+func _bounce_letters(box: HBoxContainer) -> void:
+	var i := 0
+	for letter in box.get_children():
+		var tw := create_tween()
+		tw.tween_interval(i * 0.06)
+		tw.tween_callback(func(): Sfx.play("boing", 0.8 + i * 0.06))
+		tw.tween_property(letter, "position:y", letter.position.y - 12.0, 0.12).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+		tw.tween_property(letter, "position:y", letter.position.y, 0.18).set_trans(Tween.TRANS_BOUNCE).set_ease(Tween.EASE_OUT)
+		i += 1
 
 
 func _section(text: String) -> void:
@@ -420,6 +450,15 @@ func _build_top_bar() -> Control:
 	_top.perched.mouse_filter = Control.MOUSE_FILTER_PASS
 	bar.add_child(_top.perched)
 	var bell := UI.button("", "Ghost", _open_notifications, Data.ui_icon("bell"))
+	# ringing the bell with nothing new: it shakes, and (a secret) enough empty rings are noticed
+	bell.button_down.connect(func():
+		if Game.unread == 0:
+			bell.pivot_offset = bell.size / 2.0
+			var tw := create_tween()
+			for a in [0.25, -0.2, 0.12, 0.0]:
+				tw.tween_property(bell, "rotation", a, 0.06)
+			Sfx.play("coin", 1.6)
+			Game.note_secret("bell"))
 	bell.tooltip_text = "Notifications"
 	_top.bell = bell
 	bar.add_child(bell)
@@ -859,6 +898,7 @@ func _welcome() -> void:
 	var v := UI.vbox(17)
 	var h := UI.hbox(19)
 	var p := CreaturePortrait.make("sproutlet", 1, 1, false, 144)
+	p.pokeable = true
 	h.add_child(p)
 	h.add_child(UI.wrap_label("Welcome to your Sanctum, Architect. I'm Overseer Vance.\n\nThis little Sproutlet is your first Aetherling. "
 		+ "Put it to work chopping wood, send it exploring to bind new Aetherlings, and when you have a few, "

@@ -200,6 +200,9 @@ func _fill_side_rest(s: Dictionary) -> void:
 	for c in perched:
 		var por := CreaturePortrait.of(c, 72)
 		por.glow_scale = 0.6
+		por.pokeable = true
+		por.poke_mode = "sulk"
+		por.poke_key = c.id
 		var wrapper := Control.new()
 		wrapper.custom_minimum_size = Vector2(72, 72)
 		wrapper.tooltip_text = "%s · %s Aether/min" % [Creatures.display_name(c), F.format_num(Creatures.bench_rate_per_min(c))]
