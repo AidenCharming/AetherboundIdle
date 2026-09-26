@@ -3,9 +3,9 @@
 // warm parts (the cream cross, outside `hue_min..hue_max`) keep their paint.
 shader_type canvas_item;
 
-uniform float flatness : hint_range(0.0, 1.0) = 0.8;   // 0 = as painted, 1 = one flat colour on the face
-uniform float face_value = 0.72;                       // the face's flat brightness
-uniform float face_sat = 0.62;                         // the face's flat saturation
+uniform float flatness : hint_range(0.0, 1.0) = 0.95;  // 0 = as painted, 1 = one flat colour on the face
+uniform float face_value = 0.50;                       // the face's flat brightness
+uniform float face_sat = 0.14;                         // the face's flat saturation
 uniform float hue_min = 0.62;                          // the face's hues (violet by default)
 uniform float hue_max = 0.86;
 uniform float brighten = 1.0;                          // hover: > 1 lifts the whole icon
