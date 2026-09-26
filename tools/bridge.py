@@ -278,6 +278,8 @@ def main(argv):
         args = {"expr": " ".join(rest)}
     elif cmd == "game":
         args = {"method": rest[0], "args": [json.loads(a) if a[:1] in "[{\"0123456789-" or a in ("true", "false", "null") else a for a in rest[1:]]}
+    elif cmd == "perf":
+        args = {"reset": "--reset" in rest, "prefix": next((a for a in rest if not a.startswith("--")), "")}
     elif cmd == "raw":
         req = json.loads(rest[0])
         cmd, args = req.pop("cmd"), req
@@ -285,6 +287,9 @@ def main(argv):
         res = send(cmd, **args)
     except OSError:
         raise SystemExit("The game isn't listening on port %d. Start it with: python tools/bridge.py launch" % PORT)
+    if cmd == "perf" and res.get("ok"):
+        print(res["text"])
+        return 0
     print(json.dumps(res, indent=1))
     return 0 if res.get("ok") else 1
 

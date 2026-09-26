@@ -146,12 +146,14 @@ func show_screen(screen: String, arg := "", from_history := false) -> void:
 	Modal.close_all()
 	if _screen:
 		_screen.queue_free()
+	var t0 := Perf.begin()
 	var s: Control = SCREENS[screen].new()
 	s.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	if s.has_method("setup"):
 		s.setup(arg)
 	_screen = s
 	_content.add_child(s)
+	Perf.end("page.open." + screen, t0)
 	s.modulate.a = 0.0
 	create_tween().tween_property(s, "modulate:a", 1.0, 0.15)
 	_update_nav()
@@ -169,13 +171,17 @@ func _on_changed() -> void:
 		_refresh_waiting = true
 	else:
 		_refresh_screen()
+	var t0 := Perf.begin()
 	_refresh_rail()
+	Perf.end("page.rail", t0)
 
 
 func _refresh_screen() -> void:
 	_refresh_waiting = false
 	if _screen and _screen.has_method("refresh"):
+		var t0 := Perf.begin()
 		_screen.refresh()
+		Perf.end("page.refresh." + current, t0)
 
 
 ## The mouse's back (or forward) button: the page visited before (or after) this one.
@@ -497,8 +503,16 @@ func _update_bell() -> void:
 
 
 func _process(delta: float) -> void:
+	Perf.sample("frame", delta * 1000.0)
 	if Game.state.is_empty():
 		return
+	var t0 := Perf.begin()
+	_process_shell(delta)
+	Perf.end("page.shell_process", t0)
+
+
+## The shell's per-frame work (rail bars, activity panel, the held-mouse check), timed as page.shell_process.
+func _process_shell(delta: float) -> void:
 	if _mouse_held and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 		_mouse_held = false   # released where this window never saw it (focus lost mid-click)
 		if _refresh_waiting:
@@ -707,7 +721,32 @@ func _dev_modal() -> void:
 	sr.add_child(sl)
 	sr.add_child(UI.button("Set", "", func(): Game.dev_skill_level(Data.skill_list[sk.selected].id, int(sl.value))))
 	v.add_child(sr)
+	v.add_child(UI.label("Performance", "H3"))
+	v.add_child(UI.hbox(10, [UI.button("Timings", "", _timings_modal), UI.button("Reset timings", "Ghost", func(): Perf.reset())]))
 	Modal.open(v, "Developer tools", 1104)
+
+
+## Developer tools > Timings: what each part of the game has cost since the last reset (Perf).
+func _timings_modal() -> void:
+	var v := UI.vbox(10)
+	v.add_child(UI.wrap_label("Milliseconds per call: the median and the slowest 5%% of the last %d calls, the slowest ever, and the share of all the time since the last reset. sim.* is the game rules, game.* the clock around them, page.* the interface, save.* the saves, frame the whole frame." % Perf.RING, "Faint", 1000))
+	var g := GridContainer.new()
+	g.columns = 7
+	g.add_theme_constant_override("h_separation", 24)
+	g.add_theme_constant_override("v_separation", 4)
+	for h in ["Metric", "Calls", "Avg", "Median", "p95", "Max", "Share"]:
+		g.add_child(UI.label(h, "Dim"))
+	for r in Perf.report():
+		var slow: bool = r.p95 > 8.0 and r.name != "frame"
+		g.add_child(UI.label(r.name, "", Palette.DANGER if slow else Palette.TEXT))
+		for val in [F.format_num(r.n), "%.2f" % r.avg, "%.2f" % r.median, "%.2f" % r.p95, "%.1f" % r.max, "%.1f%%" % (r.share * 100.0)]:
+			var l := UI.label(val, "Num")
+			l.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+			g.add_child(l)
+	var sc := UI.scroll(g)
+	sc.custom_minimum_size.y = 560
+	v.add_child(sc)
+	Modal.open(v, "Timings", 1104)
 
 
 func _open_notifications() -> void:

@@ -51,3 +51,12 @@ func test_bridge_hangs_up_on_http() -> void:
 	t.ok(TestBridge._looks_like_http("POST / HTTP/1.1"), "a browser POST")
 	t.ok(TestBridge._looks_like_http("GET /x HTTP/1.1\r"), "a GET")
 	t.ok(not TestBridge._looks_like_http("{\"cmd\": \"ping\"}"), "a bridge command")
+
+
+func test_bridge_perf_reports_and_resets() -> void:
+	Perf.reset()
+	Perf.sample("bridge.test", 2.0)
+	var res: Dictionary = await TestBridge._handle({"cmd": "perf", "reset": true})
+	t.ok(res.ok and res.rows.any(func(r): return r.name == "bridge.test"), "the rows include what was recorded")
+	t.ok("bridge.test" in String(res.text), "and the text table")
+	t.ok(not Perf.has("bridge.test"), "reset cleared it after reporting")

@@ -128,7 +128,12 @@ func _process(_delta: float) -> void:
 		# the window was asleep or suspended: treat the gap as time away
 		_apply_offline(dt)
 	else:
-		_handle(Sim.step(state, dt, rng))
+		var t0 := Perf.begin()
+		var events := Sim.step(state, dt, rng)
+		var t1 := Perf.begin()
+		_handle(events)
+		Perf.end("game.events", t1)
+		Perf.end("game.tick", t0)
 	state.lastSeen = now
 	_night_owl_left -= dt
 	if _night_owl_left <= 0.0:
@@ -142,7 +147,9 @@ func _process(_delta: float) -> void:
 
 
 func _apply_offline(seconds: float) -> void:
+	var t0 := Perf.begin()
 	var summary := Offline.apply(state, seconds, rng)
+	Perf.end("game.offline", t0)
 	state.lastSeen = now_sec()
 	last_offline_summary = summary
 	var shown := 0
@@ -332,10 +339,14 @@ func save_game() -> void:
 		return
 	_store_rng()
 	state.lastSeen = now_sec()
+	var t0 := Perf.begin()
 	var text := JSON.stringify(state)
+	Perf.end("save.stringify", t0)
 	if slot <= 0:
 		return
+	var t1 := Perf.begin()
 	_write_slot(slot, text)
+	Perf.end("save.write", t1)
 
 
 ## Writes a save without ever leaving a half-written main file: the text goes to .tmp first, the old main
@@ -386,7 +397,9 @@ func _parse_file(path: String) -> Variant:
 func load_game() -> bool:
 	loaded_from = ""
 	for path in _slot_paths(slot):
+		var t0 := Perf.begin()
 		var parsed: Variant = _parse_file(path)
+		Perf.end("save.load_parse", t0)
 		if parsed is Dictionary and parsed.has("version"):
 			_adopt(parsed)
 			loaded_from = path

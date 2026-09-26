@@ -157,6 +157,7 @@ static var _idx_state: Dictionary = {}
 static var _idx_count := -1
 static var _idx_workers := {}   # skill id -> [creature], by slot
 static var _idx_perched := []
+static var _idx_rev := 0        # counts rebuilds: anything cached per roster (Skills' auras and cooldowns) keys on it
 
 
 static func roster_changed(_s: Dictionary = {}) -> void:
@@ -168,6 +169,7 @@ static func _index(s: Dictionary) -> void:
 		return
 	_idx_state = s
 	_idx_count = s.creatures.size()
+	_idx_rev += 1
 	_idx_workers = {}
 	for c in s.creatures.values():
 		if c.job.get("kind", "") == "skill":
@@ -177,6 +179,13 @@ static func _index(s: Dictionary) -> void:
 	for list in _idx_workers.values():
 		list.sort_custom(func(a, b): return int(a.job.get("slot", 0)) < int(b.job.get("slot", 0)))
 	_idx_perched = Economy.find_perched(s)
+
+
+## A number that changes whenever the roster index is rebuilt (a creature added or removed, a job change, a
+## trait reroll, another save): a cache built from who works where stays good while this stays the same.
+static func roster_revision(s: Dictionary) -> int:
+	_index(s)
+	return _idx_rev
 
 
 static func workers(s: Dictionary, skill_id: String) -> Array:

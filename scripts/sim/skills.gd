@@ -87,11 +87,39 @@ static func speed(s: Dictionary) -> float:
 
 # ---------------------------------------------------------------- stepping
 
+# Each worker's cooldown, kept between steps: working it out (traits, auras, efficiency) was most of a step's
+# time with a full set of slots, and it only moves when the roster, the worker or the task does.
+static var _cd_cache := {}      # creature id -> [key, cooldown ms]
+static var _aura_cache := {"rev": -1, "auras": []}
+
+
+## active_auras, kept while the roster is unchanged (auras come from the workers' traits and jobs).
+static func cached_auras(s: Dictionary) -> Array:
+	var rev := GameState.roster_revision(s)
+	if int(_aura_cache.rev) != rev:
+		_aura_cache = {"rev": rev, "auras": active_auras(s)}
+	return _aura_cache.auras
+
+
+## worker_cooldown for step(), kept while nothing it depends on has moved.
+static func _step_cooldown(c: Dictionary, skill_id: String, action: Dictionary, auras: Array, sp: float, rev: int) -> float:
+	var key := [rev, skill_id, action.ms, c.level, c.rarity, c.get("form", 0), c.get("overclock", 0), sp]
+	var hit: Array = _cd_cache.get(c.id, [])
+	if not hit.is_empty() and hit[0] == key:
+		return hit[1]
+	var cd := worker_cooldown(c, skill_id, action, auras, sp)
+	_cd_cache[c.id] = [key, cd]
+	return cd
+
+
 static func step(s: Dictionary, dt_ms: float, rng: RandomNumberGenerator, offline := false) -> Array:
 	var events := []
 	if dt_ms <= 0.0:
 		return events
-	var auras := active_auras(s)
+	var rev := GameState.roster_revision(s)
+	if _cd_cache.size() > 4096:
+		_cd_cache.clear()
+	var auras := cached_auras(s)
 	var sp := speed(s)
 	for skill in Data.skill_list:
 		var ws := GameState.workers(s, skill.id)
@@ -99,7 +127,7 @@ static func step(s: Dictionary, dt_ms: float, rng: RandomNumberGenerator, offlin
 			continue
 		var action := current_action(s, skill.id)
 		for c in ws:
-			var cd := worker_cooldown(c, skill.id, action, auras, sp)
+			var cd := _step_cooldown(c, skill.id, action, auras, sp, rev)
 			c.progress = float(c.progress) + dt_ms
 			var n := int(floor(c.progress / cd + 1e-9))
 			if n <= 0:

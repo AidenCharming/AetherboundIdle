@@ -202,6 +202,12 @@ func _handle(r: Dictionary) -> Dictionary:
 			return _call_game(String(r.get("method", "")), r.get("args", []))
 		"eval":
 			return _eval(String(r.get("expr", "")))
+		"perf":
+			# timing metrics (Perf): rows by total time, and the same as a text table; "reset": true starts over
+			var out := {"ok": true, "rows": Perf.report(String(r.get("prefix", ""))), "text": Perf.table(String(r.get("prefix", "")))}
+			if bool(r.get("reset", false)):
+				Perf.reset()
+			return out
 		"wait":
 			await get_tree().create_timer(clampf(float(r.get("seconds", 1.0)), 0.0, 600.0)).timeout
 			return {"ok": true}

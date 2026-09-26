@@ -48,6 +48,7 @@ Or start the game yourself: `Godot.exe --path . -- --bridge`.
 | `eval "<expression>"` | A GDScript expression with `Game`, `Data`, `S` (the save) and `M` (the game screen): `eval "S.gold"`, `eval "M.current"` |
 | `errors [since]` | Engine and script errors (with a script backtrace when there is one) since error number `since` |
 | `screenshot [file.png]` | Saves exactly what the window shows and returns the path |
+| `perf [prefix] [--reset]` | Timing metrics since the last reset (the same table as Developer tools > Timings): calls, avg, median, p95, max and share of the time per metric (`sim.*` the game rules, `game.*` the clock, `page.*` the interface, `save.*`, `frame`). `perf page.` shows only the pages; `--reset` starts over after reporting |
 | `wait <seconds>` | Lets the game run |
 | `quit` | Closes the game |
 | `monkey [--steps N] [--seed S] [--delay 0.2] [--shots DIR]` | Clicks random enabled buttons (never quit/delete/reset/leave), logs every step, and on the first new error saves a screenshot and prints the errors with the last steps that led to them |
