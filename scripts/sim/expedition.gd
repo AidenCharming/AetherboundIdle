@@ -169,6 +169,8 @@ static func roll_wild(s: Dictionary, z: Dictionary, rng: RandomNumberGenerator) 
 	p += float(Data.tuning.pearls.lensWildPerLevel) * GameState.pearl(s, "pearl-lens")
 	var shiny := Rng.chance(rng, p)
 	s.counters.encountersSinceShiny = 0 if shiny else since + 1
+	if shiny:
+		s.counters.shiniesSeen = int(s.counters.get("shiniesSeen", 0)) + 1
 	s.collection.seen[sp_id] = true
 	return {"species": sp_id, "level": level, "rarity": rarity, "shiny": shiny, "form": roll_form(rng, level)}
 
@@ -392,6 +394,8 @@ static func _bind(s: Dictionary, w: Dictionary, rng: RandomNumberGenerator, even
 	s.creatures[c.id] = c
 	GameState.roster_changed()
 	s.counters.captures = int(s.counters.captures) + 1
+	if c.shiny:
+		s.counters.shinyBinds = int(s.counters.get("shinyBinds", 0)) + 1
 	var ev := {"type": "captured", "creature": c.id, "species": c.species, "rarity": c.rarity, "shiny": c.shiny, "how": how}
 	if chance >= 0.0:
 		ev.chance = chance
@@ -440,6 +444,8 @@ static func _on_boss_defeated(s: Dictionary, z: Dictionary, rng: RandomNumberGen
 	var first: bool = not zs.cleared
 	zs.cleared = true
 	s.counters.bossKills = int(s.counters.bossKills) + 1
+	if s.expedition.party.size() == 1:
+		s.counters.soloBoss = int(s.counters.get("soloBoss", 0)) + 1
 	var boss: Dictionary = z.boss
 	_party_xp(s, _alive_party(s), kill_xp(int(boss.level), int(Data.tuning.combat.bossXpRarity), true), events, s.expedition.battle)
 	var bl: Dictionary = z.bossLoot
@@ -501,6 +507,7 @@ static func _on_wipe(s: Dictionary, events: Array) -> void:
 	zone_state(s, b.zone).bestWave = maxi(int(zone_state(s, b.zone).bestWave), int(b.wave) - 1)
 	b.phase = "rest"
 	b.timer = float(Data.tuning.combat.exhaustMs)
+	s.counters.wipes = int(s.counters.get("wipes", 0)) + 1
 	events.append({"type": "wiped", "zone": b.zone, "wave": b.wave})
 
 

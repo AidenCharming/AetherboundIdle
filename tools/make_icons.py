@@ -507,6 +507,17 @@ def ui_work_slot():
 <circle cx="12" cy="18" r="2" fill="{INK}"/><circle cx="52" cy="18" r="2" fill="{INK}"/>"""
 
 
+def ui_trophy():
+    return f'''<path d="M20 12 L44 12 L44 26 Q44 40 32 42 Q20 40 20 26 Z" fill="#f2c14e" {st()}/>
+<path d="M20 16 Q10 16 11 25 Q12 32 21 32" fill="none" {st(3.6)}/>
+<path d="M44 16 Q54 16 53 25 Q52 32 43 32" fill="none" {st(3.6)}/>
+<path d="M20 16 Q10 16 11 25 Q12 32 21 32" fill="none" stroke="#f2c14e" stroke-width="1.6"/>
+<path d="M44 16 Q54 16 53 25 Q52 32 43 32" fill="none" stroke="#f2c14e" stroke-width="1.6"/>
+<rect x="28" y="41" width="8" height="8" fill="#d9a032" {st()}/>
+<rect x="20" y="49" width="24" height="7" rx="2" fill="#8a5a3a" {st()}/>
+<path d="M25 16 Q25 30 30 36" stroke="#fff3c4" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.85"/>'''
+
+
 UI = {'aether': ui_aether, 'gold': ui_gold, 'woodcutting': ui_axe, 'herbalism': lambda: leaf('#57cf8e', '#8fe8b4', '#2f9a62'),
       'mining': ui_pick, 'fishing': ui_rod, 'scavenging': ui_magnifier, 'smithing': ui_hammer, 'cooking': ui_pan,
       'circuitry': ui_bolt, 'aether-weaving': lambda: spool('#9d6bff', '#c5a8ff', '#6a3fd0'),
@@ -517,7 +528,48 @@ UI = {'aether': ui_aether, 'gold': ui_gold, 'woodcutting': ui_axe, 'herbalism': 
       'upgrade': ui_up, 'shiny': ui_sparkle, 'vessel': lambda: vessel('#c9a36a', '#e0c58f', '#8f6f3a'),
       'meal': lambda: meal('#e0a36a', '#f0c49a', '#b07a42'), 'owned': ui_owned,
       'market': ui_market, 'egg-market': ui_egg_market, 'boost-incense': ui_boost_incense, 'boost-tonic': ui_boost_tonic,
-      'boost-lure': ui_boost_lure, 'boost-brew': ui_boost_brew, 'work-slot': ui_work_slot}
+      'boost-lure': ui_boost_lure, 'boost-brew': ui_boost_brew, 'work-slot': ui_work_slot, 'achievements': ui_trophy}
+
+
+# ----------------------------------------------------------------------------- achievement placeholders
+# Stand-ins for the painted achievement scenes (tools/art/achievement_art.py): a tinted square with the
+# category's (or the skill's) glyph, so the page works before the art is in. A painted PNG with the same name wins.
+ACH_TINT = {'skills': '#3f6fb0', 'nexus': '#3f9a6a', 'adventure': '#b0703f', 'breeding': '#b04f8a', 'secret': '#6a4fc0'}
+ACH_GLYPH = {'skills': ui_star, 'nexus': ui_paw, 'adventure': ui_compass, 'breeding': ui_egg}
+
+
+def ui_question():
+    return f'''<circle cx="32" cy="32" r="24" fill="#8f7fe0" {st()}/>
+<path d="M24 25 Q24 16 32 16 Q41 16 41 24 Q41 30 34 32 L33 38" fill="none" stroke="{INK}" stroke-width="5.5" stroke-linecap="round"/>
+<path d="M24 25 Q24 16 32 16 Q41 16 41 24 Q41 30 34 32 L33 38" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+<circle cx="33" cy="46" r="3.4" fill="#fff" {st(2)}/>'''
+
+
+def achievement_placeholder(a):
+    cat = a['category']
+    tint = ACH_TINT[cat]
+    glyph = ui_question if cat == 'secret' else ACH_GLYPH[cat]
+    if a['check'].get('kind') == 'skill_level' and a['check']['skill'] in UI:
+        glyph = UI[a['check']['skill']]
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 64 64">\n'
+            f'<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{shade(tint, 0.12)}"/>'
+            f'<stop offset="1" stop-color="{shade(tint, -0.18)}"/></linearGradient></defs>\n'
+            f'<rect width="64" height="64" fill="url(#g)"/>\n'
+            f'<ellipse cx="32" cy="54" rx="22" ry="5" fill="{shade(tint, -0.28)}"/>\n'
+            f'<g transform="translate(14 12) scale(0.56)">{glyph()}</g>\n</svg>\n')
+
+
+def write_achievement_placeholders():
+    out = os.path.join(ROOT, 'assets', 'achievements')
+    os.makedirs(out, exist_ok=True)
+    done = set()
+    for a in json.load(open(os.path.join(ROOT, 'data', 'achievements.json'), encoding='utf8')):
+        if a['art'].startswith('zone:') or a['art'] in done:
+            continue
+        done.add(a['art'])
+        with open(os.path.join(out, a['art'] + '.svg'), 'w', newline='\n') as f:
+            f.write(achievement_placeholder(a))
+    return len(done)
 
 
 def svg(body):
@@ -531,14 +583,15 @@ def main():
         ic = it['icon']
         base = ic['color']
         body = SHAPES[ic['shape']](base, shade(base, 0.18, 0.05), shade(base, -0.2))
-        with open(os.path.join(OUT, it['id'] + '.svg'), 'w') as f:
+        with open(os.path.join(OUT, it['id'] + '.svg'), 'w', newline='\n') as f:
             f.write(svg(body))
     ui_out = os.path.join(ROOT, 'assets', 'icons', 'ui')
     os.makedirs(ui_out, exist_ok=True)
     for name, fn in UI.items():
-        with open(os.path.join(ui_out, name + '.svg'), 'w') as f:
+        with open(os.path.join(ui_out, name + '.svg'), 'w', newline='\n') as f:
             f.write(svg(fn()))
-    print(f'wrote {len(items)} item icons and {len(UI)} interface icons')
+    n_ach = write_achievement_placeholders()
+    print(f'wrote {len(items)} item icons, {len(UI)} interface icons and {n_ach} achievement placeholders')
 
 
 if __name__ == '__main__':

@@ -1,0 +1,1889 @@
+[
+	{
+		"id": "woodcutting-10",
+		"category": "skills",
+		"name": "Splinter",
+		"text": "Reach level 10 in Woodcutting.",
+		"tier": 1,
+		"art": "skill-woodcutting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "woodcutting",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "woodcutting-50",
+		"category": "skills",
+		"name": "Lumberjack",
+		"text": "Reach level 50 in Woodcutting.",
+		"tier": 2,
+		"art": "skill-woodcutting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "woodcutting",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "woodcutting-99",
+		"category": "skills",
+		"name": "Heart of the Forest",
+		"text": "Reach level 99 in Woodcutting.",
+		"tier": 3,
+		"art": "skill-woodcutting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "woodcutting",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "herbalism-10",
+		"category": "skills",
+		"name": "Green Thumb",
+		"text": "Reach level 10 in Herbalism.",
+		"tier": 1,
+		"art": "skill-herbalism",
+		"check": {
+			"kind": "skill_level",
+			"skill": "herbalism",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "herbalism-50",
+		"category": "skills",
+		"name": "Herb Whisperer",
+		"text": "Reach level 50 in Herbalism.",
+		"tier": 2,
+		"art": "skill-herbalism",
+		"check": {
+			"kind": "skill_level",
+			"skill": "herbalism",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "herbalism-99",
+		"category": "skills",
+		"name": "Garden of Wonders",
+		"text": "Reach level 99 in Herbalism.",
+		"tier": 3,
+		"art": "skill-herbalism",
+		"check": {
+			"kind": "skill_level",
+			"skill": "herbalism",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "mining-10",
+		"category": "skills",
+		"name": "Pebble Picker",
+		"text": "Reach level 10 in Mining.",
+		"tier": 1,
+		"art": "skill-mining",
+		"check": {
+			"kind": "skill_level",
+			"skill": "mining",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "mining-50",
+		"category": "skills",
+		"name": "Deep Delver",
+		"text": "Reach level 50 in Mining.",
+		"tier": 2,
+		"art": "skill-mining",
+		"check": {
+			"kind": "skill_level",
+			"skill": "mining",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "mining-99",
+		"category": "skills",
+		"name": "Heart of the Mountain",
+		"text": "Reach level 99 in Mining.",
+		"tier": 3,
+		"art": "skill-mining",
+		"check": {
+			"kind": "skill_level",
+			"skill": "mining",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "fishing-10",
+		"category": "skills",
+		"name": "First Nibble",
+		"text": "Reach level 10 in Fishing.",
+		"tier": 1,
+		"art": "skill-fishing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fishing",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "fishing-50",
+		"category": "skills",
+		"name": "Reel Deal",
+		"text": "Reach level 50 in Fishing.",
+		"tier": 2,
+		"art": "skill-fishing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fishing",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "fishing-99",
+		"category": "skills",
+		"name": "Lord of the Tides",
+		"text": "Reach level 99 in Fishing.",
+		"tier": 3,
+		"art": "skill-fishing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fishing",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "scavenging-10",
+		"category": "skills",
+		"name": "Finders Keepers",
+		"text": "Reach level 10 in Scavenging.",
+		"tier": 1,
+		"art": "skill-scavenging",
+		"check": {
+			"kind": "skill_level",
+			"skill": "scavenging",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "scavenging-50",
+		"category": "skills",
+		"name": "Treasure Nose",
+		"text": "Reach level 50 in Scavenging.",
+		"tier": 2,
+		"art": "skill-scavenging",
+		"check": {
+			"kind": "skill_level",
+			"skill": "scavenging",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "scavenging-99",
+		"category": "skills",
+		"name": "Nothing Goes to Waste",
+		"text": "Reach level 99 in Scavenging.",
+		"tier": 3,
+		"art": "skill-scavenging",
+		"check": {
+			"kind": "skill_level",
+			"skill": "scavenging",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "smithing-10",
+		"category": "skills",
+		"name": "Hot Iron",
+		"text": "Reach level 10 in Smithing.",
+		"tier": 1,
+		"art": "skill-smithing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "smithing",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "smithing-50",
+		"category": "skills",
+		"name": "Anvil Rhythm",
+		"text": "Reach level 50 in Smithing.",
+		"tier": 2,
+		"art": "skill-smithing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "smithing",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "smithing-99",
+		"category": "skills",
+		"name": "Master of the Forge",
+		"text": "Reach level 99 in Smithing.",
+		"tier": 3,
+		"art": "skill-smithing",
+		"check": {
+			"kind": "skill_level",
+			"skill": "smithing",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "cooking-10",
+		"category": "skills",
+		"name": "Snack Time",
+		"text": "Reach level 10 in Cooking.",
+		"tier": 1,
+		"art": "skill-cooking",
+		"check": {
+			"kind": "skill_level",
+			"skill": "cooking",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "cooking-50",
+		"category": "skills",
+		"name": "Sous Chef",
+		"text": "Reach level 50 in Cooking.",
+		"tier": 2,
+		"art": "skill-cooking",
+		"check": {
+			"kind": "skill_level",
+			"skill": "cooking",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "cooking-99",
+		"category": "skills",
+		"name": "Feast Maker",
+		"text": "Reach level 99 in Cooking.",
+		"tier": 3,
+		"art": "skill-cooking",
+		"check": {
+			"kind": "skill_level",
+			"skill": "cooking",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "circuitry-10",
+		"category": "skills",
+		"name": "Spark Starter",
+		"text": "Reach level 10 in Circuitry.",
+		"tier": 1,
+		"art": "skill-circuitry",
+		"check": {
+			"kind": "skill_level",
+			"skill": "circuitry",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "circuitry-50",
+		"category": "skills",
+		"name": "Live Wire",
+		"text": "Reach level 50 in Circuitry.",
+		"tier": 2,
+		"art": "skill-circuitry",
+		"check": {
+			"kind": "skill_level",
+			"skill": "circuitry",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "circuitry-99",
+		"category": "skills",
+		"name": "Clockwork Genius",
+		"text": "Reach level 99 in Circuitry.",
+		"tier": 3,
+		"art": "skill-circuitry",
+		"check": {
+			"kind": "skill_level",
+			"skill": "circuitry",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "aether-weaving-10",
+		"category": "skills",
+		"name": "Loose Threads",
+		"text": "Reach level 10 in Aether-Weaving.",
+		"tier": 1,
+		"art": "skill-aether-weaving",
+		"check": {
+			"kind": "skill_level",
+			"skill": "aether-weaving",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "aether-weaving-50",
+		"category": "skills",
+		"name": "Loom Keeper",
+		"text": "Reach level 50 in Aether-Weaving.",
+		"tier": 2,
+		"art": "skill-aether-weaving",
+		"check": {
+			"kind": "skill_level",
+			"skill": "aether-weaving",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "aether-weaving-99",
+		"category": "skills",
+		"name": "Weaver of Stars",
+		"text": "Reach level 99 in Aether-Weaving.",
+		"tier": 3,
+		"art": "skill-aether-weaving",
+		"check": {
+			"kind": "skill_level",
+			"skill": "aether-weaving",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "vessel-crafting-10",
+		"category": "skills",
+		"name": "Cracked Pot",
+		"text": "Reach level 10 in Vessel Crafting.",
+		"tier": 1,
+		"art": "skill-vessel-crafting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "vessel-crafting",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "vessel-crafting-50",
+		"category": "skills",
+		"name": "Steady Hands",
+		"text": "Reach level 50 in Vessel Crafting.",
+		"tier": 2,
+		"art": "skill-vessel-crafting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "vessel-crafting",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "vessel-crafting-99",
+		"category": "skills",
+		"name": "Vesselsmith Supreme",
+		"text": "Reach level 99 in Vessel Crafting.",
+		"tier": 3,
+		"art": "skill-vessel-crafting",
+		"check": {
+			"kind": "skill_level",
+			"skill": "vessel-crafting",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "fabrication-10",
+		"category": "skills",
+		"name": "Tinkerer",
+		"text": "Reach level 10 in Fabrication.",
+		"tier": 1,
+		"art": "skill-fabrication",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fabrication",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "fabrication-50",
+		"category": "skills",
+		"name": "Workshop Regular",
+		"text": "Reach level 50 in Fabrication.",
+		"tier": 2,
+		"art": "skill-fabrication",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fabrication",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "fabrication-99",
+		"category": "skills",
+		"name": "Master Fabricator",
+		"text": "Reach level 99 in Fabrication.",
+		"tier": 3,
+		"art": "skill-fabrication",
+		"check": {
+			"kind": "skill_level",
+			"skill": "fabrication",
+			"n": 99
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "total-250",
+		"category": "skills",
+		"name": "Well Rounded",
+		"text": "Reach a total skill level of 250.",
+		"tier": 1,
+		"art": "skill-total",
+		"check": {
+			"kind": "total_level",
+			"n": 250
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "total-500",
+		"category": "skills",
+		"name": "Jack of All Trades",
+		"text": "Reach a total skill level of 500.",
+		"tier": 2,
+		"art": "skill-total",
+		"check": {
+			"kind": "total_level",
+			"n": 500
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "total-1000",
+		"category": "skills",
+		"name": "Pillar of the Sanctum",
+		"text": "Reach a total skill level of 1,000.",
+		"tier": 3,
+		"art": "skill-total",
+		"check": {
+			"kind": "total_level",
+			"n": 1000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "first-99",
+		"category": "skills",
+		"name": "Peak Performance",
+		"text": "Reach level 99 in any skill.",
+		"tier": 3,
+		"art": "skill-first99",
+		"check": {
+			"kind": "skills_at",
+			"level": 99,
+			"n": 1
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "all-99",
+		"category": "skills",
+		"name": "Grand Master",
+		"text": "Reach level 99 in every skill.",
+		"tier": 3,
+		"art": "skill-grandmaster",
+		"check": {
+			"kind": "skills_at",
+			"level": 99,
+			"n": 11
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500,
+			"title": "Grand Master"
+		}
+	},
+	{
+		"id": "actions-1000",
+		"category": "skills",
+		"name": "Busy Paws",
+		"text": "Finish 1,000 skill actions.",
+		"tier": 1,
+		"art": "skill-actions",
+		"check": {
+			"kind": "counter",
+			"counter": "actions",
+			"n": 1000
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "actions-10000",
+		"category": "skills",
+		"name": "Hard Workers",
+		"text": "Finish 10,000 skill actions.",
+		"tier": 2,
+		"art": "skill-actions",
+		"check": {
+			"kind": "counter",
+			"counter": "actions",
+			"n": 10000
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "actions-100000",
+		"category": "skills",
+		"name": "Tireless",
+		"text": "Finish 100,000 skill actions.",
+		"tier": 3,
+		"art": "skill-actions",
+		"check": {
+			"kind": "counter",
+			"counter": "actions",
+			"n": 100000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "own-10",
+		"category": "nexus",
+		"name": "Small Flock",
+		"text": "Own 10 Aetherlings at once.",
+		"tier": 1,
+		"art": "nexus-own",
+		"check": {
+			"kind": "creatures",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "own-50",
+		"category": "nexus",
+		"name": "Full House",
+		"text": "Own 50 Aetherlings at once.",
+		"tier": 2,
+		"art": "nexus-own",
+		"check": {
+			"kind": "creatures",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "own-200",
+		"category": "nexus",
+		"name": "Menagerie",
+		"text": "Own 200 Aetherlings at once.",
+		"tier": 3,
+		"art": "nexus-own",
+		"check": {
+			"kind": "creatures",
+			"n": 200
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "species-10",
+		"category": "nexus",
+		"name": "Curious",
+		"text": "Discover 10 species.",
+		"tier": 1,
+		"art": "nexus-species",
+		"check": {
+			"kind": "log",
+			"track": "species",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "species-35",
+		"category": "nexus",
+		"name": "Naturalist",
+		"text": "Discover 35 species.",
+		"tier": 2,
+		"art": "nexus-species",
+		"check": {
+			"kind": "log",
+			"track": "species",
+			"n": 35
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "species-all",
+		"category": "nexus",
+		"name": "Living Encyclopedia",
+		"text": "Discover every species.",
+		"tier": 3,
+		"art": "nexus-species",
+		"check": {
+			"kind": "log",
+			"track": "species",
+			"n": "all"
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "form-2",
+		"category": "nexus",
+		"name": "Growing Up",
+		"text": "Evolve an Aetherling to its second form.",
+		"tier": 1,
+		"art": "nexus-form2",
+		"check": {
+			"kind": "form",
+			"n": 2
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "form-3",
+		"category": "nexus",
+		"name": "Final Form",
+		"text": "Evolve an Aetherling to its third form.",
+		"tier": 2,
+		"art": "nexus-form3",
+		"check": {
+			"kind": "form",
+			"n": 3
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "level-25",
+		"category": "nexus",
+		"name": "Trained",
+		"text": "Raise an Aetherling to level 25.",
+		"tier": 1,
+		"art": "nexus-level",
+		"check": {
+			"kind": "creature_level",
+			"n": 25
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "level-50",
+		"category": "nexus",
+		"name": "Veteran",
+		"text": "Raise an Aetherling to level 50.",
+		"tier": 2,
+		"art": "nexus-level",
+		"check": {
+			"kind": "creature_level",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "level-100",
+		"category": "nexus",
+		"name": "Living Legend",
+		"text": "Raise an Aetherling to level 100.",
+		"tier": 3,
+		"art": "nexus-level",
+		"check": {
+			"kind": "creature_level",
+			"n": 100
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "rarity-luminous",
+		"category": "nexus",
+		"name": "It Glows!",
+		"text": "Own a Luminous Aetherling.",
+		"tier": 1,
+		"art": "nexus-luminous",
+		"check": {
+			"kind": "rarity",
+			"n": 5
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "rarity-zenith",
+		"category": "nexus",
+		"name": "Zenith Reached",
+		"text": "Own a Zenith Aetherling.",
+		"tier": 2,
+		"art": "nexus-zenith",
+		"check": {
+			"kind": "rarity",
+			"n": 9
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "rarity-aetheric",
+		"category": "nexus",
+		"name": "Pure Aether",
+		"text": "Own an Aetheric Aetherling.",
+		"tier": 3,
+		"art": "nexus-aetheric",
+		"check": {
+			"kind": "rarity",
+			"n": 10
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "shiny-1",
+		"category": "nexus",
+		"name": "Something Shiny",
+		"text": "Log a shiny Aetherling in the Aether-Log.",
+		"tier": 1,
+		"art": "nexus-shiny",
+		"check": {
+			"kind": "log",
+			"track": "shinies",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "shiny-10",
+		"category": "nexus",
+		"name": "Shiny Hunter",
+		"text": "Log 10 different shiny species.",
+		"tier": 3,
+		"art": "nexus-shiny",
+		"check": {
+			"kind": "log",
+			"track": "shinies",
+			"n": 10
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500,
+			"title": "Shiny Hunter"
+		}
+	},
+	{
+		"id": "all-types",
+		"category": "nexus",
+		"name": "Full Spectrum",
+		"text": "Own an Aetherling of all six types.",
+		"tier": 1,
+		"art": "nexus-types",
+		"check": {
+			"kind": "all_types"
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "perches-full",
+		"category": "nexus",
+		"name": "Full Roost",
+		"text": "Fill every perch once the Perches are fully built.",
+		"tier": 2,
+		"art": "nexus-perches",
+		"check": {
+			"kind": "perches_full"
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "works-10",
+		"category": "nexus",
+		"name": "Renovator",
+		"text": "Buy 10 levels of Sanctum Works.",
+		"tier": 1,
+		"art": "nexus-works",
+		"check": {
+			"kind": "upgrades",
+			"n": 10
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "works-30",
+		"category": "nexus",
+		"name": "Sanctum Architect",
+		"text": "Buy 30 levels of Sanctum Works.",
+		"tier": 3,
+		"art": "nexus-works",
+		"check": {
+			"kind": "upgrades",
+			"n": 30
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "pearl-1",
+		"category": "nexus",
+		"name": "Pearl of Wisdom",
+		"text": "Earn your first Aether Pearl.",
+		"tier": 1,
+		"art": "nexus-pearl",
+		"check": {
+			"kind": "counter",
+			"counter": "pearls",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "gold-10k",
+		"category": "nexus",
+		"name": "Pocket Money",
+		"text": "Hold 10,000 gold.",
+		"tier": 1,
+		"art": "nexus-gold",
+		"check": {
+			"kind": "gold_peak",
+			"n": 10000
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "gold-1m",
+		"category": "nexus",
+		"name": "Millionaire",
+		"text": "Hold 1,000,000 gold.",
+		"tier": 3,
+		"art": "nexus-gold",
+		"check": {
+			"kind": "gold_peak",
+			"n": 1000000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "binds-1",
+		"category": "adventure",
+		"name": "Gotcha!",
+		"text": "Bind a wild Aetherling.",
+		"tier": 1,
+		"art": "adv-bind",
+		"check": {
+			"kind": "captures",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "binds-100",
+		"category": "adventure",
+		"name": "Collector",
+		"text": "Bind 100 wild Aetherlings.",
+		"tier": 2,
+		"art": "adv-bind",
+		"check": {
+			"kind": "captures",
+			"n": 100
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "binds-1000",
+		"category": "adventure",
+		"name": "Binder Supreme",
+		"text": "Bind 1,000 wild Aetherlings.",
+		"tier": 3,
+		"art": "adv-bind",
+		"check": {
+			"kind": "captures",
+			"n": 1000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "kills-100",
+		"category": "adventure",
+		"name": "Scrapper",
+		"text": "Defeat 100 wild Aetherlings.",
+		"tier": 1,
+		"art": "adv-kills",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 100
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "kills-10000",
+		"category": "adventure",
+		"name": "Brawler",
+		"text": "Defeat 10,000 wild Aetherlings.",
+		"tier": 2,
+		"art": "adv-kills",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 10000
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "kills-100000",
+		"category": "adventure",
+		"name": "Unstoppable",
+		"text": "Defeat 100,000 wild Aetherlings.",
+		"tier": 3,
+		"art": "adv-kills",
+		"check": {
+			"kind": "counter",
+			"counter": "kills",
+			"n": 100000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "clear-whisperleaf-hollow",
+		"category": "adventure",
+		"name": "Whisperleaf Hollow",
+		"text": "Defeat Old Thicketroll and clear Whisperleaf Hollow.",
+		"tier": 1,
+		"art": "zone:whisperleaf-hollow",
+		"check": {
+			"kind": "zone",
+			"zone": "whisperleaf-hollow"
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "clear-fractured-quarry",
+		"category": "adventure",
+		"name": "Fractured Quarry",
+		"text": "Defeat Granitusk, the Stone-Cracker and clear Fractured Quarry.",
+		"tier": 1,
+		"art": "zone:fractured-quarry",
+		"check": {
+			"kind": "zone",
+			"zone": "fractured-quarry"
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "clear-smoldering-caldera",
+		"category": "adventure",
+		"name": "Smoldering Caldera",
+		"text": "Defeat Ignis Prime and clear Smoldering Caldera.",
+		"tier": 1,
+		"art": "zone:smoldering-caldera",
+		"check": {
+			"kind": "zone",
+			"zone": "smoldering-caldera"
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "clear-whispering-tides",
+		"category": "adventure",
+		"name": "Whispering Tides",
+		"text": "Defeat Leviathan Core and clear Whispering Tides.",
+		"tier": 1,
+		"art": "zone:whispering-tides",
+		"check": {
+			"kind": "zone",
+			"zone": "whispering-tides"
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "clear-thunderhum-steppe",
+		"category": "adventure",
+		"name": "Thunderhum Steppe",
+		"text": "Defeat Stormcrest, the Relay Eagle and clear Thunderhum Steppe.",
+		"tier": 2,
+		"art": "zone:thunderhum-steppe",
+		"check": {
+			"kind": "zone",
+			"zone": "thunderhum-steppe"
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "clear-null-horizon",
+		"category": "adventure",
+		"name": "Null Horizon",
+		"text": "Defeat The Aetherial Apex and clear Null Horizon.",
+		"tier": 2,
+		"art": "zone:null-horizon",
+		"check": {
+			"kind": "zone",
+			"zone": "null-horizon"
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "clear-verdigris-canopy",
+		"category": "adventure",
+		"name": "Verdigris Canopy",
+		"text": "Defeat Lumbercrown, the Canopy King and clear Verdigris Canopy.",
+		"tier": 2,
+		"art": "zone:verdigris-canopy",
+		"check": {
+			"kind": "zone",
+			"zone": "verdigris-canopy"
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "clear-magmaglass-rift",
+		"category": "adventure",
+		"name": "Magmaglass Rift",
+		"text": "Defeat Craterchomp, the Magma Maw and clear Magmaglass Rift.",
+		"tier": 2,
+		"art": "zone:magmaglass-rift",
+		"check": {
+			"kind": "zone",
+			"zone": "magmaglass-rift"
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "clear-stormsea-expanse",
+		"category": "adventure",
+		"name": "Stormsea Expanse",
+		"text": "Defeat Brinesoul, the Drowned Storm and clear Stormsea Expanse.",
+		"tier": 3,
+		"art": "zone:stormsea-expanse",
+		"check": {
+			"kind": "zone",
+			"zone": "stormsea-expanse"
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "clear-zenith-spire",
+		"category": "adventure",
+		"name": "Zenith Spire",
+		"text": "Defeat The Hollow Sovereign and clear Zenith Spire.",
+		"tier": 3,
+		"art": "zone:zenith-spire",
+		"check": {
+			"kind": "zone",
+			"zone": "zenith-spire"
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500,
+			"title": "Island Walker"
+		}
+	},
+	{
+		"id": "bosses-50",
+		"category": "adventure",
+		"name": "Boss Rush",
+		"text": "Defeat 50 island bosses.",
+		"tier": 2,
+		"art": "adv-bosses",
+		"check": {
+			"kind": "counter",
+			"counter": "bossKills",
+			"n": 50
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "solo-boss",
+		"category": "adventure",
+		"name": "One-Aetherling Army",
+		"text": "Defeat an island boss with a party of one.",
+		"tier": 2,
+		"art": "adv-solo",
+		"check": {
+			"kind": "counter",
+			"counter": "soloBoss",
+			"n": 1
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "shiny-seen",
+		"category": "adventure",
+		"name": "Did You See That?",
+		"text": "Meet a shiny wild Aetherling.",
+		"tier": 1,
+		"art": "adv-shinyseen",
+		"check": {
+			"kind": "counter",
+			"counter": "shiniesSeen",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "shiny-bind",
+		"category": "adventure",
+		"name": "Shiny Catch",
+		"text": "Bind a shiny wild Aetherling.",
+		"tier": 2,
+		"art": "adv-shinybind",
+		"check": {
+			"kind": "counter",
+			"counter": "shinyBinds",
+			"n": 1
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "bred-1",
+		"category": "breeding",
+		"name": "First Egg",
+		"text": "Breed an egg in a Genesis Pod.",
+		"tier": 1,
+		"art": "breed-eggs",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "bred-100",
+		"category": "breeding",
+		"name": "Egg Enthusiast",
+		"text": "Breed 100 eggs.",
+		"tier": 2,
+		"art": "breed-eggs",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 100
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "bred-1000",
+		"category": "breeding",
+		"name": "Egg Empire",
+		"text": "Breed 1,000 eggs.",
+		"tier": 3,
+		"art": "breed-eggs",
+		"check": {
+			"kind": "counter",
+			"counter": "bred",
+			"n": 1000
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "hybrid-1",
+		"category": "breeding",
+		"name": "Mix and Match",
+		"text": "Discover a hybrid.",
+		"tier": 1,
+		"art": "breed-hybrid",
+		"check": {
+			"kind": "kind_owned",
+			"species_kind": "hybrid",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "hybrid-all",
+		"category": "breeding",
+		"name": "Every Blend",
+		"text": "Discover all 15 hybrids of two types.",
+		"tier": 3,
+		"art": "breed-hybrid",
+		"check": {
+			"kind": "kind_owned",
+			"species_kind": "hybrid",
+			"n": 15
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "special-1",
+		"category": "breeding",
+		"name": "Secret Recipe",
+		"text": "Discover a secret-recipe species.",
+		"tier": 1,
+		"art": "breed-special",
+		"check": {
+			"kind": "kind_owned",
+			"species_kind": "special",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "special-10",
+		"category": "breeding",
+		"name": "Recipe Keeper",
+		"text": "Discover 10 secret-recipe species.",
+		"tier": 2,
+		"art": "breed-special",
+		"check": {
+			"kind": "kind_owned",
+			"species_kind": "special",
+			"n": 10
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "special-30",
+		"category": "breeding",
+		"name": "Keeper of Secrets",
+		"text": "Discover 30 secret-recipe species.",
+		"tier": 3,
+		"art": "breed-special",
+		"check": {
+			"kind": "kind_owned",
+			"species_kind": "special",
+			"n": 30
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500,
+			"title": "Keeper of Secrets"
+		}
+	},
+	{
+		"id": "mutation",
+		"category": "breeding",
+		"name": "Mutation!",
+		"text": "Hatch an egg rarer than both its parents.",
+		"tier": 1,
+		"art": "breed-mutation",
+		"check": {
+			"kind": "counter",
+			"counter": "mutations",
+			"n": 1
+		},
+		"reward": {
+			"aether": 100,
+			"gold": 50
+		}
+	},
+	{
+		"id": "shiny-hatch",
+		"category": "breeding",
+		"name": "Shiny Surprise",
+		"text": "Hatch a shiny egg.",
+		"tier": 2,
+		"art": "breed-shinyhatch",
+		"check": {
+			"kind": "counter",
+			"counter": "shinyHatches",
+			"n": 1
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "bred-zenith",
+		"category": "breeding",
+		"name": "Bred for Greatness",
+		"text": "Hatch a Zenith Aetherling.",
+		"tier": 2,
+		"art": "breed-zenith",
+		"check": {
+			"kind": "counter",
+			"counter": "bestBred",
+			"n": 9
+		},
+		"reward": {
+			"aether": 1000,
+			"gold": 500
+		}
+	},
+	{
+		"id": "bred-aetheric",
+		"category": "breeding",
+		"name": "Born of Aether",
+		"text": "Hatch an Aetheric Aetherling.",
+		"tier": 3,
+		"art": "breed-aetheric",
+		"check": {
+			"kind": "counter",
+			"counter": "bestBred",
+			"n": 10
+		},
+		"reward": {
+			"aether": 5000,
+			"gold": 2500
+		}
+	},
+	{
+		"id": "runaway",
+		"category": "secret",
+		"name": "Leave Me Alone!",
+		"text": "You poked an Aetherling until it ran off.",
+		"tier": 0,
+		"art": "secret-runaway",
+		"check": {
+			"kind": "secret",
+			"id": "runaway",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250,
+			"title": "The Pesterer"
+		},
+		"secret": true,
+		"hint": "Poke, poke, p—"
+	},
+	{
+		"id": "headpats",
+		"category": "secret",
+		"name": "Headpats",
+		"text": "You petted an Aetherling 25 times.",
+		"tier": 0,
+		"art": "secret-headpats",
+		"check": {
+			"kind": "secret",
+			"id": "pet",
+			"n": 25
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Who's a good Aetherling? Show them, gently."
+	},
+	{
+		"id": "cold-shoulder",
+		"category": "secret",
+		"name": "Cold Shoulder",
+		"text": "A perched Aetherling turned its back on you.",
+		"tier": 0,
+		"art": "secret-cold-shoulder",
+		"check": {
+			"kind": "secret",
+			"id": "cold_shoulder",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Resting Aetherlings need their beauty sleep."
+	},
+	{
+		"id": "wish",
+		"category": "secret",
+		"name": "Wish Upon a Star",
+		"text": "You caught a shiny drifting across the title screen.",
+		"tier": 0,
+		"art": "secret-wish",
+		"check": {
+			"kind": "secret",
+			"id": "wish",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Something sparkly drifts past the title…"
+	},
+	{
+		"id": "hop-scotch",
+		"category": "secret",
+		"name": "Hop Scotch",
+		"text": "You made five title-screen Aetherlings jump.",
+		"tier": 0,
+		"art": "secret-hop-scotch",
+		"check": {
+			"kind": "secret",
+			"id": "hop_scotch",
+			"n": 5
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "The title drifters love a little bounce."
+	},
+	{
+		"id": "letter-bounce",
+		"category": "secret",
+		"name": "Letter Bounce",
+		"text": "You made the logo's letters bounce.",
+		"tier": 0,
+		"art": "secret-letter-bounce",
+		"check": {
+			"kind": "secret",
+			"id": "letter_bounce",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Our name is quite springy, if you press it."
+	},
+	{
+		"id": "konami",
+		"category": "secret",
+		"name": "Up, Up, Down, Down",
+		"text": "You entered an old code on the title screen.",
+		"tier": 0,
+		"art": "secret-konami",
+		"check": {
+			"kind": "secret",
+			"id": "konami",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Some old codes never stop working."
+	},
+	{
+		"id": "patience",
+		"category": "secret",
+		"name": "Patience!",
+		"text": "You knocked on an egg until it squeaked.",
+		"tier": 0,
+		"art": "secret-patience",
+		"check": {
+			"kind": "secret",
+			"id": "patience",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Eggs hatch when they're ready. Knocking doesn't help."
+	},
+	{
+		"id": "bell",
+		"category": "secret",
+		"name": "Is Anyone There?",
+		"text": "You rang the bell with nothing to hear.",
+		"tier": 0,
+		"art": "secret-bell",
+		"check": {
+			"kind": "secret",
+			"id": "bell",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Ring, even when no one is calling."
+	},
+	{
+		"id": "stare-down",
+		"category": "secret",
+		"name": "Stare Down",
+		"text": "You poked a wild Aetherling mid-battle. It glared back.",
+		"tier": 0,
+		"art": "secret-stare-down",
+		"check": {
+			"kind": "secret",
+			"id": "stare",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Wild ones don't like being pointed at."
+	},
+	{
+		"id": "night-owl",
+		"category": "secret",
+		"name": "Night Owl",
+		"text": "You played in the small hours of the night.",
+		"tier": 0,
+		"art": "secret-night-owl",
+		"check": {
+			"kind": "secret",
+			"id": "night_owl",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "The Aether is quiet at 3 in the morning."
+	},
+	{
+		"id": "catch-release",
+		"category": "secret",
+		"name": "Catch and Release",
+		"text": "You released a shiny Aetherling.",
+		"tier": 0,
+		"art": "secret-catch-release",
+		"check": {
+			"kind": "counter",
+			"counter": "shinyReleased",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Let the rarest sparkle go free."
+	},
+	{
+		"id": "try-again",
+		"category": "secret",
+		"name": "Try, Try Again",
+		"text": "Your party was overwhelmed 10 times.",
+		"tier": 0,
+		"art": "secret-try-again",
+		"check": {
+			"kind": "counter",
+			"counter": "wipes",
+			"n": 10
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Falling down is part of the journey. Ten times."
+	},
+	{
+		"id": "bargain-bin",
+		"category": "secret",
+		"name": "Bargain Bin",
+		"text": "You sold something for exactly 1 gold.",
+		"tier": 0,
+		"art": "secret-bargain-bin",
+		"check": {
+			"kind": "counter",
+			"counter": "oneGoldSale",
+			"n": 1
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Everything has a price. Even the smallest."
+	},
+	{
+		"id": "riches-to-rags",
+		"category": "secret",
+		"name": "Riches to Rags",
+		"text": "You fell below 1,000 gold after once holding a million.",
+		"tier": 0,
+		"art": "secret-riches-to-rags",
+		"check": {
+			"kind": "riches_to_rags",
+			"peak": 1000000,
+			"below": 1000
+		},
+		"reward": {
+			"aether": 250,
+			"gold": 250
+		},
+		"secret": true,
+		"hint": "Easy come, easy go."
+	}
+]

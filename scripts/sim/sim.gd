@@ -12,4 +12,5 @@ static func step(s: Dictionary, dt_sec: float, rng: RandomNumberGenerator) -> Ar
 	events.append_array(Expedition.step(s, dt_sec * 1000.0, rng))
 	Market.tick(s, dt_sec)
 	s.playSeconds = float(s.playSeconds) + dt_sec
+	events.append_array(Achievements.tick(s, dt_sec))
 	return events

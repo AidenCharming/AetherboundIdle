@@ -39,10 +39,13 @@ static func new_game(seed_value: int = 0) -> Dictionary:
 		"pods": [],
 		"collection": {"species": {}, "recipes": [], "revealed": [], "claimed": {}, "titles": [], "seen": {}},
 		"counters": {"encountersSinceShiny": 0, "hatchesSinceShiny": 0, "hatches": 0, "captures": 0, "kills": 0,
-			"actions": 0, "bossKills": 0, "released": 0, "bred": 0},
+			"actions": 0, "bossKills": 0, "released": 0, "bred": 0, "wipes": 0, "shiniesSeen": 0, "shinyBinds": 0,
+			"soloBoss": 0, "shinyReleased": 0, "goldPeak": 0, "oneGoldSale": 0, "pearls": 0, "mutations": 0, "bestBred": 0,
+			"shinyHatches": 0},
 		"upgrades": {},
 		"settings": {"sfx": 0.7, "dev": false, "reduceMotion": false, "title": ""},
 		"goals": {"index": 0, "claimed": []},
+		"achievements": Achievements.fresh_state(),
 		"notices": [],
 		"market": Market.fresh_state(),
 	}
@@ -75,6 +78,7 @@ static func add_item(s: Dictionary, id: String, qty: float) -> void:
 		s.aether = maxf(0.0, float(s.aether) + qty)
 	elif id == "gold":
 		s.gold = maxf(0.0, float(s.gold) + qty)
+		Achievements.note_gold(s)
 	else:
 		var v := int(s.items.get(id, 0)) + int(qty)
 		if v <= 0:
@@ -114,6 +118,7 @@ static func give_pearls(s: Dictionary, n: int, why: String) -> Array:
 	if n <= 0:
 		return []
 	add_item(s, "aether-pearl", n)
+	s.counters.pearls = int(s.counters.get("pearls", 0)) + n
 	return [{"type": "pearl", "amount": n, "why": why}]
 
 
@@ -206,6 +211,7 @@ static func slot_count(s: Dictionary, skill_id: String) -> int:
 
 ## Brings an older save up to SAVE_VERSION and fills in any key a newer build added.
 static func migrate(s: Dictionary) -> Dictionary:
+	var had_achievements := s.has("achievements")
 	var fresh := new_game()
 	_fill_missing(s, fresh, ["creatures", "items", "skills", "pods", "upgrades", "species", "zones", "claimed", "seen"])
 	var skill_max: int = Data.tuning.skills.maxLevel
@@ -241,6 +247,8 @@ static func migrate(s: Dictionary) -> Dictionary:
 			s.items.erase(id)
 	Goals.migrate(s)
 	Collection.migrate(s)
+	if not had_achievements:
+		Achievements.backfill(s)
 	s.version = SAVE_VERSION
 	sync_pods(s)
 	return s

@@ -14,7 +14,7 @@ const GROUPS := [
 ]
 const GROUP_OF := {
 	"rare": "sfx_rare", "shiny_appear": "sfx_rare", "rare_appear": "sfx_rare", "capture": "sfx_rare",
-	"level": "sfx_notify", "evolve": "sfx_notify", "hatch": "sfx_notify", "egg": "sfx_notify", "crack": "sfx_notify",
+	"level": "sfx_notify", "achievement": "sfx_notify", "evolve": "sfx_notify", "hatch": "sfx_notify", "egg": "sfx_notify", "crack": "sfx_notify",
 	"hit": "sfx_battle", "strong": "sfx_battle", "whoosh": "sfx_battle",
 }
 
@@ -69,6 +69,13 @@ func _ready() -> void:
 	# a super-effective hit adds a bright ping on top
 	_streams.strong = _render([[1568, 0.0, 0.12, "sine", 0.22], [2349, 0.03, 0.14, "sine", 0.16]])
 	_streams.whoosh = _render([[400, 0.0, 0.25, "noise", 0.12]])
+	# an achievement: a bright fanfare, two quick notes then a held chord with a bell on top
+	_streams.achievement = _render([[659, 0.0, 0.1, "tri", 0.34], [784, 0.08, 0.1, "tri", 0.34], [1047, 0.16, 0.5, "tri", 0.34],
+		[1319, 0.16, 0.5, "tri", 0.22], [1568, 0.16, 0.5, "sine", 0.2], [2093, 0.24, 0.6, "sine", 0.14]])
+	# a poked Aetherling hops: a springy rising boing; a knocked egg squeaks; a runaway zips off
+	_streams.boing = _render([[220, 0.0, 0.18, "sine", 0.4, 660, "drop"], [440, 0.02, 0.12, "sine", 0.12, 1100, "drop"]])
+	_streams.squeak = _render([[1400, 0.0, 0.08, "sine", 0.22, 2100], [1800, 0.07, 0.07, "sine", 0.18, 1300]])
+	_streams.zip = _render([[600, 0.0, 0.22, "tri", 0.22, 1800], [2000, 0.0, 0.2, "noise", 0.08]])
 
 
 ## Every sound's name (the Rarity preview lists them).

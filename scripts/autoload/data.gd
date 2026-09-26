@@ -27,6 +27,8 @@ var default_hybrids: Dictionary = {} # "typeA+typeB" (sorted) -> species id
 var special_recipes: Dictionary = {} # "speciesA+speciesB" (sorted) -> recipe
 var special_list: Array = []
 var goals: Array = []
+var achievement_list: Array = []
+var achievements: Dictionary = {}
 var market: Dictionary = {}
 var patch_notes: Array = []        # newest first, shown on the title screen
 
@@ -62,6 +64,8 @@ func load_all() -> void:
 	upgrades = _index(upgrade_list)
 	collection = _read("collection.json")
 	goals = _read("goals.json")
+	achievement_list = _read("achievements.json")
+	achievements = _index(achievement_list)
 	market = _read("market.json")
 	patch_notes = _read("patch_notes.json")
 	var recipes: Dictionary = _read("recipes.json")
@@ -194,6 +198,18 @@ func item_icon(id: String) -> Texture2D:
 
 func ui_icon(icon_name: String) -> Texture2D:
 	return _icon("res://assets/icons/ui/" + icon_name)
+
+
+## An achievement's painting: assets/achievements/<art>.png (tools/art/achievement_art.py), the generated SVG
+## placeholder until then. "zone:<id>" is an island's battle backdrop (the island-clear achievements).
+func achievement_art(art: String) -> Texture2D:
+	if art.begins_with("zone:"):
+		return zone_backdrop(art.substr(5))
+	return _icon("res://assets/achievements/" + art)
+
+
+func achievement_icon(a: Dictionary) -> Texture2D:
+	return achievement_art(a.art)
 
 
 ## A painted PNG icon (from the art pipeline, tools/art/icon_runner.py) wins over the generated SVG placeholder.

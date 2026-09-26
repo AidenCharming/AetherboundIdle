@@ -164,7 +164,8 @@ static func breed(s: Dictionary, a: Dictionary, b: Dictionary, tier: int, rng: R
 		shell = clampi(rarity + (1 if rng.randf() < 0.5 else -1), 1, Data.max_rarity())
 	var secs := hatch_seconds(a, b, tier, s)
 	var egg := {"species": sp_id, "rarity": rarity, "shiny": shiny, "traits": traits, "tier": tier, "laidAt": now,
-		"readyAt": now + secs, "parents": [a.species, b.species], "shell": shell}
+		"readyAt": now + secs, "parents": [a.species, b.species], "shell": shell,
+		"parentRarity": maxi(int(a.rarity), int(b.rarity))}
 	var pod := free_pod(s)
 	s.pods[pod] = egg
 	s.counters.bred = int(s.counters.bred) + 1
@@ -240,6 +241,11 @@ static func hatch(s: Dictionary, pod: int, now: float) -> Dictionary:
 	GameState.roster_changed()
 	s.pods[pod] = {}
 	s.counters.hatches = int(s.counters.hatches) + 1
+	if int(egg.rarity) > int(egg.get("parentRarity", 99)):
+		s.counters.mutations = int(s.counters.get("mutations", 0)) + 1
+	s.counters.bestBred = maxi(int(s.counters.get("bestBred", 0)), int(egg.rarity))
+	if c.shiny:
+		s.counters.shinyHatches = int(s.counters.get("shinyHatches", 0)) + 1
 	var events := Collection.on_owned(s, c)
 	if c.shiny:
 		events.append_array(GameState.give_pearls(s, int(Data.tuning.pearls.shinyFound), "a shiny hatched"))

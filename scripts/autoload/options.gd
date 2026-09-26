@@ -36,11 +36,13 @@ var values := {
 	"exp_zones_open": true,   # Expeditions page: the island list is shown (or folded to a strip)
 	"exp_log_open": true,     # Expeditions page: the log column is shown (or folded to a strip)
 	"keybinds": {},           # tab -> keycode, only where the player changed it (0 = no key); see keybind()
+	"secrets_pending": {},    # secret id -> count, from the title screen (no save loaded); Game.start_slot hands them over
 }
 
 ## The rail's tabs other than the skills, in rail order, with their names. Skills sit after the Sanctum.
 const TABS := [["nexus", "Nexus"], ["pods", "Genesis Pods"], ["expeditions", "Expeditions"], ["aetherlog", "Aether-Log"],
-	["inventory", "Inventory"], ["market", "Market"], ["eggmarket", "Egg Market"], ["works", "Sanctum Works"]]
+	["inventory", "Inventory"], ["market", "Market"], ["eggmarket", "Egg Market"], ["works", "Sanctum Works"],
+	["achievements", "Achievements"]]
 ## Keys a tab can't take: Esc opens the menu, and modifiers alone aren't keys.
 const RESERVED_KEYS := [KEY_ESCAPE, KEY_F11, KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META, KEY_CAPSLOCK]
 

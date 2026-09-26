@@ -275,6 +275,9 @@
 		"version": 1,
 		"autosaveSec": 20
 	},
+	"achievements": {
+		"checkEvery": 2.0
+	},
 	"start": {
 		"creature": {
 			"species": "sproutlet",

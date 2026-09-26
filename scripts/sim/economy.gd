@@ -60,6 +60,8 @@ static func sell(s: Dictionary, id: String, qty: int) -> int:
 	var gold := int(Data.items[id].sell) * qty
 	GameState.add_item(s, id, -qty)
 	GameState.add_item(s, "gold", gold)
+	if gold == 1:
+		s.counters.oneGoldSale = 1
 	return gold
 
 
@@ -163,6 +165,8 @@ static func release(s: Dictionary, c: Dictionary) -> int:
 	if pearls > 0:
 		GameState.add_item(s, "aether-pearl", pearls)
 	s.counters.released = int(s.counters.released) + 1
+	if c.get("shiny", false):
+		s.counters.shinyReleased = int(s.counters.get("shinyReleased", 0)) + 1
 	return value
 
 

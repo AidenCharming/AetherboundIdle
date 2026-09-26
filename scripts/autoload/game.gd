@@ -11,6 +11,7 @@ signal reveal_requested(kind: String, data: Dictionary)  ## hatch or evolution r
 signal notifications_changed
 
 const SLOTS := 3
+const ACHIEVEMENT_TOASTS := 3   ## more unlocks than this at once make one summary toast
 
 var slot := 0   ## 1..SLOTS while playing, 0 on the title screen
 
@@ -24,6 +25,7 @@ var unread := 0
 
 var _last_tick := 0.0
 var _autosave_left := 0.0
+var _night_owl_left := 0.0
 
 
 func _ready() -> void:
@@ -92,6 +94,11 @@ func start_slot(n: int, fresh := false) -> void:
 	set_process(true)
 	if away > float(Data.tuning.offline.awayThresholdSec):
 		_apply_offline(away)
+	_claim_pending_secrets()
+	var quiet := int(state.achievements.get("quiet", 0))
+	if quiet > 0:
+		state.achievements.quiet = 0
+		_notify("%d achievement%s unlocked from your past progress" % [quiet, "" if quiet == 1 else "s"], Data.ui_icon("achievements"), Palette.GOLD)
 	changed.emit()
 
 
@@ -123,6 +130,11 @@ func _process(_delta: float) -> void:
 	else:
 		_handle(Sim.step(state, dt, rng))
 	state.lastSeen = now
+	_night_owl_left -= dt
+	if _night_owl_left <= 0.0:
+		_night_owl_left = 60.0
+		if Time.get_datetime_dict_from_system().hour == 3:
+			note_secret("night_owl")
 	_autosave_left -= dt
 	if _autosave_left <= 0.0:
 		_autosave_left = float(Data.tuning.save.autosaveSec)
@@ -139,6 +151,7 @@ func _apply_offline(seconds: float) -> void:
 			reveal_requested.emit("evolve", e)
 			shown += 1
 	offline_summary.emit(summary)
+	_handle(Achievements.check(state))
 	changed.emit()
 	save_game()
 
@@ -201,6 +214,10 @@ static func _chance_note(e: Dictionary) -> String:
 
 func _handle(events: Array) -> void:
 	var structural := false
+	var unlocked := events.filter(func(e): return e.type == "achievement")
+	if unlocked.size() > ACHIEVEMENT_TOASTS:
+		_notify("%d achievements unlocked!" % unlocked.size(), Data.ui_icon("achievements"), Palette.GOLD)
+		Sfx.play("achievement")
 	for e in events:
 		event.emit(e)
 		_log_battle(e)
@@ -247,6 +264,12 @@ func _handle(events: Array) -> void:
 				_notify("A shiny %s is waiting to be bound (Expeditions)" % Data.species[e.species].name, Data.ui_icon("shiny"), Palette.GOLD)
 			"wiped":
 				structural = true
+			"achievement":
+				if unlocked.size() <= ACHIEVEMENT_TOASTS:
+					var a: Dictionary = Data.achievements[e.id]
+					_notify("Achievement: %s" % a.name, Data.achievement_icon(a), Palette.GOLD)
+					Sfx.play("achievement")
+				structural = true
 	if structural:
 		changed.emit()
 
@@ -257,6 +280,39 @@ func _notify(text: String, icon: Texture2D, color: Color) -> void:
 		notifications.resize(60)
 	unread += 1
 	toast.emit(text, icon, color)
+	notifications_changed.emit()
+
+
+# ---------------------------------------------------------------- secrets
+
+## A secret interaction (see Achievements.poke). On the title screen, with no save loaded, it waits in Options
+## until a slot starts. Returns true when it unlocked something.
+func note_secret(secret_id: String, n := 1) -> bool:
+	if not running or state.is_empty():
+		var pending: Dictionary = Options.get_value("secrets_pending").duplicate()
+		pending[secret_id] = int(pending.get(secret_id, 0)) + n
+		Options.set_value("secrets_pending", pending)
+		return false
+	Achievements.poke(state, secret_id, n)
+	var events := Achievements.check(state)
+	_handle(events)
+	return not events.is_empty()
+
+
+func _claim_pending_secrets() -> void:
+	var pending: Dictionary = Options.get_value("secrets_pending")
+	if pending.is_empty():
+		return
+	for id in pending:
+		Achievements.poke(state, id, int(pending[id]))
+	Options.set_value("secrets_pending", {})
+	_handle(Achievements.check(state))
+
+
+## Marks every unlocked achievement as looked at (the Achievements page calls this when it closes).
+func mark_achievements_seen() -> void:
+	for id in state.achievements.unlocked:
+		state.achievements.seen[id] = true
 	notifications_changed.emit()
 
 
