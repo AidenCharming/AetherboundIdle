@@ -3,6 +3,32 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.1 (2026-09-26): timing metrics, faster refreshes and sim step, softer close button
+
+- **Timing metrics (designer's request):** `Perf` (`scripts/sim/perf.gd`) times the sim step and its parts,
+  the game tick, offline catch-up, saves and loads, every page's open and refresh, the rail and the frame.
+  Developer tools > Timings, the bridge's `perf` command and the new `tests/perf_probe.tscn` report it; the
+  month probe prints its own split. See DECISIONS.
+- **HANDOFF performance item:** with 600 Aetherlings a refresh that changes nothing now costs the Aether-Log
+  0.1 ms (was ~38), Expeditions ~4 (24), a skill page ~2 (29), the Sanctum 0.5 (10), the Egg Market 0.4 (15)
+  and the Nexus 6 (14). Pages key each section (`UI.stale`) and keep its nodes while the key holds.
+  "Fill empty slots" asks `Skills.can_fill` instead of ranking the whole roster.
+- **Sim step:** the probe showed `Skills.step` spending 70% of its time recomputing every worker's cooldown
+  and the auras. They are kept per roster revision: `sim.skills` 0.84 → 0.18 ms a frame with 55 workers.
+- **Close button too purple (designer):** `flat_icon.gdshader` flattens the face further and much less
+  saturated (flatness 0.8 → 0.95, face_sat 0.62 → 0.14, face_value 0.72 → 0.50).
+- Checked, no change needed: the `--warnings` pass catches a warning planted in `scripts/sim/market.gd`
+  (review 3 #1 holds). Every review-3 item is fixed, so `docs/codereview.md` moved to
+  `docs/archive/done/codereview-v0.6.3.md`. `docs/design.md` has a banner listing where the built game
+  differs from it.
+- Balance probes (no change): the month probe has every skill at 97–99 by day 30 and 99 by day 33, Zenith
+  Spire first cleared on day 22. `--split` has every island's waves at ×1.43–1.53 and bosses at ×1.30 except
+  Whisperleaf Hollow (waves ×2.36, boss ×0.90: Old Thicketroll is the deliberate wall, Dims win at level 7).
+  Thunderhum Steppe's waves (×1.53) are a touch soft, but a 5% harder `enemyMult` measured ×1.59, so the
+  probe's noise is as large as the gap: left alone.
+- Tests: `test_pages_keep_unchanged_sections`, `test_perf_records_timings`, `test_sim_step_is_timed`,
+  `test_cached_cooldowns_follow_changes`, `test_bridge_perf_reports_and_resets`.
+
 ## 0.7.0d (2026-09-25): title-screen drifters clickable everywhere
 
 - The designer couldn't click a shiny drifter (Wish Upon a Star). The title menu's layout boxes (a margin and a

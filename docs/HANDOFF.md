@@ -4,10 +4,12 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.7.0d)
+## Where things stand (2026-09-26, v0.7.1)
 
-- Current version **0.7.0d** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
-  done except its deferred #10–#12 (see the CHANGELOG).
+- Current version **0.7.1** (timing metrics and faster refreshes). All 188 tests pass, zero warnings. Every
+  code review is done (the last one is in `docs/archive/done/`).
+- **Timing metrics:** Developer tools > Timings, `python tools/bridge.py perf [prefix] [--reset]`, or
+  `godot --headless --path . res://tests/perf_probe.tscn [-- --n=600]`. Check a change with it before and after.
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
   bugtest_benchmark [--movie]`. The 2026-09-25 movie run passes once reprocessed (fps isn't judged under
@@ -17,9 +19,10 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 
 ## Open: code and balance
 
-1. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
-   rebuilding everything on each `Game.changed` at 600: the Aether-Log (~40 ms), Expeditions and skill pages
-   (~25 ms), Market (~18 ms).
+1. Performance, nice to have (numbers from `perf_probe` at 600 Aetherlings): opening a page builds it whole:
+   the Nexus ~105 ms (120 cards) and ~450 ms the first time sprites load, the Sanctum ~80 ms. A refresh with
+   nothing changed: Nexus ~6 ms (it still sorts the roster), Market ~5, Expeditions ~4. `save.stringify` is
+   ~9 ms per autosave.
 ## Open: for the designer
 
 - **Paint the achievement art (0.7.0a):** 57 paintings, each its own scene (the island clears show their backdrop in a
@@ -48,15 +51,17 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - **Sound and music (designer's playtest, 2026-09-25):** `rare_appear` works but feels "meh"; the type attack
   sounds and the sounds and music in general may need real recordings from an open-source (CC0) library instead
   of the ones synthesized in `scripts/autoload/sfx.gd`. Plan the source and licences with the designer first.
-- **Close button is too purple** (designer, 2026-09-25): tone down `face_sat` / `face_value` in
-  `assets/shaders/flat_icon.gdshader` (or set them per button in `modal.gd`'s `close_x`).
+- **Judge the close button (0.7.1):** now a muted violet (`flat_icon.gdshader`: face_sat 0.14, face_value 0.50);
+  nudge those two if it went too grey.
 - **Confirm on Windows:** the Options window-mode fix (the bug was on Windows fullscreen; guarded three ways).
 - **Balance only play can judge:** Overseer Vance's 113 goals (order, texts, rewards in `data/goals.json`),
   Market prices (`data/market.json`, and whether buying materials makes gathering pointless), Aether Pearl drop
   rates (3–7 a day at the end), work XP, early-island pacing (`combat.levelGap`, Fractured Quarry).
 - **Cosmetics:** pick from `docs/cosmetics.md`; nothing is built.
 - Gear stays out (it would upset the balance).
-- Check one hatch reveal's rarity pips.
+- **Hatch reveal rarity pips:** checked in the tour (2026-09-26): the reveal shows the Aetherling without its
+  plate (`reveal.gd` sets `plate = false`), so it has no pips; the caption names the rarity ("Steady · …").
+  Say if you want pips under the caption.
 - **Kill XP is now split across the party** (0.6.3d) with the per-kill base tripled so a trio keeps its
   pace: judge in play whether solo/duo parties now level too fast.
 

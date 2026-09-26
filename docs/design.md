@@ -1,6 +1,15 @@
 # Aetherbound Idle: Design Document
 
-Status: pre-production. Everything here is decided unless marked **PLACEHOLDER** (pick a sensible value, put it in JSON) or **TBD** (ask the designer).
+> **Historical.** This is the original design, written before the build. The game is now built (see
+> `docs/HANDOFF.md`), and where it differs, `docs/DECISIONS.md` and the JSON in `data/` win. The main
+> differences: skills cap at **99** with work slots at levels 1/10/25/45/70 (not 250 and 50/100/165/225);
+> creatures cap at 100 with forms at 20 and 40; the pacing target is one month to every skill at 99 and
+> Zenith Spire cleared (not 12 months); there are ten islands and ten rarities (Aetheric added in 0.6.5);
+> **gear** was dropped (it would upset the balance), as were catalysts, awakening and region unlocks;
+> the screens and names in section 11 are as built (Nexus, Genesis Pods, Aether-Log, Market, Egg Market,
+> Sanctum Works, Achievements). The `test/pacing.test.ts` checks named below belonged to the web build.
+
+Status when written: pre-production. Everything here is decided unless marked **PLACEHOLDER** (pick a sensible value, put it in JSON) or **TBD** (ask the designer).
 
 ## 1. Vision
 A creature-collecting incremental game like Melvor Idle. The player collects **Aetherlings**, assigns them as workers to skills, breeds them into rarer and hybrid forms, and sends parties on simple idle-combat expeditions to capture new species. **Aether** is the central resource that binds everything. The player is a collector and completionist, so collection tracks, hidden recipes, shinies, and Creaturedex completion are core, not extras.

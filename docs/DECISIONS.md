@@ -68,11 +68,33 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 183 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 188 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
   how far sample parties get on each island.
+- **Timing metrics (`Perf`, 0.7.1, designer's request):** `scripts/sim/perf.gd` records, per named metric, the
+  calls, total, max and the last 240 samples (median, p95). It is pure bookkeeping on the clock, so the sim may
+  use it. Recorded: `sim.step` and its parts (`sim.skills`, `sim.economy`, `sim.expedition`, `sim.market`,
+  `sim.achievements`), `game.tick`, `game.events`, `game.offline`, `page.open.<page>`, `page.refresh.<page>`,
+  `page.rail`, `page.shell_process`, `save.stringify`, `save.write`, `save.load_parse` and `frame`. Read it in
+  Developer tools > Timings (rows with p95 over 8 ms in red), the bridge's `perf [prefix] [--reset]`, and
+  `tests/perf_probe.tscn` (`-- --n=600 --seconds=60 --only=sim,offline,save,pages`: a late-game save with N
+  Aetherlings through the real code; each page opened twice and refreshed with nothing changed and after a
+  capture). The month probe prints its own split (`probe.*`).
+- **Pages keep what didn't change (0.7.1):** every `Game.changed` refreshes the open page. A section passes
+  `UI.stale(self, "section", key)` a key of everything it shows (creatures through `UI.creature_key`, which
+  leaves out XP and progress) and keeps its nodes while the key is the same. Anything a section shows that is
+  not in its key goes stale, so keys are generous; values that move all the time (item counts, XP bars,
+  timers) are live labels updated from `_process`. Keyed: the Aether-Log (the collection), skill pages (slots;
+  tasks), Expeditions (islands; party, pending and tabs), the Nexus detail panel, the Sanctum (stations,
+  perches, expedition card, pods) and the Egg Market.
+- **Workers' cooldowns are kept between steps (0.7.1):** `Skills.step` worked every worker's cooldown and the
+  aura list out again each frame (70% of a step with every slot full). `Skills._step_cooldown` keeps each
+  one under a key (roster revision, skill, task time, level, rarity, form, overclock stacks, speed boost);
+  `GameState.roster_revision` changes whenever the roster index is rebuilt, which `roster_changed()` (jobs,
+  trait rerolls, new or released creatures) already triggers. `test_cached_cooldowns_follow_changes`.
+  With 600 Aetherlings and 55 workers: `sim.skills` 0.84 → 0.18 ms a frame.
 - **Export:** `export_presets.cfg` has a Windows Desktop preset (one self-contained `.exe` with the app
   icon, ~130 MB) and a Linux one. Both were exported and the Linux build was booted to confirm the
   packed data loads. The `.exe` itself is not committed (it is over GitHub's file size limit, and build

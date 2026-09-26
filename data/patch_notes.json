@@ -1,5 +1,17 @@
 [
 	{
+		"version": "0.7.1",
+		"date": "2026-09-26",
+		"title": "Smoother with a big collection",
+		"notes": {
+			"QOL": [
+				["Game", "With hundreds of Aetherlings, pages no longer rebuild when a capture, level-up or achievement changes nothing they show. The Aether-Log, Expeditions, skill pages, Sanctum, Egg Market and the Nexus's detail panel stay put, so the game hitches much less."],
+				["Skills", "Workers cost a quarter of the time per frame they used to with every slot filled."],
+				["UI", "The close button is a softer violet, closer to the rest of the interface."]
+			]
+		}
+	},
+	{
 		"version": "0.7.0d",
 		"date": "2026-09-25",
 		"title": "Title screen fix",
