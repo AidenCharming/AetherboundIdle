@@ -19,25 +19,20 @@ uniform float shimmer = 0.0;          // shiny sparkle sweep strength
 uniform float fx = 0.0;
 uniform vec4 fx_color : source_color = vec4(1.0, 0.85, 0.4, 1.0);
 
+// the node's own modulate (fade-ins, dimmed cards); COLOR in fragment() already has the texture's alpha
+// multiplied in, which is 0 around the sprite and erased every glow drawn there
+varying float node_alpha;
+
+void vertex() {
+	node_alpha = COLOR.a;
+}
+
 vec3 hue(float h) {
 	return clamp(abs(mod(h * 6.0 + vec3(0.0, 4.0, 2.0), 6.0) - 3.0) - 1.0, 0.0, 1.0);
 }
 
 float hash1(float n) {
 	return fract(sin(n * 127.1) * 43758.5453);
-}
-
-// how much sprite is nearby (0..1): the alpha around this pixel, for a glow outside the outline
-float near_alpha(sampler2D tex, vec2 uv, float r) {
-	float a = 0.0;
-	for (int i = 0; i < 12; i++) {
-		float ang = float(i) * 0.5236;
-		vec2 d = vec2(cos(ang), sin(ang));
-		a = max(a, texture(tex, uv + d * r).a * 0.55);
-		a = max(a, texture(tex, uv + d * r * 0.5).a * 0.8);
-		a = max(a, texture(tex, uv + d * r * 0.25).a);
-	}
-	return a;
 }
 
 vec3 gradient_map(float l) {
@@ -72,7 +67,16 @@ void fragment() {
 		// glow just outside the outline
 		// the glow's reach is a share of the sprite, so it reads the same at any size
 		float r = 0.012 + 0.004 * fx;
-		float near = near_alpha(TEXTURE, UV, r);
+		// how much sprite is nearby (0..1), sampled here: passing TEXTURE into a helper function fails to
+		// compile on the Compatibility renderer, which left every rarity without its glow
+		float near = 0.0;
+		for (int i = 0; i < 12; i++) {
+			float ang = float(i) * 0.5236;
+			vec2 nd = vec2(cos(ang), sin(ang)) * r;
+			near = max(near, texture(TEXTURE, UV + nd).a * 0.55);
+			near = max(near, texture(TEXTURE, UV + nd * 0.5).a * 0.8);
+			near = max(near, texture(TEXTURE, UV + nd * 0.25).a);
+		}
 		float glow = near * (1.0 - c.a) * min(0.95, 0.45 + 0.1 * fx) * pulse;
 		// a band of light sweeping across the body every few seconds
 		if (fx > 2.5) {
@@ -117,5 +121,5 @@ void fragment() {
 	}
 	rgb = mix(rgb, silhouette_color.rgb, silhouette);
 	rgb = mix(rgb, vec3(1.0), flash);
-	COLOR = vec4(rgb, out_a * COLOR.a);
+	COLOR = vec4(rgb, out_a * node_alpha);
 }

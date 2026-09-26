@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.5)
+## Where things stand (2026-09-25, v0.6.5a)
 
-- Current version **0.6.5**. All 171 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.6.5a**. All 171 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
@@ -29,7 +29,10 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 - **Play-test the 0.6.5 rarity ladder:** each island brings one new rarity (Whisperleaf all Dim, Quarry adds
   Faint, … Stormsea adds Zenith) and the new top rarity, **Aetheric**, lives only on Zenith Spire (0.1% of its
   wilds, or a 4% mutation from two Zeniths on tier-10 materials). Judge the Aetheric look (grant one in
-  Developer tools; its sprite halo shows in battle), and whether an all-Dim Whisperleaf feels right. Still
+  Developer tools; its sprite halo shows in battle), and whether an all-Dim Whisperleaf feels right.
+  **The rarity sprite effects (outline glow from Luminous up, shine, pulse, rainbow edge, motes) never rendered
+  before 0.6.5a**, so judge all of them fresh: strength, colours, and whether the glow is too much on small
+  cards. Still
   from 0.6.4: fewer traits on catches, rarer egg mutations, a half-strength Glimmer Lure, a weaker Old
   Thicketroll (Dims win at level 7) and a smaller attack-speed edge from rarity. The last benchmark party (three at Lv 10)
   failing Smoldering Caldera (Lv 15–25) is expected: that island's calibration party is Faint at Lv 23.

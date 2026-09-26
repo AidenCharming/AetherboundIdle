@@ -3,6 +3,19 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.5a (2026-09-25): rarity sprite effects never rendered
+
+- Checking Aetheric in battle showed no sprite effect at all, and the designer confirmed they had never seen
+  one on Zenith either. Two bugs in `creature.gdshader`, both there since the effects were added:
+  - The last line wrote `out_a * COLOR.a`, but in `fragment()` Godot 4's `COLOR` already has the texture's
+    alpha multiplied in, which is 0 around the sprite: every glow, halo and mote was erased. The shader now
+    keeps the node's own alpha from `vertex()` (`node_alpha`) instead.
+  - `near_alpha(TEXTURE, …)` passed `TEXTURE` into a helper function, which the Compatibility renderer
+    can't compile (the `custom_samplers` errors in the headless test log). The outline sampling is now
+    inline in `fragment()`.
+- Found with a magenta fill on transparent pixels (proved `fx` arrived and there was room to draw), then
+  confirmed on the Nexus cards: Brilliant, Resplendent, Zenith and Aetheric each show their own effect.
+
 ## 0.6.5 (2026-09-25): one new rarity per island, and Aetheric
 
 - **The designer's question:** what if each island brought one new rarity? There were nine rarities for ten
