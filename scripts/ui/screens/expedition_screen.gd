@@ -131,6 +131,12 @@ func refresh() -> void:
 
 func _fill_zones() -> void:
 	var s := Game.state
+	var key := [zone_id]
+	for z in Data.zone_list:
+		var zs := Expedition.zone_state(s, z.id)
+		key.append([Expedition.zone_unlocked(s, z.id), zs.cleared, zs.runs, zs.bestWave])
+	if not UI.stale(self, "zones", key):
+		return
 	UI.clear(_zones)
 	for z in Data.zone_list:
 		var unlocked := Expedition.zone_unlocked(s, z.id)
@@ -293,6 +299,15 @@ func _fill_controls() -> void:
 
 func _fill_right() -> void:
 	var s := Game.state
+	# the pending shinies, the party, and the Auto-bind and Supplies tabs (with the meal and vessel counts
+	# in their dropdowns); a kill or a capture that moves none of these keeps the panel as it is
+	var counts := []
+	for it in Data.item_list:
+		if it.category == "meal" or it.category == "vessel":
+			counts.append(int(GameState.count(s, it.id)))
+	if not UI.stale(self, "right", [_bottom_tab, s.expedition.pending, GameState.party(s).map(UI.creature_key), Expedition.party_locked(s),
+			s.expedition.autobind, s.expedition.meal, s.upgrades, counts]):
+		return
 	UI.clear(_right)
 	_party_locked = Expedition.party_locked(s)
 	# shinies waiting for a vessel come first, with a pulsing gold edge, so they are never missed

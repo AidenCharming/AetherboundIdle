@@ -247,6 +247,29 @@ static func clear(node: Node) -> void:
 		c.queue_free()
 
 
+## Whether a section of a page needs building again. Pages refresh on every Game.changed (a capture, an
+## evolution, an achievement), which at a big roster made them rebuild hundreds of nodes that showed the same
+## thing. Each section passes a `key` holding everything it shows; while the key matches the one it was last
+## built with this returns false and the section keeps its nodes. Anything a section shows that isn't in its
+## key goes stale, so keys are generous: they leave out only what changes all the time (XP, progress, item
+## counts that live labels already update).
+static func stale(node: Object, section: String, key: Variant) -> bool:
+	var meta := "refresh_key_" + section
+	var h := hash(key)
+	if node.has_meta(meta) and int(node.get_meta(meta)) == h:
+		return false
+	node.set_meta(meta, h)
+	return true
+
+
+## A creature as a page shows it: everything but the XP and action progress that move all the time.
+static func creature_key(c: Dictionary) -> int:
+	var k := c.duplicate()
+	k.erase("xp")
+	k.erase("progress")
+	return hash(k)
+
+
 const PAGE := 120
 
 

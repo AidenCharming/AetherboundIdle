@@ -309,6 +309,16 @@ static func fill_candidates(s: Dictionary, skill_id: String) -> Array:
 	return keyed.slice(0, free).map(func(k): return k[2])
 
 
+## Whether "Fill empty slots" has anyone to place: fill_candidates without ranking the whole roster.
+static func can_fill(s: Dictionary, skill_id: String) -> bool:
+	if GameState.slot_count(s, skill_id) <= GameState.workers(s, skill_id).size():
+		return false
+	for c in s.creatures.values():
+		if Creatures.is_benched(c) and Creatures.can_work(c, skill_id):
+			return true
+	return false
+
+
 ## Puts the best resting Aetherlings into every empty slot of a skill. Returns how many went to work.
 static func fill_slots(s: Dictionary, skill_id: String) -> int:
 	var n := 0

@@ -42,6 +42,10 @@ func _ready() -> void:
 func refresh() -> void:
 	if Game.state.is_empty():
 		return
+	# everything here is read from the collection (and the display choices): a capture of a species already
+	# logged at that rarity changes nothing shown, so the page keeps its cards
+	if not UI.stale(self, "page", [tab, show_form, show_rarity, show_shiny, Game.state.collection, Game.state.settings.title]):
+		return
 	_completion.text = "%s complete" % F.pct(Collection.completion(Game.state))
 	var claim := Collection.claimable(Game.state).size()
 	for b in _tabs.get_children():

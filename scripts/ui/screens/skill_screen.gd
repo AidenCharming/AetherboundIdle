@@ -86,18 +86,21 @@ func refresh() -> void:
 
 func _fill_slots() -> void:
 	var s := Game.state
-	UI.clear(_slots)
-	_slot_bars.clear()
 	var ws := GameState.workers(s, skill_id)
 	var open := GameState.slot_count(s, skill_id)
 	var levels: Array = Data.tuning.skills.slotLevels
 	var action := Skills.current_action(s, skill_id)
 	var auras := Skills.active_auras(s)
-	var fill := Skills.fill_candidates(s, skill_id)
+	var can_fill := Skills.can_fill(s, skill_id)
 	_fill_btn.visible = ws.size() < open
-	_fill_btn.disabled = fill.is_empty()
+	_fill_btn.disabled = not can_fill
 	_fill_btn.tooltip_text = "Put the best resting Aetherlings (most %s per hour) in every empty slot" % Data.item_name(action.outputs.keys()[0]) \
-		if not fill.is_empty() else "No resting Aetherling can work here"
+		if can_fill else "No resting Aetherling can work here"
+	if not UI.stale(self, "slots", [ws.map(UI.creature_key), open, action.id, auras, Skills.speed(s), s.skills[skill_id].level,
+			Collection.owned_type(s, _skill.type) if _skill.type != null else true, Market.next_slot_price(s, skill_id), Market.slot_check(s, skill_id)]):
+		return
+	UI.clear(_slots)
+	_slot_bars.clear()
 	for i in maxi(levels.size(), open):
 		var card := UI.panel("Card")
 		card.custom_minimum_size = Vector2(300, 257)
@@ -218,9 +221,12 @@ func _worker_sorts(action: Dictionary, auras: Array) -> Array:
 
 func _fill_actions() -> void:
 	var s := Game.state
+	var current := Skills.current_action(s, skill_id)
+	# the cards show the level and the chosen task; the counts on them are live labels (_update_have)
+	if not UI.stale(self, "actions", [current.id, s.skills[skill_id].level]):
+		return
 	UI.clear(_actions)
 	_have_labels.clear()
-	var current := Skills.current_action(s, skill_id)
 	for a in _skill.actions:
 		var unlocked := int(a.level) <= int(s.skills[skill_id].level)
 		var selected: bool = a.id == current.id
