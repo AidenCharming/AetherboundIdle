@@ -534,7 +534,7 @@
 		"name": "Scrap",
 		"tier": 1,
 		"category": "salvage",
-		"sell": 2,
+		"sell": 1,
 		"icon": {
 			"shape": "gear",
 			"color": "#a3acb8"

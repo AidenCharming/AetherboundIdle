@@ -1,5 +1,15 @@
 [
 	{
+		"version": "0.7.0c",
+		"date": "2026-09-25",
+		"title": "Scrap is cheap",
+		"notes": {
+			"Balancing": [
+				["Market", "Scrap sells for 1 gold (was 2), and costs less to buy in the Market."]
+			]
+		}
+	},
+	{
 		"version": "0.7.0b",
 		"date": "2026-09-25",
 		"title": "Hands-on battles",

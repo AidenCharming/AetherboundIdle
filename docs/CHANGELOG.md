@@ -3,6 +3,11 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.0c (2026-09-25): Scrap sells for 1 gold
+
+- Nothing sold for exactly 1 gold, so the Bargain Bin secret could never unlock. Designer's pick: Scrap sells
+  for 1 gold (was 2); its Market price follows (sell value times the markup, at least sell + 1).
+
 ## 0.7.0b (2026-09-25): battle clicks reach the fighters
 
 - The designer found the Stare Down secret never triggered. The Expeditions page hides the island preview during a
