@@ -90,6 +90,13 @@ func _build_menu() -> void:
 		col.add_child(_menu_button("Quit", "Ghost", func(): get_tree().quit()))
 	col.add_child(UI.spacer(true))
 	col.add_child(UI.label("Progress saves automatically", "Faint"))   # the version is on the patch notes
+	# the menu's layout boxes cover the whole left side: let clicks through them to the drifting Aetherlings
+	# behind (the buttons still take their own clicks)
+	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	col.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	for n in col.get_children():
+		if n is Container:
+			n.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var notes := PatchNotes.new()
 	notes.set_anchors_and_offsets_preset(Control.PRESET_RIGHT_WIDE)
 	notes.offset_left = -660

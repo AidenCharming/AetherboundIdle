@@ -3,6 +3,12 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.0d (2026-09-25): title-screen drifters clickable everywhere
+
+- The designer couldn't click a shiny drifter (Wish Upon a Star). The title menu's layout boxes (a margin and a
+  column, anchored left-wide, 744 px) covered the whole left side and caught clicks, like the Expeditions preview
+  margin in 0.7.0b. They ignore the mouse now; the menu buttons still take their clicks.
+
 ## 0.7.0c (2026-09-25): Scrap sells for 1 gold
 
 - Nothing sold for exactly 1 gold, so the Bargain Bin secret could never unlock. Designer's pick: Scrap sells

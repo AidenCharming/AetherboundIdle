@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.7.0c)
+## Where things stand (2026-09-25, v0.7.0d)
 
-- Current version **0.7.0c** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.7.0d** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
