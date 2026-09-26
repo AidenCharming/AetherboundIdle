@@ -3,6 +3,13 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.6.5b (2026-09-25): one shine on shinies
+
+- The designer saw two separate shines on a shiny Zenith: the shiny's own thin, repeating diagonal stripes
+  (`shimmer`) and the rarity sweep (one thick band, Brilliant and up), and liked the thicker one. The two are one
+  sweep in `creature.gdshader` now: every shiny gets the thick band (tinted halfway to its palette's light
+  colour), and a shiny of Brilliant or up shows it once.
+
 ## 0.6.5a (2026-09-25): rarity sprite effects never rendered
 
 - Checking Aetheric in battle showed no sprite effect at all, and the designer confirmed they had never seen

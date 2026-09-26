@@ -12,7 +12,7 @@ uniform vec4 pal_light : source_color = vec4(0.9, 0.95, 1.0, 1.0);
 uniform float silhouette = 0.0;       // 1 = solid silhouette
 uniform vec4 silhouette_color : source_color = vec4(0.23, 0.25, 0.47, 1.0);
 uniform float flash = 0.0;            // 0..1 white flash
-uniform float shimmer = 0.0;          // shiny sparkle sweep strength
+uniform float shimmer = 0.0;          // shiny light sweep strength (shares the rarity sweep's band)
 // Rarity effects (data/rarities.json "fx"), all following the sprite's own outline:
 // 1-2 outline glow, 3 + a sweeping shine, 4 + the glow pulses, 5 rainbow edge, body shimmer, rising motes,
 // 6 (Aetheric) + a turning halo of rays, twice the motes and a stronger shimmer.
@@ -56,9 +56,14 @@ void fragment() {
 		float amount = (1.0 - keep_outline) * (1.0 - keep_white) * 0.88;
 		rgb = mix(rgb, mapped, amount);
 	}
-	if (shimmer > 0.0) {
-		float band = sin((UV.x + UV.y) * 9.0 - TIME * 2.4);
-		rgb += pal_light.rgb * 0.35 * smoothstep(0.93, 1.0, band) * shimmer;
+	// one thick band of light sweeping across the body every few seconds, for shinies (tinted with their palette)
+	// and for rarities from fx 3 up; a shiny of such a rarity gets the one band, not two
+	float sweep_on = max(shimmer, (fx > 2.5 && silhouette < 0.5) ? 1.0 : 0.0);
+	if (sweep_on > 0.0) {
+		float sweep = fract(TIME * 0.28);
+		float d = abs((UV.x * 0.8 + UV.y * 0.4) - (sweep * 2.2 - 0.4));
+		vec3 sc = shimmer > 0.0 ? mix(vec3(1.0, 0.97, 0.9), pal_light.rgb, 0.5) : vec3(1.0, 0.97, 0.9);
+		rgb += sc * smoothstep(0.07, 0.0, d) * 0.45 * sweep_on * c.a;
 	}
 	float out_a = c.a;
 	if (fx > 0.5 && silhouette < 0.5) {
@@ -78,12 +83,6 @@ void fragment() {
 			near = max(near, texture(TEXTURE, UV + nd * 0.25).a);
 		}
 		float glow = near * (1.0 - c.a) * min(0.95, 0.45 + 0.1 * fx) * pulse;
-		// a band of light sweeping across the body every few seconds
-		if (fx > 2.5) {
-			float sweep = fract(TIME * 0.28);
-			float d = abs((UV.x * 0.8 + UV.y * 0.4) - (sweep * 2.2 - 0.4));
-			rgb += vec3(1.0, 0.97, 0.9) * smoothstep(0.07, 0.0, d) * 0.45 * c.a;
-		}
 		// Zenith: a soft rainbow sheen over the body and motes rising around it
 		if (fx > 4.5) {
 			rgb = mix(rgb, rgb * 0.75 + hue(TIME * 0.12 + UV.y * 0.8) * 0.35, (fx > 5.5 ? 0.32 : 0.22) * c.a);

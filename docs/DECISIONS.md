@@ -161,7 +161,8 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   shinies blue), each type has its own shiny palette, applied as a gradient map that keeps the dark
   outline, the shading and the white highlights: Verdant *autumn gold*, Telluric *rose quartz*, Pyric
   *blue flame*, Aqueous *sunset coral*, Voltaic *neon violet*, Void *aurora teal* (keeping the designer's
-  earlier teal choice for Void). Shinies also get a slow sparkle sweep and twinkling four-point glints.
+  earlier teal choice for Void). Shinies also get a band of light sweeping across the body (the same thick band Brilliant and up get,
+  tinted with the shiny palette; a shiny of those rarities shows it once, not twice) and twinkling four-point glints.
   Hybrids use their first type's palette. The palettes are three colours per type in `data/types.json`
   (`"shiny": {dark, mid, light}`), easy to retune. The Aether-Log shows each species' shiny colours once
   you own that shiny.

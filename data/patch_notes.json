@@ -1,5 +1,15 @@
 [
 	{
+		"version": "0.6.5b",
+		"date": "2026-09-25",
+		"title": "One shine",
+		"notes": {
+			"Bugfixes": [
+				["Nexus", "Shiny Aetherlings showed two different shines across their bodies at once. They now have one broad sweep of light in their shiny colours."]
+			]
+		}
+	},
+	{
 		"version": "0.6.5a",
 		"date": "2026-09-25",
 		"title": "Rarities finally shine",
