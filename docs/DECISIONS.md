@@ -331,9 +331,9 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
     summary toast instead of dozens, and those don't show as "new".
   - **Art:** one painting per family (the tiers share it; the frame drawn in code shows the tier: bronze,
     silver, gold, violet for secrets), 57 paintings plus the 10 island backdrops for the island clears. Every
-    painting is made in the backdrops' style (designer's request) by `tools/art/achievement_art.py`, which
-    paints through the edit graph with the island's backdrop (and the Aetherling's approved sprite) as
-    references. Shipped at 512 px in `assets/achievements/`; until then `make_icons.py` writes SVG placeholders.
+    painting is its own scene (0.7.0a, designer's request: no backdrop used as a reference), painted by
+    `tools/art/achievement_art.py` from a written island setting; scenes with an Aetherling use its approved
+    sprite as the only reference. The island clears show their backdrop in a trophy frame (pennant, ribbon). Shipped at 512 px in `assets/achievements/`; until then `make_icons.py` writes SVG placeholders.
   - **Secrets** (designer's idea: click an Aetherling that's hopping, and on the third click it runs away).
     A locked secret shows only a hint. The pokes live in the UI and only report to `Game.note_secret`:
     - `CreaturePortrait.pokeable`: a click hops (with a boing); `poke_mode` "runaway" (Nexus detail, work

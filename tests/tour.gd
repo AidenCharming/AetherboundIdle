@@ -99,6 +99,7 @@ func _run() -> void:
 	GameState.add_item(Game.state, "sunken-trinket", 2)
 	GameState.add_item(Game.state, "seedcache", 1)
 	load("res://scripts/ui/screens/inventory_screen.gd").selected = "oak-log"
+	AchievementsScreen.category = "adventure"   # the island clears show the framed backdrops
 	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["skill", "smithing"], ["skill", "fishing"], ["nexus", ""], ["pods", ""], ["aetherlog", ""], ["inventory", ""], ["works", ""], ["achievements", ""]]:
 		var shot_name: String = screen[0] + ("_" + screen[1] if screen[1] != "" else "")
 		if not _want(shot_name):

@@ -113,7 +113,9 @@ static func detail(achievement: Dictionary) -> Modal:
 	return Modal.open(v, "???" if hidden(achievement) else achievement.name, 520.0)
 
 
-## The painting in its tier frame: dimmed and greyed until earned; a locked secret is a "?" on violet.
+## The painting in its tier frame: an ink line, the tier's colour band with a highlight, diamond studs on the corners
+## and a soft vignette. Dimmed and greyed until earned; a locked secret is a "?" on violet. The island clears show
+## their island's battle backdrop, framed as a trophy picture: a victory pennant on top, the island's name on a ribbon.
 class FramedArt extends Control:
 	var a: Dictionary
 
@@ -124,6 +126,9 @@ class FramedArt extends Control:
 		var r := Rect2(Vector2.ZERO, size)
 		var col := AchievementTile.frame_color(a)
 		var done := Achievements.is_unlocked(Game.state, a.id)
+		var island: bool = str(a.art).begins_with("zone:")
+		var band := maxf(4.0, size.x * 0.035)
+		var inner := r.grow(-band)
 		if AchievementTile.hidden(a):
 			draw_rect(r, Color(0.16, 0.12, 0.3))
 			var font := get_theme_default_font()
@@ -133,10 +138,72 @@ class FramedArt extends Control:
 		else:
 			var tex := Data.achievement_icon(a)
 			if tex:
-				draw_texture_rect(tex, r, false, Color.WHITE if done else Color(0.42, 0.42, 0.5))
+				draw_texture_rect(tex, inner, false, Color.WHITE if done else Color(0.42, 0.42, 0.5))
+			_vignette(inner, 0.45 if island else 0.3)
 			if not done:
-				draw_rect(r, Color(0.05, 0.05, 0.14, 0.35))
-		var w := maxf(3.0, size.x * 0.022)
-		draw_rect(r.grow(-w / 2.0), col if done else col.darkened(0.45), false, w)
-		if done:
-			draw_rect(r.grow(-w * 1.5), Color(1, 1, 1, 0.18), false, 1.0)
+				draw_rect(inner, Color(0.05, 0.05, 0.14, 0.35))
+		var c := col if done else col.darkened(0.45)
+		# the frame: ink outside, the tier band, a thin highlight inside it, an ink line against the picture
+		draw_rect(r.grow(-1.0), Palette.INK, false, 2.0)
+		draw_rect(r.grow(-band / 2.0 - 1.0), c, false, band - 2.0)
+		draw_rect(r.grow(-2.5), c.lightened(0.35), false, 1.0)
+		draw_rect(inner.grow(0.5), Palette.INK, false, 1.5)
+		for corner in [r.position, Vector2(r.end.x, r.position.y), Vector2(r.position.x, r.end.y), r.end]:
+			_diamond(corner + (r.get_center() - corner).sign() * band * 0.5, band * 1.15, c)
+		if island and not AchievementTile.hidden(a):
+			_pennant(Vector2(size.x / 2.0, band), band, c)
+			_ribbon(Data.zones[str(a.art).substr(5)].name, c)
+
+	func _diamond(at: Vector2, rad: float, c: Color) -> void:
+		var pts := PackedVector2Array([at + Vector2(0, -rad), at + Vector2(rad, 0), at + Vector2(0, rad), at + Vector2(-rad, 0)])
+		draw_colored_polygon(pts, c)
+		pts.append(pts[0])
+		draw_polyline(pts, Palette.INK, 1.5, true)
+		draw_circle(at + Vector2(-rad * 0.25, -rad * 0.25), rad * 0.18, Color(1, 1, 1, 0.7))
+
+	## Darker edges, so the frame sits on the picture and the middle reads first.
+	func _vignette(box: Rect2, strength: float) -> void:
+		var steps := 8
+		var depth := box.size.x * 0.14
+		for i in steps:
+			var k := float(i) / steps
+			var w := depth * (1.0 - k) / steps
+			var col := Color(0.02, 0.02, 0.08, strength * (1.0 - k) * (1.0 - k) * 0.45)
+			var b := box.grow(-depth * k)
+			draw_rect(Rect2(b.position, Vector2(b.size.x, w)), col)
+			draw_rect(Rect2(Vector2(b.position.x, b.end.y - w), Vector2(b.size.x, w)), col)
+			draw_rect(Rect2(b.position, Vector2(w, b.size.y)), col)
+			draw_rect(Rect2(Vector2(b.end.x - w, b.position.y), Vector2(w, b.size.y)), col)
+
+	## A little victory flag on a pole, planted on the top of the frame.
+	func _pennant(foot: Vector2, band: float, c: Color) -> void:
+		var h := band * 3.2
+		draw_line(foot, foot + Vector2(0, -h * 0.2) + Vector2(0, h), Palette.INK, 2.0)
+		var top := foot + Vector2(0, band * 0.2)
+		var flag := PackedVector2Array([top, top + Vector2(h * 0.9, h * 0.28), top + Vector2(0, h * 0.56)])
+		draw_colored_polygon(flag, c.lightened(0.15))
+		flag.append(flag[0])
+		draw_polyline(flag, Palette.INK, 1.5, true)
+
+	## The island's name on a ribbon across the bottom of the picture.
+	func _ribbon(text: String, c: Color) -> void:
+		var font := get_theme_default_font()
+		var fs := int(clampf(size.y * 0.075, 11.0, 28.0))
+		var tw := font.get_string_size(text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
+		var w := minf(size.x * 0.9, tw + fs * 2.0)
+		var hgt := fs * 1.6
+		var y := size.y * 0.8
+		var x0 := (size.x - w) / 2.0
+		var tail := hgt * 0.45
+		for side in [-1.0, 1.0]:
+			var ex: float = x0 if side < 0.0 else x0 + w
+			var pts := PackedVector2Array([Vector2(ex, y + hgt * 0.2), Vector2(ex + side * tail * 1.4, y + hgt * 0.2),
+				Vector2(ex + side * tail, y + hgt * 0.7), Vector2(ex + side * tail * 1.4, y + hgt * 1.2), Vector2(ex, y + hgt * 1.2)])
+			draw_colored_polygon(pts, c.darkened(0.35))
+			pts.append(pts[0])
+			draw_polyline(pts, Palette.INK, 1.5, true)
+		var body := Rect2(x0, y, w, hgt)
+		draw_rect(body, c)
+		draw_rect(body, Palette.INK, false, 1.5)
+		draw_line(body.position + Vector2(3, 3), Vector2(body.end.x - 3, body.position.y + 3), c.lightened(0.4), 1.0)
+		draw_string(font, Vector2(x0, y + hgt * 0.5 + fs * 0.35), text, HORIZONTAL_ALIGNMENT_CENTER, w, fs, Palette.INK)

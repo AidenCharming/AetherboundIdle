@@ -3,6 +3,21 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.0a (2026-09-25): achievement frames and the art prompts reworked
+
+- **Designer:** cancel the achievement art run (stopped: ComfyUI's queue cleared, the runner closed; the tool
+  now has `cancel` for this), don't paint scenes into the island backdrops, give each achievement its own
+  painting except the tiered ones, let the island clears keep their backdrop if the frame is nice, and use the
+  Aetherlings' art as references like the Headpats run (which the designer loved).
+- `achievement_art.py`: no backdrop reference any more. Each scene gets a written setting for its island;
+  scenes with one Aetherling (now 30, up from 20) use its approved sprite as the only reference (edit graph),
+  the rest are text-to-image. The stopped run's 48 candidates and log were set aside in
+  `cand_achievements_old_backdrop_refs` / `achievement_generation_log.old_backdrop_refs.jsonl`, except the
+  four Headpats candidates, kept to pick from.
+- `AchievementTile.FramedArt`: every tile has an ink line, the tier band with a highlight, diamond corner studs
+  and a soft vignette; an island clear shows its backdrop as a trophy picture with a victory pennant and the
+  island's name on a ribbon.
+
 ## 0.7.0 (2026-09-25): Achievements
 
 - **The designer's request** (planned together first, since it's a new system): an Achievements page with

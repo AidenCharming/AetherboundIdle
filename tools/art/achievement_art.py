@@ -1,9 +1,10 @@
 """Achievement art for Aetherbound: generates, picks and installs the painted achievement tiles through ComfyUI.
 
-Every painting is made in the style of the island battle backdrops (the island-clear achievements show the backdrops
-themselves, so the rest must sit beside them): each scene is painted through the edit graph with its island's
-backdrop (godot/assets/zones/<island>.jpg) as the first reference image, and, when an Aetherling is in it, that
-creature's approved sprite (godot/assets/creatures/<id>-f<form>.png) as the second, so it stays on-model.
+Every achievement has a painting of its own (only the tiers of one achievement share one; the frame shows the tier),
+except the ten island clears, which show their island's battle backdrop in the game's island frame. No backdrop is
+used as a reference: each scene is described in words, with a short written setting for the island it happens on. A scene without an Aetherling in it is painted text-to-image; one with an Aetherling
+goes through the edit graph with that creature's approved sprite (godot/assets/creatures/<id>-f<form>.png, flattened
+onto a white square) as the only reference, so it stays on-model while everything around it is new.
 The ComfyUI plumbing (HTTP, upload, queue, wait, graph specs) comes from batch_runner.py in D:\\AI\\tools.
 
 Run with plain `python` from the repo root or tools/art:
@@ -16,8 +17,10 @@ Commands
   run      [--category ...] [--only a,b] [--count 4] [--more] [--dry-run]
            generates candidates (1024x1024). Skips approved paintings and ones that already have --count
            candidates; --more adds another --count. Builds a contact sheet at the end.
-  sheet    [--category ...] [--only a,b]   numbered contact sheet, each row starting with its island backdrop so a
-           painting that drifts from the backdrops' style stands out. D:\\AI\\achievements\\sheets\\
+  sheet    [--category ...] [--only a,b]   numbered contact sheet (each row starts with its sprite reference, if
+           any), D:\\AI\\achievements\\sheets\\
+  cancel   stops a run: clears ComfyUI's queue and interrupts the image being made. (Ctrl+C in the window
+           running `run` stops the script itself; its images already queued keep going unless you cancel.)
   pick     KEY N [--force]                  copies candidate N to D:\\AI\\achievements\\approved\\<key>.png
   fix      KEY N --prompt "..." [--count 4] an edit of candidate N ("The same painting as the reference image, ...")
   finish   [--only a,b] [--size 512] [--no-install]
@@ -59,9 +62,22 @@ PLATE = "#171a38"
 sys.path.insert(0, str(TOOLS))
 
 # ----------------------------------------------------------------------------- the paintings
-# A(key, island, scene, ref=None): island is the backdrop the scene is painted in (a data/zones.json id); scene says
-# what happens, in plain words, as one or two sentences; ref "<species>-f<form>" puts that Aetherling's approved
-# sprite in as the second reference (then say "the Aetherling" in the scene).
+# A(key, island, scene, ref=None): island names where the scene happens (a data/zones.json id; its written setting
+# below goes into the prompt, never its backdrop picture); scene says what happens, in plain words, as one or two
+# sentences; ref "<species>-f<form>" puts that Aetherling's approved sprite in as the reference (then say "the
+# Aetherling" in the scene).
+ISLANDS = {
+    "whisperleaf-hollow": "a mossy forest glade on a small floating island, tall soft-leaved trees and blue dusk light",
+    "fractured-quarry": "a sunlit stone quarry of cracked grey and ochre cliffs, loose boulders and dusty ledges",
+    "smoldering-caldera": "the rim of a smouldering volcano, dark rock, warm orange lava light and drifting embers",
+    "whispering-tides": "a calm sandy shore with turquoise water, smooth rocks and a pale morning sky",
+    "thunderhum-steppe": "a wide windswept grassy steppe under heavy purple storm clouds with distant lightning",
+    "null-horizon": "a quiet dark violet plain under a starry sky, floating rocks and faint aurora ribbons",
+    "verdigris-canopy": "the top of a giant ancient forest, huge green branches and leaves with golden sunlight",
+    "magmaglass-rift": "a deep rift of shiny black volcanic glass with glowing orange cracks",
+    "stormsea-expanse": "a rolling grey-green stormy sea with tall waves and rain in the distance",
+    "zenith-spire": "the top of a white and gold spire far above the clouds in bright dawn light",
+}
 ART = []
 
 
@@ -86,7 +102,7 @@ A("skill-first99", "zenith-spire", "A single golden trophy cup stands on a stone
 A("skill-grandmaster", "zenith-spire", "A tall golden trophy crowned with a star stands on a high pedestal, surrounded by the tools of every craft laid out in a circle.")
 A("skill-actions", "whisperleaf-hollow", "The Aetherling hurries along carrying a tall wobbling stack of logs, fish and ore.", "joulebug-f1")
 # Aetherlings & Nexus
-A("nexus-own", "whisperleaf-hollow", "A cosy clearing crowded with many small round cute creatures of different colours sitting together.")
+A("nexus-own", "whisperleaf-hollow", "The Aetherling sits happily in a cosy clearing crowded with many small round creatures of different colours.", "sproutlet-f1")
 A("nexus-species", "verdigris-canopy", "An open leather field journal on a tree root, its pages filled with little drawings of creatures and notes.")
 A("nexus-form2", "whisperleaf-hollow", "The Aetherling stands tall and proud in a swirl of soft light, looking a little bigger and stronger than before.", "sproutlet-f2")
 A("nexus-form3", "verdigris-canopy", "The Aetherling in its mightiest form stands on a high branch, towering and majestic.", "sproutlet-f3")
@@ -105,45 +121,45 @@ A("adv-bind", "whisperleaf-hollow", "A round crystal capture vessel lies in the 
 A("adv-kills", "thunderhum-steppe", "The Aetherling stands in a heroic pose on a small hill, a crowd of dazed wild creatures lying around it with little stars over their heads.", "emberfang-f2")
 A("adv-bosses", "magmaglass-rift", "A row of five huge defeated monster silhouettes lies in the distance under a banner planted in the ground.")
 A("adv-solo", "stormsea-expanse", "The Aetherling stands alone and brave facing a gigantic storm creature towering over the waves.", "splashfin-f2")
-A("adv-shinyseen", "whisperleaf-hollow", "A wild creature with unusual sparkling colours peeks out from behind a tree, while a startled traveller's hat lies on the ground.")
-A("adv-shinybind", "whispering-tides", "A crystal capture vessel glows with a rainbow-coloured sparkling creature inside it, resting in the sand.")
+A("adv-shinyseen", "whisperleaf-hollow", "The Aetherling, in unusual sparkling colours, peeks out from behind a tree, a startled traveller's hat lying on the ground.", "buzzbud-f1")
+A("adv-shinybind", "whispering-tides", "The Aetherling, sparkling in unusual colours, peeks out of a round crystal capture vessel resting in the sand.", "puddlescoop-f1")
 # breeding
 A("breed-eggs", "whisperleaf-hollow", "A nest of soft moss holding a speckled egg, gently glowing, under a small glass dome.")
 A("breed-hybrid", "verdigris-canopy", "Two different little creatures, one leafy green and one watery blue, look proudly at a newly hatched baby that mixes both of them.")
 A("breed-special", "null-horizon", "An open old recipe book glowing on a stone table, with a strange rare egg beside it marked with a swirl.")
 A("breed-mutation", "smoldering-caldera", "A cracked egg with a bright light shining out of the crack, the shell patterns shifting to brighter colours.")
-A("breed-shinyhatch", "whispering-tides", "An egg hatching on the beach, a sparkling unusually coloured baby creature popping out of the shell.")
+A("breed-shinyhatch", "whispering-tides", "The Aetherling, as a sparkling unusually coloured baby, pops out of a cracked eggshell on the beach.", "dewdrop-f1")
 A("breed-zenith", "zenith-spire", "A tall ivory and gold egg rests on a marble plinth, radiant light around it.")
 A("breed-aetheric", "zenith-spire", "A translucent-looking pale egg made of aether light hovers above an altar at the top of the spire.")
 # secret
 A("secret-runaway", "whisperleaf-hollow", "The Aetherling dashes away across the moss with a puff of dust behind it, looking back over its shoulder annoyed.", "sproutlet-f1")
 A("secret-headpats", "whisperleaf-hollow", "The Aetherling closes its eyes happily as a big gentle hand pats its head, little hearts floating up.", "buzzbud-f1")
 A("secret-cold-shoulder", "verdigris-canopy", "The Aetherling sits on a perch with its back turned to the viewer, arms folded, clearly sulking.", "cinderpup-f1")
-A("secret-wish", "null-horizon", "A small sparkling creature drifts across a night sky, a shooting star trailing behind it.")
-A("secret-hop-scotch", "whisperleaf-hollow", "Five small round creatures jump in the air at the same time, mid-hop, with happy faces.")
+A("secret-wish", "null-horizon", "The Aetherling, sparkling, drifts across the night sky riding a shooting star.", "hushflutter-f1")
+A("secret-hop-scotch", "whisperleaf-hollow", "The Aetherling and four small round friends jump in the air at the same time, mid-hop, with happy faces.", "pebblescoot-f1")
 A("secret-letter-bounce", "thunderhum-steppe", "Big chunky wooden alphabet blocks bouncing in the air above the grass, caught mid-bounce.")
 A("secret-konami", "null-horizon", "An old retro game controller with a cross-shaped pad and two round buttons floats in space, glowing in rainbow colours.")
-A("secret-patience", "smoldering-caldera", "An egg in a warm nest with a small cross face drawn by its shape, a tiny knuckle knocking on its shell.")
-A("secret-bell", "fractured-quarry", "A small brass bell on a stand rings on its own in an empty quarry, one lonely tumbleweed rolling by.")
-A("secret-stare-down", "thunderhum-steppe", "Two creatures glare at each other nose to nose, eyes narrowed, a tense wind blowing the grass.")
+A("secret-patience", "smoldering-caldera", "The Aetherling knocks impatiently on a big speckled egg in a warm nest, tapping its foot.", "charwhisk-f1")
+A("secret-bell", "fractured-quarry", "The Aetherling rings a small brass bell in an empty quarry, looking around hopefully, one lonely tumbleweed rolling by.", "geodecore-f1")
+A("secret-stare-down", "thunderhum-steppe", "The Aetherling glares nose to nose at a wild creature, both with narrowed eyes, a tense wind blowing the grass.", "cinderpup-f1")
 A("secret-night-owl", "null-horizon", "The Aetherling sits awake by a small lantern under a big moon, eyes wide, a clock nearby showing three o'clock.", "eclipsa-f1")
-A("secret-catch-release", "whispering-tides", "An open crystal vessel on the shore, a sparkling creature hopping out of it towards the sea, waving goodbye.")
+A("secret-catch-release", "whispering-tides", "The Aetherling, sparkling, hops out of an open crystal vessel on the shore towards the sea, waving goodbye.", "frothsprite-f1")
 A("secret-try-again", "fractured-quarry", "The Aetherling picks itself up from the dust with a bandage on its head, determined, a little flag in its paw.", "tuskcub-f1")
 A("secret-bargain-bin", "magmaglass-rift", "A wooden crate labelled with only a drawn coin symbol, a single copper coin on top of a pile of odd junk.")
 A("secret-riches-to-rags", "stormsea-expanse", "An empty treasure chest on a rock with one lonely coin at the bottom, a single moth fluttering out of it.")
 
-STYLE = ("A square painted illustration for an achievement in a cute creature-collecting idle game, painted in exactly the same "
-         "soft painterly digital illustration style, rich colour and light as the first reference image, and set in the same place "
-         "as the first reference image. {scene}{ref} The scene fills the whole square, with one clear subject near the centre "
-         "that reads well at a small size, and the colours slightly deep and rich like the reference. No text, no letters, no "
-         "numbers, no user interface, no border, no frame, no watermark.")
-REF_LINE = (" The Aetherling is exactly the creature in the second reference image: the same shape, colours and markings, "
-            "painted in the same style as the scene.")
-BAD = ["text that says", "logo", "signature", "photo", "photorealistic", "3d render", "realistic"]
+STYLE = ("{lead}A square painted illustration for an achievement in a cute creature-collecting idle game, in a soft painterly "
+         "digital illustration style with rich colour. Setting: {setting}. {scene}{ref} The scene fills the whole square, "
+         "one clear subject near the centre that reads well small, slightly deep rich colours. No text, no letters, no numbers, no user interface, no border, no frame, no watermark.")
+REF_LEAD = "Paint a completely new picture. "
+REF_LINE = (" The Aetherling is exactly the creature in the reference image: same shape, colours and markings, in the scene's "
+            "style; everything around it is new, the white behind it replaced by the setting.")
+BAD = ["text that says", "logo", "signature", "photo", "photorealistic", "3d render", "realistic", "reference image of the place"]
 
 
 def prompt(a):
-    return STYLE.format(scene=a["scene"], ref=REF_LINE if a["ref"] else "")
+    return STYLE.format(lead=REF_LEAD if a["ref"] else "", setting=ISLANDS.get(a["island"], a["island"]), scene=a["scene"],
+                        ref=REF_LINE if a["ref"] else "")
 
 
 def load_data():
@@ -158,15 +174,15 @@ def validate():
     keys = [a["key"] for a in ART]
     for k in {k for k in keys if keys.count(k) > 1}:
         errs.append(f"{k} is in the table twice")
-    game = {x["art"] for x in ach if not x["art"].startswith("zone:")}
+    game = {x["art"] for x in ach if not x["art"].startswith("zone:")}   # island clears show their backdrop
     for k in sorted(game - set(keys)):
         errs.append(f"achievement art {k} (data/achievements.json) has no prompt")
     for k in sorted(set(keys) - game):
         errs.append(f"{k} has a prompt but no achievement uses it")
     for a in ART:
         p = prompt(a)
-        if a["island"] not in zones:
-            errs.append(f"{a['key']}: island {a['island']} is not in data/zones.json")
+        if a["island"] not in zones or a["island"] not in ISLANDS:
+            errs.append(f"{a['key']}: island {a['island']} needs to be in data/zones.json and ISLANDS")
         if a["ref"]:
             if "Aetherling" not in a["scene"]:
                 errs.append(f"{a['key']}: has a sprite ref but the scene doesn't say 'the Aetherling'")
@@ -234,8 +250,19 @@ def approved_path(key):
     return APPROVED / f"{key}.png"
 
 
-def backdrop(island):
-    return GODOT / "assets" / "zones" / f"{island}.jpg"
+def sprite_ref(a):
+    """The sprite reference, flattened onto a white square (LoadImage drops the alpha), or None."""
+    if not a["ref"]:
+        return None
+    from PIL import Image
+    REFS.mkdir(parents=True, exist_ok=True)
+    flat = REFS / f"{a['ref']}-flat.png"
+    sprite = Image.open(GODOT / "assets" / "creatures" / f"{a['ref']}.png").convert("RGBA")
+    side = max(sprite.size)
+    bg = Image.new("RGBA", (side, side), "white")
+    bg.alpha_composite(sprite, ((side - sprite.width) // 2, (side - sprite.height) // 2))
+    bg.convert("RGB").resize((1024, 1024), Image.LANCZOS).save(flat)
+    return flat
 
 
 def select(args):
@@ -269,23 +296,14 @@ def _font(px):
     return ImageFont.load_default()
 
 
-def _upload_refs(br, a):
-    """Uploads the island backdrop and (flattened onto white, since LoadImage drops the alpha) the sprite reference.
-    Returns (ref_name, ref2_name or None)."""
-    from PIL import Image
-    ref = f"ach-zone-{a['island']}.jpg"
-    br.upload_image(backdrop(a["island"]), ref)
-    if not a["ref"]:
-        return ref, None
-    REFS.mkdir(parents=True, exist_ok=True)
-    flat = REFS / f"{a['ref']}-flat.png"
-    sprite = Image.open(GODOT / "assets" / "creatures" / f"{a['ref']}.png").convert("RGBA")
-    bg = Image.new("RGBA", sprite.size, "white")
-    bg.alpha_composite(sprite)
-    bg.convert("RGB").save(flat)
-    ref2 = f"ach-sprite-{a['ref']}.png"
-    br.upload_image(flat, ref2)
-    return ref, ref2
+def _upload_ref(br, a):
+    """Uploads the sprite reference for a scene with an Aetherling. Returns its ComfyUI name, or None."""
+    flat = sprite_ref(a)
+    if flat is None:
+        return None
+    name = f"ach-sprite-{a['ref']}.png"
+    br.upload_image(flat, name)
+    return name
 
 
 # ----------------------------------------------------------------------------- commands
@@ -318,9 +336,11 @@ def cmd_prompts(args):
         PROMPTS_JSON.write_text(json.dumps(rows, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         print(f"wrote {PROMPTS_JSON}")
     out = ["# Achievement art prompts", "",
-           "Written by `tools/art/achievement_art.py prompts`; edit the `ART` table there, not this file. Each painting is "
-           "painted through the edit graph with its island's battle backdrop as the first reference (so the set matches the "
-           "backdrops the island-clear achievements show) and, when an Aetherling is in it, its approved sprite as the second.", "",
+           "Written by `tools/art/achievement_art.py prompts`; edit the `ART` table there, not this file. Every achievement "
+           "has its own painting (the tiers of one achievement share it); no battle backdrop is reused or used as a "
+           "reference, except the island clears, which show their island's backdrop in the game's island frame. Scenes "
+           "without an Aetherling are text-to-image; scenes with one use its approved sprite as the only "
+           "reference (edit graph).", "",
            "Run: `python tools/art/achievement_art.py run --category skills` (or `--only key,key`), look at the sheet, "
            "`pick KEY N`, then `finish` to install at 512 px.", "",
            "| # | Painting | Category | Island | Sprite | Used by | Status |", "|---|---|---|---|---|---|---|"]
@@ -367,13 +387,13 @@ def cmd_run(args):
         sys.exit(f"ComfyUI is not answering at {br.HOST}. Start D:\\AI\\ComfyUI\\run_nvidia_gpu.bat first.")
     done = 0
     for a, first, n in jobs:
-        ref, ref2 = _upload_refs(br, a)
-        spec = br.EDIT_DUAL if ref2 else br.EDIT
+        ref = _upload_ref(br, a)
+        spec = br.EDIT if ref else br.T2I
         text = prompt(a)
         pending = []
         for k in range(first, first + n):
             seed = random.SystemRandom().randrange(1, 2**50)
-            pending.append((k, seed, br.queue(br.build_graph(spec, text, seed, f"cand_achievements/{a['key']}-c{k}", ref, ref2))))
+            pending.append((k, seed, br.queue(br.build_graph(spec, text, seed, f"cand_achievements/{a['key']}-c{k}", ref))))
         for k, seed, pid in pending:
             try:
                 img = br.wait_for(pid)
@@ -383,7 +403,7 @@ def cmd_run(args):
                 continue
             rel = (Path(img.get("subfolder", "")) / img["filename"]).as_posix()
             append_log(dict(time=now(), key=a["key"], cand=k, ok=True, file=rel, seed=seed, steps=spec["steps_n"], cfg=1.0,
-                            model=br.MODEL, workflow=spec["file"], reference=ref, reference2=ref2, prompt=text))
+                            model=br.MODEL, workflow=spec["file"], reference=ref, prompt=text))
             done += 1
         print(f"  {a['key']}: candidates {first}-{first + n - 1} done ({done}/{total})")
     args.only = ",".join(a["key"] for a, _, _ in jobs)
@@ -412,10 +432,11 @@ def cmd_sheet(args):
         d.text((12, y + tile // 2 + 4), a["island"], fill="#8a8a99", font=f_small)
         if approved_path(a["key"]).exists():
             d.text((12, y + tile // 2 + 26), "APPROVED", fill="#8fd6a0", font=f_small)
-        # the island backdrop first, for style
-        bd = Image.open(backdrop(a["island"])).convert("RGB").resize((tile, tile), Image.LANCZOS)
-        sheet.paste(bd, (label_w, y))
-        d.text((label_w + 6, y + tile + 4), "backdrop", fill="#8a8a99", font=f_small)
+        # the sprite reference first, to check the Aetherling stayed on-model
+        flat = sprite_ref(a)
+        if flat is not None:
+            sheet.paste(Image.open(flat).convert("RGB").resize((tile, tile), Image.LANCZOS), (label_w, y))
+            d.text((label_w + 6, y + tile + 4), a["ref"], fill="#8a8a99", font=f_small)
         for i, (n, path) in enumerate(cs, 1):
             x = label_w + i * (tile + gap)
             sheet.paste(Image.open(path).convert("RGB").resize((tile, tile), Image.LANCZOS), (x, y))
@@ -517,6 +538,16 @@ def cmd_finish(args):
     print(f"check sheet -> {out}")
 
 
+def cmd_cancel(args):
+    """Clears ComfyUI's queue and interrupts the image being made (stops a run started in another window)."""
+    br = _br()
+    if not br.comfy_up():
+        sys.exit(f"ComfyUI is not answering at {br.HOST}; nothing to cancel.")
+    br.http("POST", "/queue", json.dumps({"clear": True}).encode(), {"Content-Type": "application/json"})
+    br.http("POST", "/interrupt", b"", {"Content-Type": "application/json"})
+    print("Cleared ComfyUI's queue and stopped the current image. Close or Ctrl+C the window running `run` too.")
+
+
 def main():
     ap = argparse.ArgumentParser(description="Achievement art through ComfyUI (see the module docstring).")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -525,6 +556,7 @@ def main():
     p.add_argument("--category", choices=cats, default="all")
     p.add_argument("--only")
     sub.add_parser("prompts")
+    sub.add_parser("cancel")
     p = sub.add_parser("run")
     p.add_argument("--category", choices=cats, default="all")
     p.add_argument("--only")
@@ -550,7 +582,7 @@ def main():
     p.add_argument("--no-install", action="store_true")
     args = ap.parse_args()
     {"status": cmd_status, "prompts": cmd_prompts, "run": cmd_run, "sheet": cmd_sheet, "pick": cmd_pick,
-     "fix": cmd_fix, "finish": cmd_finish}[args.cmd](args)
+     "fix": cmd_fix, "finish": cmd_finish, "cancel": cmd_cancel}[args.cmd](args)
 
 
 if __name__ == "__main__":

@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.7.0)
+## Where things stand (2026-09-25, v0.7.0a)
 
-- Current version **0.7.0** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.7.0a** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
@@ -22,9 +22,11 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
    (~25 ms), Market (~18 ms).
 ## Open: for the designer
 
-- **Paint the achievement art (0.7.0):** 57 paintings, each in its island backdrop's style. With ComfyUI running:
+- **Paint the achievement art (0.7.0a):** 57 paintings, each its own scene (the island clears show their backdrop in a
+  trophy frame). With ComfyUI running:
   `python tools/art/achievement_art.py run --category secret` (or skills, nexus, adventure, breeding; `--dry-run`
-  first), look at the sheet in `D:\AIchievements\sheets\` (each row starts with its backdrop), `pick KEY N`,
+  first), look at the sheet in `D:\AI\achievements\sheets\` (each row starts with its sprite reference; the four
+  Headpats candidates from the first run are kept), `pick KEY N`, stop a run with `cancel`,
   then `finish` to install them at 512 px. Prompts: `docs/archive/art/art-prompts-achievements.md`; edit the `ART`
   table in the tool and run `prompts`. The trophy nav icon has a prompt in `build_icon_prompts.py` (`--only
   achievements` in icon_runner).
