@@ -13,6 +13,7 @@ const SCREENS := {
 	"market": preload("res://scripts/ui/screens/market_screen.gd"),
 	"eggmarket": preload("res://scripts/ui/screens/egg_market_screen.gd"),
 	"works": preload("res://scripts/ui/screens/works_screen.gd"),
+	"achievements": preload("res://scripts/ui/screens/achievements_screen.gd"),
 }
 
 static var instance: Control
@@ -233,6 +234,7 @@ func _fill_rail() -> void:
 	_nav_item("expeditions", "", "Expeditions", "expeditions")
 	_section("Collection")
 	_nav_item("aetherlog", "", "Aether-Log", "aetherlog")
+	_nav_item("achievements", "", "Achievements", "achievements")
 	_section("Sanctum")
 	_nav_item("inventory", "", "Inventory", "inventory")
 	_nav_item("market", "", "Market", "market")
@@ -363,6 +365,8 @@ func _refresh_rail() -> void:
 	var claim := Collection.claimable(s).size()
 	_set_extra(_nav_buttons["aetherlog:"], "%d" % claim if claim > 0 else "", Palette.GOLD)
 	_nav_buttons["aetherlog:"].button.tooltip_text = "%d milestone reward%s to claim" % [claim, "" if claim == 1 else "s"] if claim > 0 else ""
+	var fresh := Achievements.unseen(s)
+	_set_extra(_nav_buttons["achievements:"], "%d new" % fresh if fresh > 0 else "", Palette.GOLD)
 	# the Market: a rare limited offer pulses in gold; fresh stock you haven't looked at says "new"
 	var mk: Dictionary = _nav_buttons["market:"]
 	var now := Game.now_sec()

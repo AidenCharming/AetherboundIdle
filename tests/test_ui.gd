@@ -288,7 +288,7 @@ func test_screens_fit_the_base_width() -> void:
 	var rail: Control = main.get_child(1).get_child(0)
 	var rail_w := rail.get_combined_minimum_size().x
 	for screen in [["sanctum", ""], ["skill", "woodcutting"], ["nexus", s.creatures.keys()[0]], ["pods", ""],
-			["expeditions", "fractured-quarry"], ["aetherlog", ""], ["inventory", ""], ["works", ""]]:
+			["expeditions", "fractured-quarry"], ["aetherlog", ""], ["inventory", ""], ["works", ""], ["achievements", ""]]:
 		main.show_screen(screen[0], screen[1])
 		var widest := 0.0
 		for c in main._screen.get_children():
@@ -1195,3 +1195,32 @@ func test_dev_tools_hidden_in_release_until_unlocked() -> void:
 	t.ok("unlocked" in (chip.get_child(0) as Label).text, "the chip says so")
 	chip.free()
 	Options.values.dev_unlocked = was
+
+
+## The Achievements page: the category filter narrows the tiles, a locked secret shows only its hint, and
+## leaving the page marks new unlocks as seen.
+func test_achievements_page_filters_and_hides_secrets() -> void:
+	_setup()
+	var main := _main()
+	var s := Game.state
+	s.skills.woodcutting.level = 10
+	Achievements.check(s)
+	AchievementsScreen.category = "secret"
+	AchievementsScreen.shown = "all"
+	main.show_screen("achievements", "")
+	var tiles: Array = main._screen._grid.get_children().filter(func(c): return c is AchievementTile)
+	t.eq(tiles.size(), Achievements.count_total("secret"), "only the secrets are shown")
+	t.ok(_find_button(main._screen, "") != null, "tiles are buttons")
+	var tile: AchievementTile = tiles[0]
+	t.ok(AchievementTile.hidden(tile.a), "a locked secret is hidden")
+	var names := []
+	for c in tile.get_children()[0].get_children():
+		if c is Label:
+			names.append(c.text)
+	t.ok("???" in names and not (tile.a.name in names), "its name stays hidden")
+	AchievementsScreen.category = ""
+	t.eq(Achievements.unseen(s), 1, "the new unlock is flagged")
+	main._screen.free()   # show_screen() frees the old page at the end of the frame; leave it now
+	t.eq(Achievements.unseen(s), 0, "leaving the page marks it seen")
+	main.free()
+	_teardown()

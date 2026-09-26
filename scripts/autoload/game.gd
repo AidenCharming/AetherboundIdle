@@ -313,7 +313,7 @@ func _claim_pending_secrets() -> void:
 func mark_achievements_seen() -> void:
 	for id in state.achievements.unlocked:
 		state.achievements.seen[id] = true
-	notifications_changed.emit()
+	changed.emit()
 
 
 func info(text: String, icon: Texture2D = null) -> void:
