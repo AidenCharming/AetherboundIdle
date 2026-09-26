@@ -1263,3 +1263,45 @@ func test_poking_aetherlings_and_eggs() -> void:
 	host.free()
 	Game.running = keep
 	_teardown()
+
+
+## Pages keep a section's nodes while the data it shows is unchanged (UI.stale), and build it again when it moves.
+func test_pages_keep_unchanged_sections() -> void:
+	_setup()
+	var s := Game.state
+	var main := _main()
+	_teardown()
+	main.show_screen("aetherlog")
+	var log_page: Node = main._screen
+	var first: Node = log_page._body.get_child(0)
+	log_page.refresh()
+	t.ok(log_page._body.get_child(0) == first, "Aether-Log: an unchanged collection keeps its cards")
+	var c := Creatures.make(s, "emberfang", 3, 1, false, [], "test")
+	s.creatures[c.id] = c
+	Collection.on_owned(s, c)
+	log_page.refresh()
+	t.ok(log_page._body.get_child(0) != first, "a new species builds the page again")
+	main.show_screen("skill", "woodcutting")
+	var sk: Node = main._screen
+	var slot: Node = sk._slots.get_child(0)
+	var card: Node = sk._actions.get_child(0)
+	sk.refresh()
+	t.ok(sk._slots.get_child(0) == slot and sk._actions.get_child(0) == card, "skill page: unchanged slots and tasks are kept")
+	var worker := Creatures.make(s, "sproutlet", 1, 5, false, [], "test")
+	s.creatures[worker.id] = worker
+	Game.assign(worker.id, "woodcutting")
+	sk.refresh()
+	t.ok(sk._slots.get_child(0) != slot, "a new worker builds the slots again")
+	t.ok(sk._actions.get_child(0) == card, "and leaves the task cards alone")
+	main.show_screen("expeditions")
+	var ex: Node = main._screen
+	var zone: Node = ex._zones.get_child(0)
+	var right_count: int = ex._right.get_child_count()
+	ex.refresh()
+	t.ok(ex._zones.get_child(0) == zone, "Expeditions: unchanged islands are kept")
+	Expedition.zone_state(s, Data.zone_list[0].id).bestWave = 3
+	ex.refresh()
+	t.ok(ex._zones.get_child(0) != zone, "a new best wave builds the islands again")
+	t.eq(ex._right.get_child_count(), right_count, "the party panel is still there")
+	main.free()
+	_teardown()
