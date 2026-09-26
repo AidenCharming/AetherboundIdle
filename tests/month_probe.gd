@@ -46,6 +46,7 @@ func _ready() -> void:
 		party_rates(timeline)
 	elif not "--skills" in OS.get_cmdline_user_args():
 		run_party(timeline)
+	print("\nWhere the probe's time went (Perf):\n" + Perf.table("probe."))
 	print("\n(probe took %.1f s)" % ((Time.get_ticks_msec() - t0) / 1000.0))
 	get_tree().quit()
 
@@ -107,7 +108,9 @@ func run_skills() -> Array:
 			var before := {}
 			for id in WORKER:
 				before[id] = float(s.skills[id].xp)
+			var tp := Perf.begin()
 			Skills.step(s, STEP_MIN * 60000.0, rng)
+			Perf.end("probe.skills_step_10min", tp)
 			for id in WORKER:
 				if float(s.skills[id].xp) > before[id]:
 					busy[id] += 1.0
@@ -344,6 +347,14 @@ func _combat(zone: String, rarity: int, level: int, runs := 2) -> Dictionary:
 	var key := "%s|%d|%d|%d" % [zone, rarity, lv, runs]
 	if _combat_cache.has(key):
 		return _combat_cache[key]
+	var tp := Perf.begin()
+	var out := _combat_run(zone, rarity, lv, runs)
+	Perf.end("probe.combat_battles", tp)
+	_combat_cache[key] = out
+	return out
+
+
+func _combat_run(zone: String, rarity: int, lv: int, runs: int) -> Dictionary:
 	var wins := 0
 	var xp := 0.0
 	var secs := 0.0
@@ -385,5 +396,4 @@ func _combat(zone: String, rarity: int, level: int, runs := 2) -> Dictionary:
 		xp += float(lead.xp) - xp0
 		wins += 1 if won else 0
 	var res := {"wins": wins, "xp_per_sec": xp / maxf(1.0, secs)}
-	_combat_cache[key] = res
 	return res
