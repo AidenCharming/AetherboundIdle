@@ -16,7 +16,7 @@ const AREA_COLORS := {
 	"UI": Color("b69cff"), "Nexus": Color("7ae8ff"), "Expeditions": Color("ff9e6b"), "Breeding": Color("ff8fc8"),
 	"Market": Color("ffd166"), "Sanctum": Color("8fd6ff"), "Skills": Color("66e3a0"), "Inventory": Color("f5c77e"),
 	"Options": Color("c3c8ea"), "Audio": Color("9be7c4"), "Saves": Color("a9b8ff"), "Game": Color("eef0ff"),
-	"Crafting": Color("e8b27a"), "Cooking": Color("ffb38a"), "Aether-Log": Color("9ee86b"),
+	"Crafting": Color("e8b27a"), "Cooking": Color("ffb38a"), "Aether-Log": Color("9ee86b"), "Achievements": Color("f2c14e"),
 }
 const ENTRY_WIDTH := 470
 

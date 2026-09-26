@@ -1,5 +1,18 @@
 [
 	{
+		"version": "0.7.0",
+		"date": "2026-09-25",
+		"title": "Achievements",
+		"notes": {
+			"New": [
+				["Achievements", "A new Achievements page under Collection: 111 badges across Skills, Aetherlings & Nexus, Adventure, Breeding and Secret, each with its own painting and a small Aether and gold reward. A few top ones grant a title."],
+				["Achievements", "Filter by category, or by earned and not yet. Progress bars show how close you are, and new unlocks are marked on the sidebar."],
+				["Achievements", "Secret achievements stay hidden behind a hint until you find them. Some Aetherlings don't like being poked. Over and over."],
+				["Achievements", "Progress you made before this update counts: those achievements unlock the first time you load your save."]
+			]
+		}
+	},
+	{
 		"version": "0.6.5b",
 		"date": "2026-09-25",
 		"title": "One shine",

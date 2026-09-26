@@ -4,9 +4,9 @@ For the next session (local or cloud, any model). This file is only **the rules,
 stand and what is open**. What was done or fixed is in `docs/CHANGELOG.md` (newest first); how each system works
 and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Open" below into a CHANGELOG entry.
 
-## Where things stand (2026-09-25, v0.6.5b)
+## Where things stand (2026-09-25, v0.7.0)
 
-- Current version **0.6.5b**. All 171 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
+- Current version **0.7.0** (Achievements). All 183 tests pass, zero warnings. The third code review (`docs/codereview.md`) is
   done except its deferred #10–#12 (see the CHANGELOG).
 - **Art is done:** every sprite and icon is in the game; the art docs are in `docs/archive/art/`.
 - **Benchmarks are the designer's to run** (not Claude's, on the local PC): `python tools/bridge.py run
@@ -17,15 +17,21 @@ and why is in `docs/DECISIONS.md`. When you finish something, move it out of "Op
 
 ## Open: code and balance
 
-1. **Achievements page (designer asked for it on the to-do list, 2026-09-25; plan it with the designer before
-   building, it's a new system).** Each skill already records the real time it reached each level
-   (`skills.<id>.levelTimes`); levels gained offline all get the same "now" stamp, which would need spreading
-   across the time away if a page shows them. `docs/cosmetics.md` has milestone-style rewards to build on.
-2. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
+1. Performance, nice to have: the Nexus keeps unchanged cards now (12 ms a refresh with 600 Aetherlings). Still
    rebuilding everything on each `Game.changed` at 600: the Aether-Log (~40 ms), Expeditions and skill pages
    (~25 ms), Market (~18 ms).
 ## Open: for the designer
 
+- **Paint the achievement art (0.7.0):** 57 paintings, each in its island backdrop's style. With ComfyUI running:
+  `python tools/art/achievement_art.py run --category secret` (or skills, nexus, adventure, breeding; `--dry-run`
+  first), look at the sheet in `D:\AIchievements\sheets\` (each row starts with its backdrop), `pick KEY N`,
+  then `finish` to install them at 512 px. Prompts: `docs/archive/art/art-prompts-achievements.md`; edit the `ART`
+  table in the tool and run `prompts`. The trophy nav icon has a prompt in `build_icon_prompts.py` (`--only
+  achievements` in icon_runner).
+- **Play-test the achievements and secrets (0.7.0):** reward sizes (`data/achievements.json`), names and hints,
+  and the secrets' feel: poke an Aetherling three times quickly (Nexus, work slots), rub the mouse over the Nexus
+  portrait, poke a perched one five times, knock an egg, click wild ones in battle, the rail's name (7 clicks),
+  the empty bell, the title screen's drifters and an old code there. Judge the runaway animation and the boing.
 - **Play-test the 0.6.5 rarity ladder:** each island brings one new rarity (Whisperleaf all Dim, Quarry adds
   Faint, … Stormsea adds Zenith) and the new top rarity, **Aetheric**, lives only on Zenith Spire (0.1% of its
   wilds, or a 4% mutation from two Zeniths on tier-10 materials). Judge the Aetheric look (grant one in

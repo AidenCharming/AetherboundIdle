@@ -68,7 +68,7 @@ Sections: [Engine and setup](#engine-and-project-setup) · [Art](#art) · [Sprit
   it never scrapes text. The fps check is skipped on a software renderer (the cloud's llvmpipe runs ~13 fps).
   `--movie` records the run with Movie Maker and keeps sampled frames of each animation clip with a
   jump/flicker/settle check (`tools/frame_stats.gd`).
-- **Tests:** `tests/test_*.gd`, 171 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
+- **Tests:** `tests/test_*.gd`, 183 tests (including `test_ui.gd`, which presses real dialog buttons), run headless (see the README). A script error or a `push_error` from game code fails the test it happens
   in (`t.expect_error(text)` for one a test triggers on purpose); the `--warnings` pass compiles every script
   afresh, so the autoloads' classes are checked too. Also `tests/tour.tscn`, which
   renders every screen and dialog to PNG (for visual checks), `tests/month_probe.tscn`, which runs a dedicated player's first month through the real sim (see Pacing), and `tests/balance_probe.tscn`, which prints
@@ -312,6 +312,41 @@ Onboarding is a chain of 112 goals from "Overseer Vance" on the Sanctum screen, 
 
 ## Added
 
+- **Achievements (0.7.0, designer's request; planned with the designer 2026-09-25).** `data/achievements.json`,
+  111 of them in five categories (Skills 41, Aetherlings & Nexus 23, Adventure 20, Breeding 12, Secret 15),
+  shown on their own page (`achievements_screen.gd`, under Collection) with category and earned/not-yet filters.
+  - **Checks** reuse `Goals.progress` (skill levels, counters, captures, zones, rarity...) plus a few of their own
+    in `scripts/sim/achievements.gd`: `secret` (UI pokes), `log` (Aether-Log tracks), `kind_owned`, `all_types`,
+    `perches_full`, `gold_peak`, `riches_to_rags`. `Sim.step` checks every `achievements.checkEvery` s (2 s);
+    offline progress and each secret poke check at once. More than 3 unlocks at once make one toast.
+  - **Rewards** are small and one-time (bronze 100 Aether + 50 gold, silver 1,000 + 500, gold 5,000 + 2,500,
+    secrets 250 + 250), and four titles (Grand Master, Shiny Hunter, Island Walker, Keeper of Secrets) plus
+    "The Pesterer" for the runaway secret, added to the Aether-Log's titles. No stat bonuses (design.md), so
+    the month pacing is unchanged (checked with the month probe).
+  - **New counters** for them: `wipes`, `shiniesSeen`, `shinyBinds`, `soloBoss` (a party of one), `shinyReleased`,
+    `goldPeak` (kept by `GameState.add_item`), `oneGoldSale`, `pearls`, `mutations` (an egg rarer than both parents;
+    eggs remember `parentRarity`), `bestBred`, `shinyHatches`. Counters before 0.7.0 weren't kept, so an old save
+    starts them at 0.
+  - **Old saves** unlock what they already earned on first load (`Achievements.backfill`, rewards paid) with one
+    summary toast instead of dozens, and those don't show as "new".
+  - **Art:** one painting per family (the tiers share it; the frame drawn in code shows the tier: bronze,
+    silver, gold, violet for secrets), 57 paintings plus the 10 island backdrops for the island clears. Every
+    painting is made in the backdrops' style (designer's request) by `tools/art/achievement_art.py`, which
+    paints through the edit graph with the island's backdrop (and the Aetherling's approved sprite) as
+    references. Shipped at 512 px in `assets/achievements/`; until then `make_icons.py` writes SVG placeholders.
+  - **Secrets** (designer's idea: click an Aetherling that's hopping, and on the third click it runs away).
+    A locked secret shows only a hint. The pokes live in the UI and only report to `Game.note_secret`:
+    - `CreaturePortrait.pokeable`: a click hops (with a boing); `poke_mode` "runaway" (Nexus detail, work
+      slots, the welcome dialog) dashes off the plate on the third poke within 3 s and peeks back; "sulk"
+      (Sanctum perches) turns its back after five; "stare" (wild ones in battle) glares at once; "hop" (the
+      title screen's drifters: five hops, and a shiny one is a wish). `pettable` (Nexus detail): rubbing the
+      mouse back and forth floats a heart; 25 pets.
+    - Eggs in the pods squeak on the third knock; the rail's name bounces its letters after 7 clicks; the bell
+      with nothing unread shakes (10 rings); the Konami code on the title screen makes the logo a rainbow.
+    - Play patterns: playing at 3 AM local time, releasing a shiny, 10 wipes, a sale worth exactly 1 gold, and
+      Riches to Rags (under 1,000 gold after once holding 1,000,000; designer's numbers).
+    - Title-screen secrets happen with no save loaded: they wait in `Options.secrets_pending` and are granted
+      when a slot starts.
 - **Title screen, three save slots, Options and in-game pause menu** (designer's request during the
   build): Continue (most recent slot), New Game (pick a slot; overwriting asks first), Load Game (slot
   cards show play time, creatures, species, best skill, islands cleared, last played; delete with

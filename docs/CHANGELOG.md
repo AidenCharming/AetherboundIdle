@@ -3,6 +3,29 @@
 Everything that is done or fixed, newest first, with the reasons. `HANDOFF.md` has what is open now;
 `DECISIONS.md` has how each system works and why. Player-facing notes are in `data/patch_notes.json`.
 
+## 0.7.0 (2026-09-25): Achievements
+
+- **The designer's request** (planned together first, since it's a new system): an Achievements page with
+  painted, square tiles that refer to each achievement, secret achievements, a filter by category (Skills,
+  Aetherlings & Nexus, Adventure, Breeding, Secret), and interactive secrets built on the idle hop: click an
+  Aetherling and it jumps, and the third click sends it running. Designer's answers: art as full-bleed square
+  scenes shipped at 512 px, small Aether/gold rewards plus titles, about 110 achievements and 60 paintings, all
+  four secret groups, "Riches to Rags" as under 1,000 gold after holding a million, and (added mid-plan) every
+  painting in the island backdrops' style since the island clears reuse the backdrops.
+- 111 achievements (`data/achievements.json`, `scripts/sim/achievements.gd`), checked from `Sim.step` every 2 s,
+  after offline progress and on each secret; old saves backfill quietly with one toast. See DECISIONS.
+- The page (`achievements_screen.gd`, `achievement_tile.gd`): tier frames drawn in code, dimmed art and a
+  progress bar until earned, "?" and a hint for a hidden secret, a detail view with the full painting, "N new"
+  on the rail.
+- Secrets in the UI: pokeable portraits (hop, runaway, sulk, stare), petting, knocking eggs, the bouncing rail
+  name, the empty bell, title-screen drifters and the Konami code. New synthesized sounds: achievement, boing,
+  squeak, zip.
+- `tools/art/achievement_art.py`: the ComfyUI tool for the 57 paintings (edit graph, island backdrop and sprite
+  as references). Nothing generated yet (the designer's to run). `make_icons.py` writes the placeholders and the
+  trophy icon, and now writes LF line endings (it had been leaving every SVG "modified" on Windows).
+- Tests: `test_achievements.gd` (data, unlock and reward, secrets, riches to rags, backfill, pending title-screen
+  secrets, breeding counters) and two UI tests (the page's filters and hidden secrets; pokes, sulk and knocks).
+
 ## 0.6.5b (2026-09-25): one shine on shinies
 
 - The designer saw two separate shines on a shiny Zenith: the shiny's own thin, repeating diagonal stripes
