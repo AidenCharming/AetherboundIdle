@@ -197,6 +197,7 @@ I("nexus", "ui", "Navigation", "g", "A plump cartoon creature paw in cream fur, 
 I("pods", "ui", "Navigation", "g", "A single large egg standing upright, with a pearly white shell dotted with lilac and pale-cyan spots.")
 I("expeditions", "ui", "Navigation", "m", "An open brass pocket compass with a cream face, a red-and-grey needle and small dark tick marks.", view="facing the viewer")
 I("aetherlog", "ui", "Navigation", "g", "A thick closed book with a violet leather cover, gold metal corner caps and a gold star emblem on the front.")
+I("achievements", "ui", "Navigation", "m", "A chunky golden trophy cup with two curved handles on a short stem and a dark brown wooden base, a white highlight shape on the cup.", view="facing the viewer")
 I("inventory", "ui", "Navigation", "m", "A brown leather satchel backpack with a buckled flap and a small gold clasp.")
 I("works", "ui", "Navigation", "m", "A large steel cog wheel with a smaller brass cog meshed beside it.", view="facing the viewer")
 I("settings", "ui", "Navigation", "m", "A single chunky steel-grey cog wheel with visible thickness, a raised bevelled rim around a round hole in its centre, soft shading on the teeth and white highlight shapes, drawn with depth like a solid metal part, not a flat symbol.", view="facing the viewer")
