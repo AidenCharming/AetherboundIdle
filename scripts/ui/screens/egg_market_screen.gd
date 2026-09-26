@@ -37,11 +37,17 @@ func refresh() -> void:
 	if s.is_empty():
 		return
 	_window = Market.window(Game.now_sec())
-	UI.clear(_body)
 	var best := Market.best_grade(s)
 	if grade < 0 or grade > best:
 		grade = best
 	var f: Dictionary = Market.stock(s, Game.now_sec()).featured
+	# what the page shows: the stock, the grades, and whether each egg can be bought now
+	var checks := Data.type_list.map(func(t): return Market.egg_check(s, t.id, grade))
+	if not UI.stale(self, "page", [_window, grade, best, f, s.market, Market.egg_types(s), checks,
+			float(s.gold) >= float(f.get("gold", 0)), Breeding.free_pod(s) >= 0]):
+		_tick()
+		return
+	UI.clear(_body)
 	if not f.is_empty():
 		_body.add_child(_featured_card(f))
 	# grade chips: the ones on sale, then the next one locked

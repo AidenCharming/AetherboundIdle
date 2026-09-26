@@ -119,6 +119,12 @@ func _pages() -> void:
 	for p in pages:
 		main.show_screen(p[0], p[1])
 		await get_tree().process_frame
+	# each page once more: the first open also loads its sprites and icons, the second is the page alone
+	for p in pages:
+		main.show_screen("works" if p[0] != "works" else "market")
+		await get_tree().process_frame
+		main.show_screen(p[0], p[1])
+		await get_tree().process_frame
 		for i in 5:
 			var t0 := Perf.begin()
 			main._screen.refresh()

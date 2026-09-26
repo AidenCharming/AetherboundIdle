@@ -188,8 +188,13 @@ func _make_card(c: Dictionary) -> CreatureCard:
 # ---------------------------------------------------------------- detail panel
 
 func _fill_detail() -> void:
-	UI.clear(_detail)
 	var c := GameState.creature(Game.state, selected)
+	# the panel shows this creature, the open work slots per skill and whether the party is locked
+	var open_slots := Data.skill_list.map(func(sk): return GameState.slot_count(Game.state, sk.id))
+	if not UI.stale(self, "detail", [selected, UI.creature_key(c) if not c.is_empty() else 0, GameState.roster_revision(Game.state),
+			open_slots, Expedition.party_locked(Game.state), Game.state.expedition.party]):
+		return
+	UI.clear(_detail)
 	if c.is_empty():
 		_detail.add_child(UI.label("Choose an Aetherling.", "Dim"))
 		return

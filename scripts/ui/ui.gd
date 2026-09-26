@@ -254,11 +254,12 @@ static func clear(node: Node) -> void:
 ## key goes stale, so keys are generous: they leave out only what changes all the time (XP, progress, item
 ## counts that live labels already update).
 static func stale(node: Object, section: String, key: Variant) -> bool:
-	var meta := "refresh_key_" + section
+	var keys: Dictionary = node.get_meta("refresh_keys", {})
 	var h := hash(key)
-	if node.has_meta(meta) and int(node.get_meta(meta)) == h:
+	if keys.has(section) and int(keys[section]) == h:
 		return false
-	node.set_meta(meta, h)
+	keys[section] = h
+	node.set_meta("refresh_keys", keys)
 	return true
 
 

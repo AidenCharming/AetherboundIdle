@@ -107,8 +107,6 @@ func refresh() -> void:
 	for id in _stations:
 		var st: Dictionary = _stations[id]
 		var skill: Dictionary = Data.skills[id]
-		UI.clear(st.workers)
-		st.bubbles.clear()
 		var ws := GameState.workers(s, id)
 		var usable: bool = skill.type == null or Collection.owned_type(s, skill.type)
 		var action := Skills.current_action(s, id)
@@ -123,6 +121,10 @@ func refresh() -> void:
 			st.card.modulate = Color.WHITE
 		# up to five bubbles a row (bought slots make a second row); they shrink to fit a full row
 		var n := GameState.slot_count(s, id)
+		if not UI.stale(self, "station_" + id, [ws.map(UI.creature_key), n, action.id]):
+			continue
+		UI.clear(st.workers)
+		st.bubbles.clear()
 		var cols := mini(n, 5)
 		var room := 272 - (36 if ws.size() > 0 else 0)
 		var px := clampi(int((room - 7 * (cols - 1)) / float(cols)), 41, 70)
@@ -195,8 +197,39 @@ func _fill_goal() -> void:
 
 func _fill_side_rest(s: Dictionary) -> void:
 	# perches
-	UI.clear(_perch_box)
 	var perched := Economy.perched(s)
+	_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
+	if UI.stale(self, "perches", [perched.map(UI.creature_key), GameState.upgrade_value(s, "perches")]):
+		_fill_perches(s, perched)
+	# the expedition card keeps itself live from _process; build it again only when the run or the party moved
+	if UI.stale(self, "expedition", [_expedition_key(), GameState.party(s).map(UI.creature_key), s.expedition.zone]):
+		_fill_expedition()
+	# pods
+	var ready_count := Game.ready_eggs().size()
+	if not UI.stale(self, "pods", [s.pods, ready_count]):
+		return
+	UI.clear(_pods_box)
+	_pods_box.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("pods"), 29), UI.label("Genesis Pods", "H3")]))
+	var now := Game.now_sec()
+	var eggs := UI.hbox(10)
+	for egg in s.pods:
+		if egg.is_empty():
+			var e := WorkerBubble.make({}, "woodcutting", 55)
+			e.tooltip_text = "Empty pod"
+			eggs.add_child(e)
+		else:
+			var ev := EggView.make(egg, 55)
+			ev.tooltip_text = "Ready to hatch!" if Breeding.is_ready(egg, now) else "Hatches in " + F.format_seconds(Breeding.remaining(egg, now))
+			eggs.add_child(ev)
+	_pods_box.add_child(eggs)
+	if ready_count > 0:
+		_pods_box.add_child(UI.button("Hatch %d egg%s" % [ready_count, "" if ready_count == 1 else "s"], "Gold", func(): Main.go("pods")))
+	else:
+		_pods_box.add_child(UI.button("Breed Aetherlings", "", func(): Main.go("pods")))
+
+
+func _fill_perches(s: Dictionary, perched: Array) -> void:
+	UI.clear(_perch_box)
 	for c in perched:
 		var por := CreaturePortrait.of(c, 72)
 		por.glow_scale = 0.6
@@ -213,28 +246,6 @@ func _fill_side_rest(s: Dictionary) -> void:
 		var e := WorkerBubble.make({}, "woodcutting", 72)
 		e.tooltip_text = "Empty perch: any resting Aetherling sits here"
 		_perch_box.add_child(e)
-	_perch_rate.text = "+%s/min" % F.format_num(Economy.aether_per_min(s))
-	_fill_expedition()
-	# pods
-	UI.clear(_pods_box)
-	_pods_box.add_child(UI.hbox(10, [UI.icon(Data.ui_icon("pods"), 29), UI.label("Genesis Pods", "H3")]))
-	var now := Game.now_sec()
-	var eggs := UI.hbox(10)
-	for egg in s.pods:
-		if egg.is_empty():
-			var e := WorkerBubble.make({}, "woodcutting", 55)
-			e.tooltip_text = "Empty pod"
-			eggs.add_child(e)
-		else:
-			var ev := EggView.make(egg, 55)
-			ev.tooltip_text = "Ready to hatch!" if Breeding.is_ready(egg, now) else "Hatches in " + F.format_seconds(Breeding.remaining(egg, now))
-			eggs.add_child(ev)
-	_pods_box.add_child(eggs)
-	var ready_count := Game.ready_eggs().size()
-	if ready_count > 0:
-		_pods_box.add_child(UI.button("Hatch %d egg%s" % [ready_count, "" if ready_count == 1 else "s"], "Gold", func(): Main.go("pods")))
-	else:
-		_pods_box.add_child(UI.button("Breed Aetherlings", "", func(): Main.go("pods")))
 
 
 ## The expedition card: where the party is, their health and the newest log lines. It is kept live from
